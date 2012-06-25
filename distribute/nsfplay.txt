@@ -116,7 +116,7 @@ Channel options:
 Versions
 ========
 
-NSFPlay 2.2 - ?/??/????
+NSFPlay 2.2 - BETA VERSION 0
 - Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
 - Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
 - Inverted VRC7 volume display in keyboard view.
