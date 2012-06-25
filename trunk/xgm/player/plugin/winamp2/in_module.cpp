@@ -31,10 +31,11 @@ void WA2InputModule::PreAutoStop()
 DWORD WINAPI __stdcall WA2InputModule::PlayThread(WA2InputModule *_t)
 {
   xgm::INT16 *packet_buf;
-  int packet_size = 2048 * _t->nch * _t->bps / 8; // バッファサイズ2048bytes固定
-  int blank_time = 10 * _t->rate / 48000; // 最初の数パケットは無音にする(DirectX plugin対策)
+  int packet_size = 576 * _t->nch * _t->bps / 8; // バッファサイズ2048bytes固定
+  int blank_time = 10; // 最初の数パケットは無音にする(DirectX plugin対策)
   int wsize; // dsp処理後の書き込みサイズ
   int sample_size = _t->nch * _t->bps / 8;
+  int packet_samples = packet_size / sample_size;
 
   packet_buf = new xgm::INT16[packet_size]; // dspのために2倍の領域を確保
   memset(packet_buf,0,packet_size*sizeof(xgm::INT16));
@@ -62,7 +63,6 @@ DWORD WINAPI __stdcall WA2InputModule::PlayThread(WA2InputModule *_t)
     if(_t->seek_flag)
     {
       int to_skip = _t->seek_pos - _t->decode_pos;
-      int packet_samples = packet_size / sample_size;
 
       if(to_skip > packet_samples)
       {
@@ -79,6 +79,7 @@ DWORD WINAPI __stdcall WA2InputModule::PlayThread(WA2InputModule *_t)
     
     if(_t->pMod->outMod->CanWrite() >= (packet_size<<(_t->pMod->dsp_isactive()?1:0)))
     {
+      int write_pos = _t->decode_pos;
       if(blank_time)
       {
         memset(packet_buf,0,packet_size*sizeof(xgm::INT16));
@@ -86,19 +87,19 @@ DWORD WINAPI __stdcall WA2InputModule::PlayThread(WA2InputModule *_t)
       }
       else
       {
-        _t->decode_pos += _t->pl->Render(packet_buf,packet_size/sample_size);
+        _t->decode_pos += _t->pl->Render(packet_buf,packet_samples);
       }
 
       if(_t->pMod->dsp_isactive())
-        wsize = _t->pMod->dsp_dosamples((short *)packet_buf,2048,_t->bps,_t->nch,_t->rate) * (_t->nch*_t->bps/8);
+        wsize = _t->pMod->dsp_dosamples((short *)packet_buf,packet_samples,_t->bps,_t->nch,_t->rate) * (_t->nch*_t->bps/8);
       else 
         wsize = packet_size;
 
       _t->pMod->outMod->Write((char *)packet_buf, wsize);
       //_t->decode_pos += packet_size / sample_size; // BS using Render return instead
       // (marking blank time as encoded results in inaccurate seek times being reported to keyboard view)
-      _t->pMod->SAAddPCMData(packet_buf,_t->nch,_t->bps,POS2MS(_t->decode_pos,_t->rate));
-      _t->pMod->VSAAddPCMData(packet_buf,_t->nch,_t->bps,POS2MS(_t->decode_pos,_t->rate));
+      _t->pMod->SAAddPCMData(packet_buf,_t->nch,_t->bps,POS2MS(write_pos,_t->rate));
+      _t->pMod->VSAAddPCMData(packet_buf,_t->nch,_t->bps,POS2MS(write_pos,_t->rate));
     }
     else Sleep(10);
   }
@@ -202,7 +203,7 @@ int WA2InputModule::Play(char *fn)
 
   pMod->SetInfo(rate*bps*nch/1000, rate/1000, nch, 1);
   pMod->SAVSAInit(maxlatency, rate);
-	pMod->VSASetInfo(rate,nch);
+  pMod->VSASetInfo(rate,nch);
   pMod->outMod->SetVolume(-666);
   pMod->outMod->Flush(0);
   pause_flag = false;

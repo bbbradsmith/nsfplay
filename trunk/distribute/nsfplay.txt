@@ -116,6 +116,12 @@ Channel options:
 Versions
 ========
 
+NSFPlay 2.2 - ?/??/????
+- Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
+- Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
+- Inverted VRC7 volume display in keyboard view.
+- Unmute on reset now sets $4015 to $0F instead of $1F.
+
 NSFPlay 2.1 - 3/27/2012
 Audio Output:
 - Fixed race condition in audio buffering; stand alone NSFPlay would occasionally get stuck stuttering.
@@ -160,7 +166,6 @@ Other:
 - Added extra NSF header information to "misc" text box, initial banks, load/init/play addresses, etc.
 - Fixed thread-safety issue for configuration (was accessed liberally from many threads).
 - Removed legacy code for windows versions older than XP.
-
 
 NSFPlay 2.0 - 2/22/2012
 - Restructured sln/vcproj files, and rebuilt for VS9.

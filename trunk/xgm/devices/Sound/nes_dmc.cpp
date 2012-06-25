@@ -378,10 +378,9 @@ namespace xgm
     for (i = 0; i < 0x10; i++)
       Write (0x4008 + i, 0);
 
+    Write (0x4015, 0x00);
     if (option[OPT_UNMUTE_ON_RESET])
-      Write (0x4015, 0x1f);
-    else
-      Write (0x4015, 0x00);
+      Write (0x4015, 0x0f);
 
     out[0] = out[1] = out[2] = 0;
     tri_freq = 0;
