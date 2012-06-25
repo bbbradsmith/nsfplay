@@ -1,0 +1,50 @@
+Portable 6502/65c02/HuC6280 emulator 'KM6502'
+Location: http://www.proc.org.tohoku.ac.jp/befis/
+Author:   Mamiya (mamiya@proc.org.tohoku.ac.jp)
+Language: ANSI-C
+License:  PDS
+
+
+
+<Japanese(SJIS)>
+
+移植性重視(のつもりの)の 6502,65c02,HuC6280 エミュレーターです。
+
+エラッタは判明している物については再現しています。
+ただし6502初期版の ROR が使えない問題は再現しません。
+6502の未定義命令には対応していません。
+65c02 の STP,WAI 命令は実装していません。
+huC6280 の CSL,CSH 命令は未完成です。
+
+    本エミュレーターは kmconfig.h で定義される二つの型のみ使用します。
+    通常は kmconfig.h を書き換える必要はありません。
+
+    Uword
+        0 から 65535 までを表せる整数型なら何でも良いです。
+        なるべく高速に処理できるものが望ましいです。
+        通常は unsigned int 型が最適です。
+        デフォルトは unsigned int です。
+
+    Ubyte
+        0 から 129 までを表せる整数型なら何でも良いです。
+        テーブルに用いられる型なので、配列にした場合に、
+        なるべく小さくなるものが望ましいです。
+        通常は unsigned char 型が最適です。
+        デフォルトは unsigned char です。
+
+    USE_INLINEMMC
+    USE_CALLBACK
+        メモリアクセス等にコールバック関数を用います。
+        デフォルトは 4Kbytes バンクの MMC を内蔵します。
+        またコールバック関数使用時の外部ラベルは一つのみです。
+
+    Inline
+        VC++(__inline) や GCC(__inline__) では kmconfig.h で、
+        自動的に定義されます。
+        定義しない場合はインライン関数は使いません。
+
+    ライブラリ
+        他のライブラリは一切使用しません。
+
+    バイトオーダー
+        特に関係ありません。

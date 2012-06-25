@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mgscwin", "mgscwin.vcproj", "{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xgm", "..\xgm\xgm.vcproj", "{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+		{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}.0 = {9A3DDFD1-D499-4AB2-A040-C1D5CB345045}
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}.Debug.ActiveCfg = Debug|Win32
+		{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}.Debug.Build.0 = Debug|Win32
+		{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}.Release.ActiveCfg = Release|Win32
+		{552F8D98-1075-4FF8-B42B-C3CA9ACB004F}.Release.Build.0 = Release|Win32
+		{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}.Debug.ActiveCfg = Debug|Win32
+		{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}.Debug.Build.0 = Debug|Win32
+		{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}.Release.ActiveCfg = Release|Win32
+		{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

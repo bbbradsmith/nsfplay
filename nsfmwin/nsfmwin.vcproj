@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding = "shift_jis"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="nsfmwin"
+	ProjectGUID="{6EF9BB41-276F-4C7D-B3DE-BFEE67ED5585}"
+	Keyword="MFCProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="Debug"
+			IntermediateDirectory="Debug"
+			ConfigurationType="1"
+			UseOfMFC="1"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="../xgm"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				TreatWChar_tAsBuiltInType="TRUE"
+				UsePrecompiledHeader="3"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="4"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="nafxcwd.lib libcpmtd.lib libcmtd.lib"
+				LinkIncremental="2"
+				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib;libcpmtd.lib"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="FALSE"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
+			ConfigurationType="1"
+			UseOfMFC="1"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				OmitFramePointers="TRUE"
+				AdditionalIncludeDirectories="../xgm"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
+				StringPooling="TRUE"
+				MinimalRebuild="FALSE"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="TRUE"
+				TreatWChar_tAsBuiltInType="TRUE"
+				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="3"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="nafxcw.lib libcpmt.lib libcmt.lib"
+				LinkIncremental="1"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libcpmt;libcmt;nafxcw.lib"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="FALSE"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="ソース ファイル"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
+			<File
+				RelativePath="OptionDlg.cpp">
+			</File>
+			<File
+				RelativePath="nsfmeasure.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="nsfmwin.cpp">
+			</File>
+			<File
+				RelativePath="nsfmwinDlg.cpp">
+			</File>
+			<File
+				RelativePath="stdafx.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="ヘッダー ファイル"
+			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="OptionDlg.h">
+			</File>
+			<File
+				RelativePath="Resource.h">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="ヘルプ コンパイラ用のマップ ファイルを生成しています..."
+						CommandLine="echo // 生成されたマップ ファイルです。次で使用されます。nsfmwin.HHP. &gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt; &quot;hlp\HTMLDefines.h&quot;
+echo // コマンド (ID_* and IDM_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // プロンプト (IDP_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // リソース (IDR_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // ダイアログ (IDD_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // フレーム コントロール (IDW_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+"
+						Outputs="hlp\HTMLDefines.h"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="ヘルプ コンパイラ用のマップ ファイルを生成しています..."
+						CommandLine="echo // 生成されたマップ ファイルです。次で使用されます。nsfmwin.HHP. &gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt; &quot;hlp\HTMLDefines.h&quot;
+echo // コマンド (ID_* and IDM_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h ID_,HID_,0x10000 IDM_,HIDM_,0x10000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // プロンプト (IDP_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDP_,HIDP_,0x30000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // リソース (IDR_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDR_,HIDR_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // ダイアログ (IDD_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h IDD_,HIDD_,0x20000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo. &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+echo // フレーム コントロール (IDW_*) &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+makehm /h /a afxhh.h IDW_,HIDW_,0x50000 &quot;$(InputFileName)&quot; &gt;&gt; &quot;hlp\HTMLDefines.h&quot;
+"
+						Outputs="hlp\HTMLDefines.h"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="nsfmeasure.h">
+			</File>
+			<File
+				RelativePath="nsfmwin.h">
+			</File>
+			<File
+				RelativePath="nsfmwinDlg.h">
+			</File>
+			<File
+				RelativePath="stdafx.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="リソース ファイル"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest">
+			<File
+				RelativePath="res\idr_main.ico">
+			</File>
+			<File
+				RelativePath="res\nsfmwin.ico">
+			</File>
+			<File
+				RelativePath="res\nsfmwin.manifest">
+			</File>
+			<File
+				RelativePath="nsfmwin.rc">
+			</File>
+			<File
+				RelativePath="res\nsfmwin.rc2">
+			</File>
+		</Filter>
+		<Filter
+			Name="HTML ヘルプ ファイル"
+			Filter="hhp;hhc;hhk;gif;jpg">
+			<File
+				RelativePath="hlp\nsfmwin.hhc">
+			</File>
+			<File
+				RelativePath="hlp\nsfmwin.hhk">
+			</File>
+			<File
+				RelativePath="hlp\nsfmwin.hhp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="ヘルプ ファイルを作成しています..."
+						CommandLine="start /wait hhc &quot;hlp\nsfmwin.hhp&quot;
+if not exist &quot;hlp\nsfmwin.chm&quot; goto :HelpError
+copy &quot;hlp\nsfmwin.chm&quot; &quot;$(OutDir)\nsfmwin.chm&quot;
+goto :HelpDone
+:HelpError
+echo hlp\nsfmwin.hhp(1) : error:ヘルプ ファイルを作成中に問題が発生しました。
+echo.
+:HelpDone
+echo.
+"
+						AdditionalDependencies="hlp\HTMLDefines.h"
+						Outputs="$(OutDir)\$(ProjectName).chm"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="ヘルプ ファイルを作成しています..."
+						CommandLine="start /wait hhc &quot;hlp\nsfmwin.hhp&quot;
+if not exist &quot;hlp\nsfmwin.chm&quot; goto :HelpError
+copy &quot;hlp\nsfmwin.chm&quot; &quot;$(OutDir)\nsfmwin.chm&quot;
+goto :HelpDone
+:HelpError
+echo hlp\nsfmwin.hhp(1) : error:ヘルプ ファイルを作成中に問題が発生しました。
+echo.
+:HelpDone
+echo.
+"
+						AdditionalDependencies="hlp\HTMLDefines.h"
+						Outputs="$(OutDir)\$(ProjectName).chm"/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="HTML ヘルプ トピック"
+			Filter="htm;html">
+			<File
+				RelativePath="hlp\COPYRIGHT.htm"
+				DeploymentContent="TRUE">
+			</File>
+			<File
+				RelativePath="hlp\HIDD_OPTION.htm"
+				DeploymentContent="TRUE">
+			</File>
+			<File
+				RelativePath="hlp\HIDD_ROOT_DIALOG.htm"
+				DeploymentContent="TRUE">
+			</File>
+			<File
+				RelativePath="hlp\INTRO.htm"
+				DeploymentContent="TRUE">
+			</File>
+			<File
+				RelativePath="hlp\TAG2PLS.htm"
+				DeploymentContent="TRUE">
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
