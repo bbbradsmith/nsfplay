@@ -8,10 +8,11 @@ TODO
 - NSF2
 - Debug trace code
 - Randomize RAM option
-- N163 horrible sound accuracy (maybe later)
+- N163 horrible sound accuracy
 - N163 volume vs num channels
 - User option for VRC7 patches
 - VRC7 correct patches
+- VRC7 accuracy
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
@@ -26,3 +27,4 @@ TODO
 - Unmute on reset option for MMC5?
 - 5B polarity is reversed
 - Set more accurate levels for all expansions
+- Some Japanese text is ??????? instead of text.
