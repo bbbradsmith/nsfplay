@@ -1,0 +1,183 @@
+NSFPlay/NSFPlug
+===============
+
+This is an NSF player program for Windows, and also a Winamp plugin. The original version of this program was written by Brezza and is still available at pokipoki.org.
+
+To use as a Winamp plugin, simply copy the contents of the plugins folder to your Winamp plugins folder.
+
+Full source code is available on my website at: http://rainwarrior.ca/projects/nsfplay/
+
+If you have any questions, comments, or find any bugs, please send them to me.
+
+Brad Smith
+rainwarrior AT gmail.com
+http://rainwarrior.ca
+
+
+NSFPlay Keyboard controls
+=========================
+
+  B > Next
+  X > Play
+  Z > Prev
+  V > Stop
+  C > Pause
+
+
+Command line arguments
+======================
+
+  NSFPlay [filename]
+    > Open and begin playing NSF file.
+
+  NFSPlay [nsf_filename] [wav_filename] [track] [milliseconds]
+    > Create WAV file from command line (cuts off after milliseconds are reached, or loop detection).
+
+
+Configuration files
+===================
+
+The default configuration file is in_yansf.ini, found in the plugins folder.
+
+Global options:
+  RATE: samplerate
+  NCH: 0-1 number of channels
+  BPS: 16 bits per sample (don't change this)
+  MASK: bitfield channel mask (1 bit mutes channel)
+  PLAY_TIME: (ms) default play time
+  FADE_TIME: (ms) fade out time
+  STOP_SEC: (s) seconds of silence before auto stop
+  LOOP_NUM: (#) loops to allow before stopping
+  AUTO_STOP: 1/0 automatically stop after silence yes/no
+  DETECT_TIME: (ms) loop detection comparison buffer
+  DETECT_INT: (ms) jitter allowed between time comparisons in loop detection
+  LPF: 0-400 lowpass filter strength (0=off, 400=full)
+  HPF: 0-256 highpass filter strength (256=off, 0=full)
+  ENABLE_DCF: 1/0 enable DC-bias filter
+  TITLE_FORMAT: winamp title string format
+  DETECT_ALT: 1/0 use alternate loop detection algorithm
+  VSYNC_ADJUST: 1/0 ignore NSF frame length setting (yes/no)
+  MULT_SPEED: clock multiplier (256 = no multiplier)
+  COMP_LIMIT: 0-100 compressor limit
+  COMP_THRESHOLD: 0-100 compressor threshold
+  COMP_VELOCITY: 0-100 compressor velocity
+  NES_BASECYCLES: NTSC master clock speed
+  PAL_BASECYCLES: PAL master clock speed * 12/16 (sorry, weird conversion being done)
+  PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
+  MASTER_VOLUME: 0-255 master volume
+
+TITLE_FORMAT text replacement:
+  %F/%f > filename
+  %P/%p > path
+  %T/%t > NSF title
+  %A/%a > NSF artist
+  %C/%c > NSF copyright
+  %N > song number, 2-digit hex with leading zero
+  %n > song number, 3-digit decimal with leading zeroes
+  %S > NSF starting song, 2-digit hex with leading zero
+  %s > NSF starting song, 3-digit decimal with leading zeroes
+  %E > NSF song count, 2-digit hex with leading zero
+  %e > NSF song count, 3-digit decimal with leading zeroes
+
+Device options:
+  Devices (XXX) are: APU1, APU2, 5B, MMC5, N163, VRC6, VRC7, FDS
+  XXX_VOLUME: 0-255 device volume
+  XXX_QUALITY: 0-3 oversampling control
+  XXX_FILTER: 1/0 lowpass filter on/off
+  XXX_FC: RC filter C (0 = off)
+  XXX_FR: RC filter R (0 = off)
+  XXX_MUTE: 1/0 mute channel yes/no
+  XXX_THRESHOLD: 0-100 compressor threshold (100=off)
+  APU1_OPTION0: unmute on reset
+  APU1_OPTION1: phase reset
+  APU1_OPTION2: frequency limit
+  APU1_OPTION3: nonlinear mixing
+  APU2_OPTION0: enable $4011 writes
+  APU2_OPTION1: enable periodic noise
+  APU2_OPTION2: unmute on reset
+  APU2_OPTION3: anti clicking
+  APU2_OPTION4: nonlinear mixer
+  APU2_OPTION5: randomize noise on reset
+  FDS_OPTION0: modulator reset
+  FDS_OPTION1: carrier reset
+  FDS_OPTION2: pulse width modulation
+  MMC5_OPTION0: nonlinear mixing
+  MMC5_OPTION1: phase reset
+
+Channel options:
+  There are 29 channels, as appear vertically in the channel mixer, numbered (XX) from 00 to 28.
+  CHANNEL_XX_PAN: 0-255 panning (0=left, 255=right, 128=centre)
+  CHANNEL_XX_VOL: 0-128 volume
+  CHANNEL_XX_COL: hex string for keyboard view colour (exactly six characters, no leading space)
+  5B_ENVELOPE_COL: keyboard colour for 5B envelope
+  5B_NOISE_COL: keyboard colour for 5B noise
+
+
+Versions
+========
+
+NSFPlay 2.1 - 3/27/2012
+Audio Output:
+- Fixed race condition in audio buffering; stand alone NSFPlay would occasionally get stuck stuttering.
+- Produces stereo output, channel mixer dialog for panning and per-channel volume control.
+- Fixed PCM playback speed; CPU execution was counting requested clocks, not clocks executed.
+- Fixed accuracy of seek times.
+- Loop detection now accounts for all audio registers, not just a subset of 2A03 and N163.
+- N163 wavelength is actually 6-bit, not 3. Now allows sample length up to 256.
+- Fixed FDS volume/sweep envelope caps. (Direct register writes can make them louder.)
+- Fixed FDS modulation bias calculation and wrapping.
+- Set default volume for VRC7 and FDS a little lower (to match expected levels).
+- MMC5 PCM support (for both read and write mode).
+- Added phase reset option to MMC5.
+- MMC5 was missing length counter and audio register reads; rewrote to conform with APU.
+- Adjusted phases for APU/MMC5 square channels to match NesDev's description.
+- APU/DMC/MMC5 rewrite of envelope/length/sweep behaviour to use a frame sequencer instead of independent timers.
+Options:
+- Option to randomize noise on reset (on by default).
+- Options cleanup, removed unused/deprecated options from .ini file.
+- Using global LPF by default instead of on each device (saves CPU, same result).
+- Keyboard view channel colour is now customizable in .ini file (CHANNEL_XX_COL).
+Keyboard view:
+- Fixed crash due to keyboard OnTimer being allowed before Reset() is executed by the PlayThread.
+- Double buffering keyboard view to remove flicker.
+- Different colours for different expansions in keyboard view.
+- Fixed sound lag after seek.
+- FME-7 now named 5B, N106 now named N163.
+- DPCM now named DMC in keyboard view.
+- Fixed 5B volume display (E now correctly indicates envelope, volume is now correct value).
+- 5B now displays envelope and noise.
+- VRC6 saw volume now displays accumulator register.
+- Corrected VRC6 saw pitch in keyboard view.
+- Fixed trailing lines on N163 waveform display.
+- DMC volume display no longer flipped (is now $4011 register value).
+- DMC now shows sample frequency rather than byte frequency.
+- Triangle and noise were not showing muting due to length counter of 0.
+- Noise now has frequency display (either rate of random samples, or tonal frequency for periodic noise).
+- Removed feature that extends the life of key dots beyond the frame the channel is active (frequency can change when key is silent, esp. VRC6 squares, which visibly jump to the wrong pitch)
+Other:
+- Save WAV button on NSFPlay.
+- Command line WAV output for batch processing.
+- Added extra NSF header information to "misc" text box, initial banks, load/init/play addresses, etc.
+- Fixed thread-safety issue for configuration (was accessed liberally from many threads).
+- Removed legacy code for windows versions older than XP.
+
+
+NSFPlay 2.0 - 2/22/2012
+- Restructured sln/vcproj files, and rebuilt for VS9.
+- All intermediate files go into common Debug/Release directories.
+- Renamed wa2nsf project to in_yansf to match name of the plugin.
+- Fixed improperly set WAVEFORMATEX header in libemuwa2 (allows execution on windows Vista/7).
+- Corrected pitch of noise channel.
+- Updated VRC7 default patch set.
+- Added PAL support and pal flags indicator (PREFER_PAL=1 to prefer PAL for dual mode).
+- Added about box for determining build version.
+- Fixed some menu items in English dialogs.
+- Fixed some initial config settings.
+- Fixed crash when using playlist menu options with no loaded NSF.
+
+NSFPlay - 12/09/2006
+- Written by Brezza > http://www.pokipoki.org/dsa/index.php?NSFplay
+
+
+===============
+end of document

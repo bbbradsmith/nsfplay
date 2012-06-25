@@ -1,0 +1,22 @@
+[OPTIONS]
+Auto Index=Yes
+Compatibility=1.1 or later
+Compiled file=nsfplug.chm
+Contents file=nsfplug.hhc
+Index file=nsfplug.hhk
+Default topic=intro.htm
+Display compile progress=Yes
+Full-text search=Yes
+Language=0x411 “ú–{Œê
+
+
+[FILES]
+intro.htm
+
+[ALIAS]
+
+[MAP]
+
+[TEXT POPUPS]
+
+[INFOTYPES]

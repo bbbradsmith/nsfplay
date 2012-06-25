@@ -1,0 +1,127 @@
+[NSFplug for Winamp2 概要]
+
+  NSFplugはNSF形式のデータを再生するためのWinamp用プラグインです。NSF 
+  形式はKevin Horton氏によって策定されたデータ形式で、ファミコン音源を
+  忠実に再現した楽曲群を格納することができます。
+
+○NSFplugの特徴
+
+  ・ファミコン本体の内蔵音源を含む７種の音源をサポート
+  ・11KHzから96KHzまでの再生周波数をサポート
+  ・演奏時間の自動検出
+  ・Tagファイルを自動生成可能
+  ・アナログフィルタのエミュレーション
+  ・音源毎の音量バランス調整／ミュート機能
+  ・チャンネルマスク機能
+  ・各音源毎の詳細なオプション設定
+
+○推奨環境
+
+  ・Windows 2000 または XP
+  ・PentiumIII 1GHz 以上のCPU
+  ・Winamp2.8x 以降 (Winamp3には対応していません）
+
+  Windows 95/98/ME/NTは製作者が環境を持ち合わせていないため動作保証は
+  ありません（条件が揃えばおそらく動作すると思われますが、未確認です）。
+
+○インストール
+
+  Winampのプラグインフォルダに
+
+  in_yansf.dll
+  in_yansf.ini
+  nsfplug_ui.dll
+ 
+  の３ファイルをコピーしてください。
+
+○設定機能について
+
+  NSFファイルの演奏中にALT+3キーを押すか、NSFファイルを右クリックし、
+  「File Info」メニューを選択してください。NSFplugの情報ウィンドウが表
+  示され、各種機能にアクセスすることができます。
+
+
+○タグ情報のサポートついて
+
+  NSFplugは、タグ情報（taginfo.tag）ファイルを利用した演奏時間情報の取
+  得や検出した演奏時間のタグ情報ファイルへの自動格納機能を装備していま
+  す。
+
+  初期状態ではタグ情報ファイルを自動生成する機能は無効になっています。
+  この機能を有効にする場合は、情報ウィンドウの、「タグ情報」メニュー
+  にある「書込み許可」という項目にチェックをつけてください。
+  
+  この項目にチェックを入れると、新しいNSFファイルを読み込んだときに、
+  自動的にtaginfo.tagファイルへタグ情報が自動生成されるようになります。
+
+  なお、NSFファイルと同名のtagファイル（ローカルタグファイル）が存在し
+  た場合、NSFplugはこのファイルの情報をtaginfo.tagよりも優先して読み込
+  みます。ただし、このファイルへの自動書込みは行われません。NSFplugが
+  自動書込みする対象はいかなる場合でもtaginfo.tagになります。
+
+○演奏時間の自動検出機能について
+  
+  NSFplugはNSFファイルのループや演奏停止を自動的に検出して、次の曲に進
+  む機能を装備しています。演奏時間の検出に成功すると、検出された情報が
+  taginfo.tagに書き込まれます。ただし、演奏時間の検出が終了した時刻と、
+  taginfo.tagに書き込まれる演奏時間は異なります。NSFplugは予想ループ地
+  点を発見すると、そこが確実にループかどうかを確認するために、しばらく
+  演奏を続けてからフェードアウトします。このためtaginfo.tag側に書き込
+  まれる演奏時間は、かならずしもフェードアウトした時間と一致しません。
+
+○謝辞
+
+  本プラグインは6502CPUのエミュレーションにMamiya氏作のKM6502を利用さ
+  せて頂きました。KbMediaPlayer版プラグインの開発にあたってはKobarin氏
+  作のプラグイン開発キットを利用しています。ソースの使用をご快諾いただ
+  いたMamiya氏、Kobarin氏の両氏に感謝いたします。いつも有益なバグレポー
+  トやご意見をくださるユーザーの皆様にも感謝の念に絶えません。
+
+  NSFplugは以下の資料を参考に作成されています。各種資料をご提供くださっ
+  た皆様に感謝いたします。
+
+  NES Music Format Spec, Kevin Horton, 
+  http://nesmusic.zophar.net/txt/nsfspec.txt, 2000 
+  
+  The NES sound channel guide 1.8, Brad Taylor, 
+  http://nesdev.parodius.com/NESSOUND.txt, 2000 
+  
+  Delta modulation channel tutorial 1.0, Brad Taylor, 
+  http://nesdev.parodius.com/DMC.txt, 2000 
+  
+  VRCVI CHIP INFO, Kevin Horton, 
+  http://nesdev.parodius.com/vrcvi.txt, 1999 
+
+  VRCVII CHIP INFO, Kevin Horton, 
+  http://nesdev.parodius.com/vrcvii.txt, 1999 
+ 
+  Nintendo Disksystem Sound no shiryou, Norix, 
+  http://nesdev.parodius.com/FDSSOUND.txt, 2002 
+ 
+  APU_FDS.cpp in VirtuaNES source archive, Norix, 
+  http://virtuanes.s1.xrea.com/, 2002 
+
+  NEZplug source archive, Mamiya, 
+  http://nezplug.sourceforge.net/, 2002 
+
+  Winamp2 Input Plugin-in SDK, Nullsoft, 
+  http://www.winamp.com/nsdn/winamp2x/dev/plugins/in.jhtml, 1998 
+
+  NSFripper he no michi, Izumi, 
+  http://nesmusic.zophar.net/ripper.html, 2000 
+
+  Namcot 106 Mapper information, goroh, 
+  http://www.geocities.co.jp/SiliconValley/2368/docs/namco.txt, 1997 
+
+  MMC5 information, goroh, 
+  http://www.geocities.co.jp/SiliconValley/2368/docs/mmc5.txt, 1998 
+
+○免責事項
+
+  本ソフトウェアは無保証であり、本プラグインを利用した結果発生したいか
+  なる障害に対しても，作者は一切その責を負いません．
+
+○配布元
+
+  Digital Sound Antiques
+  http://dsa.sakura.ne.jp/
