@@ -1,0 +1,2 @@
+EXPORTS
+	kmp_GetTestModule

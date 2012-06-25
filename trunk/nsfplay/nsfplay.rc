@@ -1,0 +1,254 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Japanese resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)\r\n"
+    "LANGUAGE 17, 1\r\n"
+    "#pragma code_page(932)\r\n"
+    "#include ""res\\nsfplay.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // ?W???R??g?|?[?l??g?g\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041103a4"
+        BEGIN
+            VALUE "CompanyName", "Digital Sound Antiques"
+            VALUE "FileDescription", "NSF player over NSFplug"
+            VALUE "FileVersion", "2.1.0.0"
+            VALUE "InternalName", "nsfplay.EXE"
+            VALUE "LegalCopyright", "Public Domain Software"
+            VALUE "OriginalFilename", "nsfplay.EXE"
+            VALUE "ProductName", "NSFplay"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 932
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+IDR_MANIFEST            RT_MANIFEST             "res\\nsfplay.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "About NSFPlay..."
+END
+
+#endif    // Japanese resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\nsfplay.ico"
+IDI_OPEN                ICON                    "res\\open.ico"
+IDI_PROP                ICON                    "res\\prop.ico"
+IDI_STOP                ICON                    "res\\stop.ico"
+IDI_PREV                ICON                    "res\\prev.ico"
+IDI_PLAY                ICON                    "res\\play.ico"
+IDI_NEXT                ICON                    "res\\next.ico"
+IDI_PAUSE               ICON                    "res\\pause.ico"
+IDI_ABOUT               ICON                    "res\\about.ico"
+IDI_CONFIG              ICON                    "res\\config.ico"
+IDI_VOLUME              ICON                    "res\\volume.ico"
+IDI_WAVEOUT             ICON                    "res\\waveout.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 129, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About NSFplay"
+FONT 9, "MS UI Gothic", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,55,7,20,20
+    CTEXT           "NSF player over NSFplug version 2.1",IDC_STATIC,7,37,114,8,SS_NOPREFIX
+    DEFPUSHBUTTON   "OK",IDOK,44,52,39,16,WS_GROUP
+END
+
+IDD_NSFPLAY_DIALOG DIALOGEX 0, 0, 247, 50
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
+CAPTION "NSFplay"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    CTEXT           "",IDC_TITLE,5,3,237,9,SS_SUNKEN
+    LTEXT           "00:00",IDC_PLAYTIME,5,16,20,9
+    LTEXT           "00:00",IDC_TIME_MAX,33,16,21,9
+    CTEXT           "/",IDC_STATIC,24,16,8,8
+    CONTROL         "",IDC_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,57,16,185,12
+    PUSHBUTTON      "&Open",IDC_OPEN,5,33,18,14,BS_ICON
+    PUSHBUTTON      "<<",IDC_PREV,27,33,18,14,BS_ICON
+    PUSHBUTTON      ">",IDC_PLAY,45,33,18,14,BS_ICON
+    PUSHBUTTON      "| |",IDC_PAUSE,63,33,18,14,BS_ICON
+    PUSHBUTTON      "[  ]",IDC_STOP,81,33,18,14,BS_ICON
+    PUSHBUTTON      ">>",IDC_NEXT,99,33,18,14,BS_ICON
+    LTEXT           "Vol:",IDC_STATIC,120,36,13,11
+    CONTROL         "",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,137,34,44,13
+    PUSHBUTTON      "&Property",IDC_INFO,183,33,18,14,BS_ICON
+    PUSHBUTTON      "&Property",IDC_CONFIG,203,33,18,14,BS_ICON
+    PUSHBUTTON      "&Property",IDC_WAVEOUT,224,33,18,14,BS_ICON
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 121
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
+    END
+
+    IDD_NSFPLAY_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 242
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 47
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR ACCELERATORS 
+BEGIN
+    "B",            IDC_NEXT,               VIRTKEY, NOINVERT
+    "X",            IDC_PLAY,               VIRTKEY, NOINVERT
+    "Z",            IDC_PREV,               VIRTKEY, NOINVERT
+    "V",            IDC_STOP,               VIRTKEY, NOINVERT
+    "C",            IDC_PAUSE,              VIRTKEY, NOINVERT
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE 17, 1
+#pragma code_page(932)
+#include "res\nsfplay.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // ?W???R?“?|?[?l?“?g
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
