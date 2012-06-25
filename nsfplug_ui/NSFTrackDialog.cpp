@@ -538,6 +538,9 @@ void NSFTrackDialog::OnShowWindow(BOOL bShow, UINT nStatus)
 {
   __super::OnShowWindow(bShow, nStatus);
 
+  m_trkinfo.SetFocus(); // BS in case someone uses mouse scroll before clicking on it,
+  // prevents the scroll from doing time expansion instead
+
   if(bShow==TRUE&&m_nTimer==0)
   {
     m_nTimer = SetTimer(1,1000/(int)CONFIG["INFO_FREQ"], NULL);

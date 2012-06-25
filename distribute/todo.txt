@@ -1,5 +1,6 @@
 TODO
-- Vertical stacking for multiple key dots on same pitch.
+- Review write order / masking / return value and try to prevent conflict with FDS-RAM $8000-DFFF.
+- Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
@@ -13,7 +14,15 @@ TODO
 - VRC7 correct patches
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
-- Unmute on reset option for MMC5?
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
 - Battletoads track 10, noise sounds much duller on hardware.
 - Remove playlist manipulation stuff / save length / etc. ; seems to be crashy?
+- Doommaster has pitch problem, also seems to have weird buffer cutting stuff, only in NSFPlay?
+- 5B envelope seems to update a little bit later than emulated (does it update only on next step? Nestopia seems to have it right)
+- Foobar2000 plugin
+- MMC5 double speed length counter, envelope, make it independent of 4017/frame sequencer.
+- MMC5 PCM mixing, should be same as APU2 nonlinear but goes to twice the input volume
+- MMC5 invert polarity of output
+- Unmute on reset option for MMC5?
+- 5B polarity is reversed
+- Set more accurate levels for all expansions

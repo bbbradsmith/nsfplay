@@ -48,7 +48,7 @@ namespace xgm
     if(opll&&trk<6)
     {
       trkinfo[trk].max_volume = 15;
-      trkinfo[trk].volume = (opll->reg[0x30+trk])&15;
+      trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
       trkinfo[trk]._freq = opll->reg[0x10+trk]+((opll->reg[0x20+trk]&1)<<8);
       int blk = (opll->reg[0x20+trk]>>1)&7;
       trkinfo[trk].freq = clock*trkinfo[trk]._freq/(double)(0x80000>>blk);

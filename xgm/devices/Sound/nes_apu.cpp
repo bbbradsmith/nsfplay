@@ -218,10 +218,9 @@ namespace xgm
       Write (0x4005, 8);
     }
 
+    Write (0x4015, 0);
     if (option[OPT_UNMUTE_ON_RESET])
-      Write (0x4015, 0x1f);
-    else
-      Write (0x4015, 0);
+      Write (0x4015, 0x0f);
 
     for (i = 0; i < 2; i++)
       out[i] = 0;
