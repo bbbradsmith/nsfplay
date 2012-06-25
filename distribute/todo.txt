@@ -1,0 +1,19 @@
+TODO
+- Vertical stacking for multiple key dots on same pitch.
+- Command line wav could use fade out (actually set config param, also channel mask option).
+- Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
+- One click button for keyboard view?
+- NSFE
+- NSF2
+- Debug trace code
+- Randomize RAM option
+- N163 horrible sound accuracy (maybe later)
+- N163 volume vs num channels
+- User option for VRC7 patches
+- VRC7 correct patches
+- Improve loop detection
+- Fix init time allowance to be an actual 1s.
+- Unmute on reset option for MMC5?
+- APU2 option panel says "Option" instead of "Options"? Make consistent.
+- Battletoads track 10, noise sounds much duller on hardware.
+- Remove playlist manipulation stuff / save length / etc. ; seems to be crashy?
