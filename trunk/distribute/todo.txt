@@ -11,6 +11,7 @@ TODO
 - N163 horrible sound accuracy
 - N163 volume vs num channels
 - User option for VRC7 patches
+- VRC6 too loud, match with Famitracker
 - VRC7 correct patches
 - VRC7 accuracy
 - Improve loop detection
@@ -21,10 +22,14 @@ TODO
 - Doommaster has pitch problem, also seems to have weird buffer cutting stuff, only in NSFPlay?
 - 5B envelope seems to update a little bit later than emulated (does it update only on next step? Nestopia seems to have it right)
 - Foobar2000 plugin
+- Frame sequencer
 - MMC5 double speed length counter, envelope, make it independent of 4017/frame sequencer.
 - MMC5 PCM mixing, should be same as APU2 nonlinear but goes to twice the input volume
 - MMC5 invert polarity of output
 - Unmute on reset option for MMC5?
 - 5B polarity is reversed
 - Set more accurate levels for all expansions
-- Some Japanese text is ??????? instead of text.
+- Channel mask caption is ????? in Japanese UI.
+- Settings Apply/Cacel buttons are ????? in Japanese UI.
+- Settings audio quality panel has ????? at bottom in Japanese UI.
+

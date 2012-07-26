@@ -121,6 +121,8 @@ NSFPlay 2.2 - BETA VERSION 0
 - Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
 - Inverted VRC7 volume display in keyboard view.
 - Unmute on reset now sets $4015 to $0F instead of $1F.
+- PAL noise frequency $1 now 8 instead of incorrectly 7.
+
 
 NSFPlay 2.1 - 3/27/2012
 Audio Output:
