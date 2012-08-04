@@ -290,6 +290,8 @@ namespace xgm
     vrc7->SetMask((*config)["MASK"].GetInt()>>15);
     n106->SetMask((*config)["MASK"].GetInt()>>21);
 
+    vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
+
     for(int i=0;i<NES_TRACK_MAX;i++)
       infobuf[i].Clear();
 

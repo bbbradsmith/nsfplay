@@ -64,6 +64,7 @@ Global options:
   NES_BASECYCLES: NTSC master clock speed
   PAL_BASECYCLES: PAL master clock speed * 12/16 (sorry, weird conversion being done)
   PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
+  VRC7_PATCH: 0-4 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
 
 TITLE_FORMAT text replacement:
@@ -112,6 +113,12 @@ Channel options:
   5B_ENVELOPE_COL: keyboard colour for 5B envelope
   5B_NOISE_COL: keyboard colour for 5B noise
 
+VRC7 patch sets:
+  0 - VRC7 set by rainwarrior 8/01/2012
+  1 - VRC7 set by quietust ?/??/???? (used by Famitracker 0.3.7)
+  2 - VRC7 set by Mitsutaka Okazaki 5/05/2006
+  3 - YM2413 set by Mitsutaka Okazaki 5/05/2006
+  4 - YMF281B set by Chabin 5/05/2006
 
 Versions
 ========

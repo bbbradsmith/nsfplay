@@ -10,6 +10,7 @@ namespace xgm
   {
   protected:
     int mask;
+    unsigned int patch_set;
     INT32 sm[2][6]; // BS stereo mix
     INT16 buf[2];
     OPLL *opll;
@@ -22,6 +23,7 @@ namespace xgm
     UINT32 Render (INT32 b[2]);
     bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
     bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    void SetPatchSet (unsigned int p);
     void SetClock (double);
     void SetRate (double);
     void SetMask (int m){ mask = m; if(opll) OPLL_setMask(opll, m); }

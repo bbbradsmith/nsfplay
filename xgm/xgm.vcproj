@@ -587,11 +587,15 @@
 						>
 					</File>
 					<File
-						RelativePath=".\devices\Sound\legacy\vrc7tone.h"
+						RelativePath=".\devices\Sound\legacy\vrc7tone_mo.h"
 						>
 					</File>
 					<File
 						RelativePath=".\devices\Sound\legacy\vrc7tone_ft.h"
+						>
+					</File>
+					<File
+						RelativePath=".\devices\Sound\legacy\vrc7tone_rw.h"
 						>
 					</File>
 				</Filter>
