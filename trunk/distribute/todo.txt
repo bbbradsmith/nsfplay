@@ -12,7 +12,6 @@ TODO
 - N163 volume vs num channels
 - User option for VRC7 patches
 - VRC6 too loud, match with Famitracker
-- VRC7 correct patches
 - VRC7 accuracy
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
@@ -32,4 +31,3 @@ TODO
 - Channel mask caption is ????? in Japanese UI.
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
-

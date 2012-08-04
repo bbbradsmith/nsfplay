@@ -51,30 +51,24 @@
 #include <math.h>
 #include "emu2413.h"
 
-#ifdef EMU2413_COMPACTION
-#define OPLL_TONE_NUM 1
+#define OPLL_TONE_NUM 5
 static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
   {
-#include "2413tone.h"
-   }
-};
-#else
-#define OPLL_TONE_NUM 4
-static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
-  { 
-#include "2413tone.h" 
+#include "vrc7tone_rw.h"
   },
   {
 #include "vrc7tone_ft.h"
-   },
+  },
   {
-#include "vrc7tone.h"
-   },
+#include "vrc7tone_mo.h"
+  },
+  {
+#include "2413tone.h" 
+  },
   {
 #include "281btone.h"
   }
 };
-#endif
 
 /* Size of Sintable ( 8 -- 18 can be used. 9 recommended.) */
 #define PG_BITS 9

@@ -4,8 +4,10 @@ namespace xgm
 {
   NES_VRC7::NES_VRC7 ()
   {
+    patch_set = OPLL_VRC7_RW_TONE;
+
     opll = OPLL_new ( 3579545, DEFAULT_RATE);
-    OPLL_reset_patch (opll, OPLL_VRC7_FT_TONE);
+    OPLL_reset_patch (opll, patch_set);
     SetClock(DEFAULT_CLOCK);
 
     for(int c=0;c<2;++c)
@@ -16,6 +18,11 @@ namespace xgm
   NES_VRC7::~NES_VRC7 ()
   {
     OPLL_delete (opll);
+  }
+
+  void NES_VRC7::SetPatchSet(unsigned int p)
+  {
+    patch_set = p;
   }
 
   void NES_VRC7::SetClock (double c)
@@ -32,6 +39,7 @@ namespace xgm
 
   void NES_VRC7::Reset ()
   {
+    OPLL_reset_patch (opll, patch_set);
     OPLL_reset (opll);
   }
 
