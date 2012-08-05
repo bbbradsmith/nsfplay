@@ -99,6 +99,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("MULT_SPEED", 256); // clock speed multiplier
   //CreateValue("FAST_SEEK", 1); // BS deprecated
   CreateValue("VRC7_PATCH", 0); // VRC7 patch set
+  CreateValue("NSFE_PLAYLIST", 1); // use NSFe playlist
 
   CreateValue("COMP_LIMIT",    100);
   CreateValue("COMP_THRESHOLD",100);

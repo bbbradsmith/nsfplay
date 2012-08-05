@@ -68,9 +68,14 @@ namespace xgm
   bool NSFPlayer::Load (SoundData * sdat)
   {
     nsf = dynamic_cast < NSF * >(sdat);
-//#ifdef _DEBUG
+
+    if((*config)["NSFE_PLAYLIST"] && nsf->nsfe_plst)
+    {
+      nsf->start = 1;
+      nsf->songs = nsf->nsfe_plst_size;
+    }
+
     nsf->DebugOut ();
-//#endif
     Reload ();
     return true;
   }
@@ -278,7 +283,13 @@ namespace xgm
     DEBUG_OUT("Playback mode: %s\n", UsePal(nsf->pal_ntsc)?"PAL":"NTSC");
     DEBUG_OUT("Playback speed: %f\n", speed);
 
-    cpu.Start (nsf->init_address, nsf->play_address, speed, nsf->song, UsePal(nsf->pal_ntsc)?1:0);
+    int song = nsf->song;
+    if ((*config)["NSFE_PLAYLIST"] && nsf->nsfe_plst)
+    {
+      song = nsf->nsfe_plst[song];
+    }
+
+    cpu.Start (nsf->init_address, nsf->play_address, speed, song, UsePal(nsf->pal_ntsc)?1:0);
 
     // マスク更新
     apu->SetMask( (*config)["MASK"].GetInt()    );

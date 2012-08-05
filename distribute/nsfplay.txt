@@ -41,7 +41,7 @@ The default configuration file is in_yansf.ini, found in the plugins folder.
 
 Global options:
   RATE: samplerate
-  NCH: 0-1 number of channels
+  NCH: 1-2 number of channels
   BPS: 16 bits per sample (don't change this)
   MASK: bitfield channel mask (1 bit mutes channel)
   PLAY_TIME: (ms) default play time
@@ -66,6 +66,7 @@ Global options:
   PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
   VRC7_PATCH: 0-4 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
+  NSFE_PLAYLIST: 1/0 use playlist data from NSFe when found
 
 TITLE_FORMAT text replacement:
   %F/%f > filename
