@@ -393,7 +393,10 @@ void CnsfplayDlg::OnBnClickedOpen()
 
   CFileDialog fd(TRUE,".nsf;.nsfe",0,OFN_FILEMUSTEXIST|OFN_HIDEREADONLY,"NSF files (*.nsf;*.nsfe)|*.nsf;*.nsfe|All files (*.*)|*.*||",this);
   if(fd.DoModal()==IDOK) {
-    m_emu->Play(fd.GetPathName().GetBuffer());
+    if (m_emu->Play(fd.GetPathName().GetBuffer()))
+    {
+      MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+    }
     m_last_len = -1;
     m_update_wait = 0;
   }
