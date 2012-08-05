@@ -20,7 +20,7 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 , m_bVsync(FALSE)
 , m_bPrefPal(FALSE)
 , m_bStereo(FALSE)
-, m_bFastSeek(FALSE)
+, m_bNSFePlaylist(FALSE)
 , m_nLimit(0)
 , m_nThreshold(0)
 , m_nVelocity(0)
@@ -73,7 +73,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     m_bVsync = CONFIG["VSYNC_ADJUST"];
     m_bPrefPal = CONFIG["PREFER_PAL"];
     m_bStereo = (CONFIG["NCH"] == 2);
-    //m_bFastSeek = CONFIG["FAST_SEEK"]; // BS deprecated
+    m_bNSFePlaylist = CONFIG["NSFE_PLAYLIST"];
     m_nLimit = 100 - CONFIG["COMP_LIMIT"];
     m_nThreshold = 100 - CONFIG["COMP_THRESHOLD"];
     m_nVelocity = 100 - CONFIG["COMP_VELOCITY"];
@@ -102,7 +102,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["VSYNC_ADJUST"] = m_bVsync;
     CONFIG["PREFER_PAL"] = m_bPrefPal;
     CONFIG["NCH"] = m_bStereo ? 2 : 1;
-    //CONFIG["FAST_SEEK"] = m_bFastSeek; // BS deprecated
+    CONFIG["NSFE_PLAYLIST"] = m_bNSFePlaylist;
     CONFIG["COMP_LIMIT"] = 100 - m_nLimit;
     CONFIG["COMP_THRESHOLD"] = 100 - m_nThreshold;
     CONFIG["COMP_VELOCITY"] = 100 - m_nVelocity;
@@ -138,7 +138,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_VSYNC, m_bVsync);
   DDX_Check(pDX, IDC_PREF_PAL, m_bPrefPal);
   DDX_Check(pDX, IDC_STEREO, m_bStereo);
-  DDX_Check(pDX, IDC_FASTSEEK, m_bFastSeek);
+  DDX_Check(pDX, IDC_NSFEPLS, m_bNSFePlaylist);
   DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
   DDX_Control(pDX, IDC_THRESHOLD, m_threshCtrl);
   DDX_Control(pDX, IDC_VELOCITY, m_velocityCtrl);

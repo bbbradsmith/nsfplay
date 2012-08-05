@@ -138,6 +138,8 @@
 #define IDC_STEREO                      2010
 #define IDC_FREQ_MODE                   2011
 #define IDC_ANTI_NOISE                  2011
+#define IDC_STEREO2                     2011
+#define IDC_NSFEPLS                     2011
 #define IDC_RANDOMIZE_NOISE             2012
 #define IDC_LIMIT                       2013
 #define IDC_UNMUTE                      2013

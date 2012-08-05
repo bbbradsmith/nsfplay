@@ -338,7 +338,7 @@ BEGIN
     EDITTEXT        IDC_LOOPNUM,58,95,19,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Spin1",IDC_SECSPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,76,95,9,14
     LTEXT           "âÒ",IDC_STATIC,87,95,12,15,SS_CENTERIMAGE
-    CONTROL         "ä»à’ÉVÅ[ÉNóLå¯(&K)",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,136,96,73,10
+    CONTROL         "NSFeÉvÉåÉCÉäÉXÉgÇégóp",IDC_NSFEPLS,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,136,96,73,10
     CONTROL         "ñ≥âπãÊä‘ÇåüèoÇµÇΩÇÁé©ìÆí‚é~(&S)",IDC_AUTOSTOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,113,115,15
     EDITTEXT        IDC_STOPSEC,131,113,24,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Spin1",IDC_SECSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,146,111,9,14
@@ -1151,7 +1151,6 @@ BEGIN
     EDITTEXT        IDC_LOOPNUM,100,86,27,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Spin1",IDC_SECSPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,115,87,11,14
     LTEXT           "times.",IDC_STATIC,130,86,20,15,SS_CENTERIMAGE
-    CONTROL         "Fast see&k",IDC_FASTSEEK,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,173,88,45,10
     CONTROL         "&Stop the song automatically after",IDC_AUTOSTOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,105,120,15
     EDITTEXT        IDC_STOPSEC,141,105,25,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Spin1",IDC_SECSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,156,105,11,14
@@ -1177,6 +1176,7 @@ BEGIN
     CONTROL         "",IDC_LPF,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,59,31,55,11
     CONTROL         "Prefer PAL for DUAL mode NSFs.",IDC_PREF_PAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,189,180,9
     CONTROL         "Stereo sound.",IDC_STEREO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,201,61,9
+    CONTROL         "Use NSFe Playlist",IDC_NSFEPLS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,89,79,9
 END
 
 IDD_AUDIOPANEL DIALOGEX 0, 0, 227, 104
@@ -1657,7 +1657,7 @@ END
 LANGUAGE 17, 1
 #pragma code_page(932)
 #include "res\nsf_setup.rc2"  // non-Microsoft Visual C++ edited resources
-#include "afxres.rc"     // ?W???R?ì?|?[?l?ì?g
+#include "afxres.rc"     // ?W???R??g?|?[?l??g?g
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
