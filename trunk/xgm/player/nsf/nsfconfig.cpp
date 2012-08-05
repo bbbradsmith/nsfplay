@@ -139,7 +139,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   for (i = 0; i < NES_DEVICE_MAX; i++)
   {
     static const int DEVICE_VOLUME[NES_DEVICE_MAX] = {
-        128, 128, 128, 128, 128, 128,  96,  80 };
+        128, 128, 112, 128, 128, 128,  96,  80 };
 
     std::string str;
     str = dname[i];

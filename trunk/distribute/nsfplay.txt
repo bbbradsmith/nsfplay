@@ -132,7 +132,7 @@ NSFPlay 2.2 - BETA VERSION 0
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
 - New VRC7 patch set, option to select patch set via VRC7_PATCH.
 - NSFe support.
-- 5B polarity inverted, envelope adjusted.
+- 5B polarity inverted, envelope adjusted, volume tweak.
 - MMC5 polarity inverted, length counter runs at double speed, highest 8 frequencies are not muted.
 
 NSFPlay 2.1 - 3/27/2012

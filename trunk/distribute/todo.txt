@@ -9,7 +9,6 @@ TODO
 - Loop detector - should not set length if loop found; should not conflict with NSFe/playlist lengths
 
 TODO LATER
-- 5B test balance.
 - Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
