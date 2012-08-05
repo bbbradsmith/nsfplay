@@ -6,6 +6,14 @@
 
 namespace xgm
 {
+  struct NSFE_Entry
+  {
+    char* tlbl;
+    INT32 time;
+    INT32 fade;
+  };
+  const unsigned int NSFE_ENTRIES = 256;
+
   /**
    * NSFファイル型
    */
@@ -42,8 +50,11 @@ namespace xgm
     bool use_n106;
     UINT8 extra[4];
     UINT8 *body;
-    UINT8* nsfe_image;
     int bodysize;
+    UINT8* nsfe_image;
+    UINT8* nsfe_plst;
+    int nsfe_plst_size;
+    NSFE_Entry nsfe_entry[NSFE_ENTRIES];
 
     /** 現在選択中の曲番号 */
     int song;
