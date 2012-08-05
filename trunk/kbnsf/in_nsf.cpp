@@ -154,7 +154,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 }
 
 static KMPMODULE mod;
-static const char *exts[] = { ".nsf", NULL };
+static const char *exts[] = { ".nsf", ".nsfe", NULL };
 
 KMPMODULE * KMP_GETMODULE()
 {

@@ -115,7 +115,7 @@ Channel options:
 
 VRC7 patch sets:
   0 - VRC7 set by rainwarrior 8/01/2012
-  1 - VRC7 set by quietust ?/??/???? (used by Famitracker 0.3.7)
+  1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.7)
   2 - VRC7 set by Mitsutaka Okazaki 5/05/2006
   3 - YM2413 set by Mitsutaka Okazaki 5/05/2006
   4 - YMF281B set by Chabin 5/05/2006

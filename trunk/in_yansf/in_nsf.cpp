@@ -167,7 +167,7 @@ extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
   mod.is_seekable = 1;
   mod.UsesOutputPlug = 1;
   mod.description = "NSFplug " "("__DATE__" "__TIME__")";
-  mod.FileExtensions = "nsf\0NSF file\0";
+  mod.FileExtensions = "nsf\0NES Sound Format\0nsfe\0NES Sound Format Extended\0";
   mod.Config = Config;
   mod.About = About;
   mod.Init = Init;

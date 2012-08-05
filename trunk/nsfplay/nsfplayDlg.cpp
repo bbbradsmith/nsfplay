@@ -391,7 +391,7 @@ void CnsfplayDlg::OnBnClickedOpen()
   BOOL old_accel = theApp.GetAccel();
   theApp.SetAccel(FALSE);
 
-  CFileDialog fd(TRUE,".nsf",0,OFN_FILEMUSTEXIST|OFN_HIDEREADONLY,"NSF files (*.nsf)|*.nsf|All files (*.*)|*.*||",this);
+  CFileDialog fd(TRUE,".nsf;.nsfe",0,OFN_FILEMUSTEXIST|OFN_HIDEREADONLY,"NSF files (*.nsf;*.nsfe)|*.nsf;*.nsfe|All files (*.*)|*.*||",this);
   if(fd.DoModal()==IDOK) {
     m_emu->Play(fd.GetPathName().GetBuffer());
     m_last_len = -1;
