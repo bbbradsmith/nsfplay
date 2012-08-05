@@ -11,10 +11,24 @@ namespace xgm
     option[OPT_NONLINEAR_MIXER] = true;
     option[OPT_PHASE_REFRESH] = true;
 
+    // square nonlinear mix, same as 2A03
     square_table[0] = 0;
-      for(int i=1;i<32;i++) 
+    for(int i=1;i<32;i++) 
         square_table[i]=(INT32)((8192.0*95.88)/(8128.0/i+100));
 
+    // 2A03 style nonlinear pcm mix with double the bits
+    //pcm_table[0] = 0;
+    //INT32 wd = 22638;
+    //for(int d=1;d<256; ++d)
+    //    pcm_table[d] = (INT32)((8192.0*159.79)/(100.0+1.0/((double)d/wd)));
+
+    // linear pcm mix (actual hardware seems closer to this)
+    pcm_table[0] = 0;
+    double pcm_scale = 32.0;
+    for (int d=1; d<256; ++d)
+        pcm_table[d] = (INT32)(double(d) * pcm_scale);
+
+    // stereo mix
     for(int c=0;c<2;++c)
         for(int t=0;t<3;++t)
             sm[c][t] = 128;
@@ -99,8 +113,7 @@ namespace xgm
         }
     }
 
-    // 120hz clock
-    if ((s&1) == 0)
+    // MMC5 length counter is clocked at 240hz, unlike 2A03
     for (int i=0; i < 2; ++i)
     {
         if (!envelope_loop[i] && (length_counter[i] > 0))
@@ -122,7 +135,7 @@ namespace xgm
 
     INT32 ret = 0;
     if (enable[i] &&
-        freq[i] >= 8 &&
+        //freq[i] >= 8 && // MMC5 allows the top 8 frequencies
         length_counter[i] > 0
         )
     {
@@ -147,6 +160,7 @@ namespace xgm
 
     if(option[OPT_NONLINEAR_MIXER])
     {
+        // squares nonlinear
         INT32 voltage = square_table[out[0] + out[1]];
         m[0] = out[0] << 6;
         m[1] = out[1] << 6;
@@ -161,24 +175,30 @@ namespace xgm
             m[0] = voltage;
             m[1] = voltage;
         }
+
+        // pcm nonlinear
+        m[2] = pcm_table[out[2]];
     }
     else
     {
+        // squares
         m[0] = out[0] << 6;
         m[1] = out[1] << 6;
+
+        // pcm channel
+        m[2] = out[2] << 5;
     }
 
-    // pcm channel
-    m[2] = out[2] << 5;
+    // note polarity is flipped on output
 
-    b[0]  = m[0] * sm[0][0];
-    b[0] += m[1] * sm[0][1];
-    b[0] += m[2] * sm[0][2];
+    b[0]  = m[0] * -sm[0][0];
+    b[0] += m[1] * -sm[0][1];
+    b[0] += m[2] * -sm[0][2];
     b[0] >>= 7;
 
-    b[1]  = m[0] * sm[1][0];
-    b[1] += m[1] * sm[1][1];
-    b[1] += m[2] * sm[1][2];
+    b[1]  = m[0] * -sm[1][0];
+    b[1] += m[1] * -sm[1][1];
+    b[1] += m[2] * -sm[1][2];
     b[1] >>= 7;
 
     return 2;
