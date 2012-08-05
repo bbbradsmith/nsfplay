@@ -74,7 +74,7 @@ public:
   BOOL m_bPrefPal;
   BOOL m_bStereo;
   afx_msg void OnBnClickedVsync();
-  BOOL m_bFastSeek;
+  BOOL m_bNSFePlaylist;
   CSliderCtrl m_limitCtrl;
   CSliderCtrl m_threshCtrl;
   CSliderCtrl m_velocityCtrl;

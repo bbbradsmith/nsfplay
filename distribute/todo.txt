@@ -4,7 +4,6 @@ TODO
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
-- NSFe disable playlist UI
 - NSF2
 - Debug trace code
 - Randomize RAM option

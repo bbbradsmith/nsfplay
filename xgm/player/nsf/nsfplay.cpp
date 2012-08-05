@@ -74,6 +74,10 @@ namespace xgm
       nsf->start = 1;
       nsf->songs = nsf->nsfe_plst_size;
     }
+    else
+    {
+      nsf->nsfe_plst = NULL;
+    }
 
     nsf->DebugOut ();
     Reload ();
@@ -284,7 +288,7 @@ namespace xgm
     DEBUG_OUT("Playback speed: %f\n", speed);
 
     int song = nsf->song;
-    if ((*config)["NSFE_PLAYLIST"] && nsf->nsfe_plst)
+    if (nsf->nsfe_plst)
     {
       song = nsf->nsfe_plst[song];
     }
