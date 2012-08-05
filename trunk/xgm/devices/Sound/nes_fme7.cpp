@@ -67,8 +67,9 @@ xgm::UINT32 NES_FME7::Render (xgm::INT32 b[2])
 
   for (int i=0; i < 3; ++i)
   {
-    b[0] += psg->cout[i] * sm[0][i];
-    b[1] += psg->cout[i] * sm[1][i];
+    // note negative polarity
+    b[0] -= psg->cout[i] * sm[0][i];
+    b[1] -= psg->cout[i] * sm[1][i];
   }
   b[0] >>= (7-4);
   b[1] >>= (7-4);
