@@ -42,6 +42,7 @@ namespace xgm
     double clock, rate;
     INT32 calc_sqr (int i);
     INT32 square_table[32];
+    INT32 pcm_table[256];
     TrackInfoBasic trkinfo[3];
   public:
       NES_MMC5 ();
