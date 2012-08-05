@@ -21,9 +21,14 @@ namespace xgm
     UINT16 play_address;
     char filename[NSF_MAX_PATH];
     char print_title[256+64]; // margin 64 chars.
-    char title[32];
-    char artist[32];
-    char copyright[32];
+    char title_nsf[32];
+    char artist_nsf[32];
+    char copyright_nsf[32];
+    char* title;
+    char* artist;
+    char* copyright;
+    char* ripper; // NSFe only
+    char* text; // NSFe only
     UINT16 speed_ntsc;
     UINT8 bankswitch[8];
     UINT16 speed_pal;
@@ -37,6 +42,7 @@ namespace xgm
     bool use_n106;
     UINT8 extra[4];
     UINT8 *body;
+    UINT8* nsfe_image;
     int bodysize;
 
     /** 現在選択中の曲番号 */
@@ -64,8 +70,15 @@ namespace xgm
      * @param size  イメージのサイズ
      * @return 成功時 true 失敗時 false
      */
-    bool Load (UINT8 * image, UINT32 size);
+
+    // loads file (playlist or NSF or NSFe)
     bool LoadFile (const char *fn);
+
+    // loads NSF (or NSFe via LoadNSFe)
+    bool Load (UINT8 * image, UINT32 size);
+
+    // loads NSFe, if info is false INFO chunk is required to initialize
+    bool LoadNSFe(UINT8* image, UINT32 size, bool info);
 
     void DebugOut ();
     /**

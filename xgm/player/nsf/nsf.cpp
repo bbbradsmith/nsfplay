@@ -25,11 +25,18 @@ static int is_sjis_prefix(int c)
     default_playtime = 5 * 60 * 1000;
     default_fadetime = 5 * 1000;
     default_loopnum = 0;
+
+    title = title_nsf;
+    artist = artist_nsf;
+    copyright = copyright_nsf;
+    ripper = "";
+    nsfe_image = NULL;
   }
 
   NSF::~NSF ()
   {
     delete[]body;
+    delete[]nsfe_image;
   }
 
   void NSF::SetDefaults (int p, int f, int l)
@@ -215,7 +222,12 @@ static int is_sjis_prefix(int c)
 
     if (pls->type == 3)
       strncpy (filename, pls->filename, NSF_MAX_PATH);
-    else if (strstr (fn, ".nsf") || strstr (fn, ".NSF"))
+    else if (
+         strstr (fn, ".nsf")
+      || strstr (fn, ".NSF")
+      || strstr (fn, ".nsfe")
+      || strstr (fn, ".NSFE")
+      )
       strncpy (filename, fn, NSF_MAX_PATH);
     else
       goto Error_Exit;
@@ -330,12 +342,18 @@ static int is_sjis_prefix(int c)
 
   bool NSF::Load (UINT8 * image, UINT32 size)
   {
-    if (size < 0x80)
+    if (size < 4) // no FourCC
       return false;
 
-    memcpy (magic, image, 5);
+    memcpy (magic, image, 4);
     magic[4] = '\0';
+
     if (strcmp ("NESM", magic))
+    {
+      return LoadNSFe(image, size, false);
+    }
+
+    if (size < 0x80) // no header?
       return false;
 
     version = image[0x05];
@@ -344,12 +362,14 @@ static int is_sjis_prefix(int c)
     load_address = image[0x08] | (image[0x09] << 8);
     init_address = image[0x0a] | (image[0x0B] << 8);
     play_address = image[0x0c] | (image[0x0D] << 8);
-    memcpy (title, image + 0x0e, 32);
-    title[31] = '\0';
-    memcpy (artist, image + 0x2e, 32);
-    artist[31] = '\0';
-    memcpy (copyright, image + 0x4e, 32);
-    artist[31] = '\0';
+    memcpy (title_nsf, image + 0x0e, 32);
+    title_nsf[31] = '\0';
+    memcpy (artist_nsf, image + 0x2e, 32);
+    artist_nsf[31] = '\0';
+    memcpy (copyright_nsf, image + 0x4e, 32);
+    copyright_nsf[31] = '\0';
+    ripper = ""; // NSFe only
+    text = NULL; // NSFe only
     speed_ntsc = image[0x6e] | (image[0x6f] << 8);
     memcpy (bankswitch, image + 0x70, 8);
     speed_pal = image[0x78] | (image[0x79] << 8);
@@ -362,10 +382,10 @@ static int is_sjis_prefix(int c)
 
     soundchip = image[0x7b];
 
-    use_vrc6 = soundchip & 1 ? true : false;
-    use_vrc7 = soundchip & 2 ? true : false;
-    use_fds = soundchip & 4 ? true : false;
-    use_mmc5 = soundchip & 8 ? true : false;
+    use_vrc6 = soundchip &  1 ? true : false;
+    use_vrc7 = soundchip &  2 ? true : false;
+    use_fds  = soundchip &  4 ? true : false;
+    use_mmc5 = soundchip &  8 ? true : false;
     use_n106 = soundchip & 16 ? true : false;
     use_fme7 = soundchip & 32 ? true : false;
 
@@ -378,6 +398,181 @@ static int is_sjis_prefix(int c)
     bodysize = size - 0x80;
 
     song = start - 1;
+
+    return true;
+  }
+
+  bool NSF::LoadNSFe (UINT8 * image, UINT32 size, bool info)
+  {
+    // store entire file for string references, etc.
+    if (nsfe_image)
+      delete[] nsfe_image;
+    nsfe_image = new UINT8[size+1];
+    ::memcpy(nsfe_image, image, size);
+    nsfe_image[size] = 0; // null terminator for safety
+    image = nsfe_image;
+
+    if (size < 4) // no FourCC
+      return false;
+
+    memcpy (magic, image, 4);
+    magic[4] = '\0';
+
+    if (strcmp ("NSFE", magic))
+    {
+      return false;
+    }
+
+    UINT32 chunk_offset = 4; // skip 'NSFE'
+    while (true)
+    {
+        if ((size-chunk_offset) < 8) // not enough data for chunk size + FourCC
+          return false;
+
+        UINT8* chunk = image + chunk_offset;
+
+        unsigned int chunk_size =
+            (chunk[0]      )
+          + (chunk[1] <<  8)
+          + (chunk[2] << 16)
+          + (chunk[3] << 24);
+
+        if ((size-chunk_offset) < (chunk_size+8)) // not enough data for chunk
+          return false;
+
+        char cid[5];
+        memcpy (cid, chunk+4, 4);
+        cid[4] = 0;
+
+        chunk_offset += 8;
+        chunk += 8;
+
+        if (!strcmp(cid, "NEND")) // end of chunks
+        {
+          break;
+        }
+
+        if (!strcmp(cid, "INFO"))
+        {
+          if (chunk_size < 0x0A)
+            return false;
+
+          version = 1;
+          load_address = chunk[0x00] | (chunk[0x01] << 8);
+          init_address = chunk[0x02] | (chunk[0x03] << 8);
+          play_address = chunk[0x04] | (chunk[0x05] << 8);
+          pal_ntsc     = chunk[0x06];
+          soundchip    = chunk[0x07];
+          songs        = chunk[0x08];
+          start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
+
+          // NSFe doesn't allow custom speeds
+          speed_ntsc = 0x4100; // 60.09Hz
+          speed_pal  = 0x4E1D; // 50.00Hz
+
+          // other variables contained in other banks
+          memset (bankswitch, 0, 8);
+          memset (extra, 0, 4);
+
+          // setup derived variables
+          use_vrc6 = soundchip &  1 ? true : false;
+          use_vrc7 = soundchip &  2 ? true : false;
+          use_fds  = soundchip &  4 ? true : false;
+          use_mmc5 = soundchip &  8 ? true : false;
+          use_n106 = soundchip & 16 ? true : false;
+          use_fme7 = soundchip & 32 ? true : false;
+          song = start - 1;
+
+          // body should follow in 'DATA' chunk
+          if (body)
+            delete[] body;
+          body = NULL;
+          bodysize = 0;
+
+          // description strings should follow in 'auth' chunk
+          title_nsf[0]     = 0;
+          artist_nsf[0]    = 0;
+          copyright_nsf[0] = 0;
+          title     = title_nsf;
+          artist    = artist_nsf;
+          copyright = copyright_nsf;
+          ripper    = "";
+          text      = NULL;
+
+          // INFO chunk read
+          info = true;
+        }
+        else if (!strcmp(cid, "DATA"))
+        {
+          if (!info)
+            return false;
+
+          if (body)
+            delete[]body;
+          body = new  UINT8[chunk_size];
+          memcpy (body, chunk, chunk_size);
+          bodysize = chunk_size;
+        }
+        else if (!strcmp(cid, "BANK"))
+        {
+          if (!info)
+            return false;
+
+          for (unsigned int i=0; i < 8 && i < chunk_size; ++i)
+          {
+            bankswitch[i] = chunk[i];
+          }
+        }
+        else if (!strcmp(cid, "auth"))
+        {
+          unsigned int n=0;
+
+          #define NSFE_STRING(p) \
+            if (n >= chunk_size) break; \
+            p = reinterpret_cast<char*>(chunk+n); \
+            while (n < chunk_size && chunk[n] != 0) ++n; \
+            if(chunk[n] == 0) ++n;
+
+          while (true)
+          {
+            NSFE_STRING(title);
+            NSFE_STRING(artist);
+            NSFE_STRING(copyright);
+            NSFE_STRING(ripper);
+            break;
+          }
+        }
+        else if (!strcmp(cid, "plst"))
+        {
+          // WIP
+        }
+        else if (!strcmp(cid, "time"))
+        {
+          // WIP
+        }
+        else if (!strcmp(cid, "fade"))
+        {
+          // WIP
+        }
+        else if (!strcmp(cid, "tlbl"))
+        {
+          // WIP
+        }
+        else if (!strcmp(cid, "text"))
+        {
+          text = reinterpret_cast<char*>(chunk);
+        }
+        else // unknown chunk
+        {
+          if (cid[0] >= 'A' && cid[0] <= 'Z')
+          {
+            return false;
+          }
+        }
+
+        // next chunk
+        chunk_offset += chunk_size;
+    }
 
     return true;
   }
