@@ -93,7 +93,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("LPF", 80); // BS enabling by default
   CreateValue("HPF", 256);
   CreateValue("ENABLE_DCF", 1); // = HPF
-  CreateValue("TITLE_FORMAT", "%A - %T (%n/%e)");
+  CreateValue("TITLE_FORMAT", "%L (%n/%e) %T - %A");
   CreateValue("DETECT_ALT", 0);
   CreateValue("VSYNC_ADJUST", 0);
   CreateValue("MULT_SPEED", 256); // clock speed multiplier

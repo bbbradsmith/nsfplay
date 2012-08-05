@@ -31,6 +31,8 @@ static int is_sjis_prefix(int c)
     copyright = copyright_nsf;
     ripper = "";
     nsfe_image = NULL;
+    nsfe_plst = NULL;
+    nsfe_plst_size = 0;
   }
 
   NSF::~NSF ()
@@ -124,7 +126,7 @@ static int is_sjis_prefix(int c)
     }
     
     if(format==NULL||strlen(format)>128)
-      format = "%A - %T (%n/%e)";
+      format = "%L (%n/%e) %T - %A";
 
     print_title[wp] = '\0';
 
@@ -163,6 +165,11 @@ static int is_sjis_prefix(int c)
         case 'C':
         case 'c':
           wp += sprintf(print_title+wp, "%s", this->copyright);
+          format++;
+          break;
+        case 'L':
+        case 'l':
+          wp += sprintf(print_title+wp, "%s", nsfe_entry[song].tlbl);
           format++;
           break;
         case 'N':
@@ -297,6 +304,11 @@ static int is_sjis_prefix(int c)
 
   int NSF::GetPlayTime ()
   {
+    if (nsfe_entry[song].time >= 0)
+    {
+      return nsfe_entry[song].time;
+    }
+
     return time_in_ms < 0 ? default_playtime : time_in_ms;
   }
 
@@ -307,6 +319,11 @@ static int is_sjis_prefix(int c)
 
   int NSF::GetFadeTime ()
   {
+    if (nsfe_entry[song].fade >= 0)
+    {
+      return nsfe_entry[song].fade;
+    }
+
     if (fade_in_ms < 0)
       return default_fadetime;
     else if (fade_in_ms == 0)
@@ -345,6 +362,22 @@ static int is_sjis_prefix(int c)
     if (size < 4) // no FourCC
       return false;
 
+    // fill NSFe values with defaults
+
+    // 'plst'
+    nsfe_plst = NULL;
+    nsfe_plst_size = 0;
+
+    // entries 'tlbl', 'time', 'fade'
+    for (int i=0; i < NSFE_ENTRIES; ++i)
+    {
+      nsfe_entry[i].tlbl = "";
+      nsfe_entry[i].time = -1;
+      nsfe_entry[i].fade = -1;
+    }
+
+    // load the NSF or NSFe
+
     memcpy (magic, image, 4);
     magic[4] = '\0';
 
@@ -364,10 +397,13 @@ static int is_sjis_prefix(int c)
     play_address = image[0x0c] | (image[0x0D] << 8);
     memcpy (title_nsf, image + 0x0e, 32);
     title_nsf[31] = '\0';
+    title = title_nsf;
     memcpy (artist_nsf, image + 0x2e, 32);
     artist_nsf[31] = '\0';
+    artist = artist_nsf;
     memcpy (copyright_nsf, image + 0x4e, 32);
     copyright_nsf[31] = '\0';
+    copyright = copyright_nsf;
     ripper = ""; // NSFe only
     text = NULL; // NSFe only
     speed_ntsc = image[0x6e] | (image[0x6f] << 8);
@@ -525,14 +561,13 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "auth"))
         {
-          unsigned int n=0;
-
           #define NSFE_STRING(p) \
             if (n >= chunk_size) break; \
             p = reinterpret_cast<char*>(chunk+n); \
             while (n < chunk_size && chunk[n] != 0) ++n; \
             if(chunk[n] == 0) ++n;
 
+          unsigned int n=0;
           while (true)
           {
             NSFE_STRING(title);
@@ -544,19 +579,54 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "plst"))
         {
-          // WIP
+          nsfe_plst = chunk;
+          nsfe_plst_size = chunk_size;
         }
         else if (!strcmp(cid, "time"))
         {
-          // WIP
+          unsigned int i = 0;
+          unsigned int n = 0;
+          while (i < NSFE_ENTRIES && (n+3)<chunk_size)
+          {
+            UINT32 value =
+                (chunk[n+0]      )
+              + (chunk[n+1] <<  8)
+              + (chunk[n+2] << 16)
+              + (chunk[n+3] << 24);
+            nsfe_entry[i].time = INT32(value);
+            ++i;
+            n += 4;
+          }
         }
         else if (!strcmp(cid, "fade"))
         {
-          // WIP
+          unsigned int i = 0;
+          unsigned int n = 0;
+          while (i < NSFE_ENTRIES && (n+3)<chunk_size)
+          {
+            UINT32 value =
+                (chunk[n+0]      )
+              + (chunk[n+1] <<  8)
+              + (chunk[n+2] << 16)
+              + (chunk[n+3] << 24);
+            nsfe_entry[i].fade = INT32(value);
+            ++i;
+            n += 4;
+          }
         }
         else if (!strcmp(cid, "tlbl"))
         {
-          // WIP
+          #define NSFE_STRING(p) \
+            if (n >= chunk_size) break; \
+            p = reinterpret_cast<char*>(chunk+n); \
+            while (n < chunk_size && chunk[n] != 0) ++n; \
+            if(chunk[n] == 0) ++n;
+
+          unsigned int n=0;
+          for (unsigned int i=0; i < NSFE_ENTRIES; ++i)
+          {
+            NSFE_STRING(nsfe_entry[i].tlbl);
+          }
         }
         else if (!strcmp(cid, "text"))
         {
