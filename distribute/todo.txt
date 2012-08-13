@@ -14,12 +14,11 @@ TODO LATER
 - One click button for keyboard view?
 - NSF2
 - Foobar2000 plugin?
-- VRC7 accuracy
+- VRC7 emulation accuracy
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
 - Doommaster has pitch problem, also seems to have weird buffer cutting stuff, only in NSFPlay?
-- 5B match volume envelope to real thing? (does not match datasheet, current waveform too sharp)
 - Channel mask caption is ????? in Japanese UI.
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
