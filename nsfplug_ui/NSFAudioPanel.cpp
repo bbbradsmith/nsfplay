@@ -44,14 +44,13 @@ void NSFAudioPanel::UpdateNSFPlayerConfig(bool b)
   if(b)
   {
     m_quality.SetPos(pm->cf->GetDeviceConfig(device_id,"QUALITY"));
-    m_filter.SetPos(pm->cf->GetDeviceConfig(device_id, "FC"));
+    m_filter.SetPos(pm->cf->GetDeviceConfig(device_id, "FILTER"));
     m_threshold.SetPos(pm->cf->GetDeviceConfig(device_id,"THRESHOLD"));
   }
   else
   {
     pm->cf->GetDeviceConfig(device_id,"QUALITY") = m_quality.GetPos();
-    pm->cf->GetDeviceConfig(device_id,"FC") = m_filter.GetPos()<25?0:m_filter.GetPos();
-    pm->cf->GetDeviceConfig(device_id,"FILTER") = 1;
+    pm->cf->GetDeviceConfig(device_id,"FILTER") = m_filter.GetPos();
     pm->cf->GetDeviceConfig(device_id,"THRESHOLD") = m_threshold.GetPos();
     pm->cf->Notify(device_id);
   }

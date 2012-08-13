@@ -95,7 +95,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["DETECT_TIME"] = m_nDetectTime * 1000;
     CONFIG["UPDATE_PLAYLIST"] = m_bUpdatePlaylist;
     CONFIG["HPF"]   = 256 - m_nHpfValue;
-    CONFIG["LPF"]   = m_nLpfValue<25?0:m_nLpfValue;
+    CONFIG["LPF"]   = m_nLpfValue;
     CONFIG["MASK_INIT"]    = m_bMaskInit;
     CONFIG["DETECT_ALT"]   = !m_bUseAlt;
     CONFIG["TITLE_FORMAT"] = m_format.GetBuffer(128);

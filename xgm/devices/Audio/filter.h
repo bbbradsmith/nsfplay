@@ -72,13 +72,15 @@ namespace xgm
   class DCFilter : public IRenderable
   {
   private:
-    double dc_weight;
+    double R, C;
+    double a;
     double in[2], out[2];
     double rate;
 
   public:
     DCFilter()
     {
+      R = C = 0.0;
       Reset();
     }
 
@@ -86,36 +88,59 @@ namespace xgm
     {
     }
 
+    void UpdateFactor()
+    {
+      if(C==0.0||R==0.0)
+      {
+        a = 2.0; // disable
+      }
+      else
+      {
+        a = (R*C) / ((R*C) + (1.0/rate));
+      }
+    }
+
+    double GetFactor() { return a; }
+
     void SetRate(double r)
     {
       // カットオフ周波数 : 2pi*R*C
       rate = r;
-      const double C = 10.0E-06, R=270;
-      dc_weight = 1.0/(1.0/(rate*R*C)+1.0);
+      UpdateFactor();
     }
 
-    void SetParam(double R, double C)
+    void SetParam(double r, int c) // c = 0-256, 256 = off, 0 = max
     {
-      if(C==0.0||R==0.0)
-      {
-        C=10.0E-06/256;
-        R=270;
-      }
-      dc_weight = 1.0/(1.0/(rate*R*C)+1.0);
+      R = r;
+      //C = c;
+
+      if (c > 255)
+        C = 0.0; // disable
+      else
+        C = 2.0e-4*(1.0-::pow(1.0-(double(c+1)/256.0),0.05));
+
+      // the goal of this curve is to have a wide range of practical use,
+      // though it may look a little complicated. points of interest:
+      //   HPF = 163 ~ my NES
+      //   HPF = 228 ~ my Famicom
+      //   low values vary widely and have an audible effect
+      //   high values vary slowly and have a visible effect on DC offset
+
+      UpdateFactor();
     }
 
     // 非virtualなRender
     inline UINT32 FastRender(INT32 b[2])
     {
-      if(dc_weight<1.0)
+      if(a<1.0)
       {
-        out[0] = dc_weight * ( out[0] + b[0] - in [0] );
+        out[0] = a * ( out[0] + b[0] - in [0] );
         in[0] = b[0];
         b[0] = (INT32)out[0];
 
-        out[1] = dc_weight * ( out[1] + b[1] - in [1] );
+        out[1] = a * ( out[1] + b[1] - in [1] );
         in[1] = b[1];
-        b[1] = (INT32)out[1];      
+        b[1] = (INT32)out[1];
       }
       return 2;
     }
@@ -199,10 +224,15 @@ namespace xgm
       return FastRender(b);
     }
 
-    void SetParam (double r, double c)
+    void SetParam (double r, int c) // c = 0-400, 0=off, 400=max
     {
-      C = (1.0E-10) * c;
+      //C = 1.0E-10 * c;
       R = r;
+
+      C = ::pow(double(c) / 400.0, 2.0) * 1.0E-10 * 400.0;
+      // curved to try to provide useful range of settings
+      //   LPF = 112 ~ my NES
+
       UpdateFactor();
     }
 
@@ -220,10 +250,12 @@ namespace xgm
     void UpdateFactor()
     {
       if (R!=0.0&&C!=0.0&&rate!=0.0)
-        a = (1.0/(R * C * rate));
+        a = (1.0/rate) / ((R*C) + (1.0/rate));
       else
-        a = 1.0;      
+        a = 2.0; // disabled
     }
+
+    double GetFactor() { return a; }
 
     void Reset ()
     {
@@ -233,6 +265,6 @@ namespace xgm
 
   };
 
-}                               // namespace
+}  // namespace
 
 #endif

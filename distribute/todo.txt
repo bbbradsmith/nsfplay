@@ -1,14 +1,13 @@
 TODO
 - Review write order / masking / return value and try to prevent conflict with FDS-RAM $8000-DFFF.
-- N163 horrible sound accuracy
-- N163 volume vs num channels
-- User option for VRC7 patches
-- VRC6 too loud, match with Famitracker
-- VRC6 test polarity / channel balance / etc.
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
 - Loop detector - should not set length if loop found; should not conflict with NSFe/playlist lengths
 
 TODO LATER
+- VRC6 square phase reset should not reset divide
+- Replace all pcounter with clock based simulation (except for VRC7)
+- N163 horrible sound accuracy
+- N163 volume vs num channels
 - Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)

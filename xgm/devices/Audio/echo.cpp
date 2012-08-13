@@ -15,7 +15,7 @@ void EchoUnit::Reset()
   for(int i=0; i<16; i++) h[i] = hdef[i];
   lpf.SetParam(4700,100);
   lpf.Reset();
-  hpf.SetParam(270, 1.0E-06);
+  hpf.SetParam(270,100);
   hpf.Reset();
 }
 
