@@ -317,7 +317,7 @@ namespace xgm
 
   void NSFPlayer::DetectSilent ()
   {
-    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown)
+    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
       return;
 
     if ((*config)["MASK"].GetInt()==0 && (*config)["AUTO_STOP"].GetInt() &&
@@ -332,7 +332,7 @@ namespace xgm
 
   void NSFPlayer::DetectLoop ()
   {
-    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown)
+    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
       return;
 
     if ((*config)["AUTO_DETECT"])

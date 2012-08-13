@@ -122,17 +122,20 @@ Versions
 ========
 
 NSFPlay 2.2 - BETA VERSION 0
-- Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
-- Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
-- Inverted VRC7 volume display in keyboard view.
+Audio Emulation:
 - Unmute on reset now sets $4015 to $0F instead of $1F.
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
 - New VRC7 patch set, option to select patch set via VRC7_PATCH.
-- NSFe support.
 - 5B polarity inverted, envelope adjusted, volume tweak.
 - MMC5 polarity inverted, length counter runs at double speed, highest 8 frequencies are not muted.
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
 - VRC6 polarity inverted, phase reset now functions properly.
+Other:
+- Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
+- Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
+- Inverted VRC7 volume display in keyboard view.
+- NSFe support.
+- Added NSFe extension block 'text', contains null terminated string of any length (NSF text).
 - Removed broken ENABLE_DCF config option. HPF=256 now correctly disables HPF.
 - Rewrote LPF and HPF, should have a more usable range of options now.
 - Removed XXX_FR/XXX_FC options, now XXX_FILTER works like LPF for each device.

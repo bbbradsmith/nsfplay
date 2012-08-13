@@ -88,7 +88,7 @@ END_MESSAGE_MAP()
 void NSFInfoDialog::SetInfo(NSF *nsf)
 {
   CString ss;
-  static char buf[2048], *p;
+  static char buf[4096], *p;
   int i=0;
 
   m_title = (CString) nsf->title;
@@ -113,6 +113,12 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
 
   nsf_copy = (*nsf); nsf_copy.body=NULL; // ヘッダのみコピー  
   ntag.SetNSF(&nsf_copy);
+
+  if (nsf->text != NULL)
+  {
+    ss.Format("%s\n--- end of NSFe text ---", nsf->text);
+    m_info += ss;
+  }
 
   if((int)CONFIG["WRITE_TAGINFO"]&&!ntag.IsExistSection(true)&&!ntag.IsExistSection(false))
     ntag.CreateTag(CONFIG["TITLE_FORMAT"]);

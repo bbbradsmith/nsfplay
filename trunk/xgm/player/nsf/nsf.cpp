@@ -352,6 +352,12 @@ static int is_sjis_prefix(int c)
     return songs;
   }
 
+  bool NSF::UseNSFePlaytime()
+  {
+    if(!nsfe_plst) return false;
+    return nsfe_entry[nsfe_plst[song]].time >= 0;
+  }
+
   void NSF::SetSong (int s)
   {
     song = s % songs;
