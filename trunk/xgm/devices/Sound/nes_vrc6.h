@@ -21,6 +21,8 @@ namespace xgm
     INT16 calc_saw ();
     int accum, ct7;
     UINT8 saw_phase;
+    bool halt;
+    int freq_shift;
     double clock, rate;
     TrackInfoBasic trkinfo[3];
 

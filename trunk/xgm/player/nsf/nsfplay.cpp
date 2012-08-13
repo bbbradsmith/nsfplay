@@ -242,6 +242,7 @@ namespace xgm
     lpf.Reset();
     dcf.SetRate(rate);
     dcf.Reset(); 
+    DEBUG_OUT("rate: %f\n",rate);
   }
 
   void NSFPlayer::SetChannels(int channels)
@@ -625,14 +626,18 @@ namespace xgm
       cmp.SetParam(
         0.01 * ((*config)["COMP_LIMIT"]), 
         0.01 * ((*config)["COMP_THRESHOLD"]),
-        0.01 * ((*config)["COMP_VELOCITY"]));    
-      dcf.SetParam(270, (*config)["HPF"]*10.0E-06/256);
+        0.01 * ((*config)["COMP_VELOCITY"]));
+
+      dcf.SetParam(270,(*config)["HPF"]);
       lpf.SetParam(4700.0,(*config)["LPF"]);
+
+      DEBUG_OUT("dcf: %3d > %f\n", (*config)["HPF"].GetInt(), dcf.GetFactor());
+      DEBUG_OUT("lpf: %3d > %f\n", (*config)["LPF"].GetInt(), lpf.GetFactor());
+
       return;
     }
 
-    filter[id].SetParam (config->GetDeviceConfig(id,"FR").GetInt(),
-                         config->GetDeviceConfig(id,"FC").GetInt());
+    filter[id].SetParam (4700.0, config->GetDeviceConfig(id,"FILTER").GetInt());
 
     amp[id].SetVolume (config->GetDeviceConfig(id,"VOLUME"));
     amp[id].SetMute (config->GetDeviceConfig(id,"MUTE"));

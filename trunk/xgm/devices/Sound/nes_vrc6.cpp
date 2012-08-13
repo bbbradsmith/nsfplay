@@ -8,6 +8,9 @@ namespace xgm
     SetClock (DEFAULT_CLOCK);
     SetRate (DEFAULT_RATE);
 
+    halt = false;
+    freq_shift = 0;
+
     for(int c=0;c<2;++c)
         for(int t=0;t<3;++t)
             sm[c][t] = 128;
@@ -65,6 +68,7 @@ namespace xgm
 
   void NES_VRC6::Reset ()
   {
+    Write (0x9003, 0);
     for (int i = 0; i < 3; i++)
     {
       Write (0x9000 + i, 0);
@@ -78,33 +82,41 @@ namespace xgm
   INT16 NES_VRC6::calc_sqr (int i)
   {
     static const INT16 sqrtbl[8][16] = {
-      {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+      {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1}
     };
 
-    if (enable[i])
+    if (!enable[i])
+      return 0;
+
+    if (!halt)
       pcounter[i].iup ();
+
     return (gate[i]
-            || sqrtbl[duty[i]][pcounter[i].value ()])? volume[i] : -volume[i];
+      || sqrtbl[duty[i]][pcounter[i].value ()])? volume[i] : 0;
   }
 
   INT16 NES_VRC6::calc_saw ()
   {
-    if (enable[2] && pcounter[2].iup ())
+    if (!enable[2])
+      return 0;
+
+    if (!halt && pcounter[2].iup ())
     {
       if ((++ct7) == 7)
         ct7 = saw_phase = 0;
       else
-        saw_phase += accum;
+        saw_phase += accum; // note 8-bit wrapping behaviour
     }
 
-    return saw_phase >> 2;
+    // only top 5 bits of saw are output
+    return saw_phase >> 3;
   }
 
   UINT32 NES_VRC6::Render (INT32 b[2])
@@ -114,19 +126,21 @@ namespace xgm
     m[1] = calc_sqr(1);
     m[2] = calc_saw();
 
-    m[0] = (mask & 1) ? 0 : m[0];
-    m[1] = (mask & 2) ? 0 : m[1];
-    m[2] = (mask & 4) ? 0 : m[2];
+    // note: signal is inverted compared to 2A03
+
+    m[0] = (mask & 1) ? 0 : -m[0];
+    m[1] = (mask & 2) ? 0 : -m[1];
+    m[2] = (mask & 4) ? 0 : -m[2];
 
     b[0]  = m[0] * sm[0][0];
     b[0] += m[1] * sm[0][1];
     b[0] += m[2] * sm[0][2];
-    b[0] >>= (7 - 6);
+    //b[0] >>= (7 - 7);
 
     b[1]  = m[0] * sm[1][0];
     b[1] += m[1] * sm[1][1];
     b[1] += m[2] * sm[1][2];
-    b[1] >>= (7 - 6);
+    //b[1] >>= (7 - 7);
 
     return 2;
   }
@@ -150,7 +164,7 @@ namespace xgm
     case 0xb001:
       ch = cmap[(adr >> 12) & 3];
       freq[ch] = (freq[ch] & 0xf00) | val;
-      pcounter[ch].setcycle (freq[ch]);
+      pcounter[ch].setcycle (freq[ch] >> freq_shift);
       break;
 
     case 0x9002:
@@ -158,12 +172,39 @@ namespace xgm
     case 0xb002:
       ch = cmap[(adr >> 12) & 3];
       freq[ch] = ((val & 0xf) << 8) + (freq[ch] & 0xff);
-      pcounter[ch].setcycle (freq[ch]);
+      pcounter[ch].setcycle (freq[ch] >> freq_shift);
+      if (!enable[ch]) // if enable is being turned on, phase should be reset
+      {
+        if (adr == 0xb002)
+        {
+          ct7 = 0; // reset
+          saw_phase = 0;
+        }
+        else
+        {
+          pcounter[ch].reset(0);
+          // TODO
+          // really I need to reset the duty cycle without
+          // resetting the divider; the pcounter implementation
+          // implements both together, making this impossible.
+        }
+      }
       enable[ch] = (val >> 7) & 1;
       break;
 
     case 0xb000:
       accum = val & 63;
+      break;
+
+    case 0x9003:
+      halt = val & 1;
+      freq_shift =
+          (val & 4) ? 8 :
+          (val & 2) ? 4 :
+          0;
+      pcounter[0].setcycle(freq[0] >> freq_shift);
+      pcounter[1].setcycle(freq[1] >> freq_shift);
+      pcounter[2].setcycle(freq[2] >> freq_shift);
       break;
 
     default:

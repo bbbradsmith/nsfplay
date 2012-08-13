@@ -66,7 +66,7 @@ void NSFEasyDialog::UpdateNSFPlayerConfig(bool b)
       m_comboCtrl.AddString(*it);
     m_comboCtrl.SelectString(-1,CONFIG["LAST_PRESET"].GetStr().c_str());
     m_lpfCtrl.SetPos((int)CONFIG["LPF"]);
-    m_hpfCtrl.SetPos(256-(int)CONFIG["HPF"]);
+    m_hpfCtrl.SetPos(256 - (int)CONFIG["HPF"]);
     m_masterCtrl.SetPos((int)CONFIG["MASTER_VOLUME"]);
     m_qualityCtrl.SetPos(CONFIG.GetDeviceConfig(APU,"QUALITY"));
   }
@@ -115,7 +115,7 @@ void NSFEasyDialog::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
   }
   if((CSliderCtrl*)pScrollBar == &m_lpfCtrl)
   { 
-    CONFIG["LPF"] = m_lpfCtrl.GetPos()<25?0:m_lpfCtrl.GetPos();
+    CONFIG["LPF"] = m_lpfCtrl.GetPos();
     pm->cf->Notify(-1);
     parent->UpdateNSFPlayerConfig(true);
   }

@@ -53,7 +53,6 @@ Global options:
   DETECT_INT: (ms) jitter allowed between time comparisons in loop detection
   LPF: 0-400 lowpass filter strength (0=off, 400=full)
   HPF: 0-256 highpass filter strength (256=off, 0=full)
-  ENABLE_DCF: 1/0 enable DC-bias filter
   TITLE_FORMAT: winamp title string format
   DETECT_ALT: 1/0 use alternate loop detection algorithm
   VSYNC_ADJUST: 1/0 ignore NSF frame length setting (yes/no)
@@ -85,9 +84,7 @@ Device options:
   Devices (XXX) are: APU1, APU2, 5B, MMC5, N163, VRC6, VRC7, FDS
   XXX_VOLUME: 0-255 device volume
   XXX_QUALITY: 0-3 oversampling control
-  XXX_FILTER: 1/0 lowpass filter on/off
-  XXX_FC: RC filter C (0 = off)
-  XXX_FR: RC filter R (0 = off)
+  XXX_FILTER: 0-400 lowpass filter (0=off, 400=full)
   XXX_MUTE: 1/0 mute channel yes/no
   XXX_THRESHOLD: 0-100 compressor threshold (100=off)
   APU1_OPTION0: unmute on reset
@@ -134,6 +131,11 @@ NSFPlay 2.2 - BETA VERSION 0
 - NSFe support.
 - 5B polarity inverted, envelope adjusted, volume tweak.
 - MMC5 polarity inverted, length counter runs at double speed, highest 8 frequencies are not muted.
+- VRC6 $9003 register implemented (controls halt and frequency multiplier)
+- VRC6 polarity inverted, phase reset now functions properly.
+- Removed broken ENABLE_DCF config option. HPF=256 now correctly disables HPF.
+- Rewrote LPF and HPF, should have a more usable range of options now.
+- Removed XXX_FR/XXX_FC options, now XXX_FILTER works like LPF for each device.
 
 NSFPlay 2.1 - 3/27/2012
 Audio Output:

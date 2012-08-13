@@ -89,15 +89,12 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("AUTO_DETECT", 1);
   CreateValue("DETECT_TIME", 30*1000);
   CreateValue("DETECT_INT", 5000);
-  //CreateValue("LPF", 0);
-  CreateValue("LPF", 80); // BS enabling by default
-  CreateValue("HPF", 256);
-  CreateValue("ENABLE_DCF", 1); // = HPF
+  CreateValue("LPF", 112);
+  CreateValue("HPF", 164);
   CreateValue("TITLE_FORMAT", "%L (%n/%e) %T - %A");
   CreateValue("DETECT_ALT", 0);
   CreateValue("VSYNC_ADJUST", 0);
   CreateValue("MULT_SPEED", 256); // clock speed multiplier
-  //CreateValue("FAST_SEEK", 1); // BS deprecated
   CreateValue("VRC7_PATCH", 0); // VRC7 patch set
   CreateValue("NSFE_PLAYLIST", 1); // use NSFe playlist
 
@@ -111,7 +108,6 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
 
   CreateValue("MASTER_VOLUME", 128);
 
-  // BS volume/panning mix
   for (i = 0; i < NES_CHANNEL_MAX; ++i)
   {
       std::string str;
@@ -139,16 +135,13 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   for (i = 0; i < NES_DEVICE_MAX; i++)
   {
     static const int DEVICE_VOLUME[NES_DEVICE_MAX] = {
-        128, 128, 112, 128, 128, 128,  96,  80 };
+        128, 128, 112, 128, 128,  90,  96,  80 };
 
     std::string str;
     str = dname[i];
     CreateValue((std::string)dname[i]+"_VOLUME", DEVICE_VOLUME[i]);
     CreateValue((std::string)dname[i]+"_QUALITY", 3);
-    CreateValue((std::string)dname[i]+"_FILTER",  true);
-    //CreateValue((std::string)dname[i]+"_FC", 100);
-    CreateValue((std::string)dname[i]+"_FC", 0); // BS disabling by default
-    CreateValue((std::string)dname[i]+"_FR", 4700);
+    CreateValue((std::string)dname[i]+"_FILTER", 0);
     CreateValue((std::string)dname[i]+"_MUTE", 0);
     CreateValue((std::string)dname[i]+"_THRESHOLD", 100);
 
