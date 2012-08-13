@@ -1,9 +1,9 @@
 TODO
-- Review write order / masking / return value and try to prevent conflict with FDS-RAM $8000-DFFF.
+- Review write order / masking / return value and try to prevent conflict with FDS-RAM $8000-FFFF.
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
-- Loop detector - should not set length if loop found; should not conflict with NSFe/playlist lengths
 
 TODO LATER
+- Breakout window for info (nice for looking at NSFe text chunk).
 - VRC6 square phase reset should not reset divide
 - Replace all pcounter with clock based simulation (except for VRC7)
 - N163 horrible sound accuracy

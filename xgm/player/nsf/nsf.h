@@ -111,6 +111,8 @@ namespace xgm
     int GetLoopTime ();
     int GetFadeTime ();
     int GetLoopNum ();
+
+    bool UseNSFePlaytime();
   };
 
 }                               // namespace 
