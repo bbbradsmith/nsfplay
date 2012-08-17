@@ -576,7 +576,7 @@ namespace xgm
   {
     if (adr == 0x4015)
     {
-      val |= (irq?128:0) | (active?16:0) | (enable[1]?8:0) | (enable[0]?4:0);
+      val |= (irq?128:0) | (active?16:0) | (length_counter[1]?8:0) | (length_counter[0]?4:0);
       return true;
     }
     else if (0x4008<=adr&&adr<=0x4014)

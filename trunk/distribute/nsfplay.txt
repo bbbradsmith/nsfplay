@@ -131,6 +131,7 @@ Audio Emulation:
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
 - VRC6 polarity inverted, phase reset now functions properly.
 Other:
+- Fixed improper $4015 read implementation (1 if length counter > 0, not if enabled, also DPCM IRQ not initialized).
 - Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
 - Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
 - Inverted VRC7 volume display in keyboard view.
