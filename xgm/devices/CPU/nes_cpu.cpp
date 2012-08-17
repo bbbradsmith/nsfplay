@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "nes_cpu.h"
 
-#define DEBUG_RW 1
+#define DEBUG_RW 0
 
 namespace xgm
 {
@@ -51,6 +51,7 @@ UINT32 NES_CPU::Exec (UINT32 clock)
   {
     if (!breaked)
     {
+      //DEBUG_OUT("PC: 0x%04X\n", context.PC);
       K6502_Exec (&context);
       if (context.PC == breakpoint)
         breaked = true;

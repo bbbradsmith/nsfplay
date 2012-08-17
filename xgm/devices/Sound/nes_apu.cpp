@@ -120,7 +120,7 @@ namespace xgm
     }
     else if(adr==0x4015)
     {
-      val |= (enable[1]?2:0)|(enable[0]?1:0);
+      val |= (length_counter[1]?2:0)|(length_counter[0]?1:0);
       return true;
     }
     else
