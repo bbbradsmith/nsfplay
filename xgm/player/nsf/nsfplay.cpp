@@ -181,8 +181,8 @@ namespace xgm
        * 潰すものがあるのでコメントアウト．FDSバンクと通常バンク空間を分
        * けるべきなのか？
        */
-      //bank.SetBankDefault(6, nsf->bankswitch[6]);
-      //bank.SetBankDefault(7, nsf->bankswitch[7]);
+      bank.SetBankDefault(6, nsf->bankswitch[6]);
+      bank.SetBankDefault(7, nsf->bankswitch[7]);
     }
     else
     {

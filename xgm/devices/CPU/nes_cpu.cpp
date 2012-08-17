@@ -92,6 +92,8 @@ void NES_CPU::SetMemory (IDevice * b)
 
 bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)
 {
+  //DEBUG_OUT("Write: 0x%04X = 0x%02X\n", adr, val);
+
   if (bus)
     return bus->Write (adr, val, id);
   else
@@ -100,6 +102,8 @@ bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)
 
 bool NES_CPU::Read (UINT32 adr, UINT32 & val, UINT32 id)
 {
+  //DEBUG_OUT(" Read: 0x%04X\n", adr);
+
   if (bus)
     return bus->Read (adr, val, id);
   else
