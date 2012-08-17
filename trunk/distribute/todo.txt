@@ -16,6 +16,8 @@ TODO LATER
 - Foobar2000 plugin?
 - VRC7 emulation accuracy
 - FDS high frequency modulation behaviour, verify against hardware
+- FDS check out commented out SetBankDefault(6/7,...) lines
+- MMC5 squares, are they nonlinear, does PCM affect them?
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
@@ -24,3 +26,9 @@ TODO LATER
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
+
+NOTE:
+Bus -> writes to all devices, reads |= all devices
+Layer -> writes to devices until true is returned, reads from devices until tru is returned
+
+There is only one Bus and one Layer in the program, probably I want to change the Bus into a Layer, and move the "layer" to the end of the "bus" instead of the beginning. Review all read/write devices on the bus before changing to layer.
