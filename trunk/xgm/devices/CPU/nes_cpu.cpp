@@ -1,6 +1,8 @@
 #include <assert.h>
 #include "nes_cpu.h"
 
+#define DEBUG_RW 1
+
 namespace xgm
 {
 
@@ -92,7 +94,9 @@ void NES_CPU::SetMemory (IDevice * b)
 
 bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)
 {
-  //DEBUG_OUT("Write: 0x%04X = 0x%02X\n", adr, val);
+  #if DEBUG_RW
+    DEBUG_OUT("Write: 0x%04X = 0x%02X\n", adr, val);
+  #endif
 
   if (bus)
     return bus->Write (adr, val, id);
@@ -102,10 +106,16 @@ bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)
 
 bool NES_CPU::Read (UINT32 adr, UINT32 & val, UINT32 id)
 {
-  //DEBUG_OUT(" Read: 0x%04X\n", adr);
-
   if (bus)
-    return bus->Read (adr, val, id);
+  {
+    bool result = bus->Read (adr, val, id);
+
+    #if DEBUG_RW
+      DEBUG_OUT(" Read: 0x%04X = 0x%02X\n", adr, val);
+    #endif
+
+    return result;
+  }
   else
     return false;
 }

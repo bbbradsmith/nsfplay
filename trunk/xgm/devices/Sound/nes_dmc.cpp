@@ -378,6 +378,7 @@ namespace xgm
     for (i = 0; i < 0x10; i++)
       Write (0x4008 + i, 0);
 
+    irq = false;
     Write (0x4015, 0x00);
     if (option[OPT_UNMUTE_ON_RESET])
       Write (0x4015, 0x0f);
