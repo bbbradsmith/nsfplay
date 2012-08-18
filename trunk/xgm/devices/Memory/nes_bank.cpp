@@ -5,9 +5,11 @@
 // this workaround solves a problem with mirrored FDS RAM writes
 // when the same bank is used twice; some NSF rips reuse bank 00
 // in "unused" banks that actually get written to.
-//
-// eventually want to fix the NSFs and undo this solution
-#define FDS_MEMCPY 1
+// it is preferred to fix the NSFs and leave this disabled.
+#define FDS_MEMCPY 0
+
+// for detecting mirrored writes in FDS NSFs
+#define DETECT_FDS_MIRROR 0
 
 #if FDS_MEMCPY
 static UINT8* fds_image = NULL;
@@ -95,7 +97,6 @@ namespace xgm
     #if FDS_MEMCPY
     if (!fds_enable)
     #endif
-
     if (0x5ff8 <= adr && adr < 0x6000)
     {
       bankswitch[(adr & 7) + 8] = val & 0xff;
@@ -125,16 +126,17 @@ namespace xgm
       if (0 <= bankswitch[adr >> 12] && 0x6000 <= adr && adr < 0xe000)
       {
         // for detecting FDS ROMs with improper mirrored writes
-        //
-        //for (int i=0; i < 14; ++i)
-        //{
-        //  int b = adr >> 12;
-        //  if (i != b && bankswitch[i] == bankswitch[b])
-        //  {
-        //    DEBUG_OUT("[%04X] write mirrored to [%04X] = %02X\n",
-        //      adr, (i * 0x1000) | (adr & 0x0fff), val);
-        //  }
-        // }
+        #if DETECT_FDS_MIRROR
+          for (int i=0; i < 14; ++i)
+          {
+            int b = adr >> 12;
+            if (i != b && bankswitch[i] == bankswitch[b])
+            {
+              DEBUG_OUT("[%04X] write mirrored to [%04X] = %02X\n",
+                adr, (i * 0x1000) | (adr & 0x0fff), val);
+            }
+          }
+        #endif
 
         bank[bankswitch[adr >> 12]][adr & 0x0fff] = val;
         return true;

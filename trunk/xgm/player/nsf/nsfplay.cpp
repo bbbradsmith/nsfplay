@@ -176,11 +176,6 @@ namespace xgm
       mem.SetFDSMode (true);
       bank.SetFDSMode (true);
 
-      /** 
-       * 本来は必要なはずだが，FDSバンクの書き換えで対応する$E000-$FFFFを
-       * 潰すものがあるのでコメントアウト．FDSバンクと通常バンク空間を分
-       * けるべきなのか？
-       */
       bank.SetBankDefault(6, nsf->bankswitch[6]);
       bank.SetBankDefault(7, nsf->bankswitch[7]);
     }
