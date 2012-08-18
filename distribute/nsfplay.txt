@@ -130,8 +130,9 @@ Audio Emulation:
 - MMC5 polarity inverted, length counter runs at double speed, highest 8 frequencies are not muted.
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
 - VRC6 polarity inverted, phase reset now functions properly.
+- FDS now uses NSF header $76/$77 to set up $6000-7FFF memory range.
 Other:
-- Fixed improper $4015 read implementation (1 if length counter > 0, not if enabled, also DPCM IRQ not initialized).
+- Fixed improper $4015 read implementation (should return length counter status), also DPCM IRQ was not initialized.
 - Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
 - Fixed Winamp visualizer timing inaccuracy, changed default keyboard delay/freq.
 - Inverted VRC7 volume display in keyboard view.
