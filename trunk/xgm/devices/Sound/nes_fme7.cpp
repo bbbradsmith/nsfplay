@@ -55,8 +55,10 @@ bool NES_FME7::Write (xgm::UINT32 adr, xgm::UINT32 val, xgm::UINT32 id)
 
 bool NES_FME7::Read (xgm::UINT32 adr, xgm::UINT32 & val, xgm::UINT32 id)
 {
-  if (psg)
-    val = PSG_readIO (psg);
+  // not sure why this was here - BS
+  //if (psg)
+  //  val = PSG_readIO (psg);
+
   return false;
 }
 

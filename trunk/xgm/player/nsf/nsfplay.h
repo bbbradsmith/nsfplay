@@ -52,7 +52,8 @@ namespace xgm
     void UpdateInfo();
 
   public:
-    Bus bus;
+    Bus apu_bus;
+    Layer stack;
     Layer layer;
     Mixer mixer;
 
