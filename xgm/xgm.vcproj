@@ -559,6 +559,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\devices\Sound\legacy\281btone.h"
+						>
+					</File>
+					<File
 						RelativePath=".\devices\Sound\legacy\emu2149.c"
 						>
 					</File>
@@ -587,11 +591,23 @@
 						>
 					</File>
 					<File
-						RelativePath=".\devices\Sound\legacy\vrc7tone_mo.h"
+						RelativePath=".\devices\Sound\legacy\vrc7tone_ft35.h"
 						>
 					</File>
 					<File
-						RelativePath=".\devices\Sound\legacy\vrc7tone_ft.h"
+						RelativePath=".\devices\Sound\legacy\vrc7tone_ft36.h"
+						>
+					</File>
+					<File
+						RelativePath=".\devices\Sound\legacy\vrc7tone_kt1.h"
+						>
+					</File>
+					<File
+						RelativePath=".\devices\Sound\legacy\vrc7tone_kt2.h"
+						>
+					</File>
+					<File
+						RelativePath=".\devices\Sound\legacy\vrc7tone_mo.h"
 						>
 					</File>
 					<File
