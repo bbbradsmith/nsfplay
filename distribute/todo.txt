@@ -1,8 +1,5 @@
 TODO
-- Review write order / masking / return value and try to prevent conflict with FDS-RAM $8000-FFFF.
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
-
-TODO LATER
 - Breakout window for info (nice for looking at NSFe text chunk).
 - VRC6 square phase reset should not reset divide
 - Replace all pcounter with clock based simulation (except for VRC7)
@@ -25,11 +22,3 @@ TODO LATER
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
-
-NOTE:
-Bus -> writes to all devices, reads |= all devices
-Layer -> writes to devices until true is returned, reads from devices until tru is returned
-
-There is only one Bus and one Layer in the program, probably I want to change the Bus into a Layer, and move the "layer" to the end of the "bus" instead of the beginning. Review all read/write devices on the bus before changing to layer.
-
-I think the only place where the "bus" behaviour is used is between apu1 and apu2; consider merging them

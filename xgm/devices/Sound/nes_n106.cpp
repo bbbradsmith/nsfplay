@@ -173,7 +173,7 @@ namespace xgm
       if (addr & 0x80) addr++;
       break;
     case 0xF800:
-      //val = addr;
+      //val = addr; // this register is not readable
       return false;
     default:
       return false;

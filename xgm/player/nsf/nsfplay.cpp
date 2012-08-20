@@ -105,9 +105,10 @@ namespace xgm
     }
 
     // データにあわせたVMを作る
-    bus.DetachAll ();
+    stack.DetachAll ();
     layer.DetachAll ();
     mixer.DetachAll ();
+    apu_bus.DetachAll ();
 
     // ループディテクタの切り替え
     if((*config)["DETECT_ALT"])
@@ -137,41 +138,42 @@ namespace xgm
 
     dmc->SetMemory (&layer);
 
-    bus.Attach (&layer);
-    bus.Attach (sc[APU]);
-    bus.Attach (sc[DMC]);
+    // APU units are combined into a single bus
+    apu_bus.Attach (sc[APU]);
+    apu_bus.Attach (sc[DMC]);
+    stack.Attach(&apu_bus);
 
     mixer.Attach (&amp[APU]);
     mixer.Attach (&amp[DMC]);
 
+    if (nsf->use_mmc5)
+    {
+      stack.Attach (sc[MMC5]);
+      mixer.Attach (&amp[MMC5]);
+    }
     if (nsf->use_vrc6)
     {
-      bus.Attach (sc[VRC6]);
+      stack.Attach (sc[VRC6]);
       mixer.Attach (&amp[VRC6]);
     }
     if (nsf->use_vrc7)
     {
-      bus.Attach (sc[VRC7]);
+      stack.Attach (sc[VRC7]);
       mixer.Attach (&amp[VRC7]);
     }
     if (nsf->use_fme7)
     {
-      bus.Attach (sc[FME7]);
+      stack.Attach (sc[FME7]);
       mixer.Attach (&amp[FME7]);
-    }
-    if (nsf->use_mmc5)
-    {
-      bus.Attach (sc[MMC5]);
-      mixer.Attach (&amp[MMC5]);
     }
     if (nsf->use_n106)
     {
-      bus.Attach (sc[N106]);
+      stack.Attach (sc[N106]);
       mixer.Attach (&amp[N106]);
     }
     if (nsf->use_fds)
     {
-      bus.Attach (sc[FDS]);
+      stack.Attach (sc[FDS]); // last before memory layer
       mixer.Attach (&amp[FDS]);
       mem.SetFDSMode (true);
       bank.SetFDSMode (true);
@@ -185,7 +187,23 @@ namespace xgm
       bank.SetFDSMode (false);
     }
 
-    cpu.SetMemory (&bus);
+    // memory layer comes last
+    stack.Attach (&layer);
+
+    // NOTE: each layer in the stack is given a chance to take a read or write
+    // exclusively. The stack is structured like this:
+    //     APU > expansions > main memory
+
+    // main memory comes after other expansions because
+    // when the FDS mode is enabled, VRC6/VRC7/5B have writable registers
+    // in RAM areas of main memory. To prevent these from overwriting RAM
+    // I allow the expansions above it in the stack to prevent them.
+
+    // MMC5 comes high in the stack so that its PCM read behaviour
+    // can reread from the stack below and does not get blocked by any
+    // stack above.
+
+    cpu.SetMemory (&stack);
   }
 
   void NSFPlayer::SetPlayFreq (double r)
@@ -271,7 +289,7 @@ namespace xgm
     // 全てのコンフィグレーションを適用
     config->Notify (-1);
     // バスをリセット 
-    bus.Reset ();
+    stack.Reset ();
     // CPUリセットは必ずバスより後（重要）
     cpu.Reset ();
 
