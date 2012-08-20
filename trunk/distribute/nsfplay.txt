@@ -124,7 +124,7 @@ VRC7 patch sets:
 Versions
 ========
 
-NSFPlay 2.2 - BETA VERSION 0
+NSFPlay 2.2 - BETA VERSION 0 8/20/2012
 Audio Emulation:
 - Unmute on reset now sets $4015 to $0F instead of $1F.
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
