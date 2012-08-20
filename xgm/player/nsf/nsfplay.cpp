@@ -104,13 +104,14 @@ namespace xgm
         bank.SetBankDefault (i + 8, nsf->bankswitch[i]);
     }
 
-    // データにあわせたVMを作る
+    // virtual machine controlling memory reads and writes
+    // to various devices, expansions, etc.
     stack.DetachAll ();
     layer.DetachAll ();
     mixer.DetachAll ();
     apu_bus.DetachAll ();
 
-    // ループディテクタの切り替え
+    // select the loop detector
     if((*config)["DETECT_ALT"])
     {
       const type_info &ti = typeid(ld);
@@ -130,8 +131,9 @@ namespace xgm
       }
     }
 
-    // ループディテクタのアタッチ
-    layer.Attach (ld);
+    // loop detector ends up at the front of the stack
+    // (will capture all writes, but does not capture write)
+    stack.Attach (ld);
 
     if (bmax) layer.Attach (&bank);
     layer.Attach (&mem);
@@ -192,7 +194,7 @@ namespace xgm
 
     // NOTE: each layer in the stack is given a chance to take a read or write
     // exclusively. The stack is structured like this:
-    //     APU > expansions > main memory
+    //     loop detector > APU > expansions > main memory
 
     // main memory comes after other expansions because
     // when the FDS mode is enabled, VRC6/VRC7/5B have writable registers
