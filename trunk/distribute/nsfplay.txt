@@ -63,7 +63,7 @@ Global options:
   NES_BASECYCLES: NTSC master clock speed
   PAL_BASECYCLES: PAL master clock speed * 12/16 (sorry, weird conversion being done)
   PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
-  VRC7_PATCH: 0-4 patch set for VRC7 (see below)
+  VRC7_PATCH: 0-7 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
   NSFE_PLAYLIST: 1/0 use playlist data from NSFe when found
 
@@ -113,10 +113,13 @@ Channel options:
 
 VRC7 patch sets:
   0 - VRC7 set by rainwarrior 8/01/2012
-  1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.7)
-  2 - VRC7 set by Mitsutaka Okazaki 5/05/2006
-  3 - YM2413 set by Mitsutaka Okazaki 5/05/2006
-  4 - YMF281B set by Chabin 5/05/2006
+  1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.6)
+  2 - VRC7 set by Mitsutaka Okazaki 6/24/2001 (used by Famitracker 0.3.5 and prior)
+  3 - VRC7 set by Mitsutaka Okazaki 4/10/2004
+  4 - VRC7 set by kevtris 11/15/1999 (second set in vrcvii.txt)
+  5 - VRC7 set by kevtris 11/14/1999 (first set in vrcvii.txt)
+  6 - YM2413 set by Mitsutaka Okazaki 4/10/2004
+  7 - YMF281B set by Chabin 4/10/2004
 
 Versions
 ========
@@ -125,7 +128,7 @@ NSFPlay 2.2 - BETA VERSION 0
 Audio Emulation:
 - Unmute on reset now sets $4015 to $0F instead of $1F.
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
-- New VRC7 patch set, option to select patch set via VRC7_PATCH.
+- New VRC7 patch set, option to select alternative patch sets via VRC7_PATCH.
 - 5B polarity inverted, envelope adjusted, volume tweak.
 - MMC5 polarity inverted, length counter runs at double speed, highest 8 frequencies are not muted.
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
