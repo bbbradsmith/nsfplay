@@ -395,6 +395,7 @@ namespace xgm
     len_reg = 0;
     daddress = 0;
     noise = 1;
+    noise_tap = (1<<1);
     // BS randomize noise on startup
     if (option[OPT_RANDOMIZE_NOISE])
     {
@@ -528,7 +529,7 @@ namespace xgm
       if (option[OPT_ENABLE_PNOISE])
         noise_tap = (val & 0x80) ? (1<<6) : (1<<1);
       else
-        noise_tap = (1<<6);
+        noise_tap = (1<<1);
       pcounter[1].setcycle (wavlen_table[pal][val&15]-1);
       break;
 
