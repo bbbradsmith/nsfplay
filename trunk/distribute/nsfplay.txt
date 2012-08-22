@@ -53,7 +53,7 @@ Global options:
   DETECT_INT: (ms) jitter allowed between time comparisons in loop detection
   LPF: 0-400 lowpass filter strength (0=off, 400=full)
   HPF: 0-256 highpass filter strength (256=off, 0=full)
-  TITLE_FORMAT: winamp title string format
+  TITLE_FORMAT: title string format (see below), default: %L (%n/%e) %T - %A
   DETECT_ALT: 1/0 use alternate loop detection algorithm
   VSYNC_ADJUST: 1/0 ignore NSF frame length setting (yes/no)
   MULT_SPEED: clock multiplier (256 = no multiplier)
@@ -73,6 +73,7 @@ TITLE_FORMAT text replacement:
   %T/%t > NSF title
   %A/%a > NSF artist
   %C/%c > NSF copyright
+  %L/%l > NSFe song title
   %N > song number, 2-digit hex with leading zero
   %n > song number, 3-digit decimal with leading zeroes
   %S > NSF starting song, 2-digit hex with leading zero
@@ -134,6 +135,7 @@ Audio Emulation:
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
 - VRC6 polarity inverted, phase reset now functions properly.
 - FDS now uses NSF header $76/$77 to set up $6000-7FFF memory range.
+- Enable periodic noise option fixed. (Forced perodic noise by accident.)
 Other:
 - Fixed improper $4015 read implementation (should return length counter status), also DPCM IRQ was not initialized.
 - Default focus in keyboard window now the track list (to prevent accidental mouse scroll time expansion).
