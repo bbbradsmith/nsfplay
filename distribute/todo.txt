@@ -1,5 +1,4 @@
 RELEASE
-- pitch bug on XP/Wine?
 
 TODO
 - Frame sequencer and $4017 response, make MMC5 sequencer independent

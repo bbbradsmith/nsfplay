@@ -216,39 +216,43 @@ namespace xgm
 
     for (int i = 0; i < NES_DEVICE_MAX; i++)
     {
-      if(config->GetDeviceConfig(i,"QUALITY"))
-      {
-        // レートコンバータを使用する
-        int MULT[NES_DEVICE_MAX][4] = { 
-          1, 5, 8, 20, // APU1
-          1, 5, 8, 20, // DMC
-          1, 5, 8,  8, // FME7
-          1, 5, 8, 20, // MMC5
-          1, 5, 8, 20, // N106
-          1, 5, 8, 20, // VRC6
-          1, 3, 3,  3, // VRC7
-          1, 5, 8, 20  // FDS
-        };
-        sc[i]->SetClock(UsePal(nsf->pal_ntsc) ?
-            config->GetValue("PAL_BASECYCLES").GetInt() :
-            config->GetValue("NES_BASECYCLES").GetInt());
+      int quality = config->GetDeviceConfig(i,"QUALITY");
 
-        sc[i]->SetRate(rate * MULT[i][config->GetDeviceConfig(i,"QUALITY").GetInt()&3]);
-        rconv[i].SetClock(rate * MULT[i][config->GetDeviceConfig(i,"QUALITY").GetInt()&3]);
-        rconv[i].SetRate(rate);
-        rconv[i].Reset();
+      // レートコンバータを使用する
+      int MULT[NES_DEVICE_MAX][4] = { 
+        1, 5, 8, 20, // APU1
+        1, 5, 8, 20, // DMC
+        1, 5, 8,  8, // FME7
+        1, 5, 8, 20, // MMC5
+        1, 5, 8, 20, // N106
+        1, 5, 8, 20, // VRC6
+        1, 3, 3,  3, // VRC7
+        1, 5, 8, 20  // FDS
+      };
+      sc[i]->SetClock(UsePal(nsf->pal_ntsc) ?
+          config->GetValue("PAL_BASECYCLES").GetInt() :
+          config->GetValue("NES_BASECYCLES").GetInt());
+
+      int mult = config->GetDeviceConfig(i,"QUALITY").GetInt() & 3;
+
+      sc[i]->SetRate(rate * MULT[i][mult]);
+
+      rconv[i].SetClock(rate * MULT[i][mult]);
+      rconv[i].SetRate(rate);
+      rconv[i].Reset();
+
+      if (quality)
+      {
         filter[i].Attach (&rconv[i]);
       }
       else
       {
         // レートコンバータは使用しない
-        sc[i]->SetRate (rate);
         filter[i].Attach (sc[i]);
       }
       // フィルタ動作周波数の設定
       filter[i].SetRate(rate);
       filter[i].Reset();
-
     }
     mixer.Reset ();
     echo.SetRate(rate);
@@ -646,8 +650,8 @@ namespace xgm
       dcf.SetParam(270,(*config)["HPF"]);
       lpf.SetParam(4700.0,(*config)["LPF"]);
 
-      DEBUG_OUT("dcf: %3d > %f\n", (*config)["HPF"].GetInt(), dcf.GetFactor());
-      DEBUG_OUT("lpf: %3d > %f\n", (*config)["LPF"].GetInt(), lpf.GetFactor());
+      //DEBUG_OUT("dcf: %3d > %f\n", (*config)["HPF"].GetInt(), dcf.GetFactor());
+      //DEBUG_OUT("lpf: %3d > %f\n", (*config)["LPF"].GetInt(), lpf.GetFactor());
 
       return;
     }
