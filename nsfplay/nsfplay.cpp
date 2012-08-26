@@ -81,9 +81,10 @@ BOOL CnsfplayApp::InitInstance()
 
     } else {
 
-	  CWnd* pWnd = CWnd::FindWindow(NULL, "NSFplay");
-      if( pWnd ) {
-	    pWnd->SetForegroundWindow();
+        // NOTE this string must match CAPTION in IDD_NSFPLAY_DIALOG in nsfplay.rc
+        CWnd* pWnd = CWnd::FindWindow(NULL, "NSFplay 2.2 beta 2");
+        if( pWnd ) {
+          pWnd->SetForegroundWindow();
 
         if(2<=__argc) {
           size_t size = strlen(__argv[1])+1;
@@ -118,7 +119,7 @@ BOOL CnsfplayApp::ProcessMessageFilter(int code, LPMSG lpMsg)
 {
   if(m_hAccel!= NULL && m_bAccel){
     if(::TranslateAccelerator(m_pMainWnd -> m_hWnd, m_hAccel, lpMsg)){
-      return TRUE;                                                  
+      return TRUE;
     }
   }
   return CWinApp::ProcessMessageFilter(code, lpMsg);

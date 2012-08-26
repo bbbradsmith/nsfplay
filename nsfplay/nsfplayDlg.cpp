@@ -162,6 +162,13 @@ BOOL CnsfplayDlg::OnInitDialog()
         EndDialog(0);
     }
 
+    // for debugging
+    char cWndName[256];
+    ::GetWindowText(m_hWnd, cWndName, sizeof(cWndName));
+    ::OutputDebugString("Window name: ");
+    ::OutputDebugString(cWndName);
+    ::OutputDebugString("\n");
+
     return TRUE;
 }
 
