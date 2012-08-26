@@ -679,11 +679,6 @@ BEGIN
     BEGIN
         MENUITEM "設定読み込み(&O)...",               ID_LOAD
         MENUITEM "設定保存(&S)...",                 ID_SAVE
-        POPUP "プレイリスト(&P)"
-        BEGIN
-            MENUITEM "新規(&N)",                      ID_NEWPLS
-            MENUITEM "追加(&A)",                      ID_GENPLS
-        END
         MENUITEM "バージョン",                       ID_FILE_ABOUT
     END
     POPUP "表示(&V)"
@@ -1404,11 +1399,6 @@ BEGIN
     BEGIN
         MENUITEM "&Open Settings...",           ID_LOAD
         MENUITEM "&Save Settings...",           ID_SAVE
-        POPUP "&Playlist"
-        BEGIN
-            MENUITEM "&New",                        ID_NEWPLS
-            MENUITEM "&Append",                     ID_GENPLS
-        END
         MENUITEM "About",                       ID_FILE_ABOUT
     END
     POPUP "&View"
