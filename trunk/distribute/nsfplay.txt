@@ -153,6 +153,7 @@ Audio Emulation:
 - VRC6 $9003 register implemented (controls halt and frequency multiplier)
 - VRC6 polarity inverted, phase reset now functions properly.
 - FDS now uses NSF header $76/$77 to set up $6000-7FFF memory range.
+- FDS $4087 bit 7 now mutes modulator.
 - Enable periodic noise option fixed. (Forced perodic noise by accident.)
 Other:
 - Fixed improper $4015 read implementation (should return length counter status), also DPCM IRQ was not initialized.

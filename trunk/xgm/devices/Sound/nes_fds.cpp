@@ -182,6 +182,11 @@ namespace xgm
       if (fm > 193) fm -= 258;
       if (fm < -64) fm += 256;
 
+      if (write_enable[1]) // disable modulator if $4080 bit 7 set
+      {
+        fm = 0;
+      }
+
       pcounter[0] += incr[0] + (incr[0] * double(fm)) / 64.0;
     }
 
