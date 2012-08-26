@@ -1,3 +1,9 @@
+RELEASE
+- Document M3U playlist format, see NEZPlug playlist format
+- When file is associated, double clicking doesn't change the currently playing NSF.
+- pitch bug on XP/Wine?
+
+
 TODO
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
 - Breakout window for info (nice for looking at NSFe text chunk).
@@ -22,3 +28,4 @@ TODO
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
+- RushJet1 says if you right click you can't use the keyboard C to close the window

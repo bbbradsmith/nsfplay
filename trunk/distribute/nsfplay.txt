@@ -147,6 +147,7 @@ Other:
 - Rewrote LPF and HPF, should have a more usable range of options now.
 - Removed XXX_FR/XXX_FC options, now XXX_FILTER works like LPF for each device.
 - Memory R/W access is now exclusive to the first device that accepts it; prevents FDS multi-expansion write conflicts.
+- Title string will automatically remove whitespace at its beginning or end.
 
 NSFPlay 2.1 - 3/27/2012
 Audio Output:

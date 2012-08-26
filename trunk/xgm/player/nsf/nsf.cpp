@@ -207,6 +207,28 @@ static int is_sjis_prefix(int c)
     }
     
     print_title[wp]='\0';
+
+    // strip trailing whitespace
+    for (--wp; wp >= 0 && print_title[wp] == ' '; --wp)
+    {
+      print_title[wp] = '\0';
+    }
+
+    // strip leading whitespace
+    for (wp = 0; print_title[wp] == ' '; ++wp) {}
+    if (wp > 0)
+    {
+      int i=0;
+      do
+      {
+        print_title[i] = print_title[i+wp];
+        if (print_title[i] == '\0')
+            break;
+        ++i;
+      } while (true);
+    }
+
+    title_unknown = false;
     return print_title;
   }
 
