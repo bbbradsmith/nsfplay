@@ -26,22 +26,20 @@
 
 #include "resource.h"
 
+class CnsfplayDlg; // forward declaration
 
 class CnsfplayApp : public CWinApp
 {
 protected:
     HACCEL m_hAccel;
-    BOOL m_bAccel;
+    CnsfplayDlg* m_pDlg;
 public:
-	CnsfplayApp();
+    CnsfplayApp();
 
 public:
-	virtual BOOL InitInstance();
+    virtual BOOL InitInstance();
     
-    void SetAccel(BOOL bEnable);
-    BOOL GetAccel() const;
-
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
     virtual BOOL ProcessMessageFilter(int code, LPMSG lpMsg);
 };
 

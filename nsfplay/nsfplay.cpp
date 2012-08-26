@@ -36,7 +36,7 @@ END_MESSAGE_MAP()
 
 
 CnsfplayApp::CnsfplayApp() :
-    m_bAccel(true)
+    m_pDlg(NULL)
 {
 }
 
@@ -50,10 +50,11 @@ BOOL CnsfplayApp::InitInstance()
     CWinApp::InitInstance();
 
     CMutex mutex(FALSE, m_pszExeName);
-	if( mutex.Lock(0) == TRUE ) {
+    if( mutex.Lock(0) == TRUE ) {
 
-	  CnsfplayDlg dlg;
-	  m_pMainWnd = &dlg;
+      CnsfplayDlg dlg;
+      m_pDlg = &dlg;
+      m_pMainWnd = &dlg;
       m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
 
       if(5==__argc) // command line wave out
@@ -105,21 +106,15 @@ BOOL CnsfplayApp::InitInstance()
 	return FALSE;
 }
 
-void CnsfplayApp::SetAccel(BOOL bEnable)
-{
-    m_bAccel = bEnable;
-}
-
-BOOL CnsfplayApp::GetAccel() const
-{
-    return m_bAccel;
-}
-
 BOOL CnsfplayApp::ProcessMessageFilter(int code, LPMSG lpMsg)
 {
-  if(m_hAccel!= NULL && m_bAccel){
-    if(::TranslateAccelerator(m_pMainWnd -> m_hWnd, m_hAccel, lpMsg)){
-      return TRUE;
+  // keyboard player commands
+  if(m_hAccel!= NULL && m_pDlg->m_hWnd == ::GetForegroundWindow())
+  {
+    if(::TranslateAccelerator(m_pMainWnd -> m_hWnd, m_hAccel, lpMsg))
+    {
+      //return TRUE;
+      // allowing keyboard messages to pass through (no need to block)
     }
   }
   return CWinApp::ProcessMessageFilter(code, lpMsg);
