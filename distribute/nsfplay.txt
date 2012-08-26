@@ -143,7 +143,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.2 - BETA VERSION 2 8/26/2012
+NSFPlay 2.2 - BETA VERSION 3
 Audio Emulation:
 - Unmute on reset now sets $4015 to $0F instead of $1F.
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
