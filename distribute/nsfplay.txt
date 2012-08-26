@@ -122,6 +122,24 @@ VRC7 patch sets:
   6 - YM2413 set by Mitsutaka Okazaki 4/10/2004
   7 - YMF281B set by Chabin 4/10/2004
 
+
+Playlists
+=========
+
+NSFPlug supports Winamp M3U playlists in the same style as NEZplug.
+The playlist is a text file with one track per line in the form:
+
+filename::NSF,[song],[title],[time],[loop],[fade],[loopcount]
+
+filename  - relative path to NSF file
+song      - track number from the NSF (track 1 is the first track)
+title     - title of the track
+time      - h:m:s length of the track
+loop      - h:m:s loop length, h:m:s- loop start time, - no loop, 0 no loop
+fade      - h:m:s fade time
+loopcount - number of times to loop, 0 default
+
+
 Versions
 ========
 
