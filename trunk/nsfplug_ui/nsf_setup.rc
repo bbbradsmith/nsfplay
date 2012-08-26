@@ -695,17 +695,6 @@ BEGIN
         MENUITEM "演奏情報(&K)",                    ID_TRKINFO
         MENUITEM "プリセット管理(&P)",                 ID_PRESET
     END
-    POPUP "タグ情報(&T)"
-    BEGIN
-        POPUP "削除(&D)"
-        BEGIN
-            MENUITEM "この曲のみ(&C)",                   ID_DELONE
-            MENUITEM "このNSF全体(&A)",                 ID_DELALL
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "読込み許可(&R)",                   ID_READTAG
-        MENUITEM "書込み許可(&W)",                   ID_WRITETAG
-    END
     POPUP "オプション(&O)"
     BEGIN
         MENUITEM "簡易設定(&E)",                    ID_EASY
@@ -1419,17 +1408,6 @@ BEGIN
         MENUITEM "&Memory",                     ID_MEMDLG
         MENUITEM "&Keyboard",                   ID_TRKINFO
         MENUITEM "&Preset",                     ID_PRESET
-    END
-    POPUP "&Taginfo"
-    BEGIN
-        POPUP "&Delete"
-        BEGIN
-            MENUITEM "&Current song",               ID_DELONE
-            MENUITEM "&All songs",                  ID_DELALL
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "&Read taginfo",               ID_READTAG
-        MENUITEM "&Write taginfo",              ID_WRITETAG
     END
     POPUP "&Options"
     BEGIN
