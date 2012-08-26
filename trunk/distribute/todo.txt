@@ -1,6 +1,5 @@
 RELEASE
 - Document M3U playlist format, see NEZPlug playlist format
-- When file is associated, double clicking doesn't change the currently playing NSF.
 - pitch bug on XP/Wine?
 
 
