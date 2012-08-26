@@ -56,7 +56,7 @@ END_MESSAGE_MAP()
 
 
 CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CnsfplayDlg::IDD, pParent)
+    : CDialog(CnsfplayDlg::IDD, pParent)
     , m_cancel_open(false)
 {
   m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -87,10 +87,9 @@ void CnsfplayDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CnsfplayDlg, CDialog)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	//}}AFX_MSG_MAP
+    ON_WM_SYSCOMMAND()
+    ON_WM_PAINT()
+    ON_WM_QUERYDRAGICON()
     ON_WM_DROPFILES()
     ON_BN_CLICKED(IDC_PREV, OnBnClickedPrev)
     ON_BN_CLICKED(IDC_NEXT, OnBnClickedNext)
@@ -113,23 +112,22 @@ BOOL CnsfplayDlg::OnInitDialog()
 
     m_last_title[0] = 0; // BS this was uninitialized
 
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
+    ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+    ASSERT(IDM_ABOUTBOX < 0xF000);
 
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
-		CString strAboutMenu;
-		strAboutMenu.LoadString(IDS_ABOUTBOX);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-
+    CMenu* pSysMenu = GetSystemMenu(FALSE);
+    if (pSysMenu != NULL)
+    {
+        CString strAboutMenu;
+        strAboutMenu.LoadString(IDS_ABOUTBOX);
+        if (!strAboutMenu.IsEmpty())
+        {
+            pSysMenu->AppendMenu(MF_SEPARATOR);
+            pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+        }
     }
 
-	SetIcon(m_hIcon, TRUE);
+    SetIcon(m_hIcon, TRUE);
     SetIcon(m_hIcon, FALSE);
 
     ((CButton *)GetDlgItem(IDC_OPEN))->SetIcon((HICON)::LoadImage(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_OPEN),IMAGE_ICON,16,16,LR_DEFAULTCOLOR));
@@ -255,10 +253,6 @@ void CnsfplayDlg::OnBnClickedWaveout()
 {
   OnBnClickedStop();
 
-  // disable keyboard accelerators
-  BOOL old_accel = theApp.GetAccel();
-  theApp.SetAccel(FALSE);
-
   char title[1024];
   strcpy(title,m_last_title);
   for (char* t = title; *t; ++t)
@@ -281,8 +275,6 @@ void CnsfplayDlg::OnBnClickedWaveout()
     m_emu->Waveout(fd.GetPathName().GetBuffer());
     OnBnClickedPlay();
   }
-
-  theApp.SetAccel(old_accel);
 }
 
 void CnsfplayDlg::OnBnClickedInfo()
@@ -394,10 +386,6 @@ void CnsfplayDlg::OnBnClickedPause()
 
 void CnsfplayDlg::OnBnClickedOpen()
 {
-  // disable keyboard accelerators
-  BOOL old_accel = theApp.GetAccel();
-  theApp.SetAccel(FALSE);
-
   CFileDialog fd(TRUE,".nsf;.nsfe",0,OFN_FILEMUSTEXIST|OFN_HIDEREADONLY,"NSF files (*.nsf;*.nsfe)|*.nsf;*.nsfe|All files (*.*)|*.*||",this);
   if(fd.DoModal()==IDOK) {
     if (m_emu->Play(fd.GetPathName().GetBuffer()))
@@ -407,8 +395,6 @@ void CnsfplayDlg::OnBnClickedOpen()
     m_last_len = -1;
     m_update_wait = 0;
   }
-
-  theApp.SetAccel(old_accel);
 }
 
 // BS command line wave output

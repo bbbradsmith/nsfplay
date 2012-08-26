@@ -318,5 +318,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="nsfplay.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
