@@ -264,13 +264,11 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
 
 void NSFInfoDialog::OnNewpls()
 {
-  // menu item removed, causes crash on NSFPlay
   GeneratePlaylist(true);
 }
 
 void NSFInfoDialog::OnGenpls() 
 {
-  // menu item removed, causes crash on NSFPlay
   GeneratePlaylist(false);
 }
 

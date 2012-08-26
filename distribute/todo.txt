@@ -1,5 +1,4 @@
 RELEASE
-- Document M3U playlist format, see NEZPlug playlist format
 - pitch bug on XP/Wine?
 
 TODO
@@ -26,3 +25,4 @@ TODO
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
+
