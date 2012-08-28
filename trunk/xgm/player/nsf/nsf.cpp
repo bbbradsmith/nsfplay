@@ -326,9 +326,11 @@ static int is_sjis_prefix(int c)
 
   int NSF::GetPlayTime ()
   {
-    if (nsfe_entry[song].time >= 0)
+    int s = song;
+    if (nsfe_plst) s = nsfe_plst[song];
+    if (nsfe_entry[s].time >= 0)
     {
-      return nsfe_entry[song].time;
+      return nsfe_entry[s].time;
     }
 
     return time_in_ms < 0 ? default_playtime : time_in_ms;
@@ -341,9 +343,11 @@ static int is_sjis_prefix(int c)
 
   int NSF::GetFadeTime ()
   {
-    if (nsfe_entry[song].fade >= 0)
+    int s = song;
+    if (nsfe_plst) s = nsfe_plst[song];
+    if (nsfe_entry[s].fade >= 0)
     {
-      return nsfe_entry[song].fade;
+      return nsfe_entry[s].fade;
     }
 
     if (fade_in_ms < 0)
