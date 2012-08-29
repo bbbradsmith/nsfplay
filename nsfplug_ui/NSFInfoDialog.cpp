@@ -116,7 +116,7 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
 
   if (nsf->text != NULL)
   {
-    ss.Format("%s\n--- end of NSFe text ---", nsf->text);
+    ss.Format("%s\r\n--- end of NSFe text ---\r\n\r\n", nsf->text);
     m_info += ss;
   }
 
