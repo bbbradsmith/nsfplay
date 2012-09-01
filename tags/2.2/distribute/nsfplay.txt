@@ -5,7 +5,9 @@ This is an NSF player program for Windows, and also a Winamp plugin. The origina
 
 To use as a Winamp plugin, simply copy the contents of the plugins folder to your Winamp plugins folder.
 
-Full source code is available on my website at: http://rainwarrior.ca/projects/nsfplay/
+Full source code is available at:
+- http://code.google.com/p/nsfplay/
+- http://rainwarrior.ca/projects/nsfplay/
 
 If you have any questions, comments, or find any bugs, please send them to me.
 
