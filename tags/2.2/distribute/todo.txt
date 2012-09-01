@@ -1,0 +1,27 @@
+RELEASE
+
+TODO
+- Frame sequencer and $4017 response, make MMC5 sequencer independent
+- Breakout window for info (nice for looking at NSFe text chunk).
+- VRC6 square phase reset should not reset divide
+- Replace all pcounter with clock based simulation (except for VRC7)
+- N163 horrible sound accuracy
+- N163 volume vs num channels
+- Vertical stacking for multiple key dots on same pitch?
+- Command line wav could use fade out (actually set config param, also channel mask option).
+- Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
+- One click button for keyboard view?
+- NSF2
+- Foobar2000 plugin?
+- VRC7 emulation accuracy
+- FDS high frequency modulation behaviour, verify against hardware
+- MMC5 squares, are they nonlinear, does PCM affect them?
+- Improve loop detection
+- Fix init time allowance to be an actual 1s.
+- Battletoads track 10, noise sounds much duller on hardware.
+- Doommaster has pitch problem, also seems to have weird buffer cutting stuff, only in NSFPlay?
+- Channel mask caption is ????? in Japanese UI.
+- Settings Apply/Cacel buttons are ????? in Japanese UI.
+- Settings audio quality panel has ????? at bottom in Japanese UI.
+- APU2 option panel says "Option" instead of "Options"? Make consistent.
+

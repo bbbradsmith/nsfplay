@@ -1,0 +1,41 @@
+Portable Z80/R800/HD84180/DMG-CPU emulator 'KMZ80'
+Location: http://www.proc.org.tohoku.ac.jp/befis/
+Author:   Mamiya (mamiya@proc.org.tohoku.ac.jp)
+Language: ANSI-C
+License:  PDS
+
+
+
+<Japanese(SJIS)>
+
+移植性重視(のつもりの)の Z80/R800/HD84180/DMG-CPU エミュレーターです。
+
+未定義の動作も可能な限り再現しています。
+
+    本エミュレーターは kmtypes.h で定義される二つの型とint型のみ使用します。
+    通常は kmz80set.h を書き換える必要はありません。
+
+    Uint32
+        0 から 0x1ffff までを表せる整数型なら何でも良いです。
+        R800乗算命令をサポートする場合は 0xffff * 0xffff まで必要です。
+        なるべく高速に処理できるものが望ましいです。
+        通常は unsigned int 型が最適です。
+        デフォルトは unsigned int です。
+
+    Uint8
+        0 から 0xff までを表せる整数型なら何でも良いです。
+        テーブルに用いられる型なので、配列にした場合に、
+        なるべく小さくなるものが望ましいです。
+        通常は unsigned char 型が最適です。
+        デフォルトは unsigned char です。
+
+    int
+        M_系関数の一部で1か-1を表すのに使用しています。
+        '(Uint32)=(Uint32)+(int);' でインクリメント、デクリメントします。
+        万が一型変換に問題が起きる場合はM_系マクロを使用してください。
+
+    ライブラリ
+        他のライブラリには依存しません。
+
+    バイト、ワードオーダー
+        依存しません。
