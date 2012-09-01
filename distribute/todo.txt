@@ -24,4 +24,4 @@ TODO
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
-
+- More speed control options in keyboard view: pitch adjust, fast playback
