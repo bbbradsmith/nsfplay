@@ -112,7 +112,7 @@ Channel options:
   5B_ENVELOPE_COL: keyboard colour for 5B envelope
   5B_NOISE_COL: keyboard colour for 5B noise
 
-VRC7 patch sets:
+VRC7 patch sets: (VRC7_PATCH)
   0 - VRC7 set by rainwarrior 8/01/2012
   1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.6)
   2 - VRC7 set by Mitsutaka Okazaki 6/24/2001 (used by Famitracker 0.3.5 and prior)
@@ -143,7 +143,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.2 - BETA VERSION 3 8/28/2012
+NSFPlay 2.2 - 8/31/2012
 Audio Emulation:
 - Unmute on reset now sets $4015 to $0F instead of $1F.
 - PAL noise frequency $1 now 8 instead of incorrectly 7.
