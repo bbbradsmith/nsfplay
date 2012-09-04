@@ -59,7 +59,7 @@ CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
     : CDialog(CnsfplayDlg::IDD, pParent)
     , m_cancel_open(false)
 {
-  m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+  m_hIcon = AfxGetApp()->LoadIcon(IDI_MAINFRAME);
 
   char buf[MAX_PATH];
   GetModuleFileName(AfxGetApp()->m_hInstance, m_IniPath, MAX_PATH);
@@ -128,7 +128,7 @@ BOOL CnsfplayDlg::OnInitDialog()
     }
 
     SetIcon(m_hIcon, TRUE);
-    SetIcon(m_hIcon, FALSE);
+    //SetIcon(m_hIcon, FALSE);
 
     ((CButton *)GetDlgItem(IDC_OPEN))->SetIcon((HICON)::LoadImage(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_OPEN),IMAGE_ICON,16,16,LR_DEFAULTCOLOR));
     ((CButton *)GetDlgItem(IDC_INFO))->SetIcon((HICON)::LoadImage(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_PROP),IMAGE_ICON,16,16,LR_DEFAULTCOLOR));

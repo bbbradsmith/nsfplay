@@ -280,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\nsfplug.ico"
+				>
+			</File>
+			<File
 				RelativePath="res\open.ico"
 				>
 			</File>

@@ -6,7 +6,8 @@
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
 #define IDD_NSFPLAY_DIALOG              102
-#define IDR_MAINFRAME                   128
+#define IDI_MAINFRAME                   128
+#define IDI_FAMICOM                     129
 #define IDR_ACCELERATOR                 130
 #define IDI_OPEN                        131
 #define IDI_PROP                        132
@@ -40,7 +41,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32779
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101

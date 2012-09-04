@@ -7,6 +7,7 @@
 #define IDD_BASIC                       103
 #define IDD_EASY                        106
 #define IDI_NSF                         128
+#define IDI_NSFPLUG                     129
 #define IDC_INFO                        1000
 #define IDR_INFOMENU                    1000
 #define IDC_AUTOSTOP                    1004
@@ -27,7 +28,6 @@
 #define IDC_LOOPNUM                     1015
 #define IDD_MIXERBOX                    1016
 #define IDC_SECSPIN3                    1016
-#define IDI_NSFPLUG                     1018
 #define IDI_MIXER                       1019
 #define IDI_MEMORY                      1020
 #define IDD_MEMWRITE                    1022
