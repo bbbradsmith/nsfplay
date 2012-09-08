@@ -107,9 +107,9 @@ inline static char *note2string(int note)
 {
   static char *notename[12]=
   {
-    "C ","C+","D ","D+",
-    "E ","F ","F+","G ",
-    "G+","A ","A+","B "
+    "C ","C#","D ","D#",
+    "E ","F ","F#","G ",
+    "G#","A ","A#","B "
   };
 
   if(note)
@@ -274,7 +274,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
               break;
 
             case NSFPlayer::APU2_TRK2:
-              str.Format("%04XH",ti->GetTone());
+              str.Format("%04X",ti->GetTone());
               m_trkinfo.SetItem(trk,5,LVIF_TEXT,str,0,0,0,0);
               break;
 
