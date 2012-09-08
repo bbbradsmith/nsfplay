@@ -68,6 +68,16 @@ Global options:
   VRC7_PATCH: 0-7 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
   NSFE_PLAYLIST: 1/0 use playlist data from NSFe when found
+  WRITE_TAGINFO: ?
+  READ_TAGINFO: ?
+  UPDATE_PLAYLIST: ?
+  MASK_INIT: ?
+  INFO_DELAY: ?
+  INFO_FREQ: ?
+  GRAPHIC_MODE: ?
+  FREQ_MODE: ?
+  LAST_PRESET: ?
+  INI_FILE: ?
 
 TITLE_FORMAT text replacement:
   %F/%f > filename
@@ -148,6 +158,8 @@ Versions
 NSFPlay 2.3 BETA 0 - ?/??/????
 Other:
 - Better small icon.
+- Thinner DPCM address display, does not get truncated.
+- Using # instead of + for note names.
 
 NSFPlay 2.2 - 8/31/2012
 Audio Emulation:

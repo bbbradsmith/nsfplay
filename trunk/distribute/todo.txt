@@ -26,3 +26,4 @@ TODO
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
 - More speed control options in keyboard view: pitch adjust, fast playback
 - Play speed override option.
+- Visualizer plugin system.
