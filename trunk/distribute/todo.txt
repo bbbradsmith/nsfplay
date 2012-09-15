@@ -29,3 +29,4 @@ TODO
 - Visualizer plugin system.
 - See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
+- Bus/stack plugins: register trace, NSF validator, other export tools

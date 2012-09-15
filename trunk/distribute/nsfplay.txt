@@ -155,7 +155,9 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.3 BETA 0 - ?/??/????
+NSFPlay 2.3 BETA 0 - 9/15/2012
+Emulation:
+- Temporary implementation of $4017/$4015 frame counter IRQ flag for Deflemask.
 Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.

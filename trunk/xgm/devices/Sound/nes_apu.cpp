@@ -18,6 +18,11 @@ namespace xgm
   {
     //DEBUG_OUT("FrameSequence(%d)\n",s);
 
+    if (s == 0)
+    {
+        frame_irq = true;
+    }
+
     // 240hz clock
     for (int i=0; i < 2; ++i)
     {
@@ -121,6 +126,11 @@ namespace xgm
     else if(adr==0x4015)
     {
       val |= (length_counter[1]?2:0)|(length_counter[0]?1:0);
+
+      // temporary irq flag solution for Deflemask
+      val |= frame_irq ? 0x40 : 0;
+      frame_irq = false;
+
       return true;
     }
     else
@@ -199,6 +209,10 @@ namespace xgm
     int i;
     gclock = 0;
     mask = 0;
+
+    // temporary irq flag solution for Deflemask
+    frame_irq = false;
+    frame_irq_enable = false;
 
     sweep_div[0] = 1;
     sweep_div[1] = 1;
@@ -374,6 +388,8 @@ namespace xgm
 
     else if (adr == 0x4017)
     {
+      // temporary irq flag solution for Deflemask
+      frame_irq_enable = ((val & 0x40) == 0x40);
     }
 
     return false;
