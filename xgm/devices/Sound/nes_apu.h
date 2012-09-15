@@ -53,6 +53,10 @@ namespace xgm
 
     bool enable[2];
 
+      // temporary irq flag solution for Deflemask
+    bool frame_irq;
+    bool frame_irq_enable;
+
     void sweep_sqr (int ch); // calculates target sweep frequency
     INT32 calc_sqr (int ch);
     TrackInfoBasic trkinfo[2];
