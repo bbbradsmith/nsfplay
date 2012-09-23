@@ -162,6 +162,7 @@ Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.
 - Using # instead of + for note names.
+- Cosmetic fixes in settings dialog.
 
 NSFPlay 2.2 - 8/31/2012
 Audio Emulation:

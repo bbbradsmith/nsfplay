@@ -1,6 +1,6 @@
 RELEASE
 
-TODO
+To Do:
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
 - Breakout window for info (nice for looking at NSFe text chunk).
 - VRC6 square phase reset should not reset divide
@@ -19,10 +19,6 @@ TODO
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
-- Doommaster has pitch problem, also seems to have weird buffer cutting stuff, only in NSFPlay?
-- Channel mask caption is ????? in Japanese UI.
-- Settings Apply/Cacel buttons are ????? in Japanese UI.
-- Settings audio quality panel has ????? at bottom in Japanese UI.
 - APU2 option panel says "Option" instead of "Options"? Make consistent.
 - More speed control options in keyboard view: pitch adjust, fast playback
 - Play speed override option.
@@ -30,3 +26,9 @@ TODO
 - See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
 - Bus/stack plugins: register trace, NSF validator, other export tools
+
+Unknown:
+- Doommaster had weird pitch and cutting problems. Are these still there?
+- Channel mask caption is ????? in Japanese UI.
+- Settings Apply/Cacel buttons are ????? in Japanese UI.
+- Settings audio quality panel has ????? at bottom in Japanese UI.
