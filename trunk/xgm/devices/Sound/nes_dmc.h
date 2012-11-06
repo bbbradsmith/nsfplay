@@ -100,6 +100,7 @@ namespace xgm
     void SetMemory (IDevice * r);
     void FrameSequence(int s);
     int GetDamp(){ return (damp<<1)|dac_lsb ; }
+    void TickFrameSequence (int clock);
 
     virtual void Reset ();
     virtual void Tick (int clocks);

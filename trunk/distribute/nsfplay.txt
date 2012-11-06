@@ -159,9 +159,10 @@ Versions
 NSFPlay 2.3 BETA 1 - ?/??/????
 Emulation:
 - Temporary implementation of $4017/$4015 frame counter IRQ flag for Deflemask.
-- Audio emulation is now driven by CPU clock cycles, increases timing accuracy. (Partially complete.)
+- Audio emulation is now driven by CPU clock cycles, increases timing accuracy. (TODO: APU/DMC/5B/MMC5/VRC6/FDS/VRC7)
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
-- MMC5 framesequencer now independant of APU frame sequencer.
+- MMC5 frame sequencer now independant of APU frame sequencer.
+- Time dilation now slows frame sequencer along with CPU rate.
 Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.

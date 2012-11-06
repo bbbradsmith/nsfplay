@@ -41,7 +41,9 @@ namespace xgm
     INT32 last_out;
     int silent_length;
 
-    int clock_rest;          // レンダリング時のクロック剰余を格納
+    double cpu_clock_rest;
+    double apu_clock_rest;
+
     int time_in_ms;             // 演奏した時間(ms)
     bool playtime_detected;     // 演奏時間が検出されたらtrue
 

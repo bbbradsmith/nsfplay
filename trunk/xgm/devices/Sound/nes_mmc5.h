@@ -51,6 +51,7 @@ namespace xgm
      ~NES_MMC5 ();
 
     void FrameSequence ();
+    void TickFrameSequence (int clocks);
 
     virtual void Reset ();
     virtual void Tick (int clocks);
