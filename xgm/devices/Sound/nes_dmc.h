@@ -7,6 +7,8 @@
 
 namespace xgm
 {
+  class NES_APU; // forward declaration
+
   /** Bottom Half of APU **/
   class NES_DMC:public ISoundChip
   {
@@ -75,6 +77,15 @@ namespace xgm
 
     TrackInfoBasic trkinfo[3];
 
+    // frame sequencer
+    NES_APU* apu; // apu is clocked by DMC's frame sequencer
+    int frame_sequence_count;  // current cycle count
+    int frame_sequence_length; // CPU cycles per FrameSequence
+    int frame_sequence_step;   // current step of frame sequence
+    int frame_sequence_steps;  // 4/5 steps per frame
+    bool frame_irq;
+    bool frame_irq_enable;
+
     inline UINT32 calc_tri ();
     inline UINT32 calc_dmc ();
     inline UINT32 calc_noise ();
@@ -85,6 +96,7 @@ namespace xgm
 
     void InitializeTNDTable(double wt, double wn, double wd);
     void SetPal (bool is_pal);
+    void SetAPU (NES_APU* apu_);
     void SetMemory (IDevice * r);
     void FrameSequence(int s);
     int GetDamp(){ return (damp<<1)|dac_lsb ; }

@@ -10,6 +10,7 @@ namespace xgm
     SetRate (DEFAULT_RATE);
     option[OPT_NONLINEAR_MIXER] = true;
     option[OPT_PHASE_REFRESH] = true;
+    frame_sequence_count = 0;
 
     // square nonlinear mix, same as 2A03
     square_table[0] = 0;
@@ -48,6 +49,7 @@ namespace xgm
     length_counter[1] = 0;
     envelope_counter[0] = 0;
     envelope_counter[1] = 0;
+    frame_sequence_count = 0;
 
     for (i = 0; i < 8; i++)
       Write (0x5000 + i, 0);
@@ -71,7 +73,7 @@ namespace xgm
 
   void NES_MMC5::SetClock (double c)
   {
-    this->clock = c / 12;
+    this->clock = c;
   }
 
   void NES_MMC5::SetRate (double r)
@@ -83,7 +85,7 @@ namespace xgm
     }
   }
 
-  void NES_MMC5::FrameSequence (int s)
+  void NES_MMC5::FrameSequence ()
   {
     // 240hz clock
     for (int i=0; i < 2; ++i)
@@ -148,6 +150,12 @@ namespace xgm
 
   void NES_MMC5::Tick (int clocks)
   {
+      frame_sequence_count += clocks;
+      while (frame_sequence_count > 7458)
+      {
+          FrameSequence();
+          frame_sequence_count -= 7458;
+      }
   }
 
   UINT32 NES_MMC5::Render (INT32 b[2])

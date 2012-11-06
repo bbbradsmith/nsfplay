@@ -62,8 +62,9 @@ Global options:
   COMP_LIMIT: 0-100 compressor limit
   COMP_THRESHOLD: 0-100 compressor threshold
   COMP_VELOCITY: 0-100 compressor velocity
-  NES_BASECYCLES: NTSC master clock speed
-  PAL_BASECYCLES: PAL master clock speed * 12/16 (sorry, weird conversion being done)
+  NTSC_BASECYCLES: NTSC master clock speed
+  PAL_BASECYCLES: PAL master clock speed
+  DENDY_BASECYCLES: DENDY master clock speed
   PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
   VRC7_PATCH: 0-7 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
@@ -158,6 +159,9 @@ Versions
 NSFPlay 2.3 BETA 1 - ?/??/????
 Emulation:
 - Temporary implementation of $4017/$4015 frame counter IRQ flag for Deflemask.
+- Audio emulation is now driven by CPU clock cycles, increases timing accuracy. (Partially complete.)
+- APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
+- MMC5 framesequencer now independant of APU frame sequencer.
 Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.

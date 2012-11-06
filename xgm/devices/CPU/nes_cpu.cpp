@@ -76,16 +76,7 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 
   clock_of_frame -= (context.clock<<16);
 
-  // BS frame sequencer
-  int old_quarter = frame_quarter;
-  frame_quarter = 3 - (clock_of_frame / (clock_per_frame >> 2));
-  frame_quarter = frame_quarter < 0 ? 0 : frame_quarter;
-  if (frame_quarter != old_quarter)
-  {
-      FrameSequence(frame_quarter);
-  }
-
-  return context.clock; // BS return actual number of clocks executed
+  return context.clock; // return actual number of clocks executed
 }
 
 void NES_CPU::SetMemory (IDevice * b)
@@ -121,12 +112,6 @@ bool NES_CPU::Read (UINT32 adr, UINT32 & val, UINT32 id)
     return false;
 }
 
-void NES_CPU::FrameSequence(int s) // BS frame sequencer
-{
-  if (bus)
-    bus->FrameSequence(s);
-}
-
 void NES_CPU::Reset ()
 {
   // KM6502のリセット
@@ -149,7 +134,7 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
 {
   // 割り込みアドレス設定
       int_address = int_adr;
-  clock_per_frame = (int)((double)((1<<16) * (NES_BASECYCLES) / 12) / int_freq );
+  clock_per_frame = (int)((double)((1<<16) * NES_BASECYCLES) / int_freq );
   clock_of_frame = 0;
 
   // count clock quarters
@@ -160,7 +145,7 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
   context.Y = y;
   startup (start_adr);
 
-  for (int i = 0; (i < (NES_BASECYCLES / 12 / int_freq )) && !breaked; i++, K6502_Exec (&context))
+  for (int i = 0; (i < (NES_BASECYCLES / int_freq )) && !breaked; i++, K6502_Exec (&context))
   {
     if (context.PC == breakpoint) breaked = true;
   }

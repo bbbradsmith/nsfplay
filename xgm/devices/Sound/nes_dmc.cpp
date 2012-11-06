@@ -1,4 +1,5 @@
 #include "nes_dmc.h"
+#include "nes_apu.h"
 
 namespace xgm
 {
@@ -31,6 +32,11 @@ namespace xgm
     option[OPT_RANDOMIZE_NOISE] = 1;
     tnd_table[0][0][0][0] = 0;
     tnd_table[1][0][0][0] = 0;
+
+    apu = NULL;
+    frame_sequence_count = 0;
+    frame_sequence_length = 7458;
+    frame_sequence_steps = 4;
 
     for(int c=0;c<2;++c)
         for(int t=0;t<3;++t)
@@ -95,6 +101,21 @@ namespace xgm
   void NES_DMC::FrameSequence(int s)
   {
     //DEBUG_OUT("FrameSequence(%d)\n",s);
+
+    if (s > 3) return; // no operation in step 4
+
+    // mode 0 sequence is backwards
+    s = (frame_sequence_steps == 5) ? frame_sequence_step : (3 - frame_sequence_step);
+
+    if (apu)
+    {
+        apu->FrameSequence(s);
+    }
+
+    if (s == 0 && (frame_sequence_steps == 4))
+    {
+        frame_irq = true;
+    }
 
     // 240hz clock
     {
@@ -251,6 +272,16 @@ namespace xgm
 
   void NES_DMC::Tick (int clocks)
   {
+      frame_sequence_count += clocks;
+      while (frame_sequence_count > frame_sequence_length)
+      {
+          FrameSequence(frame_sequence_step);
+
+          frame_sequence_count -= frame_sequence_length;
+          ++frame_sequence_step;
+          if(frame_sequence_step >= frame_sequence_steps)
+              frame_sequence_step = 0;
+      }
   }
 
   UINT32 NES_DMC::Render (INT32 b[2])
@@ -316,7 +347,7 @@ namespace xgm
 
   void NES_DMC::SetClock (double c)
   {
-    clock = (UINT32)(c/12);
+    clock = (UINT32)(c);
     syn_interval = (INT32)((1<<30)/clock);
     now = 0;
   }
@@ -339,6 +370,13 @@ namespace xgm
   void NES_DMC::SetPal (bool is_pal)
   {
       pal = (is_pal ? 1 : 0);
+      // set CPU cycles in frame_sequence
+      frame_sequence_length = is_pal ? 8314 : 7458;
+  }
+
+  void NES_DMC::SetAPU (NES_APU* apu_)
+  {
+      apu = apu_;
   }
 
   // Initializing TRI, NOISE, DPCM mixing table
@@ -378,6 +416,12 @@ namespace xgm
     length_counter[0] = 0;
     length_counter[1] = 0;
     envelope_counter = 0;
+
+    frame_irq = false;
+    frame_irq_enable = false;
+    frame_sequence_count = 0;
+    frame_sequence_steps = 4;
+    frame_sequence_step = 0;
 
     for (i = 0; i < 0x10; i++)
       Write (0x4008 + i, 0);
@@ -479,6 +523,12 @@ namespace xgm
 
     if (adr == 0x4017)
     {
+      frame_irq_enable = ((val & 0x40) == 0x40);
+      frame_sequence_steps = ((val & 0x80) == 0x80) ? 5 : 4;
+      frame_sequence_step = 0;
+      frame_sequence_count = 0;
+      FrameSequence(0);
+      frame_sequence_step = 1;
     }
 
     if (adr<0x4008||0x4013<adr)
@@ -581,7 +631,14 @@ namespace xgm
   {
     if (adr == 0x4015)
     {
-      val |= (irq?128:0) | (active?16:0) | (length_counter[1]?8:0) | (length_counter[0]?4:0);
+      val |= (irq?128:0)
+          | (frame_irq ? 0x40 : 0)
+          | (active?16:0)
+          | (length_counter[1]?8:0)
+          | (length_counter[0]?4:0)
+          ;
+
+      frame_irq = false;
       return true;
     }
     else if (0x4008<=adr&&adr<=0x4014)

@@ -19,7 +19,7 @@ NES_FME7::~NES_FME7 ()
 
 void NES_FME7::SetClock (double c)
 {
-  this->clock = c / 6;
+  this->clock = c * 2.0;
 }
 
 void NES_FME7::SetRate (double r)

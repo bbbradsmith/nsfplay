@@ -156,7 +156,7 @@ namespace xgm
 
   void NES_N106::SetClock (double c)
   {
-    clock = c;
+    clock = c * 12.0;
   }
 
   void NES_N106::SetRate (double r)

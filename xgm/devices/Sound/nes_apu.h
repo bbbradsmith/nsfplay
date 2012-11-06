@@ -53,10 +53,6 @@ namespace xgm
 
     bool enable[2];
 
-      // temporary irq flag solution for Deflemask
-    bool frame_irq;
-    bool frame_irq_enable;
-
     void sweep_sqr (int ch); // calculates target sweep frequency
     INT32 calc_sqr (int ch);
     TrackInfoBasic trkinfo[2];
@@ -65,12 +61,13 @@ namespace xgm
       NES_APU ();
      ~NES_APU ();
 
+    void FrameSequence(int s);
+
     virtual void Reset ();
     virtual void Tick (int clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-    virtual void FrameSequence(int s); // TODO remove
     virtual void SetRate (double rate);
     virtual void SetClock (double clock);
     virtual void SetOption (int id, int b);

@@ -52,9 +52,6 @@ namespace xgm
      * 各種オプションを設定する(もしあれば)
      */
     virtual void SetOption (int id, int val){};
-
-    // BS frame sequencer (sequence is quarters of frames 0,1,2,3)
-    virtual void FrameSequence(int s){};
   };
 
   /**
@@ -219,13 +216,6 @@ namespace xgm
         }
       }
       return ret;
-    }
-
-    void FrameSequence(int s) // BS frame sequencer
-    {
-      std::vector < IDevice * >::iterator it;
-      for (it = vd.begin (); it != vd.end (); it++)
-        (*it)->FrameSequence(s);
     }
   };
 

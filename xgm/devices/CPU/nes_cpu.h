@@ -34,7 +34,6 @@ public:
   void SetMemory (IDevice *);
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-  void FrameSequence(int s); // BS frame sequencer
 };
 
 } // namespace xgm

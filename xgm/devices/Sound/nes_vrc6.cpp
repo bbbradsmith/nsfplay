@@ -56,7 +56,7 @@ namespace xgm
 
   void NES_VRC6::SetClock (double c)
   {
-    clock = c / 12;
+    clock = c;
   }
 
   void NES_VRC6::SetRate (double r)
