@@ -62,7 +62,7 @@ bool NES_FME7::Read (xgm::UINT32 adr, xgm::UINT32 & val, xgm::UINT32 id)
   return false;
 }
 
-void NES_FME7::Tick (int clocks)
+void NES_FME7::Tick (xgm::UINT32 clocks)
 {
 }
 

@@ -64,7 +64,7 @@ void RateConverter::SetRate (double r)
   rate = r;
 }
 
-void RateConverter::Tick (int clocks_)
+void RateConverter::Tick (UINT32 clocks_)
 {
   assert (target);
   clocks += clocks_;

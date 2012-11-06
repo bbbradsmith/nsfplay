@@ -2,7 +2,6 @@
 #define _NES_DMC_H_
 
 #include "../device.h"
-#include "counter.h"
 #include "../audio/MedianFilter.h"
 
 namespace xgm
@@ -18,7 +17,7 @@ namespace xgm
       OPT_ENABLE_4011=0,
       OPT_ENABLE_PNOISE,
       OPT_UNMUTE_ON_RESET,
-      OPT_DPCM_ANTI_NOISE,
+      OPT_DPCM_ANTI_CLICK,
       OPT_NONLINEAR_MIXER,
       OPT_RANDOMIZE_NOISE,
       OPT_END 
@@ -32,7 +31,7 @@ namespace xgm
 
     int option[OPT_END];
     int mask;
-    INT32 sm[2][3]; // BS stereo mix
+    INT32 sm[2][3];
     UINT8 reg[0x10];
     UINT32 len_reg;
     UINT32 adr_reg;
@@ -52,7 +51,10 @@ namespace xgm
     int anti_noise_mode;
     INT16 dcoff;
 
-    Counter pcounter[3]; // ˆÊ‘ŠƒJƒEƒ“ƒ^
+    UINT32 counter[3]; // frequency dividers
+    int tphase;        // triangle phase
+    UINT32 nfreq;      // noise frequency
+    UINT32 dfreq;      // DPCM frequency
 
     UINT32 tri_freq;
     int linear_counter;
@@ -86,9 +88,9 @@ namespace xgm
     bool frame_irq;
     bool frame_irq_enable;
 
-    inline UINT32 calc_tri ();
-    inline UINT32 calc_dmc ();
-    inline UINT32 calc_noise ();
+    inline UINT32 calc_tri (UINT32 clocks);
+    inline UINT32 calc_dmc (UINT32 clocks);
+    inline UINT32 calc_noise (UINT32 clocks);
 
   public:
       NES_DMC ();
@@ -100,10 +102,10 @@ namespace xgm
     void SetMemory (IDevice * r);
     void FrameSequence(int s);
     int GetDamp(){ return (damp<<1)|dac_lsb ; }
-    void TickFrameSequence (int clock);
+    void TickFrameSequence (UINT32 clocks);
 
     virtual void Reset ();
-    virtual void Tick (int clocks);
+    virtual void Tick (UINT32 clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
