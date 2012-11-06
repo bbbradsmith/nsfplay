@@ -43,7 +43,7 @@ namespace xgm
 
   void NES_FDS::SetClock (double c)
   {
-    clock = c / 12;
+    clock = c;
   }
 
   void NES_FDS::SetRate (double r)

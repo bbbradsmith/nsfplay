@@ -39,6 +39,8 @@ namespace xgm
 
     int length_counter[2];
 
+    int frame_sequence_count;
+
     double clock, rate;
     INT32 calc_sqr (int i);
     INT32 square_table[32];
@@ -48,12 +50,13 @@ namespace xgm
       NES_MMC5 ();
      ~NES_MMC5 ();
 
+    void FrameSequence ();
+
     virtual void Reset ();
     virtual void Tick (int clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
-    virtual void FrameSequence (int s);
     virtual void SetOption (int id, int b);
     virtual void SetClock (double);
     virtual void SetRate (double);

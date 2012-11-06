@@ -102,8 +102,9 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("COMP_THRESHOLD",100);
   CreateValue("COMP_VELOCITY", 100);
 
-  CreateValue("NES_BASECYCLES", (int)(21477272.0));
-  CreateValue("PAL_BASECYCLES", (int)(26601712.5 * 12.0 / 16.0));
+  CreateValue("NTSC_BASECYCLES", 1789773);
+  CreateValue("PAL_BASECYCLES", 1662607);
+  CreateValue("DENDY_BASECYCLES", 1773448);
   CreateValue("PREFER_PAL", 0);
 
   CreateValue("MASTER_VOLUME", 128);

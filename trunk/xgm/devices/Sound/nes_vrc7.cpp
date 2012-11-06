@@ -27,7 +27,7 @@ namespace xgm
 
   void NES_VRC7::SetClock (double c)
   {
-    clock = c / 6 / 72;
+    clock = c / 36;
   }
 
   void NES_VRC7::SetRate (double r)

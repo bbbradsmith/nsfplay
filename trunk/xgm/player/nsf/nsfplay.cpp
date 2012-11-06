@@ -19,7 +19,8 @@ namespace xgm
     sc[VRC7] = (vrc7 = new NES_VRC7());
     ld = new NESDetector();
 
-    mmc5->SetCPU(&cpu); // BS MMC5 PCM read action requires CPU read access
+    dmc->SetAPU(apu); // set APU
+    mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
 
     /* アンプ←フィルタ←レートコンバータ←音源 を接続 */
     for (int i = 0; i < NES_DEVICE_MAX; i++)
@@ -212,7 +213,8 @@ namespace xgm
   {
     rate = r;
 
-    dmc->SetPal(UsePal(nsf->pal_ntsc));
+    bool pal = UsePal(nsf->pal_ntsc);
+    dmc->SetPal(pal);
 
     for (int i = 0; i < NES_DEVICE_MAX; i++)
     {
@@ -231,7 +233,7 @@ namespace xgm
       };
       sc[i]->SetClock(UsePal(nsf->pal_ntsc) ?
           config->GetValue("PAL_BASECYCLES").GetInt() :
-          config->GetValue("NES_BASECYCLES").GetInt());
+          config->GetValue("NTSC_BASECYCLES").GetInt());
 
       int mult = config->GetDeviceConfig(i,"QUALITY").GetInt() & 3;
 
@@ -286,7 +288,7 @@ namespace xgm
 
     cpu.NES_BASECYCLES = UsePal(nsf->pal_ntsc) ?
         config->GetValue("PAL_BASECYCLES").GetInt() :
-        config->GetValue("NES_BASECYCLES").GetInt() ;
+        config->GetValue("NTSC_BASECYCLES").GetInt() ;
 
     // 演奏後にRAM空間を破壊される場合があるので，再ロード
     Reload ();
@@ -380,7 +382,7 @@ namespace xgm
     if (length)
     { 
       int clock_per_sample;
-      clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/12/rate * ((*config)["MULT_SPEED"].GetInt()) / 256);
+      clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/rate * ((*config)["MULT_SPEED"].GetInt()) / 256);
 
       //int fast_seek = (*config)["FAST_SEEK"];
       
@@ -486,7 +488,7 @@ namespace xgm
     int master_volume;
 
     master_volume = (*config)["MASTER_VOLUME"];
-    clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/12/rate*((*config)["MULT_SPEED"].GetInt())/256) ;
+    clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/rate*((*config)["MULT_SPEED"].GetInt())/256) ;
 
     for (i = 0; i < length; i++)
     {
