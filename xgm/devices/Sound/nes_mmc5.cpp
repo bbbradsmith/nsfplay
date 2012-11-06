@@ -148,7 +148,7 @@ namespace xgm
     return ret;
   }
 
-  void NES_MMC5::Tick (int clocks)
+  void NES_MMC5::TickFrameSequence (int clocks)
   {
       frame_sequence_count += clocks;
       while (frame_sequence_count > 7458)
@@ -156,6 +156,10 @@ namespace xgm
           FrameSequence();
           frame_sequence_count -= 7458;
       }
+  }
+
+  void NES_MMC5::Tick (int clocks)
+  {
   }
 
   UINT32 NES_MMC5::Render (INT32 b[2])

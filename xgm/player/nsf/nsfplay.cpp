@@ -284,7 +284,8 @@ namespace xgm
     click_mode = PRE_CLICK;
     total_render = 0;
     frame_render = (int)(rate)/60; // ‰‰‘tî•ñ‚ðXV‚·‚éŽüŠú
-    clock_rest = 0;
+    apu_clock_rest = 0.0;
+    cpu_clock_rest = 0.0;
 
     cpu.NES_BASECYCLES = UsePal(nsf->pal_ntsc) ?
         config->GetValue("PAL_BASECYCLES").GetInt() :
@@ -381,25 +382,36 @@ namespace xgm
   {
     if (length)
     { 
-      int clock_per_sample;
-      clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/rate * ((*config)["MULT_SPEED"].GetInt()) / 256);
-
-      //int fast_seek = (*config)["FAST_SEEK"];
-      
-      //if(fast_seek) cpu.SetMemory(&dummy_bus);
+      double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
+      double cpu_clock_per_sample = apu_clock_per_sample * ((double)((*config)["MULT_SPEED"].GetInt())/256.0);
 
       for (UINT32 i = 0; i < length; i++)
       {
         total_render++;
-        clock_rest += clock_per_sample;
-        if (clock_rest > 0)
+
+        // tick CPU
+        cpu_clock_rest += cpu_clock_per_sample;
+        int cpu_clocks = (int)(cpu_clock_rest);
+        if (cpu_clocks > 0)
         {
-            UINT32 clocks = cpu.Exec ( clock_rest>>20 );
-            clock_rest -= (clocks << 20);
+            UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+            cpu_clock_rest -= (double)(real_cpu_clocks);
+
+            // tick APU frame sequencer
+            dmc->TickFrameSequence(real_cpu_clocks);
+            if (nsf->use_mmc5)
+                mmc5->TickFrameSequence(real_cpu_clocks);
+        }
+
+        // skip APU / expansions
+        apu_clock_rest += apu_clock_per_sample;
+        int apu_clocks = (int)(apu_clock_rest);
+        if (apu_clocks > 0)
+        {
+            //mixer.Tick(apu_clocks);
+            apu_clock_rest -= (double)(apu_clocks);
         }
       }
-
-      //if(fast_seek) cpu.SetMemory(&bus);
 
       mixer.Skip (length);
       time_in_ms += (int)(1000 * length / rate * ((*config)["MULT_SPEED"].GetInt()) / 256) ;
@@ -484,26 +496,43 @@ namespace xgm
     INT32 out[2];
     INT32 outm;
     UINT32 i;
-    int clock_per_sample;
     int master_volume;
 
     master_volume = (*config)["MASTER_VOLUME"];
-    clock_per_sample = (int)((double)(1<<20)*cpu.NES_BASECYCLES/rate*((*config)["MULT_SPEED"].GetInt())/256) ;
+
+    double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
+    double cpu_clock_per_sample = apu_clock_per_sample * ((double)((*config)["MULT_SPEED"].GetInt())/256.0);
 
     for (i = 0; i < length; i++)
     {
       total_render++;
 
-      clock_rest += clock_per_sample;
-      if (clock_rest > 0)
+      // tick CPU
+      cpu_clock_rest += cpu_clock_per_sample;
+      int cpu_clocks = (int)(cpu_clock_rest);
+      if (cpu_clocks > 0)
       {
-          UINT32 clocks = cpu.Exec ( clock_rest>>20 );
-          clock_rest -= (clocks << 20);
+          UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+          cpu_clock_rest -= (double)(real_cpu_clocks);
+
+          // tick APU frame sequencer
+          dmc->TickFrameSequence(real_cpu_clocks);
+          if (nsf->use_mmc5)
+              mmc5->TickFrameSequence(real_cpu_clocks);
       }
 
       UpdateInfo();
 
-      mixer.Tick(clock_per_sample >> 20); // TODO use accurate number of clocks
+      // tick APU / expansions
+      apu_clock_rest += apu_clock_per_sample;
+      int apu_clocks = (int)(apu_clock_rest);
+      if (apu_clocks > 0)
+      {
+          mixer.Tick(apu_clocks);
+          apu_clock_rest -= (double)(apu_clocks);
+      }
+
+      // render output
       mixer.Render(buf);
       outm = (buf[0] + buf[1]) >> 1; // mono mix
       if (outm == last_out) silent_length++; else silent_length = 0;

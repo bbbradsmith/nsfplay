@@ -104,9 +104,6 @@ namespace xgm
 
     if (s > 3) return; // no operation in step 4
 
-    // mode 0 sequence is backwards
-    s = (frame_sequence_steps == 5) ? frame_sequence_step : (3 - frame_sequence_step);
-
     if (apu)
     {
         apu->FrameSequence(s);
@@ -270,7 +267,7 @@ namespace xgm
     return (damp<<1) + dac_lsb;
   }
 
-  void NES_DMC::Tick (int clocks)
+  void NES_DMC::TickFrameSequence (int clocks)
   {
       frame_sequence_count += clocks;
       while (frame_sequence_count > frame_sequence_length)
@@ -282,6 +279,10 @@ namespace xgm
           if(frame_sequence_step >= frame_sequence_steps)
               frame_sequence_step = 0;
       }
+  }
+
+  void NES_DMC::Tick (int clocks)
+  {
   }
 
   UINT32 NES_DMC::Render (INT32 b[2])
@@ -524,11 +525,11 @@ namespace xgm
     if (adr == 0x4017)
     {
       frame_irq_enable = ((val & 0x40) == 0x40);
-      frame_sequence_steps = ((val & 0x80) == 0x80) ? 5 : 4;
-      frame_sequence_step = 0;
       frame_sequence_count = 0;
-      FrameSequence(0);
-      frame_sequence_step = 1;
+      frame_sequence_steps = ((val & 0x80) == 0x80) ? 5 : 4;
+      frame_sequence_step = (frame_sequence_steps == 5) ? 0 : 1;
+      FrameSequence(frame_sequence_step);
+      ++frame_sequence_step;
     }
 
     if (adr<0x4008||0x4013<adr)
