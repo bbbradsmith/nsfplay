@@ -68,7 +68,7 @@ namespace xgm
                 if (freq[i] >= 8 && sfreq[i] < 0x800 && sweep_amount[i] > 0) // update frequency if appropriate
                 {
                     freq[i] = sfreq[i] < 0 ? 0 : sfreq[i];
-                    pcounter[i].setcycle(freq[i]);
+                    if (scounter[i] > freq[i]) scounter[i] = freq[i];
                 }
                 sweep_div[i] = sweep_div_period[i] + 1;
 
@@ -85,9 +85,8 @@ namespace xgm
 
   }
 
-  INT32 NES_APU::calc_sqr (int i)
+  INT32 NES_APU::calc_sqr (int i, UINT32 clocks)
   {
-    // BS changed phase to match NesDev description
     static const INT16 sqrtbl[4][16] = {
       {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -95,7 +94,19 @@ namespace xgm
       {1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
 
-    pcounter[i].iup();
+    scounter[i] += clocks;
+    if (freq[i] > 0)
+    {
+        while (scounter[i] > freq[i])
+        {
+            sphase[i] = (sphase[i] + 1) & 15;
+            scounter[i] -= (freq[i] + 1);
+        }
+    }
+    else
+    {
+        scounter[i] = 0;
+    }
 
     //DEBUG_OUT("freq[%d] = %03X\n", i, freq[i]);
 
@@ -107,7 +118,7 @@ namespace xgm
         )
     {
         int v = envelope_disable[i] ? volume[i] : envelope_counter[i];
-        ret = sqrtbl[duty[i]][pcounter[i].value() & 15] ? v : 0;
+        ret = sqrtbl[duty[i]][sphase[i]] ? v : 0;
     }
     
     return ret;
@@ -129,16 +140,15 @@ namespace xgm
       return false;
   }
 
-  void NES_APU::Tick (int clocks)
+  void NES_APU::Tick (UINT32 clocks)
   {
+    out[0] = calc_sqr(0, clocks);
+    out[1] = calc_sqr(1, clocks);
   }
 
   // ê∂ê¨Ç≥ÇÍÇÈîgå`ÇÃêUïùÇÕ0-8191
   UINT32 NES_APU::Render (INT32 b[2])
   {
-    out[0] = calc_sqr(0);
-    out[1] = calc_sqr(1);
-
     out[0] = (mask & 1) ? 0 : out[0];
     out[1] = (mask & 2) ? 0 : out[1];
 
@@ -206,6 +216,11 @@ namespace xgm
     gclock = 0;
     mask = 0;
 
+    scounter[0] = 0;
+    scounter[1] = 0;
+    sphase[0] = 0;
+    sphase[0] = 0;
+
     sweep_div[0] = 1;
     sweep_div[1] = 1;
     envelope_div[0] = 0;
@@ -247,11 +262,6 @@ namespace xgm
   void NES_APU::SetRate (double r)
   {
     rate = r ? r : DEFAULT_RATE;
-
-    for (int i = 0; i < 2; i++)
-    {
-      pcounter[i].init (clock, rate, 32);
-    }
   }
 
   void NES_APU::SetStereoMix(int trk, xgm::INT16 mixl, xgm::INT16 mixr)
@@ -336,22 +346,22 @@ namespace xgm
       case 0x2:
       case 0x6:
         freq[ch] = val | ((reg[adr+1]&7)<<8) ;
-        pcounter[ch].setcycle (freq[ch]);
         sweep_sqr(ch);
+        if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
         break;
 
       case 0x3: 
       case 0x7:
         freq[ch] = reg[adr-1] | ((val & 0x7) << 8) ;
-        pcounter[ch].setcycle (freq[ch]);
         if (option[OPT_PHASE_REFRESH])
-          pcounter[ch].reset (0);
+          sphase[ch] = 0;
         envelope_write[ch] = true;
         if (enable[ch])
         {
           length_counter[ch] = length_table[(val >> 3) & 0x1f];
         }
         sweep_sqr(ch);
+        if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
         break;
 
       default:

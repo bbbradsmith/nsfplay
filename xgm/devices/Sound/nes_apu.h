@@ -2,7 +2,6 @@
 #define _NES_APU_H_
 #include "../device.h"
 #include "nes_dmc.h"
-#include "counter.h"
 
 namespace xgm
 {
@@ -19,7 +18,7 @@ namespace xgm
   protected:
     int option[OPT_END];        // 各種オプション
     int mask;
-    INT32 sm[2][2]; // BS stereo mix
+    INT32 sm[2][2];
 
     UINT32 gclock;
     UINT8 reg[0x20];
@@ -28,7 +27,8 @@ namespace xgm
 
     INT32 square_table[32];     // nonlinear mixer
 
-    Counter pcounter[2];        // phase counter
+    int scounter[2];            // frequency divider
+    int sphase[2];              // phase counter
 
     int duty[2];
     int volume[2];
@@ -54,7 +54,7 @@ namespace xgm
     bool enable[2];
 
     void sweep_sqr (int ch); // calculates target sweep frequency
-    INT32 calc_sqr (int ch);
+    INT32 calc_sqr (int ch, UINT32 clocks);
     TrackInfoBasic trkinfo[2];
 
   public:
@@ -64,7 +64,7 @@ namespace xgm
     void FrameSequence(int s);
 
     virtual void Reset ();
-    virtual void Tick (int clocks);
+    virtual void Tick (UINT32 clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);

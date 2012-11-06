@@ -58,7 +58,7 @@ namespace xgm
       virtual ~ NES_FDS ();
 
     virtual void Reset ();
-    virtual void Tick (int clocks);
+    virtual void Tick (UINT32 clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);

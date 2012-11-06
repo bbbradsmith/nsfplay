@@ -73,7 +73,7 @@ namespace xgm
      *  chip update/operation is now bound to CPU clocks
      *  Render() now simply mixes and outputs sound
      */
-    virtual void Tick (int clocks) {}
+    virtual void Tick (UINT32 clocks) {}
 
   };
 
@@ -86,7 +86,7 @@ namespace xgm
     /**
      * Soundchip clocked by M2 (NTSC = ~1.789MHz)
      */
-    virtual void Tick (int clocks) = 0;
+    virtual void Tick (UINT32 clocks) = 0;
 
     /**
      * チップの動作クロックを設定

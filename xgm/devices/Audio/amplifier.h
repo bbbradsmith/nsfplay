@@ -68,7 +68,7 @@ namespace xgm
       target = p;
     }
 
-    void Tick (int clocks)
+    void Tick (UINT32 clocks)
     {
       assert (target);
       target->Tick(clocks);

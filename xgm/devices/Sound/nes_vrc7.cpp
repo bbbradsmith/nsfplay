@@ -89,7 +89,7 @@ namespace xgm
     return false;
   }
 
-  void NES_VRC7::Tick (int clocks)
+  void NES_VRC7::Tick (UINT32 clocks)
   {
   }
 

@@ -56,7 +56,7 @@ namespace xgm
       return in;
     }
 
-    void Tick(int clocks)
+    void Tick(UINT32 clocks)
     {
     }
 
@@ -154,7 +154,7 @@ namespace xgm
       return FastRender(b);
     }
 
-    void Tick(int clocks)
+    void Tick(UINT32 clocks)
     {
     }
 
@@ -227,7 +227,7 @@ namespace xgm
       return 2;
     }
 
-    virtual void Tick(int clocks)
+    virtual void Tick(UINT32 clocks)
     {
       if (target) target->Tick(clocks);
     }

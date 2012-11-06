@@ -23,7 +23,7 @@ public:
 	BOOL	m_enable_4011;
 	BOOL	m_enable_pnoise;
 	BOOL	m_nonlinear_mixer;
-	BOOL	m_anti_noise;
+	BOOL	m_anti_click;
 	BOOL	m_randomize_noise;
 	BOOL	m_unmute;
 	//}}AFX_DATA

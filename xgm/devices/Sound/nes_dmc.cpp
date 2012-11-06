@@ -13,10 +13,10 @@ namespace xgm
 
   const UINT32 NES_DMC::freq_table[2][16] = {
   { // NTSC
-    428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54
+    428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54
   },
   { // PAL
-    398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50
+    398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98, 78, 66, 50
   }};
 
   NES_DMC::NES_DMC () : GETA_BITS (20)
@@ -27,7 +27,7 @@ namespace xgm
     option[OPT_ENABLE_4011] = 1;
     option[OPT_ENABLE_PNOISE] = 1;
     option[OPT_UNMUTE_ON_RESET] = 1;
-    option[OPT_DPCM_ANTI_NOISE] = 0;
+    option[OPT_DPCM_ANTI_CLICK] = 0;
     option[OPT_NONLINEAR_MIXER] = 1;
     option[OPT_RANDOMIZE_NOISE] = 1;
     tnd_table[0][0][0][0] = 0;
@@ -79,7 +79,6 @@ namespace xgm
                        (envelope_disable ? (noise_volume>0) : (envelope_counter>0));
       trkinfo[1]._freq = reg[0x400e-0x4008]&0xF;
       trkinfo[1].freq = clock/double(wavlen_table[pal][trkinfo[1]._freq] * ((noise_tap&(1<<6)) ? 93 : 1));
-      // BS rewrote noise generator
       trkinfo[1].tone = noise_tap & (1<<6);
       trkinfo[1].output = out[1];
       break;
@@ -171,7 +170,7 @@ namespace xgm
   }
 
   // 三角波チャンネルの計算 戻り値は0-15
-  UINT32 NES_DMC::calc_tri ()
+  UINT32 NES_DMC::calc_tri (UINT32 clocks)
   {
     static UINT32 tritbl[32] = 
     {
@@ -182,11 +181,25 @@ namespace xgm
     };
 
     bool flag = linear_counter <= 0 || length_counter[0] <= 0;
-    UINT32 ret = tritbl[pcounter[0].value()];
 
-    if (enable[0] && !flag && tri_freq > 1) 
-      pcounter[0].iup ();
+    if (enable[0] && !flag)
+    {
+      if (tri_freq > 1)
+      {
+          counter[0] += clocks;
+          while (counter[0] > tri_freq)
+          {
+            tphase = (tphase + 1) & 31;
+            counter[0] -= (tri_freq + 1);
+          }
+      }
+      else
+      {
+          counter[0] = 0;
+      }
+    }
 
+    UINT32 ret = tritbl[tphase];
     return ret;
   }
 
@@ -194,40 +207,53 @@ namespace xgm
   // 低サンプリングレートで合成するとエイリアスノイズが激しいので
   // ノイズだけはこの関数内で高クロック合成し、簡易なサンプリングレート
   // 変換を行っている。
-  UINT32 NES_DMC::calc_noise()
+  UINT32 NES_DMC::calc_noise(UINT32 clocks)
   {
     UINT32 env = envelope_disable ? noise_volume : envelope_counter;
 
-    int i, c, num = 0;
-    UINT32 noise_out = 0;
+    UINT32 last = (noise & 0x4000) ? env : 0;
+    if (clocks < 1) return last;
 
-    while ( now < out_interval ) {
-      now +=syn_interval;
-      num++;
-      c = pcounter[1].iup_wofc();
-      if (enable[1] && length_counter[1] > 0) {
-        for(i=0;i<c;i++) {
-              // BS rewrote noise generator
-              UINT32 feedback = (noise&1) ^ ((noise&noise_tap)?1:0);
-              noise = (noise>>1) | (feedback<<14);
-        }
-        if(noise&0x4000) noise_out += env;
-      }
+    // simple anti-aliasing (noise requires it, even when oversampling is off)
+    UINT32 count = 0;
+    UINT32 accum = 0;
+
+    counter[1] += clocks;
+    assert (nfreq > 0); // prevent infinite loop
+    while (counter[1] >= nfreq)
+    {
+        // tick the noise generator
+        UINT32 feedback = (noise&1) ^ ((noise&noise_tap)?1:0);
+        noise = (noise>>1) | (feedback<<14);
+
+        ++count;
+        accum += last;
+        last = (noise & 0x4000) ? env : 0;
+
+        counter[1] -= nfreq;
     }
-    now -= out_interval;
-    if(num!=0) noise_out /= num;
 
-    return noise_out;
+    if (count < 1) // no change over interval, don't anti-alias
+    {
+       return last;
+    }
+
+    UINT32 clocks_accum = clocks - counter[1];
+    // count = number of samples in accum
+    // counter[1] = number of clocks since last sample
+
+    accum = (accum * clocks_accum) + (last * counter[1] * count);
+    // note accum as an average is already premultiplied by count
+
+    return accum / (clocks * count);
   }
 
   // DMCチャンネルの計算 戻り値は0-127
-  UINT32 NES_DMC::calc_dmc ()
+  UINT32 NES_DMC::calc_dmc (UINT32 clocks)
   {
-    int i,c;
- 
-    c = pcounter[2].iup_wofc();
-
-    for(i=0;i<c;i++)
+    counter[2] += clocks;
+    assert (dfreq > 0); // prevent infinite loop
+    while (counter[2] >= dfreq)
     {
       if ( data != 0x100 ) // data = 0x100 は EMPTY を意味する。
       {
@@ -262,12 +288,14 @@ namespace xgm
           active = false;
         }
       }
+
+      counter[2] -= dfreq;
     }
 
     return (damp<<1) + dac_lsb;
   }
 
-  void NES_DMC::TickFrameSequence (int clocks)
+  void NES_DMC::TickFrameSequence (UINT32 clocks)
   {
       frame_sequence_count += clocks;
       while (frame_sequence_count > frame_sequence_length)
@@ -281,21 +309,20 @@ namespace xgm
       }
   }
 
-  void NES_DMC::Tick (int clocks)
+  void NES_DMC::Tick (UINT32 clocks)
   {
+    out[0] = calc_tri(clocks);
+    out[1] = calc_noise(clocks);
+    out[2] = calc_dmc(clocks);
   }
 
   UINT32 NES_DMC::Render (INT32 b[2])
   {
-    out[0] = calc_tri();
-    out[1] = calc_noise();
-    out[2] = calc_dmc();
-
     out[0] = (mask & 1) ? 0 : out[0];
     out[1] = (mask & 2) ? 0 : out[1];
     out[2] = (mask & 4) ? 0 : out[2];
 
-    if(option[OPT_DPCM_ANTI_NOISE])
+    if(option[OPT_DPCM_ANTI_CLICK])
     {
       switch(anti_noise_mode)
       {
@@ -345,7 +372,6 @@ namespace xgm
     return 2;
   }
 
-
   void NES_DMC::SetClock (double c)
   {
     clock = (UINT32)(c);
@@ -356,15 +382,7 @@ namespace xgm
   void NES_DMC::SetRate (double r)
   {
     rate = (UINT32)(r?r:DEFAULT_RATE);
-
-    pcounter[0].init (clock, rate, 32);
-    pcounter[1].init (clock, clock, 2); 
-    pcounter[2].init (clock, rate, 1);
-
     out_interval = (INT32)((1<<30)/rate);
-    // BS I have no idea why this is half of what it should be
-    out_interval *= 2;
-
     now = 0;
   }
 
@@ -413,6 +431,13 @@ namespace xgm
 
     InitializeTNDTable(8227,12241,22638);
 
+    counter[0] = 0;
+    counter[1] = 0;
+    counter[2] = 0;
+    tphase = 0;
+    nfreq = wavlen_table[0][0];
+    dfreq = freq_table[0][0];
+
     envelope_div = 0;
     length_counter[0] = 0;
     length_counter[1] = 0;
@@ -445,7 +470,6 @@ namespace xgm
     daddress = 0;
     noise = 1;
     noise_tap = (1<<1);
-    // BS randomize noise on startup
     if (option[OPT_RANDOMIZE_NOISE])
     {
         noise |= ::rand();
@@ -554,12 +578,12 @@ namespace xgm
 
     case 0x400a:
       tri_freq = val | (tri_freq & 0x700) ;
-      pcounter[0].setcycle (tri_freq);
+      if (counter[0] > tri_freq) counter[0] = tri_freq;
       break;
 
     case 0x400b:
       tri_freq = (tri_freq & 0xff) | ((val & 0x7) << 8) ;
-      pcounter[0].setcycle (tri_freq);
+      if (counter[0] > tri_freq) counter[0] = tri_freq;
       linear_counter_halt = true;
       if (enable[0])
       {
@@ -580,12 +604,12 @@ namespace xgm
       break;
 
     case 0x400e:
-      // BS rewrote noise generator
       if (option[OPT_ENABLE_PNOISE])
         noise_tap = (val & 0x80) ? (1<<6) : (1<<1);
       else
         noise_tap = (1<<1);
-      pcounter[1].setcycle (wavlen_table[pal][val&15]-1);
+      nfreq = wavlen_table[pal][val&15];
+      if (counter[1] > nfreq) counter[1] = nfreq;
       break;
 
     case 0x400f:
@@ -600,7 +624,8 @@ namespace xgm
 
     case 0x4010:
       mode = (val >> 6) & 3;
-      pcounter[2].setcycle(freq_table[pal][val&15]-1);
+      dfreq = freq_table[pal][val&15];
+      if (counter[2] > dfreq) counter[2] = dfreq;
       break;
 
     case 0x4011:

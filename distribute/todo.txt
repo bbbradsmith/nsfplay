@@ -1,4 +1,5 @@
 To Do:
+- Review sinc resampler implementation
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
 - kfaraday says if options are opened from main panel, changes don't save?
