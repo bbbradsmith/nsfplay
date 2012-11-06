@@ -51,6 +51,10 @@ namespace xgm
     return wave[(offset[i]+((pcounter[i]>>18)%length[i]))&0xff] * volume[i];
   }
 
+  void NES_N106::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_N106::Render (INT32 b[2])
   {
     int i, c;

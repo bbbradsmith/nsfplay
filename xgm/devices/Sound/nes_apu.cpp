@@ -137,6 +137,10 @@ namespace xgm
       return false;
   }
 
+  void NES_APU::Tick (int clocks)
+  {
+  }
+
   // ¶¬‚³‚ê‚é”gŒ`‚ÌU•‚Í0-8191
   UINT32 NES_APU::Render (INT32 b[2])
   {

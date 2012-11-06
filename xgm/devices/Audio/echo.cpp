@@ -48,6 +48,12 @@ inline xgm::UINT32 EchoUnit::FastRender(xgm::INT32 b[2])
   return 2;
 }
 
+void xgm::EchoUnit::Tick(int clocks)
+{
+  lpf.Tick(clocks);
+  //hpf.Tick(clocks); // hpf has no sub-renderable
+}
+
 xgm::UINT32 EchoUnit::Render(xgm::INT32 b[2])
 {
   return FastRender(b);

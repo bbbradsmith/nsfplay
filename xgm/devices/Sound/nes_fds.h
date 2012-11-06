@@ -57,16 +57,17 @@ namespace xgm
       NES_FDS ();
       virtual ~ NES_FDS ();
 
-    void Reset ();
-    bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-    bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
-    UINT32 Render (INT32 b[2]);
-    void SetRate (double);
-    void SetClock (double);
-    void SetOption (int, int);
-    void SetMask(int m){ mask = m&1; }
-    void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
-    ITrackInfo *GetTrackInfo(int trk);
+    virtual void Reset ();
+    virtual void Tick (int clocks);
+    virtual UINT32 Render (INT32 b[2]);
+    virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
+    virtual void SetRate (double);
+    virtual void SetClock (double);
+    virtual void SetOption (int, int);
+    virtual void SetMask(int m){ mask = m&1; }
+    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual ITrackInfo *GetTrackInfo(int trk);
   };
 
 }                               // namespace

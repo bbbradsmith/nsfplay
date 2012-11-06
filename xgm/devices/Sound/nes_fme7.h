@@ -17,15 +17,16 @@ namespace xgm
   public:
       NES_FME7 ();
      ~NES_FME7 ();
-    void Reset ();
-    UINT32 Render (INT32 b[2]);
-    bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
-    bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-    void SetClock (double);
-    void SetRate (double);
-    void SetMask (int m){ if(psg) PSG_setMask(psg,m); }
-    void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
-    ITrackInfo *GetTrackInfo(int trk);
+    virtual void Reset ();
+    virtual void Tick (int clocks);
+    virtual UINT32 Render (INT32 b[2]);
+    virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
+    virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    virtual void SetClock (double);
+    virtual void SetRate (double);
+    virtual void SetMask (int m){ if(psg) PSG_setMask(psg,m); }
+    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual ITrackInfo *GetTrackInfo(int trk);
   };
 
 }                               // namespace

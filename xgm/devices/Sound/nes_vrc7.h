@@ -19,16 +19,18 @@ namespace xgm
   public:
       NES_VRC7 ();
      ~NES_VRC7 ();
-    void Reset ();
-    UINT32 Render (INT32 b[2]);
-    bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
-    bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-    void SetPatchSet (unsigned int p);
-    void SetClock (double);
-    void SetRate (double);
-    void SetMask (int m){ mask = m; if(opll) OPLL_setMask(opll, m); }
-    void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
-    ITrackInfo *GetTrackInfo(int trk);
+
+    virtual void Reset ();
+    virtual void Tick (int clocks);
+    virtual UINT32 Render (INT32 b[2]);
+    virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
+    virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    virtual void SetPatchSet (unsigned int p);
+    virtual void SetClock (double);
+    virtual void SetRate (double);
+    virtual void SetMask (int m){ mask = m; if(opll) OPLL_setMask(opll, m); }
+    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual ITrackInfo *GetTrackInfo(int trk);
   };
 
 }                               // namespace

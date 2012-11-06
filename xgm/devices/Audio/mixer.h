@@ -69,7 +69,16 @@ namespace xgm
            fade_speed * length) ? 0 : fade_amount - (fade_speed * length);
     }
 
-    UINT32 Render (INT32 b[2])
+    virtual void Tick (int clocks)
+    {
+      DeviceList::iterator it;
+      for (it = dlist.begin (); it != dlist.end (); it++)
+      {
+        (*it)->Tick (clocks);
+      }
+    }
+
+    virtual UINT32 Render (INT32 b[2])
     {
       INT32 tmp[2];
       DeviceList::iterator it;

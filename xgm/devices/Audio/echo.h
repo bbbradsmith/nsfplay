@@ -18,7 +18,8 @@ namespace xgm {
     ~EchoUnit(){ delete [] echo_buf; }
     void Reset();
     void SetRate(double r);
-    UINT32 Render(INT32 b[2]);
+    virtual void Tick(int clocks);
+    virtual UINT32 Render(INT32 b[2]);
     inline UINT32 FastRender(INT32 b[2]);
   };
 

@@ -119,6 +119,10 @@ namespace xgm
     return saw_phase >> 3;
   }
 
+  void NES_VRC6::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_VRC6::Render (INT32 b[2])
   {
     INT32 m[3];

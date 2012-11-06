@@ -16,6 +16,7 @@ namespace xgm
     int mult;          // オーバーサンプリング倍率(奇数)
     INT32  tap[128][2];
     double hr[128];    // H(z)
+    int clocks; // clocks pending Tick execution
 
     SimpleFIR *fir;
 
@@ -26,7 +27,8 @@ namespace xgm
     void Reset ();
     void SetClock (double clock);
     void SetRate (double rate);
-    UINT32 Render (INT32 b[2]);
+    virtual void Tick (int clocks_); // ticks get executed during Render
+    virtual UINT32 Render (INT32 b[2]);
     inline UINT32 FastRender(INT32 b[2]);
   };
 
