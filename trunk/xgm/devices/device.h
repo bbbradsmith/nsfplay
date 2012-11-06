@@ -72,6 +72,12 @@ namespace xgm
      */
     virtual UINT32 Render (INT32 b[2]) = 0;
 
+    /**
+     *  chip update/operation is now bound to CPU clocks
+     *  Render() now simply mixes and outputs sound
+     */
+    virtual void Tick (int clocks) {}
+
   };
 
   /**
@@ -80,6 +86,11 @@ namespace xgm
   class ISoundChip : public IDevice, virtual public IRenderable
   {
   public:
+    /**
+     * Soundchip clocked by M2 (NTSC = ~1.789MHz)
+     */
+    virtual void Tick (int clocks) = 0;
+
     /**
      * チップの動作クロックを設定
      *
@@ -94,12 +105,25 @@ namespace xgm
      */
     virtual void SetRate (double rate) = 0;
 
+    /**
+     * Channel mask.
+     */
     virtual void SetMask (int mask)=0;
 
-    // BS adding stereo mix capabilities to everything
-    // mixl = 0-256, mixr = 0-256, 128 = neutral, 256 = double, 0 = nil
+    /**
+     * Stereo mix.
+     *   mixl = 0-256
+     *   mixr = 0-256
+     *     128 = neutral
+     *     256 = double
+     *     0 = nil
+     *    <0 = inverted
+     */
     virtual void SetStereoMix(int trk, xgm::INT16 mixl, xgm::INT16 mixr) = 0;
 
+    /**
+     * Track info for keyboard view.
+     */
     virtual ITrackInfo *GetTrackInfo(int trk){ return NULL; }
   };
 

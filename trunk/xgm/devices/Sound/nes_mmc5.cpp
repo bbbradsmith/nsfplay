@@ -146,6 +146,10 @@ namespace xgm
     return ret;
   }
 
+  void NES_MMC5::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_MMC5::Render (INT32 b[2])
   {
     out[0] = calc_sqr(0);

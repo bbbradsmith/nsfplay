@@ -206,6 +206,10 @@ namespace xgm
     return (opout[0] * vtable[volume & 3]) >> 4;
   }
 
+  void NES_FDS::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_FDS::Render (INT32 b[2])
   {
     INT32 m = calc();

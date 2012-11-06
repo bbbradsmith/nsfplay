@@ -249,6 +249,10 @@ namespace xgm
     return (damp<<1) + dac_lsb;
   }
 
+  void NES_DMC::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_DMC::Render (INT32 b[2])
   {
     out[0] = calc_tri();

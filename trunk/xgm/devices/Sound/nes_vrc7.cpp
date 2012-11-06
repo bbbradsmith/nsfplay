@@ -89,6 +89,10 @@ namespace xgm
     return false;
   }
 
+  void NES_VRC7::Tick (int clocks)
+  {
+  }
+
   UINT32 NES_VRC7::Render (INT32 b[2])
   {
     b[0] = b[1] = 0;

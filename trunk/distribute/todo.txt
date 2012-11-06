@@ -1,6 +1,7 @@
-RELEASE
-
 To Do:
+- during 5s fadeout seems to be a quiet 60hz buzz
+- kfaraday says if options are opened from main panel, changes don't save?
+- Improve "eliminiate click" option: allow DMC writes but apply an equivalent - to the output to eliminate any pop
 - Frame sequencer and $4017 response, make MMC5 sequencer independent
 - Breakout window for info (nice for looking at NSFe text chunk).
 - VRC6 square phase reset should not reset divide
@@ -26,9 +27,9 @@ To Do:
 - See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
 - Bus/stack plugins: register trace, NSF validator, other export tools
+- Invert L/R of each channel for rushjet.
 
 Unknown:
-- Doommaster had weird pitch and cutting problems. Are these still there?
 - Channel mask caption is ????? in Japanese UI.
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.

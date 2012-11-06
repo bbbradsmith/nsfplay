@@ -501,6 +501,7 @@ namespace xgm
 
       UpdateInfo();
 
+      mixer.Tick(clock_per_sample >> 20); // TODO use accurate number of clocks
       mixer.Render(buf);
       outm = (buf[0] + buf[1]) >> 1; // mono mix
       if (outm == last_out) silent_length++; else silent_length = 0;

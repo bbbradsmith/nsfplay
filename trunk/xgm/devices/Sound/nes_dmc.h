@@ -82,21 +82,24 @@ namespace xgm
   public:
       NES_DMC ();
      ~NES_DMC ();
-    void Reset ();
+
     void InitializeTNDTable(double wt, double wn, double wd);
-    void SetRate (double rate);
     void SetPal (bool is_pal);
-    UINT32 Render (INT32 b[2]);
     void SetMemory (IDevice * r);
-    bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
-    bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
     void FrameSequence(int s);
-    void SetClock (double rate);
-    void SetOption (int, int);
     int GetDamp(){ return (damp<<1)|dac_lsb ; }
-    void SetMask(int m){ mask = m; }
-    void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
-    ITrackInfo *GetTrackInfo(int trk);
+
+    virtual void Reset ();
+    virtual void Tick (int clocks);
+    virtual UINT32 Render (INT32 b[2]);
+    virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
+    virtual void SetRate (double rate);
+    virtual void SetClock (double rate);
+    virtual void SetOption (int, int);
+    virtual void SetMask(int m){ mask = m; }
+    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual ITrackInfo *GetTrackInfo(int trk);
   };
 
 }

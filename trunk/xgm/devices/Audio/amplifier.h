@@ -68,6 +68,12 @@ namespace xgm
       target = p;
     }
 
+    void Tick (int clocks)
+    {
+      assert (target);
+      target->Tick(clocks);
+    }
+
     UINT32 Render (INT32 b[2])
     {
       assert (target);
