@@ -5,9 +5,16 @@ namespace xgm{
 #define GETA 16
 #define PI (3.14159265358979)
 
-static double hamming_window(int n, int M)
+static double window(int n, int M)
 {
-  return 0.54 + 0.46 * cos(PI*n/M);
+  // rectangular window
+  //return 1.0;
+
+  // hanning window
+  //return 0.5 + 0.5 * cos(PI*double(n)/double(M));
+
+  // hamming window
+  return 0.54 + 0.46 * cos(PI*double(n)/double(M));
 }
 
 RateConverter::RateConverter () : clock(0.0), rate(0.0), mult(0), clocks(0)
@@ -33,22 +40,25 @@ void RateConverter::Reset ()
     mult = (int)(clock/rate);
     if(mult<2) return ;
 
-    double wc = 2.0 * PI * (rate/2.0) / clock ;
-    int m = (mult*2+1)/2;    
+    int m = (mult*2+1)/2;
 
-    hr[0] = wc / PI * hamming_window(0,m);
+    // generate resampling window
+    hr[0] = window(0,m);
     double gain = hr[0];
     for(int i=1; i<=m; i++)
     {
-      hr[i]= (1.0/(PI*i)) * sin(wc*i) * hamming_window(i,m);
+      hr[i]= window(i,m);
       gain += hr[i] * 2;
     }
 
+    // normalize window
     for(int i=0; i<=m; i++)
+    {
       hr[i] /= gain;
+    }
 
-	  for(int i=0; i<=mult*2; i++) 
-		  tap[i][0] = tap[i][1] = 0;
+    for(int i=0; i<=mult*2; i++) 
+      tap[i][0] = tap[i][1] = 0;
   }
 
 }
