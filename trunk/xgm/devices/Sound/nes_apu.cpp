@@ -111,10 +111,9 @@ namespace xgm
     //DEBUG_OUT("freq[%d] = %03X\n", i, freq[i]);
 
     INT32 ret = 0;
-    if (enable[i] &&
+    if (length_counter[i] > 0 &&
         freq[i] >= 8 &&
-        sfreq[i] < 0x800 &&
-        length_counter[i] > 0
+        sfreq[i] < 0x800
         )
     {
         int v = envelope_disable[i] ? volume[i] : envelope_counter[i];

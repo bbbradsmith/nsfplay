@@ -98,6 +98,7 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
     tap[i][1] = tap[i+mult][1];
   }
 
+  // divide clock ticks among samples evenly
   int mclocks = 0;
   for(int i=1; i<=mult; i++)
   {
@@ -110,7 +111,7 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
     }
     target->Render(tap[mult+i]);
   }
-  assert (mclocks == 0);
+  assert (mclocks == 0); // all clocks must be used
   clocks = 0;
 
   out[0] = hr[0] * tap[mult][0];
