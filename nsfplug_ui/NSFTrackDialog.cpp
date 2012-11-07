@@ -293,7 +293,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
               break;
 
             case NSFPlayer::FME7_TRK3: // envelope
-              str.Format("%02X",ti->GetTone());
+              str.Format("%1X",ti->GetTone());
               m_trkinfo.SetItem(trk,5,LVIF_TEXT,str,0,0,0,0);
               break;
 

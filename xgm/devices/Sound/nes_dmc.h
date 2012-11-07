@@ -64,7 +64,6 @@ namespace xgm
 
     int noise_volume;
     UINT32 noise, noise_tap;
-    UINT32 now, syn_interval, out_interval; // ノイズチャンネルのサンプリングレート変換
 
     // noise envelope
     bool envelope_loop;

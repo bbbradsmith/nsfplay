@@ -139,7 +139,7 @@ namespace xgm
     pcounter[1] += incr[1];
     update_envelope (1);
 
-    // BS setting envelope_output after updating now
+    // setting envelope_output after updating
     if (!envelope_disable) envelope_output[1] = envelope_amount[1];
 
     /* Carrier */

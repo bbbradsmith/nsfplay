@@ -99,8 +99,6 @@ namespace xgm
 
   void NES_DMC::FrameSequence(int s)
   {
-    //DEBUG_OUT("FrameSequence(%d)\n",s);
-
     if (s > 3) return; // no operation in step 4
 
     if (apu)
@@ -180,9 +178,7 @@ namespace xgm
       7, 6, 5, 4, 3, 2, 1, 0
     };
 
-    bool flag = linear_counter <= 0 || length_counter[0] <= 0;
-
-    if (enable[0] && !flag)
+    if (linear_counter > 0 && length_counter[0] > 0)
     {
       if (tri_freq > 1)
       {
@@ -210,6 +206,7 @@ namespace xgm
   UINT32 NES_DMC::calc_noise(UINT32 clocks)
   {
     UINT32 env = envelope_disable ? noise_volume : envelope_counter;
+    if (length_counter[1] < 1) env = 0;
 
     UINT32 last = (noise & 0x4000) ? env : 0;
     if (clocks < 1) return last;
@@ -375,15 +372,11 @@ namespace xgm
   void NES_DMC::SetClock (double c)
   {
     clock = (UINT32)(c);
-    syn_interval = (INT32)((1<<30)/clock);
-    now = 0;
   }
 
   void NES_DMC::SetRate (double r)
   {
     rate = (UINT32)(r?r:DEFAULT_RATE);
-    out_interval = (INT32)((1<<30)/rate);
-    now = 0;
   }
 
   void NES_DMC::SetPal (bool is_pal)
