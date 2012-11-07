@@ -163,6 +163,7 @@ Emulation:
 - MMC5 frame sequencer now independant of APU frame sequencer.
 - Time dilation now slows frame sequencer along with CPU rate.
 - Fixed broken oversampling filter.
+- More effective implementation of DMC anti-click option.
 Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.
