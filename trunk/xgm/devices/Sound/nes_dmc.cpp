@@ -319,22 +319,6 @@ namespace xgm
     out[1] = (mask & 2) ? 0 : out[1];
     out[2] = (mask & 4) ? 0 : out[2];
 
-    if(option[OPT_DPCM_ANTI_CLICK])
-    {
-      switch(anti_noise_mode)
-      {
-      case PRESENT_NOISE:
-        if(out[2]==dac_lsb) anti_noise_mode = AFTER_NOISE;
-        out[2] = 0;
-        break;
-      case BEFORE_NOISE:
-        if(out[2]!=0) anti_noise_mode = PRESENT_NOISE;
-        break;
-      default:
-        break;
-      }
-    }
-
     INT32 m[3];
     m[0] = tnd_table[0][out[0]][0][0];
     m[1] = tnd_table[0][0][out[1]][0];
@@ -354,6 +338,20 @@ namespace xgm
             for (int i=0; i < 3; ++i)
                 m[i] = voltage;
         }
+    }
+
+    // anti-click nullifies any 4011 write but preserves nonlinearity
+    if (option[OPT_DPCM_ANTI_CLICK])
+    {
+        if (dmc_pop) // $4011 will cause pop this frame
+        {
+            // adjust offset to counteract pop
+            dmc_pop_offset += dmc_pop_follow - m[2];
+            dmc_pop = false;
+        }
+        dmc_pop_follow = m[2]; // remember previous position
+
+        m[2] += dmc_pop_offset; // apply offset
     }
 
     b[0]  = m[0] * sm[0][0];
@@ -453,8 +451,10 @@ namespace xgm
     out[0] = out[1] = out[2] = 0;
     tri_freq = 0;
     damp = 0;
+    dmc_pop = false;
+    dmc_pop_offset = 0;
+    dmc_pop_follow = 0;
     dac_lsb = 0;
-    dcoff = 0;
     data = 0x100;
     adr_reg = 0;
     active = false;
@@ -467,8 +467,6 @@ namespace xgm
     {
         noise |= ::rand();
     }
-
-    anti_noise_mode = BEFORE_NOISE;
 
     SetRate(rate);
   }
@@ -626,6 +624,7 @@ namespace xgm
       {
         damp = (val >> 1) & 0x3f;
         dac_lsb = val & 1;
+        dmc_pop = true;
       }
       break;
 

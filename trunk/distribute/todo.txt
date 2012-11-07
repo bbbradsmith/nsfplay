@@ -1,11 +1,9 @@
 To Do:
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
-- kfaraday says if options are opened from main panel, changes don't save?
-- Improve "eliminiate click" option: allow DMC writes but apply an equivalent - to the output to eliminate any pop
 - Breakout window for info (nice for looking at NSFe text chunk).
 - VRC6 square phase reset should not reset divide
-- Replace all pcounter with clock based simulation (except for VRC7)
+- Replace all pcounter with clock based simulation (todo 5B, MMC5, VRC6, VRC7, FDS)
 - N163 horrible sound accuracy
 - N163 volume vs num channels
 - Vertical stacking for multiple key dots on same pitch?

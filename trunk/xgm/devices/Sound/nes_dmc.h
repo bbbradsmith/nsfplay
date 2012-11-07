@@ -23,7 +23,6 @@ namespace xgm
       OPT_END 
     };
   protected:
-    enum { BEFORE_NOISE, PRESENT_NOISE, AFTER_NOISE };
     const int GETA_BITS;
     static const UINT32 freq_table[2][16];
     static const UINT32 wavlen_table[2][16];
@@ -42,14 +41,15 @@ namespace xgm
     UINT32 data;
     INT16 damp;
     int dac_lsb;
+    bool dmc_pop;
+    INT32 dmc_pop_offset;
+    INT32 dmc_pop_follow;
     UINT32 clock;
     UINT32 rate;
     int pal;
     int mode;
     bool irq;
     bool active;
-    int anti_noise_mode;
-    INT16 dcoff;
 
     UINT32 counter[3]; // frequency dividers
     int tphase;        // triangle phase
