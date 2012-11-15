@@ -156,7 +156,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.3 BETA 1 - ?/??/????
+NSFPlay 2.3 BETA 1 - 11/15/2012
 Emulation:
 - Audio emulation is now driven by CPU clock cycles, increases timing accuracy. (TODO: 5B/MMC5/VRC6/FDS/VRC7)
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
@@ -169,6 +169,7 @@ Other:
 - Thinner DPCM address display, does not get truncated.
 - Using # instead of + for note names.
 - Cosmetic fixes in settings dialog.
+- Keyboard frequency display correction for APU/MMC5/VRC6 (were off by 1).
 
 NSFPlay 2.2 - 8/31/2012
 Audio Emulation:

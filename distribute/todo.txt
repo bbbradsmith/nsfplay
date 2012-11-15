@@ -1,4 +1,6 @@
 To Do:
+- full-emulation quality option (emulate at M2 speed and downsample)
+- wider resample window? (i.e. multi-lobe sinc?)
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
 - Breakout window for info (nice for looking at NSFe text chunk).

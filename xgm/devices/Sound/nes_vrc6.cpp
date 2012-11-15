@@ -35,7 +35,7 @@ namespace xgm
       trkinfo[trk].max_volume = 15;
       trkinfo[trk].volume = volume[trk];
       trkinfo[trk]._freq = freq[trk];
-      trkinfo[trk].freq = freq[trk]?clock/16/freq[trk]:0;
+      trkinfo[trk].freq = freq[trk]?clock/16/(freq[trk]+1):0;
       trkinfo[trk].tone = duty[trk];
       trkinfo[trk].key = (volume[trk]>0)&&enable[trk]&&!gate[trk];
       return &trkinfo[trk];
@@ -45,7 +45,7 @@ namespace xgm
       trkinfo[2].max_volume = 255;
       trkinfo[2].volume = accum;
       trkinfo[2]._freq = freq[2];
-      trkinfo[2].freq = freq[2]?clock/14/freq[2]:0;
+      trkinfo[2].freq = freq[2]?clock/14/(freq[2]+1):0;
       trkinfo[2].tone = -1;
       trkinfo[2].key = (enable[2]>0);
       return &trkinfo[2];
