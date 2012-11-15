@@ -1,7 +1,6 @@
 #ifndef _NES_MMC5_H_
 #define _NES_MMC5_H_
 #include "../device.h"
-#include "counter.h"
 #include "../CPU/nes_cpu.h"
 
 namespace xgm
@@ -23,7 +22,9 @@ namespace xgm
     bool pcm_mode; // BS PCM channel
     NES_CPU* cpu; // BS PCM channel reads need CPU access
 
-    Counter pcounter[2];        // ˆÊ‘ŠƒJƒEƒ“ƒ^
+    UINT32 scounter[2];            // frequency divider
+    UINT32 sphase[2];              // phase counter
+
     UINT32 duty[2];
     UINT32 volume[2];
     UINT32 freq[2];
@@ -42,7 +43,7 @@ namespace xgm
     int frame_sequence_count;
 
     double clock, rate;
-    INT32 calc_sqr (int i);
+    INT32 calc_sqr (int i, UINT32 clocks);
     INT32 square_table[32];
     INT32 pcm_table[256];
     TrackInfoBasic trkinfo[3];

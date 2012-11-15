@@ -108,8 +108,6 @@ namespace xgm
         scounter[i] = 0;
     }
 
-    //DEBUG_OUT("freq[%d] = %03X\n", i, freq[i]);
-
     INT32 ret = 0;
     if (length_counter[i] > 0 &&
         freq[i] >= 8 &&
@@ -275,7 +273,7 @@ namespace xgm
   {
     trkinfo[trk]._freq = freq[trk];
     if(freq[trk])
-      trkinfo[trk].freq = clock/16/freq[trk];
+      trkinfo[trk].freq = clock/16/(freq[trk] + 1);
     else
       trkinfo[trk].freq = 0;
 
@@ -375,13 +373,9 @@ namespace xgm
       enable[1] = (val & 2) ? true : false;
 
       if (!enable[0])
-      {
           length_counter[0] = 0;
-      }
       if (!enable[1])
-      {
           length_counter[1] = 0;
-      }
 
       reg[adr-0x4000] = val;
       return true;

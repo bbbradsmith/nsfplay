@@ -66,7 +66,7 @@ namespace xgm
       trkinfo[0].volume = 0;
       trkinfo[0]._freq = tri_freq;
       if(trkinfo[0]._freq)
-        trkinfo[0].freq = clock/32/trkinfo[0]._freq;
+        trkinfo[0].freq = clock/32/(trkinfo[0]._freq + 1);
       else
         trkinfo[0].freq = 0;
       trkinfo[0].tone = -1;

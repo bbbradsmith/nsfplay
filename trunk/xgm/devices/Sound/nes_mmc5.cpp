@@ -43,6 +43,11 @@ namespace xgm
   {
     int i;
 
+    scounter[0] = 0;
+    scounter[1] = 0;
+    sphase[0] = 0;
+    sphase[1] = 0;
+
     envelope_div[0] = 0;
     envelope_div[1] = 0;
     length_counter[0] = 0;
@@ -60,7 +65,7 @@ namespace xgm
         out[i] = 0;
 
     mask = 0;
-    pcm = 0; // BS PCM channel
+    pcm = 0; // PCM channel
     pcm_mode = false; // write mode
 
     SetRate(rate);
@@ -79,10 +84,6 @@ namespace xgm
   void NES_MMC5::SetRate (double r)
   {
     rate = r ? r : DEFAULT_RATE;
-    for (int i = 0; i < 2; i++)
-    {
-      pcounter[i].init (clock, rate, 32);
-    }
   }
 
   void NES_MMC5::FrameSequence ()
@@ -123,9 +124,8 @@ namespace xgm
     }
   }
 
-  INT32 NES_MMC5::calc_sqr (int i)
+  INT32 NES_MMC5::calc_sqr (int i, UINT32 clocks)
   {
-    // BS changed phase to match NesDev description
     static const INT16 sqrtbl[4][16] = {
       {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       {0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -133,18 +133,31 @@ namespace xgm
       {1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
 
-    pcounter[i].iup();
-
-    INT32 ret = 0;
-    if (enable[i] &&
-        //freq[i] >= 8 && // MMC5 allows the top 8 frequencies
-        length_counter[i] > 0
-        )
+    scounter[i] += clocks;
+    if (freq[i] > 0)
     {
-        int v = envelope_disable[i] ? volume[i] : envelope_counter[i];
-        ret = sqrtbl[duty[i]][pcounter[i].value() & 15] ? v : 0;
+        while (scounter[i] > freq[i])
+        {
+            sphase[i] = (sphase[i] + 1) & 15;
+            scounter[i] -= (freq[i] + 1);
+        }
+    }
+    else
+    {
+        scounter[i] = 0;
     }
 
+
+    INT32 ret = 0;
+    if (length_counter[i] > 0)
+    {
+        // note MMC5 does not silence the highest 8 frequencies like APU,
+        // because this is done by the sweep unit.
+
+        int v = envelope_disable[i] ? volume[i] : envelope_counter[i];
+        ret = sqrtbl[duty[i]][sphase[i]] ? v : 0;
+    }
+    
     return ret;
   }
 
@@ -160,14 +173,13 @@ namespace xgm
 
   void NES_MMC5::Tick (UINT32 clocks)
   {
+    out[0] = calc_sqr(0, clocks);
+    out[1] = calc_sqr(1, clocks);
+    out[2] = pcm;
   }
 
   UINT32 NES_MMC5::Render (INT32 b[2])
   {
-    out[0] = calc_sqr(0);
-    out[1] = calc_sqr(1);
-    out[2] = pcm;
-
     out[0] = (mask & 1) ? 0 : out[0];
     out[1] = (mask & 2) ? 0 : out[1];
     out[2] = (mask & 4) ? 0 : out[2];
@@ -269,17 +281,17 @@ namespace xgm
     case 0x5006:
       ch = (adr >> 2) & 1;
       freq[ch] = val + (freq[ch] & 0x700);
-      pcounter[ch].setcycle (freq[ch]);
+      if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
       break;
 
     case 0x5003:
     case 0x5007:
       ch = (adr >> 2) & 1;
       freq[ch] = (freq[ch] & 0xff) + ((val & 7) << 8);
-      pcounter[ch].setcycle (freq[ch]);
-      // BS added phase reset
+      if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
+      // phase reset
       if (option[OPT_PHASE_REFRESH])
-        pcounter[ch].reset (0);
+        sphase[ch] = 0;
       envelope_write[ch] = true;
       if (enable[ch])
       {
@@ -287,12 +299,12 @@ namespace xgm
       }
       break;
 
-    // BS PCM channel control
+    // PCM channel control
     case 0x5010:
       pcm_mode = ((val & 1) != 0); // 0 = write, 1 = read
       break;
 
-    // BS PCM channel control
+    // PCM channel control
     case 0x5011:
       if (!pcm_mode)
       {
@@ -304,6 +316,10 @@ namespace xgm
     case 0x5015:
       enable[0] = (val & 1) ? true : false;
       enable[1] = (val & 2) ? true : false;
+      if (!enable[0])
+          length_counter[0] = 0;
+      if (!enable[1])
+          length_counter[1] = 0;
       break;
 
     case 0x5205:
@@ -323,7 +339,7 @@ namespace xgm
 
   bool NES_MMC5::Read (UINT32 adr, UINT32 & val, UINT32 id)
   {
-    // BS in PCM read mode, reads from $8000-$C000 automatically load the PCM output
+    // in PCM read mode, reads from $8000-$C000 automatically load the PCM output
     if (pcm_mode && (0x8000 <= adr) && (adr < 0xC000) && cpu)
     {
         pcm_mode = false; // prevent recursive entry
@@ -381,7 +397,7 @@ namespace xgm
     {
         trkinfo[trk]._freq = freq[trk];
         if(freq[trk])
-          trkinfo[trk].freq = clock/16/freq[trk];
+          trkinfo[trk].freq = clock/16/(freq[trk] + 1);
         else
           trkinfo[trk].freq = 0;
 
@@ -405,7 +421,7 @@ namespace xgm
     return &trkinfo[trk];
   }
 
-  // BS pcm read mode requires CPU read access
+  // pcm read mode requires CPU read access
   void NES_MMC5::SetCPU(NES_CPU* cpu_)
   {
       cpu = cpu_;
