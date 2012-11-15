@@ -83,7 +83,7 @@ BOOL CnsfplayApp::InitInstance()
     } else {
 
         // NOTE this string must match CAPTION in IDD_NSFPLAY_DIALOG in nsfplay.rc
-        CWnd* pWnd = CWnd::FindWindow(NULL, "NSFPlay 2.3 beta 1");
+        CWnd* pWnd = CWnd::FindWindow(NULL, "NSFPlay 2.3 beta 2");
         if( pWnd ) {
           pWnd->SetForegroundWindow();
 
