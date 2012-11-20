@@ -2,6 +2,8 @@
 
 using namespace xgm;
 
+const int DIVIDER = 8; // TODO this is not optimal, rewrite PSG output
+
 NES_FME7::NES_FME7 ()
 {
   psg = PSG_new ((e_uint32)(DEFAULT_CLOCK/12), DEFAULT_RATE);
@@ -24,13 +26,15 @@ void NES_FME7::SetClock (double c)
 
 void NES_FME7::SetRate (double r)
 {
-  rate = r ? r : DEFAULT_RATE;
+  //rate = r ? r : DEFAULT_RATE;
+  rate = DEFAULT_CLOCK / double(12*DIVIDER); // TODO rewrite PSG to integrate with clock
   if (psg)
     PSG_set_rate (psg, (e_uint32)rate);
 }
 
 void NES_FME7::Reset ()
 {
+  divider = 0;
   if (psg)
     PSG_reset (psg);
 }
@@ -64,12 +68,17 @@ bool NES_FME7::Read (xgm::UINT32 adr, xgm::UINT32 & val, xgm::UINT32 id)
 
 void NES_FME7::Tick (xgm::UINT32 clocks)
 {
+  divider += clocks;
+  while (divider >= DIVIDER)
+  {
+      divider -= DIVIDER;
+      if (psg) PSG_calc(psg);
+  }
 }
 
 xgm::UINT32 NES_FME7::Render (xgm::INT32 b[2])
 {
   b[0] = b[1] = 0;
-  if (psg) PSG_calc(psg);
 
   for (int i=0; i < 3; ++i)
   {
