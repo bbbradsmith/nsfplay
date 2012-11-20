@@ -10,7 +10,7 @@ namespace xgm
   public:   
     int wavelen;
     //INT16 wave[32];
-    // BS allowing longer waves
+    // allowing longer waves
     INT16 wave[256];
     virtual IDeviceInfo *Clone(){ return new TrackInfoN106(*this); }
   };
@@ -20,7 +20,7 @@ namespace xgm
   protected:
     double clock, rate;
     int mask;
-    INT32 sm[2][8]; // BS stereo mix
+    INT32 sm[2][8]; // stereo mix
     UINT32 pcounter[8];
     UINT32 wait_counter;
     UINT32 wait_incr;

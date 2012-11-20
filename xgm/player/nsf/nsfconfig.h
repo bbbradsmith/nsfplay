@@ -33,7 +33,7 @@ namespace xgm
       return data[(std::string)dname[id]+"_OPTION"+itoa[opt]];
     }
 
-    // BS channel mix/pan config
+    // channel mix/pan config
     vcm::Value& GetChannelConfig(int id, std::string key)
     {
       MutexGuard mg_(this);
@@ -53,7 +53,7 @@ namespace xgm
     /** デバイス毎の名前 */
     static char *dname[NES_DEVICE_MAX];
 
-    // BS for channel/pan/mix
+    // for channel/pan/mix
     static char *channel_name[NES_CHANNEL_MAX]; // name of channel
     static int channel_device[NES_CHANNEL_MAX]; // device enum of channel
     static int channel_device_index[NES_CHANNEL_MAX]; // device channel index

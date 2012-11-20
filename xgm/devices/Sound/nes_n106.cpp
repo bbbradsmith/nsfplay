@@ -118,7 +118,7 @@ namespace xgm
     case 4:
       freq[ch] = (freq[ch] & 0x0FFFF) | ((val & 3) << 16);
       //length[ch] = 0x20 - ( val&0x1c );
-      length[ch] = 0x100 - ( val&0xFC ); // BS all 6 bits can be used for length
+      length[ch] = 0x100 - ( val&0xFC ); // all 6 bits can be used for length
       fflag[ch] = (val>>4)&1;
       break;
 

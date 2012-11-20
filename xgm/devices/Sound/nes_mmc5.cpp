@@ -134,19 +134,11 @@ namespace xgm
     };
 
     scounter[i] += clocks;
-    if (freq[i] > 0)
+    while (scounter[i] > freq[i])
     {
-        while (scounter[i] > freq[i])
-        {
-            sphase[i] = (sphase[i] + 1) & 15;
-            scounter[i] -= (freq[i] + 1);
-        }
+        sphase[i] = (sphase[i] + 1) & 15;
+        scounter[i] -= (freq[i] + 1);
     }
-    else
-    {
-        scounter[i] = 0;
-    }
-
 
     INT32 ret = 0;
     if (length_counter[i] > 0)

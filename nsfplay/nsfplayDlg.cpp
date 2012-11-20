@@ -110,7 +110,7 @@ BOOL CnsfplayDlg::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
-    m_last_title[0] = 0; // BS this was uninitialized
+    m_last_title[0] = 0;
 
     ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
     ASSERT(IDM_ABOUTBOX < 0xF000);
@@ -397,7 +397,7 @@ void CnsfplayDlg::OnBnClickedOpen()
   }
 }
 
-// BS command line wave output
+// command line wave output
 int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, char* ms)
 {
     int it = ::atoi(track);

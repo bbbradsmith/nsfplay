@@ -20,7 +20,7 @@ namespace xgm
   protected:
     int option[OPT_END];
     int mask;
-    INT32 sm[2]; // BS stereo mix
+    INT32 sm[2]; // stereo mix
     double clock, rate;
     bool write_enable[2];
     bool envelope_disable;

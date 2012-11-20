@@ -1,11 +1,13 @@
 To Do:
+- Dendy mode options (consider adding a dendy mode to format? maybe save for NSF2)
+- fix LF in 'text' chunks
+- streemerz support > apparently illegal opcodes are not supported
 - full-emulation quality option (emulate at M2 speed and downsample)
 - wider resample window? (i.e. multi-lobe sinc?)
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
 - Breakout window for info (nice for looking at NSFe text chunk).
-- VRC6 square phase reset should not reset divide
-- Replace all pcounter with clock based simulation (todo 5B, MMC5, VRC6, VRC7, FDS)
+- Replace all pcounter with clock based simulation, separate tick/render (todo 5B, VRC7, FDS)
 - N163 horrible sound accuracy
 - N163 volume vs num channels
 - Vertical stacking for multiple key dots on same pitch?
@@ -20,9 +22,8 @@ To Do:
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
-- APU2 option panel says "Option" instead of "Options"? Make consistent.
 - More speed control options in keyboard view: pitch adjust, fast playback
-- Play speed override option.
+- Play speed override option (keyboard adjustment should have more than just 1-8 integers).
 - Visualizer plugin system.
 - See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Behaviour with 2 NSFs in a playlist is counterintuitive.

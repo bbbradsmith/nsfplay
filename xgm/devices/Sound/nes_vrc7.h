@@ -11,7 +11,7 @@ namespace xgm
   protected:
     int mask;
     unsigned int patch_set;
-    INT32 sm[2][6]; // BS stereo mix
+    INT32 sm[2][6]; // stereo mix
     INT16 buf[2];
     OPLL *opll;
     double clock, rate;

@@ -14,13 +14,13 @@ namespace xgm
   protected:
     int option[OPT_END];
     int mask;
-    INT32 sm[2][3]; // BS stereo panning
+    INT32 sm[2][3]; // stereo panning
     UINT8 ram[0x6000 - 0x5c00];
     UINT8 reg[8];
     UINT8 mreg[2];
-    UINT8 pcm; // BS PCM channel
-    bool pcm_mode; // BS PCM channel
-    NES_CPU* cpu; // BS PCM channel reads need CPU access
+    UINT8 pcm; // PCM channel
+    bool pcm_mode; // PCM channel
+    NES_CPU* cpu; // PCM channel reads need CPU access
 
     UINT32 scounter[2];            // frequency divider
     UINT32 sphase[2];              // phase counter

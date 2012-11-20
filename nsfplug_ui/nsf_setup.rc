@@ -1096,7 +1096,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "&Option",IDC_STATIC,0,0,225,53
+    GROUPBOX        "&Options",IDC_STATIC,0,0,225,53
     CONTROL         "&Use non-linear channel mixer",IDC_NONLINEAR_MIXER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,108,10
     CONTROL         "Enable &periodic noise",IDC_ENABLE_PNOISE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,10,83,10

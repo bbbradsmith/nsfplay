@@ -259,7 +259,7 @@ calc (PSG * psg)
       }
     }
 
-    psg->cout[i] = 0; // BS maintaining cout for stereo mix
+    psg->cout[i] = 0; // maintaining cout for stereo mix
 
     if (psg->mask&PSG_MASK_CH(i))
       continue;

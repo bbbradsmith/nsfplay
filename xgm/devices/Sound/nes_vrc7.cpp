@@ -33,7 +33,7 @@ namespace xgm
   void NES_VRC7::SetRate (double r)
   {
     rate = r ? r : DEFAULT_RATE;
-    OPLL_set_quality(opll, 1); // BS quality always on (not really a CPU hog)
+    OPLL_set_quality(opll, 1); // quality always on (not really a CPU hog)
     OPLL_set_rate(opll,(e_uint32)rate);
   }
 
