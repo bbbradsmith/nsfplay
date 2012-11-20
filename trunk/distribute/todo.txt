@@ -7,7 +7,7 @@ To Do:
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
 - Breakout window for info (nice for looking at NSFe text chunk).
-- Replace all pcounter with clock based simulation, separate tick/render (todo 5B, VRC7, FDS)
+- Replace all pcounter with clock based simulation, separate tick/render (todo 5B, FDS)
 - N163 horrible sound accuracy
 - N163 volume vs num channels
 - Vertical stacking for multiple key dots on same pitch?

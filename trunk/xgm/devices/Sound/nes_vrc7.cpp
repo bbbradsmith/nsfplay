@@ -32,13 +32,16 @@ namespace xgm
 
   void NES_VRC7::SetRate (double r)
   {
-    rate = r ? r : DEFAULT_RATE;
+    //rate = r ? r : DEFAULT_RATE;
+    (void)r; // rate is ignored
+    rate = 49716;
     OPLL_set_quality(opll, 1); // quality always on (not really a CPU hog)
     OPLL_set_rate(opll,(e_uint32)rate);
   }
 
   void NES_VRC7::Reset ()
   {
+    divider = 0;
     OPLL_reset_patch (opll, patch_set);
     OPLL_reset (opll);
   }
@@ -91,12 +94,17 @@ namespace xgm
 
   void NES_VRC7::Tick (UINT32 clocks)
   {
+    divider += clocks;
+    while (divider >= 36)
+    {
+        divider -= 36;
+        OPLL_calc(opll);
+    }
   }
 
   UINT32 NES_VRC7::Render (INT32 b[2])
   {
     b[0] = b[1] = 0;
-    OPLL_calc(opll);
     for (int i=0; i < 6; ++i)
     {
         INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
