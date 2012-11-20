@@ -14,6 +14,7 @@ namespace xgm
     INT32 sm[2][6]; // stereo mix
     INT16 buf[2];
     OPLL *opll;
+    UINT32 divider; // clock divider
     double clock, rate;
     TrackInfoBasic trkinfo[6];
   public:
