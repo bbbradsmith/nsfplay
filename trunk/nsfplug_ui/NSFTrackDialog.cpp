@@ -6,7 +6,7 @@
 #include "NSFDialogs.h"
 #include "NSFTrackDialog.h"
 
-// BS color reader
+// color reader
 int read_color(const char* c)
 {
     if (c == NULL) return -1;
@@ -137,7 +137,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
   EnterCriticalSection(&parent->cso);
 
   if(parent->wa2mod && m_active
-     && !parent->wa2mod->GetResetFlag() // BS track info is not reset yet on Play(), it happens in PlayThread
+     && !parent->wa2mod->GetResetFlag() // track info is not reset yet on Play(), it happens in PlayThread
      )
   {
     int time_in_ms;
@@ -508,7 +508,7 @@ BOOL NSFTrackDialog::OnInitDialog()
   SetWindowPos(NULL,0,0,min_width,256,SWP_NOMOVE|SWP_NOZORDER);
   LocateDialogItems();
 
-  // BS setup colors
+  // setup colors
   for (int i=0; i < NES_CHANNEL_MAX; ++i)
   {
       int t = pm->cf->channel_track[i];
@@ -538,7 +538,7 @@ void NSFTrackDialog::OnShowWindow(BOOL bShow, UINT nStatus)
 {
   __super::OnShowWindow(bShow, nStatus);
 
-  m_trkinfo.SetFocus(); // BS in case someone uses mouse scroll before clicking on it,
+  m_trkinfo.SetFocus(); // in case someone uses mouse scroll before clicking on it,
   // prevents the scroll from doing time expansion instead
 
   if(bShow==TRUE&&m_nTimer==0)

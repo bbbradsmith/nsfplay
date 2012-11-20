@@ -275,7 +275,7 @@ namespace xgm
 
   void NSFPlayer::Reset ()
   {
-    ::srand((unsigned)::time(NULL)); // BS randomizing random generator
+    ::srand((unsigned)::time(NULL)); // randomizing random generator
 
     mfilter->Reset();
     time_in_ms = 0;  

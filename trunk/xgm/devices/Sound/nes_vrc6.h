@@ -9,21 +9,24 @@ namespace xgm
   class NES_VRC6:public ISoundChip
   {
   protected:
-    Counter pcounter[3];
+    UINT32 counter[3]; // frequency divider
+    UINT32 phase[3];   // phase counter
+    UINT32 freq2[3];   // adjusted frequency
+    int count14;       // saw 14-stage counter
+
     int mask;
-    INT32 sm[2][3]; // BS stereo mix
+    INT32 sm[2][3]; // stereo mix
     int duty[2];
     int volume[3];
     int enable[3];
     int gate[3];
     UINT32 freq[3];
-    INT16 calc_sqr (int i);
-    INT16 calc_saw ();
-    int accum, ct7;
-    UINT8 saw_phase;
+    INT16 calc_sqr (int i, UINT32 clocks);
+    INT16 calc_saw (UINT32 clocks);
     bool halt;
     int freq_shift;
     double clock, rate;
+    INT32 out[3];
     TrackInfoBasic trkinfo[3];
 
   public:

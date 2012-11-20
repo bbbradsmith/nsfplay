@@ -34,8 +34,8 @@ namespace xgm
     {
       trkinfo[trk].max_volume = 15;
       trkinfo[trk].volume = volume[trk];
-      trkinfo[trk]._freq = freq[trk];
-      trkinfo[trk].freq = freq[trk]?clock/16/(freq[trk]+1):0;
+      trkinfo[trk]._freq = freq2[trk];
+      trkinfo[trk].freq = freq2[trk]?clock/16/(freq2[trk]+1):0;
       trkinfo[trk].tone = duty[trk];
       trkinfo[trk].key = (volume[trk]>0)&&enable[trk]&&!gate[trk];
       return &trkinfo[trk];
@@ -43,9 +43,9 @@ namespace xgm
     else if(trk==2)
     {
       trkinfo[2].max_volume = 255;
-      trkinfo[2].volume = accum;
-      trkinfo[2]._freq = freq[2];
-      trkinfo[2].freq = freq[2]?clock/14/(freq[2]+1):0;
+      trkinfo[2].volume = volume[2];
+      trkinfo[2]._freq = freq2[2];
+      trkinfo[2].freq = freq2[2]?clock/14/(freq2[2]+1):0;
       trkinfo[2].tone = -1;
       trkinfo[2].key = (enable[2]>0);
       return &trkinfo[2];
@@ -62,8 +62,6 @@ namespace xgm
   void NES_VRC6::SetRate (double r)
   {
     rate = r ? r : DEFAULT_RATE;
-    for (int i = 0; i < 3; i++)
-      pcounter[i].init (clock, rate, i < 2 ? 16 : 2);
   }
 
   void NES_VRC6::Reset ()
@@ -75,11 +73,17 @@ namespace xgm
       Write (0xa000 + i, 0);
       Write (0xb000 + i, 0);
     }
-    ct7 = 0;
+    count14 = 0;
     mask = 0;
+    counter[0] = 0;
+    counter[1] = 0;
+    counter[2] = 0;
+    phase[0] = 0;
+    phase[0] = 1;
+    phase[0] = 2;
   }
 
-  INT16 NES_VRC6::calc_sqr (int i)
+  INT16 NES_VRC6::calc_sqr (int i, UINT32 clocks)
   {
     static const INT16 sqrtbl[8][16] = {
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -96,39 +100,62 @@ namespace xgm
       return 0;
 
     if (!halt)
-      pcounter[i].iup ();
+    {
+      counter[i] += clocks;
+      while(counter[i] > freq2[i])
+      {
+          phase[i] = (phase[i] + 1) & 15;
+          counter[i] -= (freq2[i] + 1);
+      }
+    }
 
     return (gate[i]
-      || sqrtbl[duty[i]][pcounter[i].value ()])? volume[i] : 0;
+      || sqrtbl[duty[i]][phase[i]])? volume[i] : 0;
   }
 
-  INT16 NES_VRC6::calc_saw ()
+  INT16 NES_VRC6::calc_saw (UINT32 clocks)
   {
     if (!enable[2])
       return 0;
 
-    if (!halt && pcounter[2].iup ())
+    if (!halt)
     {
-      if ((++ct7) == 7)
-        ct7 = saw_phase = 0;
-      else
-        saw_phase += accum; // note 8-bit wrapping behaviour
+      counter[2] += clocks;
+      while(counter[2] > freq2[2])
+      {
+          counter[2] -= (freq2[2] + 1);
+
+          // accumulate saw
+          ++count14;
+          if (count14 >= 14)
+          {
+            count14 = 0;
+            phase[2] = 0;
+          }
+          else if (0 == (count14 & 1)) // only accumulate on even ticks
+          {
+            phase[2] = (phase[2] + volume[2]) & 0xFF; // note 8-bit wrapping behaviour
+          }
+      }
     }
 
     // only top 5 bits of saw are output
-    return saw_phase >> 3;
+    return phase[2] >> 3;
   }
 
   void NES_VRC6::Tick (UINT32 clocks)
   {
+    out[0] = calc_sqr(0,clocks);
+    out[1] = calc_sqr(1,clocks);
+    out[2] = calc_saw(clocks);
   }
 
   UINT32 NES_VRC6::Render (INT32 b[2])
   {
     INT32 m[3];
-    m[0] = calc_sqr(0);
-    m[1] = calc_sqr(1);
-    m[2] = calc_saw();
+    m[0] = out[0];
+    m[1] = out[1];
+    m[2] = out[2];
 
     // note: signal is inverted compared to 2A03
 
@@ -162,13 +189,17 @@ namespace xgm
       duty[ch] = (val >> 4) & 7;
       gate[ch] = (val >> 7) & 1;
       break;
+    case 0xb000:
+      volume[2] = val & 63;
+      break;
 
     case 0x9001:
     case 0xa001:
     case 0xb001:
       ch = cmap[(adr >> 12) & 3];
       freq[ch] = (freq[ch] & 0xf00) | val;
-      pcounter[ch].setcycle (freq[ch] >> freq_shift);
+      freq2[ch] = (freq[ch] >> freq_shift);
+      if (counter[ch] > freq2[ch]) counter[ch] = freq2[ch];
       break;
 
     case 0x9002:
@@ -176,28 +207,17 @@ namespace xgm
     case 0xb002:
       ch = cmap[(adr >> 12) & 3];
       freq[ch] = ((val & 0xf) << 8) + (freq[ch] & 0xff);
-      pcounter[ch].setcycle (freq[ch] >> freq_shift);
+      freq2[ch] = (freq[ch] >> freq_shift);
+      if (counter[ch] > freq2[ch]) counter[ch] = freq2[ch];
       if (!enable[ch]) // if enable is being turned on, phase should be reset
       {
-        if (adr == 0xb002)
+        if (ch == 2)
         {
-          ct7 = 0; // reset
-          saw_phase = 0;
+          count14 = 0; // reset saw
         }
-        else
-        {
-          pcounter[ch].reset(0);
-          // TODO
-          // really I need to reset the duty cycle without
-          // resetting the divider; the pcounter implementation
-          // implements both together, making this impossible.
-        }
+        phase[ch] = 0;
       }
       enable[ch] = (val >> 7) & 1;
-      break;
-
-    case 0xb000:
-      accum = val & 63;
       break;
 
     case 0x9003:
@@ -206,9 +226,12 @@ namespace xgm
           (val & 4) ? 8 :
           (val & 2) ? 4 :
           0;
-      pcounter[0].setcycle(freq[0] >> freq_shift);
-      pcounter[1].setcycle(freq[1] >> freq_shift);
-      pcounter[2].setcycle(freq[2] >> freq_shift);
+      freq2[0] = (freq[0] >> freq_shift);
+      freq2[1] = (freq[1] >> freq_shift);
+      freq2[2] = (freq[2] >> freq_shift);
+      if (counter[0] > freq2[0]) counter[0] = freq2[0];
+      if (counter[1] > freq2[1]) counter[1] = freq2[1];
+      if (counter[2] > freq2[2]) counter[2] = freq2[2];
       break;
 
     default:

@@ -163,7 +163,7 @@ namespace xgm
     /** コンフィグレーションの更新情報通知を受け取るコールバック */
     virtual void Notify (int id);
 
-    // BS Notify for panning
+    // Notify for panning
     virtual void NotifyPan (int id);
 
     /** time_in_ms時点でのデバイス情報を取得する */

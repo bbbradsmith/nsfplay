@@ -100,8 +100,7 @@ namespace xgm
       }
       else if (envelope_mode[ch] == 1)
       {
-        //if (envelope_amount[ch] < 0x21)
-        if (envelope_amount[ch] < 0x20) // BS envelope should not push above $20
+        if (envelope_amount[ch] < 0x20) // envelope should not push above $20
           envelope_amount[ch]++;
       }
       ecounter[ch] -= 1.0;

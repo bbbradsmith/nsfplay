@@ -9,7 +9,7 @@ namespace xgm
   class NES_FME7:public ISoundChip
   {
   protected:
-    INT32 sm[2][3]; // BS stereo mix
+    INT32 sm[2][3]; // stereo mix
     INT16 buf[2];
     PSG *psg;
     double clock, rate;

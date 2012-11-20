@@ -180,18 +180,11 @@ namespace xgm
 
     if (linear_counter > 0 && length_counter[0] > 0)
     {
-      if (tri_freq > 1)
+      counter[0] += clocks;
+      while (counter[0] > tri_freq)
       {
-          counter[0] += clocks;
-          while (counter[0] > tri_freq)
-          {
-            tphase = (tphase + 1) & 31;
-            counter[0] -= (tri_freq + 1);
-          }
-      }
-      else
-      {
-          counter[0] = 0;
+        tphase = (tphase + 1) & 31;
+        counter[0] -= (tri_freq + 1);
       }
     }
 

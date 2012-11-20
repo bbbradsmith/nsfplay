@@ -10,7 +10,7 @@
 #include <list>
 #include <set>
 
-#include <windows.h> // BS for thread safety
+#include <windows.h> // for thread safety
 
 namespace vcm
 {
@@ -91,7 +91,7 @@ namespace vcm
   protected:
     std::map < std::string, Value > data;
 
-    // BS thread safety
+    // thread safety
     HANDLE mutex;
     class MutexGuard {
       protected:
@@ -102,7 +102,7 @@ namespace vcm
     };
 
   public:
-    // BS thread safety
+    // thread safety
     Configuration()
     {
       mutex = ::CreateMutex(NULL, false, NULL);
