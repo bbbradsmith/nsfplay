@@ -37,6 +37,7 @@ namespace xgm
     char* copyright;
     char* ripper; // NSFe only
     char* text; // NSFe only
+    UINT32 text_len; // NSFe only
     UINT16 speed_ntsc;
     UINT8 bankswitch[8];
     UINT16 speed_pal;

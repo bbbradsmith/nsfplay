@@ -438,6 +438,7 @@ static int is_sjis_prefix(int c)
     copyright = copyright_nsf;
     ripper = ""; // NSFe only
     text = NULL; // NSFe only
+    text_len = 0; // NSFe only
     speed_ntsc = image[0x6e] | (image[0x6f] << 8);
     memcpy (bankswitch, image + 0x70, 8);
     speed_pal = image[0x78] | (image[0x79] << 8);
@@ -566,6 +567,7 @@ static int is_sjis_prefix(int c)
           copyright = copyright_nsf;
           ripper    = "";
           text      = NULL;
+          text_len  = 0; // NSFe only
 
           // INFO chunk read
           info = true;
@@ -663,6 +665,7 @@ static int is_sjis_prefix(int c)
         else if (!strcmp(cid, "text"))
         {
           text = reinterpret_cast<char*>(chunk);
+          text_len = chunk_size;
         }
         else // unknown chunk
         {
