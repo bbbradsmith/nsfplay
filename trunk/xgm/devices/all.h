@@ -1,5 +1,4 @@
 #include "cpu/nes_cpu.h"
-#include "cpu/z80.h"
 
 #include "sound/nes_apu.h"
 #include "sound/nes_dmc.h"
