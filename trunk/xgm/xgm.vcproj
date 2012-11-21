@@ -484,10 +484,6 @@
 				Name="sound"
 				>
 				<File
-					RelativePath=".\devices\Sound\counter.h"
-					>
-				</File>
-				<File
 					RelativePath=".\devices\Sound\nes_apu.cpp"
 					>
 				</File>

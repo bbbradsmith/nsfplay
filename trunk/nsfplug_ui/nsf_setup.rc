@@ -230,7 +230,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,12,210,10
     CONTROL         "$4085への書き込みで変調波の位相をリセット(&M)",IDC_MOD_PHASE_REFRESH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,24,210,10
-    CONTROL         "PWM方式のD/A変換を利用(&P)",IDC_USE_PWM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,36,105,10
 END
 #endif
 
@@ -1061,7 +1060,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,11,210,10
     CONTROL         "Reset the &modulator phase after writing $4085.",IDC_MOD_PHASE_REFRESH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,23,167,10
-    CONTROL         "Use &PWM in D/A converter. ",IDC_USE_PWM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,36,141,10
 END
 
 IDD_EASY DIALOGEX 0, 0, 209, 164

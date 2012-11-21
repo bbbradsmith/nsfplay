@@ -9,7 +9,6 @@ namespace xgm
     SetRate (DEFAULT_RATE);
     option[OPT_MOD_PHASE_REFRESH] = true;
     option[OPT_CAR_PHASE_REFRESH] = false;
-    option[OPT_USE_PWM] = false;
 
     sm[0] = 128;
     sm[1] = 128;
@@ -48,7 +47,8 @@ namespace xgm
 
   void NES_FDS::SetRate (double r)
   {
-    rate = r ? r : DEFAULT_RATE;
+    //rate = r ? r : DEFAULT_RATE;
+    rate = clock;
   }
 
   void NES_FDS::SetOption (int id, int val)
@@ -84,9 +84,6 @@ namespace xgm
       envelope_output[i] = 0;
       ecounter[i] = 0;
     }
-
-    ccounter.init(clock,rate,36);
-
   }
 
   void NES_FDS::update_envelope (int ch)
@@ -191,27 +188,21 @@ namespace xgm
 
     update_envelope (0);
 
-    if (option[OPT_USE_PWM])
-    {
-      ccounter.iup();
-      if(ccounter.value() < envelope_output[0])
-        return opout[0] << 6;
-      else
-        return 0;
-    }
-    else
-      opout[0] *= envelope_output[0];
+    opout[0] *= envelope_output[0];
     
     return (opout[0] * vtable[volume & 3]) >> 4;
   }
 
   void NES_FDS::Tick (UINT32 clocks)
   {
+    // TODO this is really inefficient (need to rewrite FDS anyway)
+    while (clocks--)
+        fout = calc();
   }
 
   UINT32 NES_FDS::Render (INT32 b[2])
   {
-    INT32 m = calc();
+    INT32 m = fout;
     m = mask ? 0 : m;
 
     b[0] = (m * sm[0]) >> 7;

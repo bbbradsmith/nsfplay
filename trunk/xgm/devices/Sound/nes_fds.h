@@ -1,7 +1,6 @@
 #ifndef _NES_FDS_H_
 #define _NES_FDS_H_
 #include "../device.h"
-#include "counter.h"
 
 namespace xgm
 {
@@ -16,7 +15,7 @@ namespace xgm
   {
   public:
     enum
-    { OPT_MOD_PHASE_REFRESH=0, OPT_CAR_PHASE_REFRESH, OPT_USE_PWM, OPT_END };
+    { OPT_MOD_PHASE_REFRESH=0, OPT_CAR_PHASE_REFRESH, OPT_END };
   protected:
     int option[OPT_END];
     int mask;
@@ -33,12 +32,11 @@ namespace xgm
     UINT32 envelope_amount[2];
     UINT32 envelope_speed;
 
-    Counter ccounter;
-
     INT32 opout[2];
     INT32 opval[2];
     UINT8 reg[0x100];
 
+    INT32 fout;
     TrackInfoFDS trkinfo;
 
     /* var[0] = Carrior, var[1] = modulator */

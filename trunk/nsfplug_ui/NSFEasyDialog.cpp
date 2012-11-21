@@ -146,8 +146,6 @@ void NSFEasyDialog::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
       pm->cf->GetDeviceConfig(i,"QUALITY") = qtbl[i][quality];
       pm->cf->Notify(i);
     }
-    if(qtbl[FDS][quality]==0)
-      pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_USE_PWM) = 0;
     parent->UpdateNSFPlayerConfig(true);
   }
 
