@@ -1,37 +1,41 @@
 To Do:
-- Dendy mode options (consider adding a dendy mode to format? maybe save for NSF2)
-- fix LF in 'text' chunks
+
+Emu:
 - streemerz support > apparently illegal opcodes are not supported
 - full-emulation quality option (emulate at M2 speed and downsample)
-- wider resample window? (i.e. multi-lobe sinc?)
-- Dendy support: option for dendy override and possibly wrong duty cycle bug?
-- during 5s fadeout seems to be a quiet 60hz buzz
-- Breakout window for info (nice for looking at NSFe text chunk).
 - Replace all pcounter with clock based simulation, separate tick/render (todo FDS)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
 - N163 horrible sound accuracy
 - N163 volume vs num channels
+- VRC7 emulation accuracy
+- FDS high frequency modulation behaviour, verify against hardware
+- MMC5 squares, are they nonlinear, does PCM affect them?
+Format:
+- NSF2
+UI:
+- Breakout window for info (nice for looking at NSFe text chunk).
+- Dendy mode options (consider adding a dendy mode to format? maybe save for NSF2)
 - Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
-- NSF2
+- Visualizer plugin system.
+Other:
+- Dendy support: option for dendy override and possibly wrong duty cycle bug?
+- during 5s fadeout seems to be a quiet 60hz buzz
+- wider resample window? (i.e. multi-lobe sinc?)
 - Foobar2000 plugin?
-- VRC7 emulation accuracy
-- FDS high frequency modulation behaviour, verify against hardware
-- MMC5 squares, are they nonlinear, does PCM affect them?
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
 - More speed control options in keyboard view: pitch adjust, fast playback
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers).
-- Visualizer plugin system.
 - See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
 - Bus/stack plugins: register trace, NSF validator, other export tools
 - Invert L/R of each channel for rushjet.
-
-Unknown:
+Not sure how:
+- Mac/Linux versions?
 - Channel mask caption is ????? in Japanese UI.
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.

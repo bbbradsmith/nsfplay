@@ -114,23 +114,55 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
   nsf_copy = (*nsf); nsf_copy.body=NULL; // ヘッダのみコピー  
   ntag.SetNSF(&nsf_copy);
 
+  // if NSFe text chunk is present, reformat newlines and ensure string termination
   if (nsf->text != NULL)
   {
-    ss.Format("%s\r\n--- end of NSFe text ---\r\n\r\n", nsf->text);
+    for (xgm::UINT32 i=0; i < nsf->text_len && nsf->text[i] != 0; ++i)
+    {
+        char c = nsf->text[i];
+        if      (c == '\r')
+        {
+            continue; // ignore CR
+        }
+        else if (c == '\n')
+        {
+            m_info += "\r\n"; // expand LF to CR+LF (for windows text view)
+        }
+        else
+        {
+            m_info += c;
+        }
+    }
+    ss.Format("\r\n--- end of NSFe text ---\r\n\r\n");
     m_info += ss;
   }
 
   if((int)CONFIG["WRITE_TAGINFO"]&&!ntag.IsExistSection(true)&&!ntag.IsExistSection(false))
     ntag.CreateTag(CONFIG["TITLE_FORMAT"]);
 
+  // 
+  {
+    m_info += "FILE=";
+    for(const char* c = nsf->filename; *c != 0; ++c)
+    {
+        if (*c == '\\')
+        {
+            m_info += '/'; // convert backslashes (in Shift JIS backslash is Yen)
+        }
+        else
+        {
+            m_info += *c;
+        }
+    }    
+    m_info += "\r\n";
+  }
+
   ss.Format(
-      "FILE=%s\r\n"
       "Start track: %d of %d\r\n"
       "NTSC Speed: %fHz (%d)\r\n"
       "PAL Speed: %fHz (%d)\r\n"
       "Banks: %02X %02X %02X %02X %02X %02X %02X %02X\r\n"
       "Load/Init/Play: %04X/%04X/%04X\r\n"
-      , nsf->filename
       , nsf->start, nsf->songs
       , 1000000.0 / nsf->speed_ntsc, nsf->speed_ntsc
       , 1000000.0 / nsf->speed_pal, nsf->speed_pal
@@ -145,6 +177,42 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
       , nsf->load_address, nsf->init_address, nsf->play_address
       );
   m_info += ss;
+
+  if (nsf->ripper[0] != 0)
+  {
+    ss.Format("Ripper: %s\r\n", nsf->ripper);
+    m_info += ss;
+  }
+
+  for (unsigned int i=0; i < nsf->songs; ++i)
+  {
+    if (nsf->nsfe_entry[i].tlbl[0] != 0  ||
+        nsf->nsfe_entry[i].time    != -1 ||
+        nsf->nsfe_entry[i].fade    != -1 )
+    {
+      ss.Format("NSFe track %d: %s, %d, %d\r\n",
+          i,
+          nsf->nsfe_entry[i].tlbl,
+          nsf->nsfe_entry[i].time,
+          nsf->nsfe_entry[i].fade);
+      m_info += ss;
+    }
+  }
+
+  if (nsf->nsfe_plst)
+  {
+    m_info += "NSFe plst order:";
+    for (int i=0; i < nsf->nsfe_plst_size; ++i)
+    {
+      ss.Format(" %d", nsf->nsfe_plst[i]);
+      m_info += ss;
+      if (i < (nsf->nsfe_plst_size - 1))
+      {
+        m_info += ",";
+      }
+    }
+    m_info += "\r\n";
+  }
 
   if(ntag.IsExistSection())
   {
