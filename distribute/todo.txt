@@ -9,9 +9,8 @@ Emu:
 - N163 volume vs num channels
 - VRC7 emulation accuracy
 - FDS high frequency modulation behaviour, verify against hardware
+- FDS total rewrite for clock synch, better volume balance, etc.
 - MMC5 squares, are they nonlinear, does PCM affect them?
-Format:
-- NSF2
 UI:
 - Breakout window for info (nice for looking at NSFe text chunk).
 - Dendy mode options (consider adding a dendy mode to format? maybe save for NSF2)
@@ -19,11 +18,10 @@ UI:
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
-- Visualizer plugin system.
 Other:
+- Merger nsfplug_ui into in_yansf -- DLL is setup incorrectly (crashes Famitracker if in same dir)
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
-- wider resample window? (i.e. multi-lobe sinc?)
 - Foobar2000 plugin?
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
@@ -34,8 +32,15 @@ Other:
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
 - Bus/stack plugins: register trace, NSF validator, other export tools
 - Invert L/R of each channel for rushjet.
-Not sure how:
+
+Later version:
+- APU debug pin emulatoin
+- wider resample window? (i.e. multi-lobe sinc?)
 - Mac/Linux versions?
+- NSF2
+- Visualizer plugin system.
+
+Unknown:
 - Channel mask caption is ????? in Japanese UI.
 - Settings Apply/Cacel buttons are ????? in Japanese UI.
 - Settings audio quality panel has ????? at bottom in Japanese UI.

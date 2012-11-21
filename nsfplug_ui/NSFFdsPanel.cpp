@@ -22,7 +22,6 @@ NSFFdsPanel::NSFFdsPanel(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(NSFFdsPanel)
 	m_car_phase_refresh = FALSE;
 	m_mod_phase_refresh = FALSE;
-	m_use_pwm = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -37,7 +36,6 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
   {
     m_car_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH).GetInt();
     m_mod_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH).GetInt();
-    m_use_pwm = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_USE_PWM).GetInt();
     UpdateData(FALSE);
   }
   else
@@ -45,7 +43,6 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
     UpdateData(TRUE);
     pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH) = m_car_phase_refresh; 
     pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH) = m_mod_phase_refresh;
-    pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_USE_PWM) = m_use_pwm;
     pm->cf->Notify(FDS);
   }
 }
@@ -56,7 +53,6 @@ void NSFFdsPanel::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(NSFFdsPanel)
 	DDX_Check(pDX, IDC_CAR_PHASE_REFRESH, m_car_phase_refresh);
 	DDX_Check(pDX, IDC_MOD_PHASE_REFRESH, m_mod_phase_refresh);
-	DDX_Check(pDX, IDC_USE_PWM, m_use_pwm);
 	//}}AFX_DATA_MAP
 }
 
@@ -65,7 +61,6 @@ BEGIN_MESSAGE_MAP(NSFFdsPanel, CDialog)
 	//{{AFX_MSG_MAP(NSFFdsPanel)
 	ON_BN_CLICKED(IDC_CAR_PHASE_REFRESH, OnCarPhaseRefresh)
 	ON_BN_CLICKED(IDC_MOD_PHASE_REFRESH, OnModPhaseRefresh)
-	ON_BN_CLICKED(IDC_USE_PWM, OnUsePwm)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -80,11 +75,6 @@ void NSFFdsPanel::OnCarPhaseRefresh()
 void NSFFdsPanel::OnModPhaseRefresh() 
 {
   //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(TRUE);	
-}
-
-void NSFFdsPanel::OnUsePwm() 
-{
-  //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(TRUE);
 }
 
 BOOL NSFFdsPanel::OnInitDialog()

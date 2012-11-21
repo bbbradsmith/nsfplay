@@ -167,7 +167,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         {},
         {},
         {},
-        { 1, 0, 0 }
+        { 1, 0 }
     };
 
     for (j = 0; j < DEVICE_OPTION_MAX[i]; j++)

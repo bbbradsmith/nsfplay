@@ -1,7 +1,6 @@
 #ifndef _NES_VRC6_H_
 #define _NES_VRC6_H_
 #include "../device.h"
-#include "counter.h"
 
 namespace xgm
 {

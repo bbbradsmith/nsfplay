@@ -21,7 +21,6 @@ public:
 	enum { IDD = IDD_FDSPANEL };
 	BOOL	m_car_phase_refresh;
 	BOOL	m_mod_phase_refresh;
-	BOOL	m_use_pwm;
 	//}}AFX_DATA
 
 public:
@@ -41,7 +40,6 @@ protected:
 	//{{AFX_MSG(NSFFdsPanel)
 	afx_msg void OnCarPhaseRefresh();
 	afx_msg void OnModPhaseRefresh();
-	afx_msg void OnUsePwm();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

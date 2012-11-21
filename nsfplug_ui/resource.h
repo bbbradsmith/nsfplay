@@ -91,7 +91,6 @@
 #define IDC_SONGSLIDER                  1110
 #define IDC_FORMAT                      1111
 #define IDC_PAL                         1111
-#define IDC_USE_PWM                     1113
 #define IDC_APU_2                       1131
 #define IDC_APU_3                       1132
 #define IDC_APU_4                       1133

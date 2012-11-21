@@ -158,7 +158,7 @@ Versions
 
 NSFPlay 2.3 BETA 2 - ??/??/????
 Emulation:
-- Audio emulation is now driven by CPU clock cycles, increases timing accuracy. (TODO: 5B/MMC5/VRC6/FDS/VRC7)
+- Audio emulation is now driven by CPU clock cycles, increases timing accuracy.
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
 - MMC5 frame sequencer now independant of APU frame sequencer.
 - Time dilation now slows frame sequencer along with CPU rate.
@@ -170,6 +170,7 @@ Other:
 - Using # instead of + for note names.
 - Cosmetic fixes in settings dialog.
 - Keyboard frequency display correction for APU/MMC5/VRC6 (were off by 1).
+- Expanded infobox info for NSFe.
 
 NSFPlay 2.2 - 8/31/2012
 Audio Emulation:
