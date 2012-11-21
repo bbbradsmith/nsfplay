@@ -341,6 +341,11 @@ namespace xgm
             // adjust offset to counteract pop
             dmc_pop_offset += dmc_pop_follow - m[2];
             dmc_pop = false;
+
+            // prevent overflow, keep headspace at edges
+            const INT32 OFFSET_MAX = (1 << 30) - (4 << 16);
+            if (dmc_pop_offset >  OFFSET_MAX) dmc_pop_offset =  OFFSET_MAX;
+            if (dmc_pop_offset < -OFFSET_MAX) dmc_pop_offset = -OFFSET_MAX;
         }
         dmc_pop_follow = m[2]; // remember previous position
 
