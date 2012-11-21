@@ -2,6 +2,8 @@
 #define _NES_CPU_H_
 #include "../device.h"
 
+#define ILLEGAL_OPCODES 1
+#define DISABLE_DECIMAL 1
 #define USE_DIRECT_ZEROPAGE 0
 #define USE_CALLBACK	1
 #define USE_INLINEMMC 0

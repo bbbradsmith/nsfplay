@@ -1,5 +1,9 @@
 To Do:
 
+CPU core:
+- http://www.oxyron.de/html/opcodes02.html
+- Compare page boundary crossings to km6502ct table
+- implement illegal opcodes
 Emu:
 - streemerz support > apparently illegal opcodes are not supported
 - full-emulation quality option (emulate at M2 speed and downsample)

@@ -172,6 +172,7 @@ Other:
 - Cosmetic fixes in settings dialog.
 - Keyboard frequency display correction for APU/MMC5/VRC6 (were off by 1).
 - Expanded infobox info for NSFe.
+- Source code cleanup: removing unrelated Z80 emulation code.
 
 NSFPlay 2.2 - 8/31/2012
 Audio Emulation:
@@ -246,6 +247,7 @@ Other:
 - Added extra NSF header information to "misc" text box, initial banks, load/init/play addresses, etc.
 - Fixed thread-safety issue for configuration (was accessed liberally from many threads).
 - Removed legacy code for windows versions older than XP.
+- CPU trace define in nes_cpu.cpp for debugging.
 
 NSFPlay 2.0 - 2/22/2012
 - Restructured sln/vcproj files, and rebuilt for VS9.
