@@ -379,62 +379,6 @@
 						</File>
 					</Filter>
 				</Filter>
-				<Filter
-					Name="z80"
-					>
-					<File
-						RelativePath=".\devices\CPU\z80.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\devices\CPU\z80.h"
-						>
-					</File>
-					<Filter
-						Name="kmz80"
-						>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmdmg.c"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmevent.c"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmevent.h"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmr800.c"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmtypes.h"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmz80.c"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmz80.h"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmz80c.c"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmz80i.h"
-							>
-						</File>
-						<File
-							RelativePath=".\devices\CPU\kmz80\kmz80t.c"
-							>
-						</File>
-					</Filter>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="audio"
