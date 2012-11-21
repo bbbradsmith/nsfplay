@@ -1070,3 +1070,8 @@ static void OpcodeCall Opcode54(__CONTEXT)	/* 54 - CSL */
 static void OpcodeCall OpcodeD4(__CONTEXT)	/* D4 - CSH */
 { __THIS__.lowClockMode = 0; }
 #endif
+
+// BS - implementing all illegal opcodes
+#if ILLEGAL_OPCODES
+// TODO
+#endif
