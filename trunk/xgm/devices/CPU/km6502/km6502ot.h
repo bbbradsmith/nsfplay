@@ -44,7 +44,11 @@
 
 /* BS - allowing illegal opcode implementation */
 #if ILLEGAL_OPCODES
-#define OPxx OP__
+#define OPxx(i) \
+	case 0x##i##: \
+		Opcode##i##(__THISP); \
+		__THIS__.illegal = 1; \
+		break;
 #else
 #define OPxx(i)
 #endif

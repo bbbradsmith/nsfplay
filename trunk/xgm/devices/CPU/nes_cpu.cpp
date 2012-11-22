@@ -176,6 +176,7 @@ void NES_CPU::Reset ()
   context.Y = 0;
   context.S = 0xff;
   context.PC = breakpoint = 0xffff;
+  context.illegal = 0;
   breaked = false;
   K6502_Exec (&context);
 }

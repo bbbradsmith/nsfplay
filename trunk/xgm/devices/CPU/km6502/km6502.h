@@ -29,6 +29,10 @@ struct K6502_Context {
 	Uword lastcode;
 	void *user;			/* pointer to user area */
 
+#if ILLEGAL_OPCODES
+    Uword illegal;
+#endif
+
 #if USE_CALLBACK
 	/* pointer to callback functions */
 #if USE_INLINEMMC
