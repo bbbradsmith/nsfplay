@@ -3,7 +3,7 @@
 		Opcode##i##(__THISP); \
 		break;
 
-// BS - option to disable decimal execution for NES
+/* BS - option to disable decimal execution for NES */
 #if DISABLE_DECIMAL
 #define OP_d OP__
 #else
@@ -42,11 +42,9 @@
 #define OPt_ OP__
 #endif
 
-// BS - allowing illegal opcode implementation
+/* BS - allowing illegal opcode implementation */
 #if ILLEGAL_OPCODES
-//#define OPxx OP__
-#define OPxx(i)
-// TODO
+#define OPxx OP__
 #else
 #define OPxx(i)
 #endif
