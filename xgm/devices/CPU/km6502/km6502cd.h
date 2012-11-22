@@ -1071,7 +1071,93 @@ static void OpcodeCall OpcodeD4(__CONTEXT)	/* D4 - CSH */
 { __THIS__.lowClockMode = 0; }
 #endif
 
-// BS - implementing all illegal opcodes
+/* BS - implementing all illegal opcodes */
 #if ILLEGAL_OPCODES
-// TODO
+
+/* --- KIL ---  */
+/* halts CPU */
+#define DEF_KIL(i) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    __THIS__.PC = RTO16(__THIS__.PC - 1); \
+    __THIS__.P |= I_FLAG; /* disable interrupt */ \
+}
+/* opcodes */
+DEF_KIL(02)
+DEF_KIL(12)
+DEF_KIL(22)
+DEF_KIL(32)
+DEF_KIL(42)
+DEF_KIL(52)
+DEF_KIL(62)
+DEF_KIL(72)
+DEF_KIL(92)
+DEF_KIL(B2)
+DEF_KIL(D2)
+DEF_KIL(F2)
+
+/* --- NOP ---  */
+/* does nothing */
+#define DEF_NOP(i) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{}
+/* fetches operands but does not use them, issues dummy reads (may have page boundary cycle penalty) */
+#define DEF_NOP_A(i,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ a(__THISP); }
+/* opcodes */
+DEF_NOP_A(80,KAI_IMM);
+DEF_NOP_A(82,KAI_IMM);
+DEF_NOP_A(C2,KAI_IMM);
+DEF_NOP_A(E2,KAI_IMM);
+DEF_NOP_A(04,KAI_ZP);
+DEF_NOP_A(14,KAI_ZPX);
+DEF_NOP_A(34,KAI_ZPX);
+DEF_NOP_A(44,KAI_ZP);
+DEF_NOP_A(54,KAI_ZPX);
+DEF_NOP_A(64,KAI_ZP);
+DEF_NOP_A(74,KAI_ZPX);
+DEF_NOP_A(D4,KAI_ZPX);
+DEF_NOP_A(F4,KAI_ZPX);
+DEF_NOP_A(89,KAI_IMM);
+DEF_NOP(1A);
+DEF_NOP(3A);
+DEF_NOP(5A);
+DEF_NOP(7A);
+DEF_NOP(DA);
+DEF_NOP(FA);
+DEF_NOP_A(0C,KAI_ABS);
+DEF_NOP_A(1C,KA_ABSX_);
+DEF_NOP_A(3C,KA_ABSX_);
+DEF_NOP_A(5C,KA_ABSX_);
+DEF_NOP_A(7C,KA_ABSX_);
+DEF_NOP_A(DC,KA_ABSX_);
+DEF_NOP_A(FC,KA_ABSX_);
+
+/* --- SLO ---  */
+/* shift input left (carry result), OR result with A (nz result) */
+static void OpsubCall KM_SLO(__CONTEXT_ Uword src)
+{
+    Uword w = src << 1;
+    __THIS__.A |= RTO8(w);
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += (src & 0x100) ? C_FLAG : 0;
+}
+/* ASL + ORA */
+#define DEF_SLO(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    KM_SLO(__THISP_ src); \
+}
+/* opcodes */
+DEF_SLO(03,NP,KA_INDX);
+DEF_SLO(13,NP,KA_INDY);
+DEF_SLO(07,ZP,KA_ZP);
+DEF_SLO(17,ZP,KA_ZPX);
+DEF_SLO(1B,NP,KA_ABSY);
+DEF_SLO(0F,NP,KA_ABS);
+DEF_SLO(1F,NP,KA_ABSX);
+
+// 46 done
+// 59 left
+
 #endif

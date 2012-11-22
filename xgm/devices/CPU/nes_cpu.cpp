@@ -82,11 +82,10 @@ UINT32 NES_CPU::Exec (UINT32 clock)
         bus->Read((TPC+0) & 0xFFFF, tb[0]);
         bus->Read((TPC+1) & 0xFFFF, tb[1]);
         bus->Read((TPC+2) & 0xFFFF, tb[2]);
-        DEBUG_OUT("%04X: A=%02X X=%02X Y=%02X P=%02X S=%02X %c%c > ",
+        DEBUG_OUT("%04X: A=%02X X=%02X Y=%02X P=%02X S=%02X %c > ",
             context.PC,
             context.A, context.X, context.Y, context.P, context.S,
-            context.iRequest ? 'I':'i',
-            context.iMask ? 'M':'m');
+            context.iRequest ? 'I':'i');
       #endif
 
       K6502_Exec (&context);
