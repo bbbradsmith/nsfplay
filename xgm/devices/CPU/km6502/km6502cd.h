@@ -1132,21 +1132,22 @@ DEF_NOP_A(DC,KA_ABSX_);
 DEF_NOP_A(FC,KA_ABSX_);
 
 /* --- SLO ---  */
-/* shift input left (carry result), OR result with A (nz result) */
-static void OpsubCall KM_SLO(__CONTEXT_ Uword src)
+/* shift left, OR result */
+static Uword OpsubCall KM_SLO(__CONTEXT_ Uword src)
 {
     Uword w = src << 1;
     __THIS__.A |= RTO8(w);
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
     __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += (src & 0x100) ? C_FLAG : 0;
+    __THIS__.P += src >> 7; /* C_FLAG */
+    return __THIS__.A;
 }
-/* ASL + ORA */
+/* macro */
 #define DEF_SLO(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
 { \
     Uword adr = a(__THISP); \
     Uword src = K_READ##p##(__THISP_ adr); \
-    KM_SLO(__THISP_ src); \
+    K_WRITE##p##(__THISP_ adr, KM_SLO(__THISP_ src)); \
 }
 /* opcodes */
 DEF_SLO(03,NP,KA_INDX);
@@ -1157,7 +1158,292 @@ DEF_SLO(1B,NP,KA_ABSY);
 DEF_SLO(0F,NP,KA_ABS);
 DEF_SLO(1F,NP,KA_ABSX);
 
-// 46 done
-// 59 left
+/* --- RLA ---  */
+/* rotate left, AND result */
+static Uword OpsubCall KM_RLA(__CONTEXT_ Uword src)
+{
+    Uword w = (src << 1) + (__THIS__.P & C_FLAG);
+    __THIS__.A &= RTO8(w);
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += src >> 7; /* C_FLAG */
+    return __THIS__.A;
+}
+/* macro */
+#define DEF_RLA(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    K_WRITE##p##(__THISP_ adr, KM_RLA(__THISP_ src)); \
+}
+/* opcodes */
+DEF_RLA(23,NP,KA_INDX);
+DEF_RLA(33,NP,KA_INDY);
+DEF_RLA(27,ZP,KA_ZP);
+DEF_RLA(37,ZP,KA_ZPX);
+DEF_RLA(3B,NP,KA_ABSY);
+DEF_RLA(2F,NP,KA_ABS);
+DEF_RLA(3F,NP,KA_ABSX);
+
+/* --- SRE ---  */
+/* shift right, EOR result */
+static Uword OpsubCall KM_SRE(__CONTEXT_ Uword src)
+{
+    Uword w = src >> 1;
+    __THIS__.A ^= RTO8(w);
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += src & 1; /* C_FLAG */
+    return __THIS__.A;
+}
+/* macro */
+#define DEF_SRE(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    K_WRITE##p##(__THISP_ adr, KM_SRE(__THISP_ src)); \
+}
+/* opcodes */
+DEF_SRE(43,NP,KA_INDX);
+DEF_SRE(53,NP,KA_INDY);
+DEF_SRE(47,ZP,KA_ZP);
+DEF_SRE(57,ZP,KA_ZPX);
+DEF_SRE(5B,NP,KA_ABSY);
+DEF_SRE(4F,NP,KA_ABS);
+DEF_SRE(5F,NP,KA_ABSX);
+
+/* --- RRA ---  */
+/* rotate right, ADC result */
+static Uword OpsubCall KM_RRA(__CONTEXT_ Uword src)
+{
+    Uword w = (src >> 1) + ((__THIS__.P & C_FLAG) << 7);
+    __THIS__.P &= ~(C_FLAG);
+    __THIS__.P += (src >> 7); /* C_FLAG */
+    KMI_ADC(__THISP_ RTO8(w));
+    return __THIS__.A;
+}
+/* macro */
+#define DEF_RRA(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    K_WRITE##p##(__THISP_ adr, KM_RRA(__THISP_ src)); \
+}
+/* opcodes */
+DEF_RRA(63,NP,KA_INDX);
+DEF_RRA(73,NP,KA_INDY);
+DEF_RRA(67,ZP,KA_ZP);
+DEF_RRA(77,ZP,KA_ZPX);
+DEF_RRA(7B,NP,KA_ABSY);
+DEF_RRA(6F,NP,KA_ABS);
+DEF_RRA(7F,NP,KA_ABSX);
+
+/* --- DCP ---  */
+/* decrement, CMP */
+static Uword OpsubCall KM_DCP(__CONTEXT_ Uword src)
+{
+    Uword w = RTO8(src - 1);
+    KM_CMP(__THISP_ w);
+    return w;
+}
+/* macro */
+#define DEF_DCP(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    K_WRITE##p##(__THISP_ adr, KM_DCP(__THISP_ src)); \
+}
+/* opcodes */
+DEF_DCP(C3,NP,KA_INDX);
+DEF_DCP(D3,NP,KA_INDY);
+DEF_DCP(C7,ZP,KA_ZP);
+DEF_DCP(D7,ZP,KA_ZPX);
+DEF_DCP(DB,NP,KA_ABSY);
+DEF_DCP(CF,NP,KA_ABS);
+DEF_DCP(DF,NP,KA_ABSX);
+
+/* --- ISC ---  */
+/* increment, SBC */
+static Uword OpsubCall KM_ISC(__CONTEXT_ Uword src)
+{
+    Uword w = RTO8(src + 1);
+    KMI_SBC(__THISP_ w);
+    return __THIS__.A;
+}
+/* macro */
+#define DEF_ISC(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    K_WRITE##p##(__THISP_ adr, KM_ISC(__THISP_ src)); \
+}
+/* opcodes */
+DEF_ISC(E3,NP,KA_INDX);
+DEF_ISC(F3,NP,KA_INDY);
+DEF_ISC(E7,ZP,KA_ZP);
+DEF_ISC(F7,ZP,KA_ZPX);
+DEF_ISC(FB,NP,KA_ABSY);
+DEF_ISC(EF,NP,KA_ABS);
+DEF_ISC(FF,NP,KA_ABSX);
+
+/* --- LAX ---  */
+/* load A and X */
+static void OpsubCall KM_LAX(__CONTEXT_ Uword src)
+{
+    __THIS__.A = src;
+    __THIS__.X = src;
+    __THIS__.P &= ~(N_FLAG | Z_FLAG);
+    __THIS__.P += FLAG_NZ(src);
+}
+/* macro */
+#define DEF_LAX(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    Uword adr = a(__THISP); \
+    Uword src = K_READ##p##(__THISP_ adr); \
+    KM_LAX(__THISP_ src); \
+}
+/* opcodes */
+DEF_LAX(A3,NP,KA_INDX);
+DEF_LAX(B3,NP,KA_INDY_);
+DEF_LAX(A7,ZP,KA_ZP);
+DEF_LAX(B7,ZP,KA_ZPX);
+DEF_LAX(AB,NP,KA_IMM); /* this one is unstable on hardware */
+DEF_LAX(AF,NP,KA_ABS);
+DEF_LAX(BF,NP,KA_ABSY_);
+
+/* --- SAX ---  */
+/* store A AND X */
+#define DEF_SAX(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
+{ \
+    K_WRITE##p##(__THISP_ a(__THISP), (__THIS__.A & __THIS__.X) ); \
+}
+/* opcodes */
+DEF_SAX(83,NP,KA_INDX);
+DEF_SAX(87,ZP,KA_ZP);
+DEF_SAX(97,ZP,KA_ZPY);
+DEF_SAX(8F,NP,KA_ABS);
+
+/* --- AHX ---  */
+/* store A AND X AND high address (somewhat unstable) */
+static void OpcodeCall Opcode93(__CONTEXT)
+{
+    Uword adr = KA_ZPY(__THISP);
+    K_WRITEZP(__THISP_ adr, RTO8(__THIS__.A & __THIS__.X & ((adr >> 8) + 1)) );
+}
+static void OpcodeCall Opcode9F(__CONTEXT)
+{
+    Uword adr = KA_ABSY(__THISP);
+    K_WRITENP(__THISP_ adr, RTO8(__THIS__.A & __THIS__.X & ((adr >> 8) + 1)) );
+}
+
+/* --- TAS --- */
+/* transfer A AND X to S, store A AND X AND high address */
+static void OpcodeCall Opcode9B(__CONTEXT)
+{
+    Uword adr = KA_ABSY(__THISP);
+    __THIS__.S = __THIS__.A & __THIS__.X;
+    K_WRITENP(__THISP_ adr, RTO8(__THIS__.S & ((adr >> 8) + 1)) );
+}
+
+/* --- SHY --- */
+/* store Y AND high address (somewhat unstable) */
+static void OpcodeCall Opcode9C(__CONTEXT)
+{
+    Uword adr = KA_ABSX(__THISP);
+    K_WRITENP(__THISP_ adr, RTO8(__THIS__.Y & ((adr >> 8) + 1)) );
+}
+
+/* --- SHX --- */
+/* store X AND high address (somewhat unstable) */
+static void OpcodeCall Opcode9E(__CONTEXT)
+{
+    Uword adr = KA_ABSY(__THISP);
+    K_WRITENP(__THISP_ adr, RTO8(__THIS__.X & ((adr >> 8) + 1)) );
+}
+
+/* --- ANC --- */
+/* a = A AND immediate */
+static void OpcodeCall Opcode0B(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    __THIS__.A = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += (__THIS__.A >> 7); /* C_FLAG */
+}
+static void OpcodeCall Opcode2B(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    __THIS__.A = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += (__THIS__.A >> 7); /* C_FLAG */
+}
+
+/* --- XAA --- */
+/* a = X AND immediate (unstable) */
+static void OpcodeCall Opcode8B(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    __THIS__.A = RTO8(__THIS__.X & K_READNP(__THISP_ adr));
+    __THIS__.P &= ~(N_FLAG | Z_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+}
+
+/* --- ALR --- */
+/* A AND immediate (unstable), shift right */
+static void OpcodeCall Opcode4B(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    Uword res = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
+    __THIS__.A = res >> 1;
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += (res & 1); /* C_FLAG */
+}
+
+/* --- ARR --- */
+/* A AND immediate (unstable), rotate right, weird carry */
+static void OpcodeCall Opcode6B(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    Uword res = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
+    __THIS__.A = (res >> 1) + ((__THIS__.P & C_FLAG) << 7);
+    __THIS__.P &= ~(N_FLAG | V_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P += (res ^ (res >> 1)) & V_FLAG;
+    __THIS__.P += (res >> 7); /* C_FLAG */
+}
+
+/* --- LAS --- */
+/* stack AND immediate, copy to A and X */
+static void OpcodeCall OpcodeBB(__CONTEXT)
+{
+    Uword adr = KA_ABSY_(__THISP);
+    __THIS__.S &= RTO8(K_READNP(__THISP_ adr));
+    __THIS__.A = __THIS__.S;
+    __THIS__.X = __THIS__.S;
+    __THIS__.P &= ~(N_FLAG | Z_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.A);
+}
+
+/* --- AXS --- */
+/* (A & X) - immediate, result in X */
+static void OpcodeCall OpcodeCB(__CONTEXT)
+{
+    Uword adr = KA_IMM(__THISP);
+    Uword res = (__THIS__.A & __THIS__.X) - RTO8(K_READNP(__THISP_ adr));
+    __THIS__.X = RTO8(res);
+    __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
+    __THIS__.P += FLAG_NZ(__THIS__.X);
+    __THIS__.P += (res <= 0xFF) ? C_FLAG : 0;
+}
+
+/* --- SBC --- */
+/* EB is alternate opcode for SBC E9 */
+static void OpcodeCall OpcodeEB(__CONTEXT)
+{
+    OpcodeE9(__THISP);
+}
 
 #endif
