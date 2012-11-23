@@ -57,6 +57,8 @@ namespace xgm
 
         if (sweep_enable[i])
         {
+            //DEBUG_OUT("Clock sweep: %d\n", i);
+
             --sweep_div[i];
             if (sweep_div[i] <= 0)
             {
@@ -335,14 +337,14 @@ namespace xgm
 
       case 0x2:
       case 0x6:
-        freq[ch] = val | ((reg[adr+1]&7)<<8) ;
+        freq[ch] = val | (freq[ch] & 0x700) ;
         sweep_sqr(ch);
         if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
         break;
 
       case 0x3: 
       case 0x7:
-        freq[ch] = reg[adr-1] | ((val & 0x7) << 8) ;
+        freq[ch] = (freq[ch] & 0xFF) | ((val & 0x7) << 8) ;
         if (option[OPT_PHASE_REFRESH])
           sphase[ch] = 0;
         envelope_write[ch] = true;
