@@ -2,7 +2,7 @@
 #include "nes_cpu.h"
 
 #define DEBUG_RW 0
-#define TRACE 1
+#define TRACE 0
 
 #if TRACE
 const char* OP_NAME[256] = {

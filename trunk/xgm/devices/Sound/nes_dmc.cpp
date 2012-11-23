@@ -99,6 +99,8 @@ namespace xgm
 
   void NES_DMC::FrameSequence(int s)
   {
+    //DEBUG_OUT("FrameSequence: %d\n",s);
+
     if (s > 3) return; // no operation in step 4
 
     if (apu)
@@ -537,6 +539,8 @@ namespace xgm
 
     if (adr == 0x4017)
     {
+      //DEBUG_OUT("4017 = %02X\n", val);
+
       frame_irq_enable = ((val & 0x40) == 0x40);
       frame_sequence_count = 0;
       frame_sequence_steps = ((val & 0x80) == 0x80) ? 5 : 4;
