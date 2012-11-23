@@ -160,6 +160,7 @@ NSFPlay 2.3 BETA 2 - ??/??/????
 Emulation:
 - Audio emulation is now driven by CPU clock cycles, increases timing accuracy.
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
+- All illegal 6502 opcodes are now emulated.
 - MMC5 frame sequencer now independant of APU frame sequencer.
 - Time dilation now slows frame sequencer along with CPU rate.
 - Fixed broken oversampling filter.
