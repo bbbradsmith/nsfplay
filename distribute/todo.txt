@@ -21,10 +21,8 @@ UI:
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
 Other:
-- Merger nsfplug_ui into in_yansf -- DLL is setup incorrectly (crashes Famitracker if in same dir)
 - Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
-- Foobar2000 plugin?
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
 - Battletoads track 10, noise sounds much duller on hardware.
@@ -39,8 +37,12 @@ Later version:
 - APU debug pin emulatoin
 - wider resample window? (i.e. multi-lobe sinc?)
 - Mac/Linux versions?
+- Foobar2000 plugin
+- KB plugin
 - NSF2
 - Visualizer plugin system.
+- De-MFC GUI, change to a .lib, and build directly into plugin.
+- Remove plugin stubs from xgm, these belong in the plugin project itself.
 
 Unknown:
 - Channel mask caption is ????? in Japanese UI.
