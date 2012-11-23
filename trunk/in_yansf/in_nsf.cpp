@@ -60,10 +60,8 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
     if((*(npm.cf))["MASK_INIT"]) (*(npm.cf))["MASK"] = 0;
 
-    // GUI‚Ìƒ[ƒh
-    strcpy(path,DllPath);
-    strcat(path,"nsfplug_ui.dll");
-    ui = new NSFplug_UI_DLL(path,&npm,0);
+    // GUI initialized in Init()
+    ui = NULL;
 
     pPlugin = new WA2NSF(npm.pl,npm.cf,npm.sdat);
     pPlugin->SetUserInterface(ui);
@@ -95,11 +93,23 @@ static void About(HWND hParent)
 }
 static void Init()
 { 
+  if (ui == NULL)
+  {
+    char path[MAX_PATH+16];
+    strcpy(path,DllPath);
+    strcat(path,"nsfplug_ui.dll");
+    ui = new NSFplug_UI_DLL(path,&npm,0);
+    pPlugin->SetUserInterface(ui);
+  }
+
   pPlugin->Init(); 
 }
 static void Quit()
 { 
-  pPlugin->Quit(); 
+  pPlugin->Quit();
+
+  delete ui;
+  ui = NULL;
 }
 static void GetFileInfo(char *file, char *title, int *length_in_ms)
 { 
@@ -116,7 +126,7 @@ static int IsOurFile(char *fn)
 static int Play(char *fn)
 {
   int ret = pPlugin->Play(fn);
-  if(!ret) ui->StartUpdate();
+  if(!ret && ui) ui->StartUpdate();
   return ret;
 }
 static void Pause()
@@ -133,7 +143,7 @@ static int IsPaused()
 }
 static void Stop()
 {
-  ui->StopUpdate();
+  if (ui) ui->StopUpdate();
   pPlugin->Stop();
 }
 static int GetLength()

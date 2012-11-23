@@ -28,7 +28,7 @@ public:
   virtual void SetUserInterface(NSFplug_UI *u)
   {
     ui = u; 
-    ui->SetWA2InputModule(this);
+    if (ui) ui->SetWA2InputModule(this);
   }
 
   virtual int IsOurFile(char *fn)
