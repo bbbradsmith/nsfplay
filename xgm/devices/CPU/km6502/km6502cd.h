@@ -1135,12 +1135,12 @@ DEF_NOP_A(FC,KA_ABSX_);
 /* shift left, OR result */
 static Uword OpsubCall KM_SLO(__CONTEXT_ Uword src)
 {
-    Uword w = src << 1;
-    __THIS__.A |= RTO8(w);
+    Uword w = RTO8(src << 1);
+    __THIS__.A |= w;
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += src >> 7; /* C_FLAG */
-    return __THIS__.A;
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (src >> 7) & C_FLAG;
+    return w;
 }
 /* macro */
 #define DEF_SLO(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1162,12 +1162,12 @@ DEF_SLO(1F,NP,KA_ABSX);
 /* rotate left, AND result */
 static Uword OpsubCall KM_RLA(__CONTEXT_ Uword src)
 {
-    Uword w = (src << 1) + (__THIS__.P & C_FLAG);
-    __THIS__.A &= RTO8(w);
+    Uword w = RTO8((src << 1) | (__THIS__.P & C_FLAG));
+    __THIS__.A &= w;
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += src >> 7; /* C_FLAG */
-    return __THIS__.A;
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (src >> 7) & C_FLAG;
+    return w;
 }
 /* macro */
 #define DEF_RLA(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1189,12 +1189,12 @@ DEF_RLA(3F,NP,KA_ABSX);
 /* shift right, EOR result */
 static Uword OpsubCall KM_SRE(__CONTEXT_ Uword src)
 {
-    Uword w = src >> 1;
-    __THIS__.A ^= RTO8(w);
+    Uword w = RTO8(src >> 1);
+    __THIS__.A ^= w;
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += src & 1; /* C_FLAG */
-    return __THIS__.A;
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= src & C_FLAG;
+    return w;
 }
 /* macro */
 #define DEF_SRE(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1216,11 +1216,11 @@ DEF_SRE(5F,NP,KA_ABSX);
 /* rotate right, ADC result */
 static Uword OpsubCall KM_RRA(__CONTEXT_ Uword src)
 {
-    Uword w = (src >> 1) + ((__THIS__.P & C_FLAG) << 7);
+    Uword w = RTO8((src >> 1) | ((__THIS__.P & C_FLAG) << 7));
     __THIS__.P &= ~(C_FLAG);
-    __THIS__.P += (src >> 7); /* C_FLAG */
-    KMI_ADC(__THISP_ RTO8(w));
-    return __THIS__.A;
+    __THIS__.P |= src & C_FLAG;
+    KMI_ADC(__THISP_ w);
+    return w;
 }
 /* macro */
 #define DEF_RRA(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1268,7 +1268,7 @@ static Uword OpsubCall KM_ISC(__CONTEXT_ Uword src)
 {
     Uword w = RTO8(src + 1);
     KMI_SBC(__THISP_ w);
-    return __THIS__.A;
+    return w;
 }
 /* macro */
 #define DEF_ISC(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1293,7 +1293,7 @@ static void OpsubCall KM_LAX(__CONTEXT_ Uword src)
     __THIS__.A = src;
     __THIS__.X = src;
     __THIS__.P &= ~(N_FLAG | Z_FLAG);
-    __THIS__.P += FLAG_NZ(src);
+    __THIS__.P |= FLAG_NZ(src);
 }
 /* macro */
 #define DEF_LAX(i,p,a) static void OpcodeCall Opcode##i##(__CONTEXT) \
@@ -1306,7 +1306,7 @@ static void OpsubCall KM_LAX(__CONTEXT_ Uword src)
 DEF_LAX(A3,NP,KA_INDX);
 DEF_LAX(B3,NP,KA_INDY_);
 DEF_LAX(A7,ZP,KA_ZP);
-DEF_LAX(B7,ZP,KA_ZPX);
+DEF_LAX(B7,ZP,KA_ZPY);
 DEF_LAX(AB,NP,KA_IMM); /* this one is unstable on hardware */
 DEF_LAX(AF,NP,KA_ABS);
 DEF_LAX(BF,NP,KA_ABSY_);
@@ -1368,16 +1368,16 @@ static void OpcodeCall Opcode0B(__CONTEXT)
     Uword adr = KA_IMM(__THISP);
     __THIS__.A = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += (__THIS__.A >> 7); /* C_FLAG */
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (__THIS__.A >> 7); /* C_FLAG */
 }
 static void OpcodeCall Opcode2B(__CONTEXT)
 {
     Uword adr = KA_IMM(__THISP);
     __THIS__.A = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += (__THIS__.A >> 7); /* C_FLAG */
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (__THIS__.A >> 7) & C_FLAG;
 }
 
 /* --- XAA --- */
@@ -1387,7 +1387,7 @@ static void OpcodeCall Opcode8B(__CONTEXT)
     Uword adr = KA_IMM(__THISP);
     __THIS__.A = RTO8(__THIS__.X & K_READNP(__THISP_ adr));
     __THIS__.P &= ~(N_FLAG | Z_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
 }
 
 /* --- ALR --- */
@@ -1398,8 +1398,8 @@ static void OpcodeCall Opcode4B(__CONTEXT)
     Uword res = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
     __THIS__.A = res >> 1;
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += (res & 1); /* C_FLAG */
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (res & C_FLAG);
 }
 
 /* --- ARR --- */
@@ -1410,9 +1410,9 @@ static void OpcodeCall Opcode6B(__CONTEXT)
     Uword res = RTO8(__THIS__.A & K_READNP(__THISP_ adr));
     __THIS__.A = (res >> 1) + ((__THIS__.P & C_FLAG) << 7);
     __THIS__.P &= ~(N_FLAG | V_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
-    __THIS__.P += (res ^ (res >> 1)) & V_FLAG;
-    __THIS__.P += (res >> 7); /* C_FLAG */
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
+    __THIS__.P |= (res ^ (res >> 1)) & V_FLAG;
+    __THIS__.P |= (res >> 7) & C_FLAG;
 }
 
 /* --- LAS --- */
@@ -1424,7 +1424,7 @@ static void OpcodeCall OpcodeBB(__CONTEXT)
     __THIS__.A = __THIS__.S;
     __THIS__.X = __THIS__.S;
     __THIS__.P &= ~(N_FLAG | Z_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.A);
+    __THIS__.P |= FLAG_NZ(__THIS__.A);
 }
 
 /* --- AXS --- */
@@ -1435,8 +1435,8 @@ static void OpcodeCall OpcodeCB(__CONTEXT)
     Uword res = (__THIS__.A & __THIS__.X) - RTO8(K_READNP(__THISP_ adr));
     __THIS__.X = RTO8(res);
     __THIS__.P &= ~(N_FLAG | Z_FLAG | C_FLAG);
-    __THIS__.P += FLAG_NZ(__THIS__.X);
-    __THIS__.P += (res <= 0xFF) ? C_FLAG : 0;
+    __THIS__.P |= FLAG_NZ(__THIS__.X);
+    __THIS__.P |= (res <= 0xFF) ? C_FLAG : 0;
 }
 
 /* --- SBC --- */
