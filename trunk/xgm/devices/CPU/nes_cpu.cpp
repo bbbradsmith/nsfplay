@@ -140,6 +140,25 @@ bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)
     DEBUG_OUT("Write: 0x%04X = 0x%02X\n", adr, val);
   #endif
 
+  // for blargg's CPU tests
+  #if 0
+    if (adr == 0x6000)
+    {
+        DEBUG_OUT("Blargg result: %02X [");
+        UINT32 msg = 0x6004;
+        do
+        {
+            UINT32 ic;
+            Read(msg, ic);
+            if (ic == 0) break;
+            ++msg;
+            DEBUG_OUT("%c", char(ic));
+        } while (1);
+        DEBUG_OUT("]\n");
+        return false;
+    }
+  #endif
+
   if (bus)
     return bus->Write (adr, val, id);
   else

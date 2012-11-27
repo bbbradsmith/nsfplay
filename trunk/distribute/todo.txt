@@ -2,9 +2,7 @@ To Do:
 
 Emu:
 - test $4017=$40 to see if it will clock envelope
-- test all illegal opcodes
 - full-emulation quality option (emulate at M2 speed and downsample)
-- Replace all pcounter with clock based simulation, separate tick/render (todo FDS)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
 - N163 horrible sound accuracy
 - N163 volume vs num channels
@@ -34,7 +32,7 @@ Other:
 - Invert L/R of each channel for rushjet.
 
 Later version:
-- APU debug pin emulatoin
+- APU debug pin emulation
 - wider resample window? (i.e. multi-lobe sinc?)
 - Mac/Linux versions?
 - Foobar2000 plugin
