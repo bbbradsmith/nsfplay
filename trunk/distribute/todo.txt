@@ -30,6 +30,7 @@ Other:
 - Behaviour with 2 NSFs in a playlist is counterintuitive.
 - Bus/stack plugins: register trace, NSF validator, other export tools
 - Invert L/R of each channel for rushjet.
+- Infobox song position needs to be synched with true song position on open.
 
 Later version:
 - APU debug pin emulation
