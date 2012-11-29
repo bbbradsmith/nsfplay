@@ -33,6 +33,7 @@ NES_CPU::NES_CPU (double clock)
 {
   NES_BASECYCLES = clock;
   bus = NULL;
+  log_cpu = NULL;
 }
 
 NES_CPU::~NES_CPU ()
@@ -117,8 +118,13 @@ UINT32 NES_CPU::Exec (UINT32 clock)
     // フレームクロックに到達
     if ( (clock_of_frame>>16) < context.clock)
     {
-      if (breaked) 
+      if (breaked)
+      {
+        if (log_cpu)
+            log_cpu->Play();
+
         startup (int_address);
+      }
       clock_of_frame += clock_per_frame;
       //DEBUG_OUT("NMI\n");
     }
@@ -203,12 +209,15 @@ void NES_CPU::Reset ()
 void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, int y)
 {
   // 割り込みアドレス設定
-      int_address = int_adr;
+  int_address = int_adr;
   clock_per_frame = (int)((double)((1<<16) * NES_BASECYCLES) / int_freq );
   clock_of_frame = 0;
 
   // count clock quarters
   frame_quarter = 3;
+
+  if (log_cpu)
+      log_cpu->Init(a, x);
 
   context.A = a;
   context.X = x;
@@ -221,6 +230,11 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
   }
 
   clock_of_frame = 0;
+}
+
+void NES_CPU::SetLogger (CPULogger* logger)
+{
+    log_cpu = logger;
 }
 
 } // namespace xgm

@@ -596,6 +596,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\devices\Misc\log_cpu.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\devices\Misc\log_cpu.h"
+					>
+				</File>
+				<File
 					RelativePath=".\devices\Misc\nes_detect.cpp"
 					>
 				</File>

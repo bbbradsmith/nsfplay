@@ -106,6 +106,8 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("PAL_BASECYCLES", 1662607);
   CreateValue("DENDY_BASECYCLES", 1773448);
   CreateValue("PREFER_PAL", 0);
+  CreateValue("LOG_CPU", 0);
+  CreateValue("LOG_CPU_FILE", "nsf_write.log");
 
   CreateValue("MASTER_VOLUME", 128);
 

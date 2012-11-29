@@ -22,6 +22,7 @@
 #include "../../devices/audio/echo.h"
 #include "../../devices/audio/MedianFilter.h"
 #include "../../devices/misc/nes_detect.h"
+#include "../../devices/misc/log_cpu.h"
 
 namespace xgm
 {
@@ -71,6 +72,7 @@ namespace xgm
     Filter lpf;                          // 最終出力に掛けるローパスフィルタ
     Compressor cmp;                      // 最終出力段に掛けるコンプレッサ
     ILoopDetector *ld;                   // ループ検出器
+    CPULogger *logcpu;                   // Logs CPU to file
     EchoUnit echo;
     MedianFilter *mfilter;               // プチノイズ対策のメディアンフィルタ
 

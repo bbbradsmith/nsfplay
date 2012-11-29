@@ -31,6 +31,7 @@ Other:
 - Bus/stack plugins: register trace, NSF validator, other export tools
 - Invert L/R of each channel for rushjet.
 - Infobox song position needs to be synched with true song position on open.
+- Document logging feature (LOG_CPU, LOG_CPU_FILE), add UI for it
 
 Later version:
 - APU debug pin emulation
