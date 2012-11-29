@@ -229,7 +229,8 @@ namespace xgm
   {
     rate = r;
 
-    bool pal = UsePal(nsf->pal_ntsc);
+    int region = GetRegion(nsf->pal_ntsc);
+    bool pal = (region == REGION_PAL);
     dmc->SetPal(pal);
 
     for (int i = 0; i < NES_DEVICE_MAX; i++)
@@ -247,9 +248,22 @@ namespace xgm
         1, 3, 3,  3, // VRC7
         1, 5, 8, 20  // FDS
       };
-      sc[i]->SetClock(UsePal(nsf->pal_ntsc) ?
-          config->GetValue("PAL_BASECYCLES").GetInt() :
-          config->GetValue("NTSC_BASECYCLES").GetInt());
+
+      double clock;
+      switch (region)
+      {
+          default:
+          case REGION_NTSC:
+              clock = config->GetValue("NTSC_BASECYCLES").GetInt();
+              break;
+          case REGION_PAL:
+              clock = config->GetValue("PAL_BASECYCLES").GetInt();
+              break;
+          case REGION_DENDY:
+              clock = config->GetValue("DENDY_BASECYCLES").GetInt();
+              break;
+      }
+      sc[i]->SetClock(clock);
 
       int mult = config->GetDeviceConfig(i,"QUALITY").GetInt() & 3;
 
@@ -303,9 +317,20 @@ namespace xgm
     apu_clock_rest = 0.0;
     cpu_clock_rest = 0.0;
 
-    cpu.NES_BASECYCLES = UsePal(nsf->pal_ntsc) ?
-        config->GetValue("PAL_BASECYCLES").GetInt() :
-        config->GetValue("NTSC_BASECYCLES").GetInt() ;
+    int region = GetRegion(nsf->pal_ntsc);
+    switch (region)
+    {
+        default:
+        case REGION_NTSC:
+            cpu.NES_BASECYCLES = config->GetValue("NTSC_BASECYCLES").GetInt();
+            break;
+        case REGION_PAL:
+            cpu.NES_BASECYCLES = config->GetValue("PAL_BASECYCLES").GetInt();
+            break;
+        case REGION_DENDY:
+            cpu.NES_BASECYCLES = config->GetValue("DENDY_BASECYCLES").GetInt();
+            break;
+    }
 
     // 演奏後にRAM空間を破壊される場合があるので，再ロード
     Reload ();
@@ -320,10 +345,13 @@ namespace xgm
 
     double speed;
     if((*config)["VSYNC_ADJUST"])
-      speed = (UsePal(nsf->pal_ntsc) ? 50.0070 : 60.0988);
+        speed = ((region == REGION_NTSC) ? 60.0988 : 50.0070);
     else
-      speed = 1000000.0 / (UsePal(nsf->pal_ntsc)?nsf->speed_pal:nsf->speed_ntsc);
-    DEBUG_OUT("Playback mode: %s\n", UsePal(nsf->pal_ntsc)?"PAL":"NTSC");
+      speed = 1000000.0 / ((region == REGION_NTSC)? nsf->speed_ntsc : nsf->speed_pal);
+    DEBUG_OUT("Playback mode: %s\n",
+        (region==REGION_PAL)?"PAL":
+        (region==REGION_DENDY)?"DENDY":
+        "NTSC");
     DEBUG_OUT("Playback speed: %f\n", speed);
 
     int song = nsf->song;
@@ -335,7 +363,7 @@ namespace xgm
     if (logcpu->GetLogLevel() > 0)
         logcpu->Begin(GetTitleString());
 
-    cpu.Start (nsf->init_address, nsf->play_address, speed, song, UsePal(nsf->pal_ntsc)?1:0);
+    cpu.Start (nsf->init_address, nsf->play_address, speed, song, (region == REGION_PAL)?1:0);
 
     // マスク更新
     apu->SetMask( (*config)["MASK"].GetInt()    );
@@ -795,13 +823,28 @@ namespace xgm
     }
   }
 
-  bool NSFPlayer::UsePal (UINT8 flags)
+  int NSFPlayer::GetRegion (UINT8 flags)
   {
-      if (flags == 0) return false; // NTSC only
-      if (flags == 1) return true; // PAL only
-      // DUAL mode, use preference
-      int pref = config->GetValue("PREFER_PAL").GetInt();
-      return (pref != 0);
+      int pref = config->GetValue("REGION").GetInt();
+
+      // user forced region
+      if (pref == 3) return REGION_NTSC;
+      if (pref == 4) return REGION_PAL;
+      if (pref == 5) return REGION_DENDY;
+
+      // single-mode NSF
+      if (flags == 0) return REGION_NTSC;
+      if (flags == 1) return REGION_PAL;
+
+      if (flags & 2) // dual mode
+      {
+          if (pref == 1) return REGION_NTSC;
+          if (pref == 2) return REGION_PAL;
+          // else pref == 0 or invalid, use auto setting based on flags bit
+          return (flags & 1) ? REGION_PAL : REGION_NTSC;
+      }
+
+      return REGION_NTSC; // fallback for invalid flags
   }
 
 }

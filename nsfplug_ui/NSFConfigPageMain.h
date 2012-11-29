@@ -71,7 +71,7 @@ public:
   BOOL m_bUseAlt;
   afx_msg void OnBnClickedUsealt();
   BOOL m_bVsync;
-  BOOL m_bPrefPal;
+  int m_nRegion;
   BOOL m_bStereo;
   afx_msg void OnBnClickedVsync();
   BOOL m_bNSFePlaylist;

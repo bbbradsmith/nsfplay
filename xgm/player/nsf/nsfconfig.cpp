@@ -105,7 +105,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("NTSC_BASECYCLES", 1789773);
   CreateValue("PAL_BASECYCLES", 1662607);
   CreateValue("DENDY_BASECYCLES", 1773448);
-  CreateValue("PREFER_PAL", 0);
+  CreateValue("REGION", 0);
   CreateValue("LOG_CPU", 0);
   CreateValue("LOG_CPU_FILE", "nsf_write.log");
 
@@ -162,7 +162,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
 
     static const int DEFAULT_DEVICE_OPTION[NES_DEVICE_MAX][16] =
     {
-        { 1, 1, 1, 1 },
+        { 1, 1, 1, 1, 0 },
         { 1, 1, 1, 0, 1, 1 },
         {},
         { 1, 1 },

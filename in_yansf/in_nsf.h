@@ -39,10 +39,6 @@ public:
 
   virtual void GetFileInfo(char *file, char *title, int *length_in_ms)
   {
-    xgm::NSF nsf;
-    
-    nsf.SetDefaults((*cf)["PLAY_TIME"], (*cf)["FADE_TIME"], (*cf)["LOOP_NUM"]);
-
     if(file==NULL||file[0]=='\0')
     {
       strcpy(title,pl->GetTitleString());
@@ -51,6 +47,9 @@ public:
     }
     else
     {
+      xgm::NSF nsf;
+      nsf.SetDefaults((*cf)["PLAY_TIME"], (*cf)["FADE_TIME"], (*cf)["LOOP_NUM"]);
+
       if(nsf.LoadFile(file))
       {
         strcpy(title,nsf.GetTitleString((*cf)["TITLE_FORMAT"]));

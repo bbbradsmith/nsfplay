@@ -460,8 +460,7 @@ static int is_sjis_prefix(int c)
 
     memcpy (extra, image + 0x7c, 4);
 
-    if (body)
-      delete[]body;
+    delete[]body;
     body = new UINT8[size - 0x80];
     memcpy (body, image + 0x80, size - 0x80);
     bodysize = size - 0x80;
@@ -474,8 +473,7 @@ static int is_sjis_prefix(int c)
   bool NSF::LoadNSFe (UINT8 * image, UINT32 size, bool info)
   {
     // store entire file for string references, etc.
-    if (nsfe_image)
-      delete[] nsfe_image;
+    delete[] nsfe_image;
     nsfe_image = new UINT8[size+1];
     ::memcpy(nsfe_image, image, size);
     nsfe_image[size] = 0; // null terminator for safety
@@ -553,8 +551,7 @@ static int is_sjis_prefix(int c)
           song = start - 1;
 
           // body should follow in 'DATA' chunk
-          if (body)
-            delete[] body;
+          delete[] body;
           body = NULL;
           bodysize = 0;
 
@@ -577,8 +574,7 @@ static int is_sjis_prefix(int c)
           if (!info)
             return false;
 
-          if (body)
-            delete[]body;
+          delete[]body;
           body = new  UINT8[chunk_size];
           memcpy (body, chunk, chunk_size);
           bodysize = chunk_size;
