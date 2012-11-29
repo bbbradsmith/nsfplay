@@ -12,14 +12,13 @@ Emu:
 - MMC5 squares, are they nonlinear, does PCM affect them?
 UI:
 - Breakout window for info (nice for looking at NSFe text chunk).
-- Dendy mode options (consider adding a dendy mode to format? maybe save for NSF2)
-- NTSC/PAL preference should have 0="auto"(use 0 bit), 1=prefer pal, 2=prefer ntsc, 3=force pal, 4=force ntsc, 5=force dendy
+- Swapped duty for APU1 panel
+- UI for "REGION" setting 0="auto"(use 0 bit), 1=prefer pal, 2=prefer ntsc, 3=force pal, 4=force ntsc, 5=force dendy
 - Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 - One click button for keyboard view?
 Other:
-- Dendy support: option for dendy override and possibly wrong duty cycle bug?
 - during 5s fadeout seems to be a quiet 60hz buzz
 - Improve loop detection
 - Fix init time allowance to be an actual 1s.
@@ -43,6 +42,7 @@ Later version:
 - Visualizer plugin system.
 - De-MFC GUI, change to a .lib, and build directly into plugin.
 - Remove plugin stubs from xgm, these belong in the plugin project itself.
+- Consider adding a dendy mode to format? maybe save for NSF2?
 
 Unknown:
 - Channel mask caption is ????? in Japanese UI.

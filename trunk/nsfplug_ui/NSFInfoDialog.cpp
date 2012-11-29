@@ -111,7 +111,9 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
   m_songslider.SetPageSize(16);
   m_songslider.SetLineSize(1);
 
-  nsf_copy = (*nsf); nsf_copy.body=NULL; // ヘッダのみコピー  
+  nsf_copy = (*nsf);
+  nsf_copy.body=NULL; // ヘッダのみコピー  
+  nsf_copy.nsfe_image=NULL;
   ntag.SetNSF(&nsf_copy);
 
   // if NSFe text chunk is present, reformat newlines and ensure string termination
@@ -272,6 +274,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
   char path_buffer[_MAX_PATH];
   NSF local_nsf(*ntag.sdat);
   local_nsf.body = NULL;
+  local_nsf.nsfe_image = NULL;
   NSF_TAG local_ntag(&local_nsf);
 
   _makepath( path_buffer, ntag.drv, ntag.dir, ntag.fname, "pls" ); 

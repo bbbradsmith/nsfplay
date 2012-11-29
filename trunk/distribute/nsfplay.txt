@@ -65,7 +65,7 @@ Global options:
   NTSC_BASECYCLES: NTSC master clock speed
   PAL_BASECYCLES: PAL master clock speed
   DENDY_BASECYCLES: DENDY master clock speed
-  PREFER_PAL: 1/0 prefer pal playback for DUAL mode NSFs
+  REGION: (0=auto, 1/2=prefer NTSC/PAL, 3/4/5=force NTSC/PAL/DENDY)
   VRC7_PATCH: 0-7 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
   NSFE_PLAYLIST: 1/0 use playlist data from NSFe when found
@@ -105,6 +105,7 @@ Device options:
   APU1_OPTION1: phase reset
   APU1_OPTION2: frequency limit
   APU1_OPTION3: nonlinear mixing
+  APU1_OPTION4: famiclone swapped duty (1<->2)
   APU2_OPTION0: enable $4011 writes
   APU2_OPTION1: enable periodic noise
   APU2_OPTION2: unmute on reset
@@ -163,6 +164,8 @@ Emulation:
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
 - MMC5 frame sequencer now independant of APU frame sequencer.
 - Time dilation now slows frame sequencer along with CPU rate.
+- Replaced PREFER_PAL setting with REGION, containing more options including Dendy support.
+- Swapped duty option for APU1.
 - More effective implementation of DMC anti-click option.
 - Removed FDS PWM option.
 Other:

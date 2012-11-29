@@ -171,8 +171,13 @@ namespace xgm
     /** time_in_ms時点でのデバイス情報を取得する */
     virtual IDeviceInfo *GetInfo(int time_in_ms, int device_id);
 
-    /** Whether to use PAL based on flags and PREFER_PAL config */
-    virtual bool UsePal(UINT8 flags);
+    /** Whether to use PAL/NTSC/Dendy based on flags and REGION config */
+    virtual int GetRegion(UINT8 flags);
+    enum {
+        REGION_NTSC = 0,
+        REGION_PAL,
+        REGION_DENDY
+    };
   };
 
 }// namespace

@@ -188,6 +188,7 @@ namespace xgm
     option[OPT_PHASE_REFRESH] = true;
     option[OPT_FREQ_LIMIT] = true;
     option[OPT_NONLINEAR_MIXER] = true;
+    option[OPT_DUTY_SWAP] = false;
 
     square_table[0] = 0;
     for(int i=1;i<32;i++) 
@@ -323,6 +324,11 @@ namespace xgm
         envelope_loop[ch] = (val >> 5) & 1;
         envelope_div_period[ch] = (val & 15);
         duty[ch] = (val >> 6) & 3;
+        if (option[OPT_DUTY_SWAP])
+        {
+            if      (duty[ch] == 1) duty[ch] = 2;
+            else if (duty[ch] == 2) duty[ch] = 1;
+        }
         break;
 
       case 0x1:

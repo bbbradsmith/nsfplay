@@ -18,7 +18,7 @@ IMPLEMENT_DYNCREATE(NSFConfigPageMain, CPropertyPage)
 NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 , m_bUseAlt(FALSE)
 , m_bVsync(FALSE)
-, m_bPrefPal(FALSE)
+, m_nRegion(0)
 , m_bStereo(FALSE)
 , m_bNSFePlaylist(FALSE)
 , m_nLimit(0)
@@ -71,7 +71,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     m_format = (CString)(CONFIG["TITLE_FORMAT"]);
     m_bUseAlt = !(int)CONFIG["DETECT_ALT"];
     m_bVsync = CONFIG["VSYNC_ADJUST"];
-    m_bPrefPal = CONFIG["PREFER_PAL"];
+    m_nRegion = CONFIG["REGION"];
     m_bStereo = (CONFIG["NCH"] == 2);
     m_bNSFePlaylist = CONFIG["NSFE_PLAYLIST"];
     m_nLimit = 100 - CONFIG["COMP_LIMIT"];
@@ -100,7 +100,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["DETECT_ALT"]   = !m_bUseAlt;
     CONFIG["TITLE_FORMAT"] = m_format.GetBuffer(128);
     CONFIG["VSYNC_ADJUST"] = m_bVsync;
-    CONFIG["PREFER_PAL"] = m_bPrefPal;
+    CONFIG["REGION"] = m_nRegion;
     CONFIG["NCH"] = m_bStereo ? 2 : 1;
     CONFIG["NSFE_PLAYLIST"] = m_bNSFePlaylist;
     CONFIG["COMP_LIMIT"] = 100 - m_nLimit;
@@ -136,7 +136,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   //}}AFX_DATA_MAP
   DDX_Check(pDX, IDC_USEALT, m_bUseAlt);
   DDX_Check(pDX, IDC_VSYNC, m_bVsync);
-  DDX_Check(pDX, IDC_PREF_PAL, m_bPrefPal);
+  DDX_Check(pDX, IDC_PREF_PAL, m_nRegion); // TODO change UI
   DDX_Check(pDX, IDC_STEREO, m_bStereo);
   DDX_Check(pDX, IDC_NSFEPLS, m_bNSFePlaylist);
   DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
