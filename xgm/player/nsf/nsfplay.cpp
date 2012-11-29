@@ -18,6 +18,7 @@ namespace xgm
     sc[VRC6] = (vrc6 = new NES_VRC6());
     sc[VRC7] = (vrc7 = new NES_VRC7());
     ld = new NESDetector();
+    logcpu = new CPULogger();
 
     dmc->SetAPU(apu); // set APU
     mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
@@ -45,6 +46,7 @@ namespace xgm
     delete vrc6;
     delete vrc7;
     delete ld;
+    delete logcpu;
     delete mfilter;
   }
 
@@ -135,6 +137,20 @@ namespace xgm
     // loop detector ends up at the front of the stack
     // (will capture all writes, but does not capture write)
     stack.Attach (ld);
+
+    int log_level = (*config)["LOG_CPU"];
+    logcpu->SetOption(0, log_level);
+    logcpu->SetSoundchip(nsf->soundchip);
+    if (log_level > 0)
+    {
+        logcpu->SetFilename((*config)["LOG_CPU_FILE"]);
+        stack.Attach(logcpu);
+        cpu.SetLogger(logcpu);
+    }
+    else
+    {
+        cpu.SetLogger(NULL);
+    }
 
     if (bmax) layer.Attach (&bank);
     layer.Attach (&mem);
@@ -315,6 +331,9 @@ namespace xgm
     {
       song = nsf->nsfe_plst[song];
     }
+
+    if (logcpu->GetLogLevel() > 0)
+        logcpu->Begin(GetTitleString());
 
     cpu.Start (nsf->init_address, nsf->play_address, speed, song, UsePal(nsf->pal_ntsc)?1:0);
 

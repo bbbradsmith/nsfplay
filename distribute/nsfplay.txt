@@ -174,6 +174,7 @@ Other:
 - Keyboard frequency display correction for APU/MMC5/VRC6 (were off by 1).
 - Expanded infobox info for NSFe.
 - Fixed improper loading of UI DLL, prevents crash in same folder as Famitracker.
+- LOG_CPU option for dumping register writes to file.
 - Source code cleanup: removing unrelated Z80 emulation code.
 
 NSFPlay 2.2 - 8/31/2012
