@@ -34,6 +34,7 @@ public:
 
 typedef NSFplug_UI * (*CreateNSFplug_UI_t) (NSFplug_Model *cf, int mode);
 typedef void (*DeleteNSFplug_UI_t) (NSFplug_UI *p);
+typedef const char* (*VersionNSFplug_UI_t) ();
 
 /*
  * DLLに簡単にアクセスするためのラッパークラス
@@ -44,6 +45,7 @@ protected:
   HMODULE hModule;
   CreateNSFplug_UI_t pCreate;
   DeleteNSFplug_UI_t pDelete;
+  VersionNSFplug_UI_t pVersion;
   NSFplug_UI *pUI;
 
 public:
@@ -52,10 +54,13 @@ public:
     hModule = LoadLibrary(dllname);
     if(hModule)
     {
-      pCreate = (CreateNSFplug_UI_t)GetProcAddress(hModule, "CreateNSFplug_UI");
-      pDelete = (DeleteNSFplug_UI_t)GetProcAddress(hModule, "DeleteNSFplug_UI");
-      if(pCreate&&pDelete) 
+      pCreate =   (CreateNSFplug_UI_t)GetProcAddress(hModule,  "CreateNSFplug_UI");
+      pDelete =   (DeleteNSFplug_UI_t)GetProcAddress(hModule,  "DeleteNSFplug_UI");
+      pVersion = (VersionNSFplug_UI_t)GetProcAddress(hModule, "VersionNSFplug_UI");
+      if(pCreate && pDelete && pVersion && !::strcmp(pVersion(),NSFPLAY_VERSION))
+      {
         pUI = pCreate(cf,mode); 
+      }
       else 
       {
         //MessageBox(NULL,"Can't get procedure addresses.","ERROR",MB_OK);
@@ -67,6 +72,7 @@ public:
       //MessageBox(NULL,"Can't get UI module.","ERROR",MB_OK);
       pCreate = NULL;
       pDelete = NULL;
+      pVersion = NULL;
       pUI = NULL;
     }
 

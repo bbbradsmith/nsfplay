@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\version.h"
+				>
+			</File>
+			<File
 				RelativePath=".\xgm.h"
 				>
 			</File>

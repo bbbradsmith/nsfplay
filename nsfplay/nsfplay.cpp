@@ -22,6 +22,8 @@
 #include "nsfplay.h"
 #include "nsfplayDlg.h"
 
+#include "../xgm/version.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -83,7 +85,7 @@ BOOL CnsfplayApp::InitInstance()
     } else {
 
         // NOTE this string must match CAPTION in IDD_NSFPLAY_DIALOG in nsfplay.rc
-        CWnd* pWnd = CWnd::FindWindow(NULL, "NSFPlay 2.3 beta 3");
+        CWnd* pWnd = CWnd::FindWindow(NULL, NSFPLAY_TITLE);
         if( pWnd ) {
           pWnd->SetForegroundWindow();
 
