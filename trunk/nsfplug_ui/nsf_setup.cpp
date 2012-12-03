@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "nsf_setup.h"
 
+#include "../xgm/version.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -87,4 +89,9 @@ extern "C" __declspec( dllexport ) NSFplug_UI *CreateNSFplug_UI(NSFplug_Model *c
 extern "C" __declspec( dllexport ) void DeleteNSFplug_UI(NSFplug_UI *p)
 {
   delete p;
+}
+
+extern "C" __declspec( dllexport ) const char* VersionNSFplug_UI()
+{
+  return NSFPLAY_VERSION;
 }

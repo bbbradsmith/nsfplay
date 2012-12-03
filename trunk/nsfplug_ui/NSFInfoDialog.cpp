@@ -142,14 +142,14 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
   if((int)CONFIG["WRITE_TAGINFO"]&&!ntag.IsExistSection(true)&&!ntag.IsExistSection(false))
     ntag.CreateTag(CONFIG["TITLE_FORMAT"]);
 
-  // 
+  // convert backslashes (in Shift JIS backslash is Yen)
   {
     m_info += "FILE=";
     for(const char* c = nsf->filename; *c != 0; ++c)
     {
         if (*c == '\\')
         {
-            m_info += '/'; // convert backslashes (in Shift JIS backslash is Yen)
+            m_info += '/';
         }
         else
         {
@@ -397,7 +397,7 @@ void NSFInfoDialog::OnSave()
 void NSFInfoDialog::OnAbout()
 {
     ::MessageBox(NULL,
-        "NSFPlug " NSFPLUG_VERSION "\n"
+        "NSFPlug " NSFPLAY_VERSION "\n"
         "Brad Smith, " __DATE__ "\n"
         "http://rainwarrior.ca/\n"
         "\n"

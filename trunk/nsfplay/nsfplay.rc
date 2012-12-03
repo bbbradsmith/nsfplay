@@ -2,6 +2,8 @@
 //
 #include "resource.h"
 
+#include "../xgm/version.h"
+
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -81,12 +83,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Digital Sound Antiques"
             VALUE "FileDescription", "NSFPlay"
-            VALUE "FileVersion", "2.3.0.0"
+            VALUE "FileVersion", NSFPLAY_VERSION
             VALUE "InternalName", "nsfplay.EXE"
             VALUE "LegalCopyright", "Public Domain Software"
             VALUE "OriginalFilename", "nsfplay.EXE"
             VALUE "ProductName", "NSFplay"
-            VALUE "ProductVersion", "2.3.0.0"
+            VALUE "ProductVersion", NSFPLAY_VERSION
         END
     END
     BLOCK "VarFileInfo"
@@ -158,14 +160,14 @@ CAPTION "About NSFplay"
 FONT 9, "MS UI Gothic", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAINFRAME,IDC_STATIC,55,7,20,20
-    CTEXT           "NSFPlay version 2.3 beta 3",IDC_STATIC,7,37,114,8,SS_NOPREFIX
+    CTEXT           NSFPLAY_TITLE,IDC_STATIC,7,37,114,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,44,52,39,16,WS_GROUP
 END
 
 IDD_NSFPLAY_DIALOG DIALOGEX 0, 0, 247, 50
 STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
-CAPTION "NSFPlay 2.3 beta 3"
+CAPTION NSFPLAY_TITLE
 FONT 8, "MS Sans Serif", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_TITLE,5,3,237,9,SS_SUNKEN
