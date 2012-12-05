@@ -293,7 +293,6 @@ namespace xgm
       while (frame_sequence_count > frame_sequence_length)
       {
           FrameSequence(frame_sequence_step);
-
           frame_sequence_count -= frame_sequence_length;
           ++frame_sequence_step;
           if(frame_sequence_step >= frame_sequence_steps)
@@ -540,13 +539,21 @@ namespace xgm
     if (adr == 0x4017)
     {
       //DEBUG_OUT("4017 = %02X\n", val);
-
       frame_irq_enable = ((val & 0x40) == 0x40);
+      frame_irq = (frame_irq_enable ? frame_irq : 0);
       frame_sequence_count = 0;
-      frame_sequence_steps = ((val & 0x80) == 0x80) ? 5 : 4;
-      frame_sequence_step = (frame_sequence_steps == 5) ? 0 : 1;
-      FrameSequence(frame_sequence_step);
-      ++frame_sequence_step;
+      if (val & 0x80)
+      {
+        frame_sequence_steps = 5;
+        frame_sequence_step = 0;
+        FrameSequence(frame_sequence_step);
+        ++frame_sequence_step;
+      }
+      else
+      {
+        frame_sequence_steps = 4;
+        frame_sequence_step = 1;
+      }
     }
 
     if (adr<0x4008||0x4013<adr)

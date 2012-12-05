@@ -382,9 +382,10 @@ namespace xgm
       return true;
     }
 
-    else if (adr == 0x4017)
-    {
-    }
+    // 4017 is handled in nes_dmc.cpp
+    //else if (adr == 0x4017)
+    //{
+    //}
 
     return false;
   }
