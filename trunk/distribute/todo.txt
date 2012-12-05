@@ -1,7 +1,6 @@
 To Do:
 
 Emu:
-- test $4017=$40 to see if it will clock envelope
 - full-emulation quality option (emulate at M2 speed and downsample)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
 - N163 horrible sound accuracy
