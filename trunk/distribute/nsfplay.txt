@@ -127,7 +127,7 @@ Channel options:
   5B_NOISE_COL: keyboard colour for 5B noise
 
 VRC7 patch sets: (VRC7_PATCH)
-  0 - VRC7 set by rainwarrior 8/01/2012
+  0 - VRC7 set by rainwarrior 8/01/2012 (used by Famitracker 0.4.0)
   1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.6)
   2 - VRC7 set by Mitsutaka Okazaki 6/24/2001 (used by Famitracker 0.3.5 and prior)
   3 - VRC7 set by Mitsutaka Okazaki 4/10/2004
