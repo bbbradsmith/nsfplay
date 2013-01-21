@@ -10,6 +10,7 @@ Emu:
 - FDS total rewrite for clock synch, better volume balance, etc.
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
+- Triangle phase randomize init option.
 UI:
 - Breakout window for info (nice for looking at NSFe text chunk).
 - Swapped duty for APU1 panel
@@ -36,10 +37,22 @@ Later version:
 - Foobar2000 plugin
 - KB plugin
 - NSF2
-- Visualizer plugin system.
+- Visualizer plugin system. Full register view capability.
 - De-MFC GUI, change to a .lib, and build directly into plugin.
 - Remove plugin stubs from xgm, these belong in the plugin project itself.
 - Consider adding a dendy mode to format? maybe save for NSF2?
+
+NSF validation / debug log:
+- maybe just build into register logger
+- VRC7 speed limit
+- illegal opcodes
+- IRQ usage
+- FDS vs other expansions
+- log play/init events
+- log all writes, APU writes
+- log all reads. etc.
+- instruction trace?
+- list expansions and other NSF header info
 
 Unknown:
 - Channel mask caption is ????? in Japanese UI.
