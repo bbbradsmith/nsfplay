@@ -274,7 +274,7 @@ namespace xgm
       trkinfo[trk].freq = 0;
 
     trkinfo[trk].output = out[trk];
-    trkinfo[trk].volume = volume[trk]+(envelope_disable[trk]?0:0x10);
+    trkinfo[trk].volume = volume[trk]+(envelope_disable[trk]?0:0x10)+(envelope_loop[trk]?0x20:0);
     trkinfo[trk].key =
         enable[trk] &&
         length_counter[trk] > 0 &&

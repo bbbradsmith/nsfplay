@@ -53,6 +53,7 @@ NSF validation / debug log:
 - log all reads. etc.
 - instruction trace?
 - list expansions and other NSF header info
+- writes to register mirrors
 
 Unknown:
 - Channel mask caption is ????? in Japanese UI.
