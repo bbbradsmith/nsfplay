@@ -347,7 +347,7 @@ namespace xgm
     if((*config)["VSYNC_ADJUST"])
         speed = ((region == REGION_NTSC) ? 60.0988 : 50.0070);
     else
-      speed = 1000000.0 / ((region == REGION_NTSC)? nsf->speed_ntsc : nsf->speed_pal);
+        speed = 1000000.0 / ((region == REGION_NTSC)? nsf->speed_ntsc : nsf->speed_pal);
     DEBUG_OUT("Playback mode: %s\n",
         (region==REGION_PAL)?"PAL":
         (region==REGION_DENDY)?"DENDY":

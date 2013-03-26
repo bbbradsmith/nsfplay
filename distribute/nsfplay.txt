@@ -50,14 +50,14 @@ Global options:
   FADE_TIME: (ms) fade out time
   STOP_SEC: (s) seconds of silence before auto stop
   LOOP_NUM: (#) loops to allow before stopping
-  AUTO_STOP: 1/0 automatically stop after silence yes/no
+  AUTO_STOP: 1=automatically stop after silence
   DETECT_TIME: (ms) loop detection comparison buffer
   DETECT_INT: (ms) jitter allowed between time comparisons in loop detection
   LPF: 0-400 lowpass filter strength (0=off, 400=full)
   HPF: 0-256 highpass filter strength (256=off, 0=full)
   TITLE_FORMAT: title string format (see below), default: %L (%n/%e) %T - %A
-  DETECT_ALT: 1/0 use alternate loop detection algorithm
-  VSYNC_ADJUST: 1/0 ignore NSF frame length setting (yes/no)
+  DETECT_ALT: 1=use alternate loop detection algorithm
+  VSYNC_ADJUST: 1=ignore NSF frame length setting
   MULT_SPEED: clock multiplier (256 = no multiplier)
   COMP_LIMIT: 0-100 compressor limit
   COMP_THRESHOLD: 0-100 compressor threshold
@@ -65,19 +65,19 @@ Global options:
   NTSC_BASECYCLES: NTSC master clock speed
   PAL_BASECYCLES: PAL master clock speed
   DENDY_BASECYCLES: DENDY master clock speed
-  REGION: (0=auto, 1/2=prefer NTSC/PAL, 3/4/5=force NTSC/PAL/DENDY)
+  REGION: 0=auto, 1/2=prefer NTSC/PAL, 3/4/5=force NTSC/PAL/DENDY
   VRC7_PATCH: 0-7 patch set for VRC7 (see below)
   MASTER_VOLUME: 0-255 master volume
-  NSFE_PLAYLIST: 1/0 use playlist data from NSFe when found
+  NSFE_PLAYLIST: 1=use playlist data from NSFe when found
   WRITE_TAGINFO: ?
   READ_TAGINFO: ?
   UPDATE_PLAYLIST: ?
-  MASK_INIT: ?
-  INFO_DELAY: ?
-  INFO_FREQ: ?
-  GRAPHIC_MODE: ?
-  FREQ_MODE: ?
-  LAST_PRESET: ?
+  MASK_INIT: 1=clear channel mask on play
+  INFO_DELAY: (ms) latency delay for keyboard view
+  INFO_FREQ: (Hz) keyboard view update frequency
+  GRAPHIC_MODE: 1=display graphical waveforms for FDS/N163
+  FREQ_MODE: 1=display Hz in keyboard view, 0=display hexadecimal pitch register
+  LAST_PRESET: name of the last sound preset used
   INI_FILE: ?
 
 TITLE_FORMAT text replacement:
@@ -168,13 +168,15 @@ Emulation:
 - Swapped duty option for APU1.
 - More effective implementation of DMC anti-click option.
 - Removed FDS PWM option.
-Other:
 - Fixed broken oversampling filter.
+Other:
 - Better small icon.
 - Thinner DPCM address display, does not get truncated.
 - Using # instead of + for note names.
 - Cosmetic fixes in settings dialog.
 - Keyboard frequency display correction for APU/MMC5/VRC6 (were off by 1).
+- Keyboard envelope display now shows L for loop.
+- N163 waveform display now hides waveform when track is muted with a wave length >= 128.
 - Expanded infobox info for NSFe.
 - Fixed improper loading of UI DLL, prevents crash in same folder as Famitracker.
 - UI DLL now reports version, preventing potential problems if mismatched.

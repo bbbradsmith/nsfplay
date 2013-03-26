@@ -192,10 +192,10 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
           case NSFPlayer::FME7_TRK0:
           case NSFPlayer::FME7_TRK1:
           case NSFPlayer::FME7_TRK2:
-            if(vol>15)
-              str.Format("E%2d",(vol&=0xF));
+            if(vol & 0x10)
+                str.Format("%s%2d",((vol&0x20)?"L":"E"),(vol&=0xF));
             else if(vol>=0)
-              str.Format("%2d",ti->GetVolume()); 
+              str.Format("%2d",(vol&0xF)); 
             else
               str="-";
             break;
@@ -366,6 +366,12 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
                 m_pDCtrk->FillSolidRect(rect,RGB(0,0,0));
                 rect.bottom -=1;
                 int length = min(dynamic_cast<TrackInfoN106 *>(ti)->wavelen, rect.Width());
+                if (ti->GetVolume() == 0 && length >= 128)
+                {
+                    // hide waves that are muted and long
+                    // (engines frequently wipe most or all of the length register when muted)
+                    length = 0;
+                }
                 //int mid = (rect.top + rect.bottom)/2;
                 m_pDCtrk->MoveTo(rect.left,rect.bottom);
                 m_pDCtrk->LineTo(rect.left+length,rect.bottom);            
