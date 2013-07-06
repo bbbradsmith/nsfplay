@@ -53,8 +53,8 @@ Global options:
   AUTO_STOP: 1=automatically stop after silence
   DETECT_TIME: (ms) loop detection comparison buffer
   DETECT_INT: (ms) jitter allowed between time comparisons in loop detection
-  LPF: 0-400 lowpass filter strength (0=off, 400=full)
-  HPF: 0-256 highpass filter strength (256=off, 0=full)
+  LPF: 0-400 lowpass filter strength (0=off, 112=default, 400=full)
+  HPF: 0-256 highpass filter strength (256=off, 164=default, 0=full)
   TITLE_FORMAT: title string format (see below), default: %L (%n/%e) %T - %A
   DETECT_ALT: 1=use alternate loop detection algorithm
   VSYNC_ADJUST: 1=ignore NSF frame length setting
@@ -161,13 +161,13 @@ NSFPlay 2.3 BETA 3 - ??/??/????
 Emulation:
 - All illegal 6502 opcodes are now emulated.
 - Audio emulation is now driven by CPU clock cycles, increases timing accuracy.
+- FDS emulation completely rewritten for better accuracy.
 - APU frame sequencer now correctly driven by $4017, supports 4 and 5 step modes, immediate reset, and IRQ flag.
 - MMC5 frame sequencer now independant of APU frame sequencer.
 - Time dilation now slows frame sequencer along with CPU rate.
 - Replaced PREFER_PAL setting with REGION, containing more options including Dendy support.
 - Swapped duty option for APU1.
 - More effective implementation of DMC anti-click option.
-- Removed FDS PWM option.
 - Fixed broken oversampling filter.
 Other:
 - Better small icon.

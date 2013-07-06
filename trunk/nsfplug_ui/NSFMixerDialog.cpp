@@ -100,7 +100,7 @@ BOOL NSFMixerDialog::OnInitDialog()
 
 void NSFMixerDialog::OnReset() 
 {
-  int defvols[NES_DEVICE_MAX] = { 128, 128, 112, 128, 128,  90,  96,  80 };
+  int defvols[NES_DEVICE_MAX] = { 128, 128, 112, 128, 128,  90,  96, 128 };
 
   for(int i=0;i<NES_DEVICE_MAX; i++)
     panel[i].SetVolume(defvols[i]);

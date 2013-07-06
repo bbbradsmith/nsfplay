@@ -6,15 +6,16 @@ Emu:
 - N163 horrible sound accuracy
 - N163 volume vs num channels
 - VRC7 emulation accuracy
-- FDS high frequency modulation behaviour, verify against hardware
-- FDS total rewrite for clock synch, better volume balance, etc.
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
+- Triangle at freq 0 creates audible high frequency tone? Is this accurate? See Silver Surfer ends of tracks.
+- FDS cutoff configurable, replace with integer operation
 UI:
 - Breakout window for info (nice for looking at NSFe text chunk).
 - Swapped duty for APU1 panel
 - UI for "REGION" setting 0="auto"(use 0 bit), 1=prefer pal, 2=prefer ntsc, 3=force pal, 4=force ntsc, 5=force dendy
+- UI for FDS options (old options gone, new cutoff option)
 - Vertical stacking for multiple key dots on same pitch?
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
@@ -41,6 +42,9 @@ Later version:
 - De-MFC GUI, change to a .lib, and build directly into plugin.
 - Remove plugin stubs from xgm, these belong in the plugin project itself.
 - Consider adding a dendy mode to format? maybe save for NSF2?
+
+NSFs:
+- Sesame Street Countdown does not play. Bad rip?
 
 NSF validation / debug log:
 - maybe just build into register logger

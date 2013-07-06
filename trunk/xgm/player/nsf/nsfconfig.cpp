@@ -138,7 +138,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   for (i = 0; i < NES_DEVICE_MAX; i++)
   {
     static const int DEVICE_VOLUME[NES_DEVICE_MAX] = {
-        128, 128, 112, 128, 128,  90,  96,  80 };
+        128, 128, 112, 128, 128,  90,  96, 128 };
 
     std::string str;
     str = dname[i];
@@ -157,7 +157,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         0, // N163
         0, // VRC6
         0, // VRC7
-        NES_FDS::OPT_END
+        0, // FDS
     };
 
     static const int DEFAULT_DEVICE_OPTION[NES_DEVICE_MAX][16] =

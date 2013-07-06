@@ -68,7 +68,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     m_nHpfValue = 256 - CONFIG["HPF"];
     m_nLpfValue = CONFIG["LPF"];
     m_bMaskInit = CONFIG["MASK_INIT"];
-    m_format = (CString)(CONFIG["TITLE_FORMAT"]);
+    m_format = CString(CONFIG["TITLE_FORMAT"]);
     m_bUseAlt = !(int)CONFIG["DETECT_ALT"];
     m_bVsync = CONFIG["VSYNC_ADJUST"];
     m_nRegion = CONFIG["REGION"];
@@ -98,7 +98,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["LPF"]   = m_nLpfValue;
     CONFIG["MASK_INIT"]    = m_bMaskInit;
     CONFIG["DETECT_ALT"]   = !m_bUseAlt;
-    CONFIG["TITLE_FORMAT"] = m_format.GetBuffer(128);
+    CONFIG["TITLE_FORMAT"] = m_format;
     CONFIG["VSYNC_ADJUST"] = m_bVsync;
     CONFIG["REGION"] = m_nRegion;
     CONFIG["NCH"] = m_bStereo ? 2 : 1;
