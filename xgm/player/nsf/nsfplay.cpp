@@ -755,8 +755,8 @@ namespace xgm
       dmc->SetMask((*config)["MASK"].GetInt()>>2);
       break;
     case FDS:
-      for (i = 0; i < NES_FDS::OPT_END; i++)
-        fds->SetOption (i, config->GetDeviceOption(id,i).GetInt());
+      //for (i = 0; i < NES_FDS::OPT_END; i++)
+      //  fds->SetOption (i, config->GetDeviceOption(id,i).GetInt());
       fds->SetMask((*config)["MASK"].GetInt()>>5);
       break;
     case MMC5:

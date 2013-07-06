@@ -34,15 +34,17 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
 
   if(b)
   {
-    m_car_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH).GetInt();
-    m_mod_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH).GetInt();
+    // TODO remove
+    //m_car_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH).GetInt();
+    //m_mod_phase_refresh = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH).GetInt();
     UpdateData(FALSE);
   }
   else
   {
     UpdateData(TRUE);
-    pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH) = m_car_phase_refresh; 
-    pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH) = m_mod_phase_refresh;
+    //pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CAR_PHASE_REFRESH) = m_car_phase_refresh; 
+    //pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_MOD_PHASE_REFRESH) = m_mod_phase_refresh;
+    // TODO remove
     pm->cf->Notify(FDS);
   }
 }

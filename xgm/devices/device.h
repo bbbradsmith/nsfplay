@@ -9,7 +9,7 @@
 
 namespace xgm
 {
-  const double DEFAULT_CLOCK = 21477272.0;
+  const double DEFAULT_CLOCK = 1789772.0;
   const int DEFAULT_RATE = 44100;
 
   /**

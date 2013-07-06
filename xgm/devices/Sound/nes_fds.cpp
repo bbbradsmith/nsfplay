@@ -1,353 +1,366 @@
 #include "nes_fds.h"
 
-namespace xgm
-{
+namespace xgm {
 
-  NES_FDS::NES_FDS ()
-  {
+// HACK
+double rc_last = 0.0;
+double rc_leak = 0.0;
+double rc_add  = 1.0;
+
+NES_FDS::NES_FDS ()
+{
     SetClock (DEFAULT_CLOCK);
     SetRate (DEFAULT_RATE);
-    option[OPT_MOD_PHASE_REFRESH] = true;
-    option[OPT_CAR_PHASE_REFRESH] = false;
-
     sm[0] = 128;
     sm[1] = 128;
-  }
 
-  NES_FDS::~NES_FDS ()
-  {
-  }
+    Reset();
+}
 
-  void NES_FDS::SetStereoMix(int trk, xgm::INT16 mixl, xgm::INT16 mixr)
-  {
-      if (trk < 0) return;
-      if (trk > 1) return;
-      sm[0] = mixl;
-      sm[1] = mixr;
-  }
+NES_FDS::~NES_FDS ()
+{
+}
 
-  ITrackInfo *NES_FDS::GetTrackInfo(int trk)
-  {
-    trkinfo.max_volume = 0x21;
-    trkinfo.volume = envelope_output[0];
-    trkinfo.key = (envelope_output[0]>0);
-    trkinfo._freq = freq[0];
-    trkinfo.freq = freq[0]?clock/64*freq[0]/0x10000*2:0.0;
+void NES_FDS::SetStereoMix(int trk, xgm::INT16 mixl, xgm::INT16 mixr)
+{
+    if (trk < 0) return;
+    if (trk > 1) return;
+    sm[0] = mixl;
+    sm[1] = mixr;
+}
+
+ITrackInfo *NES_FDS::GetTrackInfo(int trk)
+{
+    trkinfo.max_volume = 32;
+    trkinfo.volume = last_vol;
+    trkinfo.key = last_vol > 0;
+    trkinfo._freq = last_freq;
+    trkinfo.freq = (double(last_freq) * clock) / (65536.0 * 64.0);
     trkinfo.tone = 0;
     for(int i=0;i<64;i++)
-      trkinfo.wave[i] = wave[0][i];
-    
+        trkinfo.wave[i] = wave[TWAV][i];
+
     return &trkinfo;
-  }
+}
 
-  void NES_FDS::SetClock (double c)
-  {
+void NES_FDS::SetClock (double c)
+{
     clock = c;
-  }
+}
 
-  void NES_FDS::SetRate (double r)
-  {
-    //rate = r ? r : DEFAULT_RATE;
-    rate = clock;
-  }
+void NES_FDS::SetRate (double r)
+{
+    rate = r;
 
-  void NES_FDS::SetOption (int id, int val)
-  {
-    if(id<OPT_END) option[id] = val;
-  }
+    // configure lowpass filter
+    const double CUTOFF = 2000.0;
+    rc_leak = ::exp(-2.0 * 3.14159 * CUTOFF / rate);
+    rc_add  = 1.0 - rc_leak;
+}
 
-  void NES_FDS::Reset ()
-  {
-    int i;
+void NES_FDS::SetOption (int id, int val)
+{
+    //if(id<OPT_END) option[id] = val;
+}
 
-    wavidx = 0;
-    geta = clock / rate;
-    mask = 0;
+void NES_FDS::Reset ()
+{
+    master_io = true;
+    master_vol = 0;
+    last_freq = 0;
+    last_vol = 0;
 
-    for (i = 0x4040; i < 0x4100; i++)
-      Write (i, 0);
-
-    Write (0x408A, 232);
-
-    for (i = 0; i < 0x40; i++)
+    for (int i=0; i<2; ++i)
     {
-      wave[0][i] = 0;
-      wave[1][i] = 0;
+        ::memset(wave[i], 0, sizeof(wave[i]));
+        freq[i] = 0;
+        phase[i] = 0;
+    }
+    wav_write = false;
+    wav_halt = true;
+    env_halt = true;
+    mod_halt = true;
+    mod_pos = 0;
+
+    for (int i=0; i<2; ++i)
+    {
+        env_mode[i] = false;
+        env_disable[i] = true;
+        env_timer[i] = 0;
+        env_speed[i] = 0;
+        env_out[i] = 0;
+    }
+    master_env_speed = 0xFF;
+
+    // NOTE: the FDS BIOS reset only does the following related to audio:
+    //   $4023 = $00
+    //   $4023 = $83 enables master_io
+    //   $4080 = $80 output volume = 0, envelope disabled
+    //   $408A = $FF master envelope speed set to slowest
+}
+
+void NES_FDS::Tick (UINT32 clocks)
+{
+    // clock envelopes
+    if (!env_halt && !wav_halt)
+    {
+        for (int i=0; i<2; ++i)
+        {
+            if (!env_disable[i])
+            {
+                env_timer[i] += clocks;
+                UINT32 period = ((env_speed[i]+1) * master_env_speed) << 3;
+                while (env_timer[i] >= period)
+                {
+                    // clock the envelope
+                    if (env_mode[i])
+                    {
+                        if (env_out[i] < 32) ++env_out[i];
+                    }
+                    else
+                    {
+                        if (env_out[i] > 0 ) --env_out[i];
+                    }
+                    env_timer[i] -= period;
+                }
+            }
+        }
     }
 
-    for (i = 0; i < 2; i++)
+    // clock the mod table
+    if (!mod_halt)
     {
-      pcounter[i] = 0;
-      phase[i] = 0;
-      opout[i] = 0;
-      opval[i] = 0;
-      envelope_output[i] = 0;
-      ecounter[i] = 0;
-    }
-  }
+        // advance phase, adjust for modulator
+        UINT32 start_pos = phase[TMOD] >> 16;
+        phase[TMOD] += (clocks * freq[TMOD]);
+        UINT32 end_pos = phase[TMOD] >> 16;
 
-  void NES_FDS::update_envelope (int ch)
-  {
-    while (ecounter[ch] >= 1.0)
-    {
-      if (envelope_mode[ch] == 0)
-      {
-        if (envelope_amount[ch])
-          envelope_amount[ch]--;
-      }
-      else if (envelope_mode[ch] == 1)
-      {
-        if (envelope_amount[ch] < 0x20) // envelope should not push above $20
-          envelope_amount[ch]++;
-      }
-      ecounter[ch] -= 1.0;
+        // wrap the phase to the 64-step table (+ 16 bit accumulator)
+        phase[TMOD] = phase[TMOD] & 0x3FFFFF;
+
+        // execute all clocked steps
+        for (UINT32 p = start_pos; p < end_pos; ++p)
+        {
+            INT32 wv = wave[TMOD][p & 0x3F];
+            if (wv == 4) // 4 resets mod position
+                mod_pos = 0;
+            else
+            {
+                const INT32 BIAS[8] = { 0, 1, 2, 4, 0, -4, -2, -1 };
+                mod_pos += BIAS[wv];
+                mod_pos &= 0x7F; // 7-bit clamp
+            }
+        }
     }
 
-    if (!envelope_disable)
-      ecounter[ch] += ecounter_incr[ch];
-  }
-
-  INT32 NES_FDS::calc ()
-  {
-    static const int vtable[4] = { 48, 32, 24, 16 };
-
-    static const int ctable[4] = { 36, 24, 18, 16 };
-
-    /* Modulator */
-    //opout[1] =
-    //  ((opval[1] & 0x40) ? (opval[1] - 128) : opval[1]) * envelope_output[1];
-    // BS setting modulator output after updating it
-
-    //if (!envelope_disable)
-    //  envelope_output[1] =
-    //    envelope_amount[1] < 0x21 ? envelope_amount[1] : 0x20;
-    // BS again, doing this after update, also removing cap ($4085 can set it higher than 0x20)
-
-    while (pcounter[1] >= 1.0)
+    // clock the wav table
+    if (!wav_halt)
     {
-      if (wave[1][phase[1]] == -1)
-        opval[1] = 0;
-      else
-        opval[1] = (opval[1] + wave[1][phase[1]]) & 0x7f;
-      phase[1] = (phase[1] + 1) & 0x3f;
-      pcounter[1] -= 1.0;
-    }
-    pcounter[1] += incr[1];
-    update_envelope (1);
+        // complex mod calculation
+        INT32 mod = 0;
+        if (env_out[EMOD] != 0) // skip if modulator off
+        {
+            // convert mod_pos to 7-bit signed
+            INT32 pos = (mod_pos < 64) ? mod_pos : (mod_pos-128);
 
-    // setting envelope_output after updating
-    if (!envelope_disable) envelope_output[1] = envelope_amount[1];
+            // multiply pos by gain,
+            // shift off 4 bits but with odd "rounding" behaviour
+            INT32 temp = pos * env_out[EMOD];
+            INT32 rem = temp & 0x0F;
+            temp >>= 4;
+            if ((rem > 0) && ((temp & 0x80) == 0))
+            {
+                if (pos < 0) temp -= 1;
+                else         temp += 2;
+            }
 
-    /* Carrier */
-    opout[0] = wave[0][phase[0]];
+            // wrap if range is exceeded
+            while (temp >= 192) temp -= 256;
+            while (temp <  -64) temp += 256;
 
-    while (pcounter[0] >= 1.0)
-    {
-      phase[0] = (phase[0] + 1) & 0x3f;
-      if (!phase[0])
-        envelope_output[0] =
-          //envelope_amount[0] < 0x21 ? envelope_amount[0] : 0x20;
-          // BS should not cap this, $4080 can set it higher
-          envelope_amount[0];
-      pcounter[0] -= 1.0;
+            // multiply result by pitch,
+            // shift off 6 bits, round to nearest
+            temp = freq[TWAV] * temp;
+            rem = temp & 0x3F;
+            temp >>= 6;
+            if (rem >= 32) temp += 1;
+
+            mod = temp;
+        }
+
+        // advance wavetable position
+        INT32 f = freq[TWAV] + mod;
+        phase[TWAV] = phase[TWAV] + (clocks * f);
+        phase[TWAV] = phase[TWAV] & 0x3FFFFF; // wrap
+
+        // store for trackinfo
+        last_freq = f;
     }
 
-    if (!write_enable[0])
-    {
-      // ’ˆÓ)fdssound.txt‚Æ‚Í3072`4095‚Ì”ÍˆÍ‚ªˆÙ‚È‚éB
-      //INT32 fm =
-      //  (((4096 + 1024 + opout[1]) & 4095) / 16) - 64 + ((opout[1] > 0)
-      //                                                   && (opout[1] & 0xf) ?
-      //                                                   2 : 0);
+    // output volume caps at 32
+    INT32 vol_out = env_out[EVOL];
+    if (vol_out > 32) vol_out = 32;
 
-      // BS rewriting FDS modulation according to disch's FDS.txt
-      INT32 sweep_bias = (opval[1] >= 64) ? (opval[1] - 128) : opval[1];
-      opout[1] = sweep_bias * envelope_output[1];
+    // final output
+    if (!wav_write)
+        fout = wave[TWAV][(phase[TWAV]>>16)&0x3F] * vol_out;
 
-      INT32 fm = opout[1]; // temp = sweep bias * sweep gain
-      if (fm & 0x0F)
-      {
-          fm /= 16;
-          if (sweep_bias < 0) fm -= 1;
-          else                fm += 2;
-      }
-      else
-      {
-          fm /= 16;
-      }
-      if (fm > 193) fm -= 258;
-      if (fm < -64) fm += 256;
+    // NOTE: during wav_halt, the unit still outputs (at phase 0)
+    // and volume can affect it if the first sample is nonzero.
+    // haven't worked out 100% of the conditions for volume to
+    // effect (vol envelope does not seem to run, but am unsure)
+    // but this implementation is very close to correct
 
-      if (write_enable[1]) // disable modulator if $4080 bit 7 set
-      {
-        fm = 0;
-      }
+    // store for trackinfo
+    last_vol = vol_out;
+}
 
-      pcounter[0] += incr[0] + (incr[0] * double(fm)) / 64.0;
-    }
+UINT32 NES_FDS::Render (INT32 b[2])
+{
+    // 8 bit approximation of master volume
+    const double MASTER_VOL = 2.4 * 1223.0; // max FDS vol vs max APU square (arbitrarily 1223)
+    const double MAX_OUT = 32.0f * 63.0f; // value that should map to master vol
+    const INT32 MASTER[4] = {
+        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 2.0f),
+        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 3.0f),
+        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 4.0f),
+        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 5.0f) };
 
-    update_envelope (0);
+    INT32 v = fout * MASTER[master_vol] >> 8;
 
-    opout[0] *= envelope_output[0];
-    
-    return (opout[0] * vtable[volume & 3]) >> 4;
-  }
+    // TODO
+    // lowpass RC filter appropriate to RATE
+    double rc_filtered = (rc_last * rc_leak) + (double(v) *  rc_add);
+    rc_last = rc_filtered;
+    v = INT32(rc_filtered);
 
-  void NES_FDS::Tick (UINT32 clocks)
-  {
-    // TODO this is really inefficient (need to rewrite FDS anyway)
-    while (clocks--)
-        fout = calc();
-  }
-
-  UINT32 NES_FDS::Render (INT32 b[2])
-  {
-    INT32 m = fout;
+    INT32 m = v;
     m = mask ? 0 : m;
 
     b[0] = (m * sm[0]) >> 7;
     b[1] = (m * sm[1]) >> 7;
 
     return 2;
-  }
+}
 
-  bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
-  {
-    UINT8 btable[] = { 0, 1, 2, 4, 0xff, 128 - 4, 128 - 2, 128 - 1 };
-
-    if (0x4040 <= adr && adr < 0x4080)
+bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
+{
+    // $4023 master I/O enable/disable
+    if (adr == 0x4023)
     {
-      if (write_enable[0])
-        wave[0][adr & 0x3f] = (val & 0x3f) - 0x20;
-      return true;
+        master_io = ((val & 2) != 0);
+        return true;
     }
 
-    switch (adr)
+    if (!master_io)
+        return false;
+    if (adr < 0x4040 || adr > 0x408A)
+        return false;
+
+    if (adr < 0x4080) // $4040-407F wave table write
     {
-    case 0x4080:
-      envelope_mode[0] = (val >> 6) & 3;
-      if (envelope_mode[0] & 2)
-        envelope_amount[0] = val & 0x3f;
-      else
-      {
-        if (envelope_speed)
-          ecounter_incr[0] =
-            geta / ((8 * envelope_speed) * ((val & 0x3f) + 1));
-        else
-          ecounter_incr[0] = 0.0;
-      }
-      break;
+        if (wav_write)
+            wave[TWAV][adr - 0x4040] = val & 0x3F;
+        return true;
+    }
 
-    case 0x4082:
-      freq[0] = (freq[0] & 0xf00) | (val & 0xff);
-      incr[0] = geta * freq[0] / 65536.0;
-      break;
-
-    case 0x4083:
-      freq[0] = ((val & 0x0f) << 8) | (freq[0] & 0xff);
-      incr[0] = geta * freq[0] / 65536.0;
-      sound_disable = (val >> 7) & 1;
-      if (sound_disable)
-        pcounter[0] = 0;
-      envelope_disable = (val >> 6) & 1;
-      if (option[OPT_CAR_PHASE_REFRESH])
-      {
-        phase[0] = 0;
-        pcounter[0] = 0;
-      }
-      break;
-
-    case 0x4084:
-      envelope_mode[1] = (val >> 6) & 3;
-      if (envelope_mode[1] & 2)
-        envelope_amount[1] = val & 0x3f;
-      else
-      {
-        if (envelope_speed)
-          ecounter_incr[1] =
-            geta / ((8 * envelope_speed) * ((val & 0x3f) + 1));
-        else
-          ecounter_incr[1] = 0.0;
-      }
-      break;
-
-    case 0x4085:
-      opval[1] = val & 0x7f;
-      if (option[OPT_MOD_PHASE_REFRESH])
-      {
-        phase[1] = 0;
-        pcounter[1] = 0;
-      }
-      break;
-
-    case 0x4086:
-      freq[1] = (freq[1] & 0xf00) | (val & 0xff);
-      incr[1] = geta * freq[1] / 65536.0;
-      break;
-
-    case 0x4087:
-      freq[1] = ((val & 0x0f) << 8) | (freq[1] & 0xff);
-      incr[1] = geta * freq[1] / 65536.0;
-      write_enable[1] = (val >> 7) & 1;
-      break;
-
-    case 0x4088:
-      if (write_enable[1])
-      {
-        wave[1][(wavidx++) & 0x3f] = btable[val & 7];
-        wave[1][(wavidx++) & 0x3f] = btable[val & 7];
-      }
-      break;
-
-    case 0x4089:
-      write_enable[0] = (val >> 7) & 1;
-      volume = (val & 3);
-      break;
-
-    case 0x408A:
-      envelope_speed = val & 0xff;
-      break;
-
-    case 0x4023:
-      break;
-
+    switch (adr & 0x00FF)
+    {
+    case 0x80: // $4080 volume envelope
+        env_disable[EVOL] = ((val & 0x80) != 0);
+        env_mode[EVOL] = ((val & 0x40) != 0);
+        env_timer[EVOL] = 0;
+        env_speed[EVOL] = val & 0x3F;
+        if (env_disable[EVOL])
+            env_out[EVOL] = env_speed[EVOL];
+        return true;
+    case 0x81: // $4081 ---
+        return false;
+    case 0x82: // $4082 wave frequency low
+        freq[TWAV] = (freq[TWAV] & 0xF00) | val;
+        return true;
+    case 0x83: // $4083 wave frequency high / enables
+        freq[TWAV] = (freq[TWAV] & 0x0FF) | ((val & 0x0F) << 8);
+        wav_halt = ((val & 0x80) != 0);
+        env_halt = ((val & 0x40) != 0);
+        if (wav_halt)
+            phase[TWAV] = 0;
+        if (env_halt)
+        {
+            env_timer[EMOD] = 0;
+            env_timer[EVOL] = 0;
+        }
+        return true;
+    case 0x84: // $4084 mod envelope
+        env_disable[EMOD] = ((val & 0x80) != 0);
+        env_mode[EMOD] = ((val & 0x40) != 0);
+        env_timer[EMOD] = 0;
+        env_speed[EMOD] = val & 0x3F;
+        if (env_disable[EMOD])
+            env_out[EMOD] = env_speed[EMOD];
+        return true;
+    case 0x85: // $4085 mod position
+        mod_pos = val & 0x7F;
+        return true;
+    case 0x86: // $4086 mod frequency low
+        freq[TMOD] = (freq[TMOD] & 0xF00) | val;
+        return true;
+    case 0x87: // $4087 mod frequency high / enable
+        freq[TMOD] = (freq[TMOD] & 0x0FF) | ((val & 0x0F) << 8);
+        mod_halt = ((val & 0x80) != 0);
+        return true;
+    case 0x88: // $4088 mod table write
+        if (mod_halt)
+        {
+            // writes to current playback position (there is no direct way to set phase)
+            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
+            phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
+            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
+            phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
+        }
+        return true;
+    case 0x89: // $4089 wave write enable, master volume
+        wav_write = ((val & 0x80) != 0);
+        master_vol = val & 0x03;
+        return true;
+    case 0x8A: // $408A envelope speed
+        master_env_speed = val;
+        // haven't tested whether this register resets phase on hardware,
+        // but this ensures my inplementation won't spam envelope clocks
+        // if this value suddenly goes low.
+        env_timer[EMOD] = 0;
+        env_timer[EVOL] = 0;
+        return true;
     default:
-      return false;
+        return false;
     }
+    return false;
+}
 
-    reg[adr & 0xFF] = val;
-    return true;
-
-  }
-
-  bool NES_FDS::Read (UINT32 adr, UINT32 & val, UINT32 id)
-  {
-    if (0x4040 <= adr && adr < 0x4080)
+bool NES_FDS::Read (UINT32 adr, UINT32 & val, UINT32 id)
+{
+    if (adr >= 0x4040 && adr < 0x407F)
     {
-      val = write_enable ? wave[0][phase[0] & 0x3f] : wave[0][adr & 0x3f];
-      return true;
+        // TODO: if wav_write is not enabled, the
+        // read address may not be reliable? need
+        // to test this on hardware.
+        val = wave[TWAV][adr - 0x4040];
+        return true;
     }
-    else if ( 0x4080 <= adr && adr < 0x408B)
+
+    if (adr == 0x4090) // $4090 read volume envelope
     {
-      val = reg[adr&0xFF];
-      return true;
+        val = env_out[EVOL] | 0x40;
+        return true;
     }
 
-    switch (adr)
+    if (adr == 0x4092) // $4092 read mod envelope
     {
-    case 0x4090:
-      val = envelope_output[0] | 0x40;
-      break;
-
-    case 0x4092:
-      val = envelope_output[1] | 0x40;
-      break;
-
-    default:
-      return false;
+        val = env_out[EMOD] | 0x40;
+        return true;
     }
 
-    return true;
-  }
+    return false;
+}
 
 } // namespace
