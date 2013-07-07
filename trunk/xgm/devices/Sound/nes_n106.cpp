@@ -39,7 +39,7 @@ namespace xgm
       trkinfo[trk].output = out[trk];
       trkinfo[trk].wavelen = length[trk];
       for(UINT32 i=0;i<length[trk];i++)
-        trkinfo[trk].wave[i] = wave[(offset[trk]+i)&0xff];
+        trkinfo[trk].wave[i] = wave[(offset[trk]+i)&0xff] + 8;
       return &trkinfo[trk];
     }
     else

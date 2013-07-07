@@ -334,7 +334,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
                 {
                   m_pDCtrk->MoveTo(rect.left+i, rect.bottom); 
                   m_pDCtrk->LineTo(rect.left+i, rect.bottom-
-                     (static_cast<TrackInfoFDS *>(ti)->wave[i]+32)* rect.Height()/64);
+                     (static_cast<TrackInfoFDS *>(ti)->wave[i] * rect.Height()/64));
                 }
                 m_pDCtrk->SelectObject(oldpen);
               }
@@ -379,7 +379,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
                 {
                   m_pDCtrk->MoveTo(rect.left+i, rect.bottom); 
                   m_pDCtrk->LineTo(rect.left+i, rect.bottom -
-                     (dynamic_cast<TrackInfoN106 *>(ti)->wave[i]+8) * rect.Height()/16);
+                     (dynamic_cast<TrackInfoN106 *>(ti)->wave[i] * rect.Height() / 16));
                 }
                 m_pDCtrk->SelectObject(oldpen);
               }
