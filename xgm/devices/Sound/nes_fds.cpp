@@ -2,13 +2,14 @@
 
 namespace xgm {
 
-// HACK
-double rc_last = 0.0;
-double rc_leak = 0.0;
-double rc_add  = 1.0;
+const int RC_BITS = 12;
 
 NES_FDS::NES_FDS ()
 {
+    option[OPT_CUTOFF] = 2000;
+    rc_k = 0;
+    rc_l = (1<<RC_BITS);
+
     SetClock (DEFAULT_CLOCK);
     SetRate (DEFAULT_RATE);
     sm[0] = 128;
@@ -53,14 +54,20 @@ void NES_FDS::SetRate (double r)
     rate = r;
 
     // configure lowpass filter
-    const double CUTOFF = 2000.0;
-    rc_leak = ::exp(-2.0 * 3.14159 * CUTOFF / rate);
-    rc_add  = 1.0 - rc_leak;
+    double cutoff = double(option[OPT_CUTOFF]);
+    double leak = 0.0;
+    if (cutoff > 0)
+        leak = ::exp(-2.0 * 3.14159 * cutoff / rate);
+    rc_k = INT32(leak * double(1<<RC_BITS));
+    rc_l = (1<<RC_BITS) - rc_k;
 }
 
 void NES_FDS::SetOption (int id, int val)
 {
-    //if(id<OPT_END) option[id] = val;
+    if(id<OPT_END) option[id] = val;
+
+    // update cutoff immediately
+    if (id == OPT_CUTOFF) SetRate(rate);
 }
 
 void NES_FDS::Reset ()
@@ -69,6 +76,8 @@ void NES_FDS::Reset ()
     master_vol = 0;
     last_freq = 0;
     last_vol = 0;
+
+    rc_accum = 0;
 
     for (int i=0; i<2; ++i)
     {
@@ -228,18 +237,15 @@ UINT32 NES_FDS::Render (INT32 b[2])
 
     INT32 v = fout * MASTER[master_vol] >> 8;
 
-    // TODO
-    // lowpass RC filter appropriate to RATE
-    double rc_filtered = (rc_last * rc_leak) + (double(v) *  rc_add);
-    rc_last = rc_filtered;
-    v = INT32(rc_filtered);
+    // lowpass RC filter
+    INT32 rc_out = ((rc_accum * rc_k) + (v * rc_l)) >> RC_BITS;
+    rc_accum = rc_out;
+    v = rc_out;
 
-    INT32 m = v;
-    m = mask ? 0 : m;
-
+    // output mix
+    INT32 m = mask ? 0 : v;
     b[0] = (m * sm[0]) >> 7;
     b[1] = (m * sm[1]) >> 7;
-
     return 2;
 }
 

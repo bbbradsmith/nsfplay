@@ -225,11 +225,11 @@ STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "MS UI Gothic", 400, 0, 0x80
 BEGIN
-    GROUPBOX        "オプション(&O)",-1,0,0,225,54
-    CONTROL         "$4083への書き込みで基本波の位相をリセット(&R)",IDC_CAR_PHASE_REFRESH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,12,210,10
-    CONTROL         "$4085への書き込みで変調波の位相をリセット(&M)",IDC_MOD_PHASE_REFRESH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,24,210,10
+    GROUPBOX        "オプション(&O)",IDC_STATIC,0,0,225,54
+    GROUPBOX        "&Options",IDC_STATIC,0,0,193,59
+    LTEXT           "ローパスフィルタ",IDC_STATIC,6,13,43,14
+    EDITTEXT        IDC_FDS_LOWPASS,52,10,46,16,ES_AUTOHSCROLL
+    LTEXT           "Hz",IDC_STATIC,100,13,13,12
 END
 #endif
 
@@ -1055,11 +1055,10 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    GROUPBOX        "&Options",-1,0,0,225,54
-    CONTROL         "&Reset the carrier phase after writing $4083.",IDC_CAR_PHASE_REFRESH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,11,210,10
-    CONTROL         "Reset the &modulator phase after writing $4085.",IDC_MOD_PHASE_REFRESH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,23,167,10
+    GROUPBOX        "&Options",IDC_STATIC,0,0,225,54
+    LTEXT           "Lowpass Filter Cutoff",IDC_STATIC,7,13,74,13
+    EDITTEXT        IDC_FDS_LOWPASS,80,9,54,15,ES_AUTOHSCROLL
+    LTEXT           "Hz",IDC_STATIC,137,11,15,11
 END
 
 IDD_EASY DIALOGEX 0, 0, 209, 164

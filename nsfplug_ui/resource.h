@@ -154,6 +154,7 @@
 #define IDC_COMBO                       2029
 #define IDC_NONLINEAR_MIXER             2033
 #define IDC_NAME                        2034
+#define IDC_FDS_LOWPASS                 2035
 #define ID_WRITETAG                     2036
 #define IDD_TRKINFO                     2039
 #define ID_TRKINFO                      2040
@@ -224,7 +225,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2096
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         2035
+#define _APS_NEXT_CONTROL_VALUE         2036
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif
