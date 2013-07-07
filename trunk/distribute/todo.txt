@@ -10,7 +10,6 @@ Emu:
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
 - Triangle at freq 0 creates audible high frequency tone? Is this accurate? See Silver Surfer ends of tracks.
-- FDS cutoff configurable, replace with integer operation
 UI:
 - Breakout window for info (nice for looking at NSFe text chunk).
 - Swapped duty for APU1 panel

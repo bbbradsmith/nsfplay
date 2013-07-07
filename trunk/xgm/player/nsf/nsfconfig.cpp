@@ -157,7 +157,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         0, // N163
         0, // VRC6
         0, // VRC7
-        0, // FDS
+        NES_FDS::OPT_END, // FDS
     };
 
     static const int DEFAULT_DEVICE_OPTION[NES_DEVICE_MAX][16] =
@@ -169,7 +169,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         {},
         {},
         {},
-        { 1, 0 }
+        { 2000 }
     };
 
     for (j = 0; j < DEVICE_OPTION_MAX[i]; j++)

@@ -19,17 +19,16 @@ public:
 // ダイアログ データ
 	//{{AFX_DATA(NSFFdsPanel)
 	enum { IDD = IDD_FDSPANEL };
-	BOOL	m_car_phase_refresh;
-	BOOL	m_mod_phase_refresh;
+	UINT	m_nCutoff;
 	//}}AFX_DATA
 
 public:
-  void UpdateNSFPlayerConfig(bool b);
+	void UpdateNSFPlayerConfig(bool b);
 
 // オーバーライド
 	// ClassWizard は仮想関数のオーバーライドを生成します。
 	//{{AFX_VIRTUAL(NSFFdsPanel)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV サポート
 	//}}AFX_VIRTUAL
 
@@ -38,12 +37,12 @@ protected:
 
 	// 生成されたメッセージ マップ関数
 	//{{AFX_MSG(NSFFdsPanel)
-	afx_msg void OnCarPhaseRefresh();
-	afx_msg void OnModPhaseRefresh();
+	afx_msg void OnChangeCutoff();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
 public:
-  virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog();
 };
 
 //{{AFX_INSERT_LOCATION}}

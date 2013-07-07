@@ -14,6 +14,10 @@ public:
 class NES_FDS : public ISoundChip
 {
 public:
+    enum
+    {
+        OPT_CUTOFF=0,
+        OPT_END };
 
 protected:
     double rate, clock;
@@ -21,6 +25,7 @@ protected:
     INT32 sm[2]; // stereo mix
     INT32 fout; // current output
     TrackInfoFDS trkinfo;
+    int option[OPT_END];
 
     bool master_io;
     UINT master_vol;
@@ -46,6 +51,11 @@ protected:
     UINT32 env_speed[2];
     UINT32 env_out[2];
     UINT32 master_env_speed;
+
+    // 1-pole RC lowpass filter
+    INT32 rc_accum;
+    INT32 rc_k;
+    INT32 rc_l;
 
 public:
     NES_FDS ();
