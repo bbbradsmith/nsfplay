@@ -7,6 +7,8 @@ const int RC_BITS = 12;
 NES_FDS::NES_FDS ()
 {
     option[OPT_CUTOFF] = 2000;
+    option[OPT_4085_RESET] = 0;
+
     rc_k = 0;
     rc_l = (1<<RC_BITS);
 
@@ -37,7 +39,7 @@ ITrackInfo *NES_FDS::GetTrackInfo(int trk)
     trkinfo.key = last_vol > 0;
     trkinfo._freq = last_freq;
     trkinfo.freq = (double(last_freq) * clock) / (65536.0 * 64.0);
-    trkinfo.tone = 0;
+    trkinfo.tone = env_out[EMOD];
     for(int i=0;i<64;i++)
         trkinfo.wave[i] = wave[TWAV][i];
 
@@ -90,6 +92,7 @@ void NES_FDS::Reset ()
     env_halt = true;
     mod_halt = true;
     mod_pos = 0;
+    mod_write_pos = 0;
 
     for (int i=0; i<2; ++i)
     {
@@ -106,6 +109,19 @@ void NES_FDS::Reset ()
     //   $4023 = $83 enables master_io
     //   $4080 = $80 output volume = 0, envelope disabled
     //   $408A = $FF master envelope speed set to slowest
+    Write(0x4023, 0x00);
+    Write(0x4023, 0x83);
+    Write(0x4080, 0x80);
+    Write(0x408A, 0xFF);
+
+    // reset other stuff
+    Write(0x4082, 0x00); // wav freq 0
+    Write(0x4083, 0x80); // wav disable
+    Write(0x4084, 0x80); // mod strength 0
+    Write(0x4085, 0x00); // mod position 0
+    Write(0x4086, 0x00); // mod freq 0
+    Write(0x4087, 0x80); // mod disable
+    Write(0x4089, 0x00); // wav write disable, max global volume}
 }
 
 void NES_FDS::Tick (UINT32 clocks)
@@ -307,6 +323,10 @@ bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
         return true;
     case 0x85: // $4085 mod position
         mod_pos = val & 0x7F;
+        // not hardware accurate., but prevents detune due to cycle inaccuracies
+        // (notably in Bio Miracle Bokutte Upa)
+        if (option[OPT_4085_RESET])
+            phase[TMOD] = mod_write_pos << 16;
         return true;
     case 0x86: // $4086 mod frequency low
         freq[TMOD] = (freq[TMOD] & 0xF00) | val;
@@ -319,10 +339,12 @@ bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
         if (mod_halt)
         {
             // writes to current playback position (there is no direct way to set phase)
+            phase[TMOD] = phase[TMOD] & 0x3F0000; // reset accumulator phase
             wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
             phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
             wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
             phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
+            mod_write_pos = phase[TMOD] >> 16; // used by OPT_4085_RESET
         }
         return true;
     case 0x89: // $4089 wave write enable, master volume

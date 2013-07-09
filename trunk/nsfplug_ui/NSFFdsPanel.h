@@ -20,6 +20,7 @@ public:
 	//{{AFX_DATA(NSFFdsPanel)
 	enum { IDD = IDD_FDSPANEL };
 	UINT	m_nCutoff;
+	BOOL	m_4085_reset;
 	//}}AFX_DATA
 
 public:
@@ -38,6 +39,7 @@ protected:
 	// 生成されたメッセージ マップ関数
 	//{{AFX_MSG(NSFFdsPanel)
 	afx_msg void OnChangeCutoff();
+	afx_msg void On4085Reset();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

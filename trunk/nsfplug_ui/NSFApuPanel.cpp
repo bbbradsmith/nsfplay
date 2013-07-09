@@ -33,7 +33,7 @@ void NSFApuPanel::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_PHASE_REFRESH, m_phase_refresh);
 	DDX_Check(pDX, IDC_UNMUTE_ON_RESET, m_unmute_on_reset);
 	DDX_Check(pDX, IDC_FREQ_LIMIT, m_freq_limit);
-  DDX_Check(pDX, IDC_NONLINEAR_MIXER, m_nonlinear_mixer);
+	DDX_Check(pDX, IDC_NONLINEAR_MIXER, m_nonlinear_mixer);
 	//}}AFX_DATA_MAP
 }
 

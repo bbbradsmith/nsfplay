@@ -15,6 +15,7 @@ CPULogger::CPULogger()
     soundchip = 0;
     file = NULL;
     filename = NULL;
+    frame_count = 0;
 }
 
 CPULogger::~CPULogger()
@@ -27,13 +28,6 @@ CPULogger::~CPULogger()
 
 void CPULogger::Reset ()
 {
-    if (file)
-    {
-        ::fclose(file);
-        file = NULL;
-    }
-    if (filename)
-        file = ::fopen(filename, "at");
 }
 
 bool CPULogger::Write (UINT32 adr, UINT32 val, UINT32 id)
@@ -115,7 +109,16 @@ void CPULogger::SetFilename (const char * filename_)
 void CPULogger::Begin (const char* title)
 {
     if (file)
-        ::fprintf(file, "BEGIN(\"%s\")\n", title);
+    {
+        ::fclose(file);
+        file = NULL;
+    }
+    if (filename)
+        file = ::fopen(filename, "at");
+
+    if (file)
+        ::fprintf(file, "BEGIN(\"%s\")\n", title);\
+    frame_count = 0;
 }
 
 void CPULogger::Init (UINT8 reg_a, UINT8 reg_x)
@@ -127,7 +130,8 @@ void CPULogger::Init (UINT8 reg_a, UINT8 reg_x)
 void CPULogger::Play ()
 {
     if (file)
-        ::fprintf(file, "PLAY()\n");
+        ::fprintf(file, "PLAY(%d)\n", frame_count);
+    ++frame_count;
 }
 
 } // namespace xgm

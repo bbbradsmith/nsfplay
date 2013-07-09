@@ -226,10 +226,10 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "MS UI Gothic", 400, 0, 0x80
 BEGIN
     GROUPBOX        "オプション(&O)",IDC_STATIC,0,0,225,54
-    GROUPBOX        "&Options",IDC_STATIC,0,0,193,59
     LTEXT           "ローパスフィルタ",IDC_STATIC,6,13,43,14
     EDITTEXT        IDC_FDS_LOWPASS,52,10,46,16,ES_AUTOHSCROLL
     LTEXT           "Hz",IDC_STATIC,100,13,13,12
+    CONTROL         "$4085を""リセット""モジュレータフェーズ",IDC_4085_RESET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,27,171,11
 END
 #endif
 
@@ -1059,6 +1059,8 @@ BEGIN
     LTEXT           "Lowpass Filter Cutoff",IDC_STATIC,7,13,74,13
     EDITTEXT        IDC_FDS_LOWPASS,80,9,54,15,ES_AUTOHSCROLL
     LTEXT           "Hz",IDC_STATIC,137,11,15,11
+    CONTROL         "$4085 ""resets"" modulator phase.",IDC_4085_RESET,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,25,200,10
 END
 
 IDD_EASY DIALOGEX 0, 0, 209, 164

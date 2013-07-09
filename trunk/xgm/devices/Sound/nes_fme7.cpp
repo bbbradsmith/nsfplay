@@ -34,6 +34,14 @@ void NES_FME7::SetRate (double r)
 
 void NES_FME7::Reset ()
 {
+  for (int i=0; i<16; ++i) // blank all registers
+  {
+    Write(0xC000,i);
+    Write(0xE000,0);
+  }
+  Write(0xC000,0x07); // disable all tones
+  Write(0xE000,0x3F);
+
   divider = 0;
   if (psg)
     PSG_reset (psg);
