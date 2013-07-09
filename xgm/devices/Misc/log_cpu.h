@@ -32,6 +32,7 @@ protected:
     UINT8 soundchip;
     FILE* file;
     char* filename;
+    UINT32 frame_count;
 };
 
 }

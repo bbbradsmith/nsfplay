@@ -146,9 +146,14 @@ namespace xgm
   {
     int i;
     for (i = 0; i < 0x100; i++)
-      writeReg (i, 0);
+    {
+      Write(0xF800,i);
+      Write(0x4800,0);
+    }
+    Write(0xF800,0x7F);
+    Write(0x4800,0x70);
+
     mask = 0;
-    writeReg(0x7f,0x70);
     for (i = 0; i < 8; i++) 
       pcounter[i] = 0;
     wait_counter = 0;

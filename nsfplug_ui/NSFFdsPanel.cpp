@@ -21,6 +21,7 @@ NSFFdsPanel::NSFFdsPanel(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(NSFFdsPanel)
 	m_nCutoff = 2000;
+	m_4085_reset = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -34,12 +35,14 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
   if(b)
   {
     m_nCutoff = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CUTOFF).GetInt();
+    m_4085_reset = pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_4085_RESET).GetInt();
     UpdateData(FALSE);
   }
   else
   {
     UpdateData(TRUE);
     pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CUTOFF) = m_nCutoff; 
+    pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_4085_RESET) = m_4085_reset;
     pm->cf->Notify(FDS);
   }
 }
@@ -50,6 +53,7 @@ void NSFFdsPanel::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(NSFFdsPanel)
 	DDX_Text(pDX, IDC_FDS_LOWPASS, m_nCutoff);
 	DDV_MinMaxUInt(pDX, m_nCutoff, 0, 99999);
+	DDX_Check(pDX, IDC_4085_RESET, m_4085_reset);
 	//}}AFX_DATA_MAP
 }
 
@@ -57,6 +61,7 @@ void NSFFdsPanel::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(NSFFdsPanel, CDialog)
 	//{{AFX_MSG_MAP(NSFFdsPanel)
 	ON_EN_CHANGE(IDC_FDS_LOWPASS, OnChangeCutoff)
+	ON_BN_CLICKED(IDC_4085_RESET, On4085Reset)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -64,6 +69,11 @@ END_MESSAGE_MAP()
 // NSFFdsPanel メッセージ ハンドラ
 
 void NSFFdsPanel::OnChangeCutoff() 
+{
+	//SetModified(true);
+}
+
+void NSFFdsPanel::On4085Reset() 
 {
 	//SetModified(true);
 }

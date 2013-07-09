@@ -17,6 +17,7 @@ public:
     enum
     {
         OPT_CUTOFF=0,
+        OPT_4085_RESET,
         OPT_END };
 
 protected:
@@ -42,6 +43,7 @@ protected:
     bool env_halt;
     bool mod_halt;
     UINT32 mod_pos;
+    UINT32 mod_write_pos;
 
     // two ramp envelopes
     const enum { EMOD=0, EVOL=1 };

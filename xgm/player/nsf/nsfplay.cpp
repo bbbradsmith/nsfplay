@@ -332,6 +332,9 @@ namespace xgm
             break;
     }
 
+    if (logcpu->GetLogLevel() > 0)
+        logcpu->Begin(GetTitleString());
+
     // 演奏後にRAM空間を破壊される場合があるので，再ロード
     Reload ();
     // レートの設定はResetより前に行っておくこと
@@ -359,9 +362,6 @@ namespace xgm
     {
       song = nsf->nsfe_plst[song];
     }
-
-    if (logcpu->GetLogLevel() > 0)
-        logcpu->Begin(GetTitleString());
 
     cpu.Start (nsf->init_address, nsf->play_address, speed, song, (region == REGION_PAL)?1:0);
 

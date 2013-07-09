@@ -41,6 +41,12 @@ namespace xgm
 
   void NES_VRC7::Reset ()
   {
+    for (int i=0; i < 0x40; ++i)
+    {
+        Write(0x9010,i);
+        Write(0x9030,0);
+    }
+
     divider = 0;
     OPLL_reset_patch (opll, patch_set);
     OPLL_reset (opll);
