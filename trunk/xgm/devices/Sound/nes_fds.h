@@ -18,6 +18,7 @@ public:
     {
         OPT_CUTOFF=0,
         OPT_4085_RESET,
+        OPT_WRITE_PROTECT,
         OPT_END };
 
 protected:

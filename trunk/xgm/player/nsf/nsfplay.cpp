@@ -192,10 +192,12 @@ namespace xgm
     }
     if (nsf->use_fds)
     {
+      bool write_enable = (config->GetDeviceOption(FDS, NES_FDS::OPT_WRITE_PROTECT).GetInt() == 0);
+
       stack.Attach (sc[FDS]); // last before memory layer
       mixer.Attach (&amp[FDS]);
-      mem.SetFDSMode (true);
-      bank.SetFDSMode (true);
+      mem.SetFDSMode (write_enable);
+      bank.SetFDSMode (write_enable);
 
       bank.SetBankDefault(6, nsf->bankswitch[6]);
       bank.SetBankDefault(7, nsf->bankswitch[7]);

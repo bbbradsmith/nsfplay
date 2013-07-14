@@ -157,6 +157,7 @@
 #define IDC_FDS_LOWPASS                 2035
 #define ID_WRITETAG                     2036
 #define IDC_4085_RESET                  2036
+#define IDC_WRITE_PROTECT               2037
 #define IDD_TRKINFO                     2039
 #define ID_TRKINFO                      2040
 #define IDD_TRKINFO_SETUP               2058
