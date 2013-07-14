@@ -8,6 +8,7 @@ NES_FDS::NES_FDS ()
 {
     option[OPT_CUTOFF] = 2000;
     option[OPT_4085_RESET] = 0;
+	option[OPT_WRITE_PROTECT] = 0; // not used here, see nsfplay.cpp
 
     rc_k = 0;
     rc_l = (1<<RC_BITS);

@@ -21,6 +21,7 @@ public:
 	enum { IDD = IDD_FDSPANEL };
 	UINT	m_nCutoff;
 	BOOL	m_4085_reset;
+	BOOL	m_write_protect;
 	//}}AFX_DATA
 
 public:
@@ -40,6 +41,7 @@ protected:
 	//{{AFX_MSG(NSFFdsPanel)
 	afx_msg void OnChangeCutoff();
 	afx_msg void On4085Reset();
+	afx_msg void OnWriteProtect();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
