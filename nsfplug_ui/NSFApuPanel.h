@@ -23,7 +23,8 @@ public:
 	BOOL	m_phase_refresh;
 	BOOL	m_unmute_on_reset;
 	BOOL	m_freq_limit;
-  BOOL  m_nonlinear_mixer;
+	BOOL	m_nonlinear_mixer;
+	BOOL	m_duty_swap;
 	//}}AFX_DATA
 
 public:
@@ -44,10 +45,13 @@ protected:
 	afx_msg void OnPhaseRefresh();
 	afx_msg void OnUnmuteOnReset();
 	afx_msg void OnFreqLimit();
+	afx_msg void OnNonlinearMixer();
+	afx_msg void OnDutySwap();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
 public:
-  virtual BOOL OnInitDialog();
+	virtual BOOL OnInitDialog();
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -79,6 +79,8 @@ Global options:
   FREQ_MODE: 1=display Hz in keyboard view, 0=display hexadecimal pitch register
   LAST_PRESET: name of the last sound preset used
   INI_FILE: ?
+  LOG_CPU: log CPU writes to file (0=off, 1=sound only, 2=all writes, 3=all r/w)
+  LOG_CPU_FILE: filename of CPU write log
 
 TITLE_FORMAT text replacement:
   %F/%f > filename
@@ -103,13 +105,13 @@ Device options:
   XXX_THRESHOLD: 0-100 compressor threshold (100=off)
   APU1_OPTION0: unmute on reset
   APU1_OPTION1: phase reset
-  APU1_OPTION2: frequency limit
+  APU1_OPTION2: frequency limit?
   APU1_OPTION3: nonlinear mixing
   APU1_OPTION4: famiclone swapped duty (1<->2)
   APU2_OPTION0: enable $4011 writes
   APU2_OPTION1: enable periodic noise
   APU2_OPTION2: unmute on reset
-  APU2_OPTION3: anti clicking
+  APU2_OPTION3: anti clicking (suppresses $4011 pop without disabling its nonlinear mix)
   APU2_OPTION4: nonlinear mixer
   APU2_OPTION5: randomize noise on reset
   FDS_OPTION0: (Hz) lowpass filter cutoff frequency (0=off, 2000=default)
@@ -117,7 +119,7 @@ Device options:
   FDS_OPTION2: write protect $8000-DFFF (for improperly formed multi-expansion NSFs)
   MMC5_OPTION0: nonlinear mixing
   MMC5_OPTION1: phase reset
-  N163_OPTION0: serial multiplexing
+  N163_OPTION0: serial multiplexing (more accurate sound for 6+ channels)
 
 Channel options:
   There are 29 channels, as appear vertically in the channel mixer, numbered (XX) from 00 to 28.
@@ -158,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.3 BETA 3 - ??/??/????
+NSFPlay 2.3 BETA 4 - ??/??/????
 Emulation:
 - All illegal 6502 opcodes are now emulated.
 - Audio emulation is now driven by CPU clock cycles, increases timing accuracy.
