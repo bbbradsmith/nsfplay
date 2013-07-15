@@ -29,17 +29,27 @@ public:
 	UINT	m_nStopSec;
 	UINT	m_nFadeTime;
 	UINT	m_nPlayTime;
-	int		m_nPlayFreq;
+	int 	m_nPlayFreq;
 	BOOL	m_bAutoDetect;
 	UINT	m_nDetectTime;
 	BOOL	m_bUpdatePlaylist;
 	UINT	m_nLoopNum;
 	BOOL	m_bMaskInit;
 	CString	m_format;
+	BOOL m_bUseAlt;
+	BOOL m_bVsync;
+	int m_nRegion;
+	BOOL m_bStereo;
+	int m_nLimit;
+	int m_nThreshold;
+	int m_nVelocity;
+	int m_nHpfValue;
+	int m_nLpfValue;
+	BOOL m_bNSFePlaylist;
 	//}}AFX_DATA
 
 // ユーザー追加
-  void UpdateNSFPlayerConfig(bool b);
+	void UpdateNSFPlayerConfig(bool b);
 
 // オーバーライド
 	// ClassWizard は仮想関数のオーバーライドを生成します。
@@ -56,6 +66,7 @@ protected:
 	// 生成されたメッセージ マップ関数
 	//{{AFX_MSG(NSFConfigPageMain)
 	afx_msg void OnSelchangePlayfreq();
+	afx_msg void OnRegion();
 	afx_msg void OnChangeStopsec();
 	afx_msg void OnChangePlaytime();
 	afx_msg void OnChangeFadetime();
@@ -67,25 +78,16 @@ protected:
 	afx_msg void OnMaskinit();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+
 public:
-  BOOL m_bUseAlt;
-  afx_msg void OnBnClickedUsealt();
-  BOOL m_bVsync;
-  int m_nRegion;
-  BOOL m_bStereo;
-  afx_msg void OnBnClickedVsync();
-  BOOL m_bNSFePlaylist;
-  CSliderCtrl m_limitCtrl;
-  CSliderCtrl m_threshCtrl;
-  CSliderCtrl m_velocityCtrl;
-  int m_nLimit;
-  int m_nThreshold;
-  int m_nVelocity;
-  virtual BOOL OnInitDialog();
-  CSliderCtrl m_hpfCtrl;
-  int m_nHpfValue;
-  CSliderCtrl m_lpfCtrl;
-  int m_nLpfValue;
+	afx_msg void OnBnClickedUsealt();
+	afx_msg void OnBnClickedVsync();
+	virtual BOOL OnInitDialog();
+	CSliderCtrl m_limitCtrl;
+	CSliderCtrl m_threshCtrl;
+	CSliderCtrl m_velocityCtrl;
+	CSliderCtrl m_hpfCtrl;
+	CSliderCtrl m_lpfCtrl;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -13,7 +13,6 @@ namespace xgm
     {
         OPT_UNMUTE_ON_RESET=0,
         OPT_PHASE_REFRESH,
-        OPT_FREQ_LIMIT,
         OPT_NONLINEAR_MIXER,
         OPT_DUTY_SWAP,
         OPT_END };

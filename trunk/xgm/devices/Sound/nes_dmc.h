@@ -20,6 +20,7 @@ namespace xgm
       OPT_DPCM_ANTI_CLICK,
       OPT_NONLINEAR_MIXER,
       OPT_RANDOMIZE_NOISE,
+      OPT_TRI_MUTE,
       OPT_END 
     };
   protected:

@@ -56,27 +56,27 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
   {
     int i;
     for(i = 0;rate[i]<CONFIG["RATE"];i++);
-    m_nPlayFreq   = i;
-    m_bAutoStop   = CONFIG["AUTO_STOP"];
-    m_nStopSec    = CONFIG["STOP_SEC"];
-    m_nFadeTime   = CONFIG["FADE_TIME"]/1000;
-    m_nPlayTime   = CONFIG["PLAY_TIME"]/1000;
-    m_nLoopNum    = CONFIG["LOOP_NUM"];
-    m_bAutoDetect = CONFIG["AUTO_DETECT"];
-    m_nDetectTime = CONFIG["DETECT_TIME"]/1000;
+    m_nPlayFreq       = i;
+    m_bAutoStop       = CONFIG["AUTO_STOP"];
+    m_nStopSec        = CONFIG["STOP_SEC"];
+    m_nFadeTime       = CONFIG["FADE_TIME"]/1000;
+    m_nPlayTime       = CONFIG["PLAY_TIME"]/1000;
+    m_nLoopNum        = CONFIG["LOOP_NUM"];
+    m_bAutoDetect     = CONFIG["AUTO_DETECT"];
+    m_nDetectTime     = CONFIG["DETECT_TIME"]/1000;
     m_bUpdatePlaylist = CONFIG["UPDATE_PLAYLIST"];
-    m_nHpfValue = 256 - CONFIG["HPF"];
-    m_nLpfValue = CONFIG["LPF"];
-    m_bMaskInit = CONFIG["MASK_INIT"];
-    m_format = CString(CONFIG["TITLE_FORMAT"]);
-    m_bUseAlt = !(int)CONFIG["DETECT_ALT"];
-    m_bVsync = CONFIG["VSYNC_ADJUST"];
-    m_nRegion = CONFIG["REGION"];
-    m_bStereo = (CONFIG["NCH"] == 2);
-    m_bNSFePlaylist = CONFIG["NSFE_PLAYLIST"];
-    m_nLimit = 100 - CONFIG["COMP_LIMIT"];
-    m_nThreshold = 100 - CONFIG["COMP_THRESHOLD"];
-    m_nVelocity = 100 - CONFIG["COMP_VELOCITY"];
+    m_nHpfValue       = 256 - CONFIG["HPF"];
+    m_nLpfValue       = CONFIG["LPF"];
+    m_bMaskInit       = CONFIG["MASK_INIT"];
+    m_format          = CString(CONFIG["TITLE_FORMAT"]);
+    m_bUseAlt         = !(int)CONFIG["DETECT_ALT"];
+    m_bVsync          = CONFIG["VSYNC_ADJUST"];
+    m_nRegion         = CONFIG["REGION"];
+    m_bStereo         = (CONFIG["NCH"] == 2);
+    m_bNSFePlaylist   = CONFIG["NSFE_PLAYLIST"];
+    m_nLimit          = 100 - CONFIG["COMP_LIMIT"];
+    m_nThreshold      = 100 - CONFIG["COMP_THRESHOLD"];
+    m_nVelocity       = 100 - CONFIG["COMP_VELOCITY"];
     
     if(m_hWnd) UpdateData(FALSE);
   }
@@ -86,26 +86,26 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     if(0<=m_nPlayFreq&&m_nPlayFreq<sizeof(rate))
       CONFIG["RATE"] = rate[m_nPlayFreq];
 
-    CONFIG["AUTO_STOP"] = m_bAutoStop;
-    CONFIG["STOP_SEC"]  = m_nStopSec;
-    CONFIG["FADE_TIME"] = m_nFadeTime * 1000;
-    CONFIG["PLAY_TIME"] = m_nPlayTime * 1000;
-    CONFIG["LOOP_NUM"]  = m_nLoopNum;
-    CONFIG["AUTO_DETECT"] = m_bAutoDetect;
-    CONFIG["DETECT_TIME"] = m_nDetectTime * 1000;
+    CONFIG["AUTO_STOP"]       = m_bAutoStop;
+    CONFIG["STOP_SEC"]        = m_nStopSec;
+    CONFIG["FADE_TIME"]       = m_nFadeTime * 1000;
+    CONFIG["PLAY_TIME"]       = m_nPlayTime * 1000;
+    CONFIG["LOOP_NUM"]        = m_nLoopNum;
+    CONFIG["AUTO_DETECT"]     = m_bAutoDetect;
+    CONFIG["DETECT_TIME"]     = m_nDetectTime * 1000;
     CONFIG["UPDATE_PLAYLIST"] = m_bUpdatePlaylist;
-    CONFIG["HPF"]   = 256 - m_nHpfValue;
-    CONFIG["LPF"]   = m_nLpfValue;
-    CONFIG["MASK_INIT"]    = m_bMaskInit;
-    CONFIG["DETECT_ALT"]   = !m_bUseAlt;
-    CONFIG["TITLE_FORMAT"] = m_format;
-    CONFIG["VSYNC_ADJUST"] = m_bVsync;
-    CONFIG["REGION"] = m_nRegion;
-    CONFIG["NCH"] = m_bStereo ? 2 : 1;
-    CONFIG["NSFE_PLAYLIST"] = m_bNSFePlaylist;
-    CONFIG["COMP_LIMIT"] = 100 - m_nLimit;
-    CONFIG["COMP_THRESHOLD"] = 100 - m_nThreshold;
-    CONFIG["COMP_VELOCITY"] = 100 - m_nVelocity;
+    CONFIG["HPF"]             = 256 - m_nHpfValue;
+    CONFIG["LPF"]             = m_nLpfValue;
+    CONFIG["MASK_INIT"]       = m_bMaskInit;
+    CONFIG["DETECT_ALT"]      = !m_bUseAlt;
+    CONFIG["TITLE_FORMAT"]    = m_format;
+    CONFIG["VSYNC_ADJUST"]    = m_bVsync;
+    CONFIG["REGION"]          = m_nRegion;
+    CONFIG["NCH"]             = m_bStereo ? 2 : 1;
+    CONFIG["NSFE_PLAYLIST"]   = m_bNSFePlaylist;
+    CONFIG["COMP_LIMIT"]      = 100 - m_nLimit;
+    CONFIG["COMP_THRESHOLD"]  = 100 - m_nThreshold;
+    CONFIG["COMP_VELOCITY"]   = 100 - m_nVelocity;
 
     pm->cf->Notify(-1);
   }
@@ -117,54 +117,55 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   CPropertyPage::DoDataExchange(pDX);
   //{{AFX_DATA_MAP(NSFConfigPageMain)
   DDX_Check(pDX, IDC_AUTOSTOP, m_bAutoStop);
-  DDX_Text(pDX, IDC_STOPSEC, m_nStopSec);
-  DDV_MinMaxUInt(pDX, m_nStopSec, 1, 30);
-  DDX_Text(pDX, IDC_FADETIME, m_nFadeTime);
-  DDV_MinMaxUInt(pDX, m_nFadeTime, 0, 32767);
-  DDX_Text(pDX, IDC_PLAYTIME, m_nPlayTime);
-  DDV_MinMaxUInt(pDX, m_nPlayTime, 0, 32767);
-  DDX_CBIndex(pDX, IDC_PLAYFREQ, m_nPlayFreq);
   DDX_Check(pDX, IDC_AUTODETECT, m_bAutoDetect);
-  DDX_Text(pDX, IDC_DETECTTIME, m_nDetectTime);
-  DDV_MinMaxUInt(pDX, m_nDetectTime, 0, 32767);
   DDX_Check(pDX, IDC_UPDATE_PLAYLIST, m_bUpdatePlaylist);
-  DDX_Text(pDX, IDC_LOOPNUM, m_nLoopNum);
-  DDV_MinMaxUInt(pDX, m_nLoopNum, 1, 256);
   DDX_Check(pDX, IDC_MASKINIT, m_bMaskInit);
-  DDX_Text(pDX, IDC_FORMAT, m_format);
-  DDV_MaxChars(pDX, m_format, 128);
-  //}}AFX_DATA_MAP
   DDX_Check(pDX, IDC_USEALT, m_bUseAlt);
   DDX_Check(pDX, IDC_VSYNC, m_bVsync);
-  DDX_Check(pDX, IDC_PREF_PAL, m_nRegion); // TODO change UI
   DDX_Check(pDX, IDC_STEREO, m_bStereo);
   DDX_Check(pDX, IDC_NSFEPLS, m_bNSFePlaylist);
+  DDX_Text(pDX, IDC_STOPSEC, m_nStopSec);
+  DDX_Text(pDX, IDC_FADETIME, m_nFadeTime);
+  DDX_Text(pDX, IDC_PLAYTIME, m_nPlayTime);
+  DDX_Text(pDX, IDC_DETECTTIME, m_nDetectTime);
+  DDX_Text(pDX, IDC_LOOPNUM, m_nLoopNum);
+  DDX_Text(pDX, IDC_FORMAT, m_format);
+  DDV_MinMaxUInt(pDX, m_nStopSec, 1, 30);
+  DDV_MinMaxUInt(pDX, m_nFadeTime, 0, 32767);
+  DDV_MinMaxUInt(pDX, m_nPlayTime, 0, 32767);
+  DDV_MinMaxUInt(pDX, m_nDetectTime, 0, 32767);
+  DDV_MinMaxUInt(pDX, m_nLoopNum, 1, 256);
+  DDX_CBIndex(pDX, IDC_PLAYFREQ, m_nPlayFreq);
+  DDX_CBIndex(pDX, IDC_REGION, m_nRegion);
+  DDV_MaxChars(pDX, m_format, 128);
   DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
   DDX_Control(pDX, IDC_THRESHOLD, m_threshCtrl);
   DDX_Control(pDX, IDC_VELOCITY, m_velocityCtrl);
+  DDX_Control(pDX, IDC_HPF, m_hpfCtrl);
+  DDX_Control(pDX, IDC_LPF, m_lpfCtrl);
   DDX_Slider(pDX, IDC_LIMIT, m_nLimit);
   DDX_Slider(pDX, IDC_THRESHOLD, m_nThreshold);
   DDX_Slider(pDX, IDC_VELOCITY, m_nVelocity);
-  DDX_Control(pDX, IDC_HPF, m_hpfCtrl);
   DDX_Slider(pDX, IDC_HPF, m_nHpfValue);
-  DDX_Control(pDX, IDC_LPF, m_lpfCtrl);
   DDX_Slider(pDX, IDC_LPF, m_nLpfValue);
+  //}}AFX_DATA_MAP
 }
 
 BEGIN_MESSAGE_MAP(NSFConfigPageMain, CPropertyPage)
 	//{{AFX_MSG_MAP(NSFConfigPageMain)
 	ON_CBN_SELCHANGE(IDC_PLAYFREQ, OnSelchangePlayfreq)
+	ON_CBN_SELCHANGE(IDC_REGION, OnRegion)
 	ON_EN_CHANGE(IDC_STOPSEC, OnChangeStopsec)
 	ON_EN_CHANGE(IDC_PLAYTIME, OnChangePlaytime)
 	ON_EN_CHANGE(IDC_FADETIME, OnChangeFadetime)
+	ON_EN_CHANGE(IDC_DETECTTIME, OnChangeDetecttime)
+	ON_EN_CHANGE(IDC_LOOPNUM, OnChangeLoopnum)
 	ON_BN_CLICKED(IDC_AUTOSTOP, OnAutostop)
 	ON_BN_CLICKED(IDC_AUTODETECT, OnAutodetect)
-	ON_EN_CHANGE(IDC_DETECTTIME, OnChangeDetecttime)
 	ON_BN_CLICKED(IDC_UPDATE_PLAYLIST, OnUpdatePlaylist)
-	ON_EN_CHANGE(IDC_LOOPNUM, OnChangeLoopnum)
 	ON_BN_CLICKED(IDC_MASKINIT, OnMaskinit)
-  ON_BN_CLICKED(IDC_USEALT, OnBnClickedUsealt)
-  ON_BN_CLICKED(IDC_VSYNC, OnBnClickedVsync)
+	ON_BN_CLICKED(IDC_USEALT, OnBnClickedUsealt)
+	ON_BN_CLICKED(IDC_VSYNC, OnBnClickedVsync)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -178,6 +179,11 @@ BOOL NSFConfigPageMain::OnApply()
 }
 
 void NSFConfigPageMain::OnSelchangePlayfreq() 
+{
+	//SetModified(true);
+}
+
+void NSFConfigPageMain::OnRegion() 
 {
 	//SetModified(true);
 }

@@ -186,7 +186,6 @@ namespace xgm
     SetRate (DEFAULT_RATE);
     option[OPT_UNMUTE_ON_RESET] = true;
     option[OPT_PHASE_REFRESH] = true;
-    option[OPT_FREQ_LIMIT] = true;
     option[OPT_NONLINEAR_MIXER] = true;
     option[OPT_DUTY_SWAP] = false;
 
@@ -225,12 +224,6 @@ namespace xgm
 
     for (i = 0x4000; i < 0x4008; i++)
       Write (i, 0);
-
-    if (!option[OPT_FREQ_LIMIT])
-    {
-      Write (0x4001, 8);
-      Write (0x4005, 8);
-    }
 
     Write (0x4015, 0);
     if (option[OPT_UNMUTE_ON_RESET])
