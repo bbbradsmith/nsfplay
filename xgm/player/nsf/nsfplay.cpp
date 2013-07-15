@@ -776,6 +776,8 @@ namespace xgm
       vrc7->SetMask((*config)["MASK"].GetInt()>>15);
       break;
     case N106:
+      for (i = 0; i < NES_N106::OPT_END; i++)
+        n106->SetOption (i, config->GetDeviceOption(id,i));
       n106->SetMask((*config)["MASK"].GetInt()>>21);
       break;
     default:

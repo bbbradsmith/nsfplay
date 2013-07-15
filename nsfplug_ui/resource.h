@@ -158,6 +158,7 @@
 #define ID_WRITETAG                     2036
 #define IDC_4085_RESET                  2036
 #define IDC_WRITE_PROTECT               2037
+#define IDC_SERIAL                      2037
 #define IDD_TRKINFO                     2039
 #define ID_TRKINFO                      2040
 #define IDD_TRKINFO_SETUP               2058
@@ -178,6 +179,7 @@
 #define ID_UPALL                        2088
 #define IDD_PANBOX                      2088
 #define ID_DOWNALL                      2089
+#define IDD_N106PANEL                   2089
 #define ID_COMMAND_UP                   2090
 #define ID_COMMAND_DOWN                 2091
 #define IDR_TRKINFOMENU                 2093
@@ -227,7 +229,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        2096
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         2037
+#define _APS_NEXT_CONTROL_VALUE         2038
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

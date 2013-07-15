@@ -154,10 +154,10 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         NES_DMC::OPT_END,
         0, // 5B
         NES_MMC5::OPT_END,
-        0, // N163
+        NES_N106::OPT_END,
         0, // VRC6
         0, // VRC7
-        NES_FDS::OPT_END, // FDS
+        NES_FDS::OPT_END,
     };
 
     static const int DEFAULT_DEVICE_OPTION[NES_DEVICE_MAX][16] =
@@ -166,7 +166,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
         { 1, 1, 1, 0, 1, 1 },
         {},
         { 1, 1 },
-        {},
+        { 0 },
         {},
         {},
         { 2000, 0, 0 }

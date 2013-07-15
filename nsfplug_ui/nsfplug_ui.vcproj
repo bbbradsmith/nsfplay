@@ -293,6 +293,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NSFN106Panel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\NSFPanDialog.cpp"
 				>
 			</File>
@@ -415,6 +419,10 @@
 			</File>
 			<File
 				RelativePath=".\NSFMMC5Panel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NSFN106Panel.h"
 				>
 			</File>
 			<File

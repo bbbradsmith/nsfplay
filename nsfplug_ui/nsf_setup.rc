@@ -584,6 +584,21 @@ BEGIN
 END
 #endif
 
+#if defined(APSTUDIO_INVOKED) || defined(JAPANESE)
+#if defined(APSTUDIO_INVOKED)
+IDD_N106PANEL$(JAPANESE) DIALOGEX 0, 0, 227, 56
+#else
+IDD_N106PANEL DIALOGEX 0, 0, 227, 56
+#endif
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 9, "MS UI Gothic", 400, 0, 0x80
+BEGIN
+    GROUPBOX        "オプション(&O)",-1,0,0,225,54
+    CONTROL         "時分割多重化",IDC_SERIAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,11,171,11
+END
+#endif
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1341,6 +1356,15 @@ CAPTION "NSFplug Channel Mixer"
 MENU IDR_PANMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
+END
+
+IDD_N106PANEL DIALOGEX 0, 0, 227, 56
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    GROUPBOX        "&Options",-1,0,0,225,54
+    CONTROL         "Serial multiplex mixing",IDC_SERIAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,10,200,10
 END
 
 

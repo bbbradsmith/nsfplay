@@ -14,6 +14,7 @@
 #include "NSFFdsPanel.h"
 #include "NSFDmcPanel.h"
 #include "NSFMMC5Panel.h"
+#include "NSFN106Panel.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // NSFConfigDialog
@@ -29,6 +30,7 @@ protected:
   NSFFdsPanel *fdsPanel;
   NSFDmcPanel *dmcPanel;
   NSFMMC5Panel *mmc5Panel;
+  NSFN106Panel *n106Panel;
   
 // コンストラクション
 public:
