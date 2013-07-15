@@ -40,11 +40,13 @@ NSFConfigDialog::NSFConfigDialog(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSel
   apuPanel = new NSFApuPanel();
   devicePage[APU]->SetPanel(apuPanel, IDD_APUPANEL);
   fdsPanel = new NSFFdsPanel();
-  devicePage[FDS]->SetPanel(fdsPanel, IDD_FDSPANEL);  
+  devicePage[FDS]->SetPanel(fdsPanel, IDD_FDSPANEL);
   dmcPanel = new NSFDmcPanel();
-  devicePage[DMC]->SetPanel(dmcPanel, IDD_DMCPANEL);  
+  devicePage[DMC]->SetPanel(dmcPanel, IDD_DMCPANEL);
   mmc5Panel = new NSFMMC5Panel();
-  devicePage[MMC5]->SetPanel(mmc5Panel, IDD_MMC5PANEL);  
+  devicePage[MMC5]->SetPanel(mmc5Panel, IDD_MMC5PANEL);
+  n106Panel = new NSFN106Panel();
+  devicePage[N106]->SetPanel(n106Panel, IDD_N106PANEL);
 }
 
 void NSFConfigDialog::SetDialogManager(NSFDialogManager *p)
@@ -64,6 +66,7 @@ NSFConfigDialog::~NSFConfigDialog()
   delete fdsPanel;
   delete dmcPanel;
   delete mmc5Panel;
+  delete n106Panel;
 }
 
 void NSFConfigDialog::Open()

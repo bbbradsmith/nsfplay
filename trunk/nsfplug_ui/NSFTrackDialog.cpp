@@ -372,7 +372,6 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
                     // (engines frequently wipe most or all of the length register when muted)
                     length = 0;
                 }
-                //int mid = (rect.top + rect.bottom)/2;
                 m_pDCtrk->MoveTo(rect.left,rect.bottom);
                 m_pDCtrk->LineTo(rect.left+length,rect.bottom);
                 for(i=0;i<length;i++)

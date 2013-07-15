@@ -170,7 +170,7 @@ UINT32 NES_N106::Render (INT32 b[2])
         // this could be made more efficient than going clock-by-clock
         // but this way is simpler
         int clocks = render_clock;
-        while (clocks >= 0)
+        while (clocks > 0)
         {
             int c = 7-render_channel;
             if (0 == ((mask >> c) & 1))
@@ -213,11 +213,14 @@ UINT32 NES_N106::Render (INT32 b[2])
             }
         }
 
-        // mix as average, increase output level by 8 bits, roll off 7 bits from sm
-        b[0] *= (256 / channels);
-        b[1] *= (256 / channels);
-        b[0] >>= 7;
-        b[1] >>= 7;
+        // mix together, increase output level by 8 bits, roll off 7 bits from sm
+        INT32 MIX[9] = { 256/1, 256/1, 256/2, 256/3, 256/4, 256/5, 256/6, 256/6, 256/6 };
+        b[0] = (b[0] * MIX[channels]) >> 7;
+        b[1] = (b[1] * MIX[channels]) >> 7;
+        // when approximating the serial multiplex as a straight mix, once the
+        // multiplex frequency gets below the nyquist frequency an average mix
+        // begins to sound too quiet. To approximate this effect, I don't attenuate
+        // any further after 6 channels are active.
     }
 
     // 8 bit approximation of master volume
@@ -225,7 +228,7 @@ UINT32 NES_N106::Render (INT32 b[2])
     //const double MASTER_VOL = 8.5 * 1223.0; // from an Erika to Satoru cart
     //const double MASTER_VOL = 6.6 * 1223.0; // from a Rolling Thunder cart
     const double MASTER_VOL = 7.3 * 1223.0; // happy medium?
-    const double MAX_OUT = 15.0f * 15.0f * 256.0; // max digital value
+    const double MAX_OUT = 15.0 * 15.0 * 256.0; // max digital value
     const INT32 GAIN = int((MASTER_VOL / MAX_OUT) * 256.0f);
     b[0] = (b[0] * GAIN) >> 8;
     b[1] = (b[1] * GAIN) >> 8;
@@ -322,7 +325,7 @@ inline INT32 NES_N106::get_sample (UINT32 index)
 inline int NES_N106::get_channels ()
 {
     // 3-bit channel count stored in reg 0x7F
-    return ((reg[0x7F] & 0x70) >> 4) + 1;
+    return ((reg[0x7F] >> 4) & 0x07) + 1;
 }
 
 inline void NES_N106::set_phase (UINT32 phase, int channel)
