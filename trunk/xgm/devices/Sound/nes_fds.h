@@ -19,7 +19,8 @@ public:
         OPT_CUTOFF=0,
         OPT_4085_RESET,
         OPT_WRITE_PROTECT,
-        OPT_END };
+        OPT_END
+    };
 
 protected:
     double rate, clock;
@@ -73,7 +74,7 @@ public:
     virtual void SetClock (double);
     virtual void SetOption (int, int);
     virtual void SetMask(int m){ mask = m&1; }
-    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual void SetStereoMix (int trk, INT16 mixl, INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);
 };
 

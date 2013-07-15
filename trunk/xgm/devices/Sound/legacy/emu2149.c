@@ -308,10 +308,10 @@ PSG_writeReg (PSG * psg, e_uint32 reg, e_uint32 val)
   switch (reg)
   {
   case 0:
-  case 2:
-  case 4:
   case 1:
+  case 2:
   case 3:
+  case 4:
   case 5:
     c = reg >> 1;
     psg->freq[c] = ((psg->reg[c * 2 + 1] & 15) << 8) + psg->reg[c * 2];

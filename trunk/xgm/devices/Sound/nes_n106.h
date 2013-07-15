@@ -2,57 +2,71 @@
 #define _NES_N106_H_
 #include "../device.h"
 
-namespace xgm
+namespace xgm {
+
+class TrackInfoN106 : public TrackInfoBasic
 {
-  class TrackInfoN106 : public TrackInfoBasic
-  {
-  public:   
+public:
     int wavelen;
-    //INT16 wave[32];
-    // allowing longer waves
     INT16 wave[256];
     virtual IDeviceInfo *Clone(){ return new TrackInfoN106(*this); }
-  };
+};
 
-  class NES_N106:public ISoundChip
-  {
-  protected:
-    double clock, rate;
+class NES_N106:public ISoundChip
+{
+public:
+    enum
+    {
+        OPT_SERIAL = 0,
+        OPT_END
+    };
+
+protected:
+    double rate, clock;
     int mask;
     INT32 sm[2][8]; // stereo mix
-    UINT32 pcounter[8];
-    UINT32 wait_counter;
-    UINT32 wait_incr;
-    INT16 wave[0x80 * 2];
-    UINT8 reg[0x100];
-    UINT32 volume[8];
-    UINT32 offset[8];
-    UINT32 freq[8];
-    UINT32 addr;
-    UINT32 length[8];
-    UINT32 fflag[8];
-    UINT32 phase[8];
-    INT32 out[8];
-    INT32 calc (int i);
-    void writeReg (UINT32 adr, UINT32 val);
-    int chnum, chidx;
+    INT32 fout[8]; // current output
     TrackInfoN106 trkinfo[8];
+    int option[OPT_END];
 
-  public:
-      NES_N106 ();
-     ~NES_N106 ();
+    bool master_disable;
+    UINT32 reg[0x80]; // all state is contained here
+    unsigned int reg_select;
+    bool reg_advance;
+    int tick_channel;
+    int tick_clock;
+    int render_channel;
+    int render_clock;
+    int render_subclock;
+
+    // convenience functions to interact with regs
+    inline UINT32 get_phase (int channel);
+    inline UINT32 get_freq (int channel);
+    inline UINT32 get_off (int channel);
+    inline UINT32 get_len (int channel);
+    inline INT32  get_vol (int channel);
+    inline INT32  get_sample (UINT32 index);
+    inline int    get_channels ();
+    // for storing back the phase after modifying
+    inline void   set_phase (UINT32 phase, int channel);
+
+public:
+    NES_N106 ();
+    ~NES_N106 ();
 
     virtual void Reset ();
     virtual void Tick (UINT32 clocks);
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
-    virtual void SetClock (double);
     virtual void SetRate (double);
-    virtual void SetMask (int m) { mask = m; }
-    virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
+    virtual void SetClock (double);
+    virtual void SetOption (int, int);
+    virtual void SetMask (int m);
+    virtual void SetStereoMix (int trk, INT16 mixl, INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);
-  };
-}                               // namespace
+};
+
+} // namespace xgm
 
 #endif
