@@ -113,6 +113,8 @@ Device options:
   APU2_OPTION4: nonlinear mixer
   APU2_OPTION5: randomize noise on reset
   FDS_OPTION0: (Hz) lowpass filter cutoff frequency (0=off, 2000=default)
+  FDS_OPTION1: reset "phase" on $4085 write (works around timing issue in Bio Miracle Bokutte Upa)
+  FDS_OPTION2: write protect $8000-DFFF (for improperly formed multi-expansion NSFs)
   MMC5_OPTION0: nonlinear mixing
   MMC5_OPTION1: phase reset
 
