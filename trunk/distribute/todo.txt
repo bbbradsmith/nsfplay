@@ -6,10 +6,7 @@ NSPlay 2.3 features to finish:
 - Emu: VRC6/VRC7 volumes need to be 128ed.
 - Emu: Triangle at freq 0 creates audible high frequency tone? Is this accurate? See Silver Surfer ends of tracks.
 - UI: for "REGION" setting 0="auto"(use 0 bit), 1=prefer pal, 2=prefer ntsc, 3=force pal, 4=force ntsc, 5=force dendy
-- Other: Infobox song position needs to be synched with true song position on open.
-- Other: See Predator NSF, starts at 8, moving down to a low track then moving up goes back to 8. When moving past end, wraps to 8.
 - Emu: during 5s fadeout seems to be a quiet 60hz buzz
-- Other: Behaviour with 2 NSFs in a playlist is counterintuitive.
 - UI: Test Japanese UI
 
 Emu:
@@ -41,6 +38,8 @@ Later version:
 - Breakout window for info (nice for looking at NSFe text chunk).
 - One click button for keyboard view?
 - Vertical stacking for multiple key dots on same pitch?
+- Other: Infobox song position needs to be synched with true song position on open. (pass, this is a mess)
+- Other: Behaviour with 2 NSFs in a playlist is counterintuitive.
 
 NSFs:
 - Sesame Street Countdown does not play. Bad rip?
