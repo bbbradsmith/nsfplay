@@ -185,6 +185,7 @@ Other:
 - Fixed improper loading of UI DLL, prevents crash in same folder as Famitracker.
 - UI DLL now reports version, preventing potential problems if mismatched.
 - LOG_CPU option for dumping register writes to file.
+- Fixed song wrap where NSFs do not start on song 1.
 - Source code cleanup: removing unrelated Z80 emulation code.
 
 NSFPlay 2.2 - 8/31/2012

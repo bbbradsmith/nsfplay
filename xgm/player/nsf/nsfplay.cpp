@@ -647,22 +647,26 @@ namespace xgm
 
   bool NSFPlayer::NextSong (int s)
   {
-    nsf->song = (nsf->song + s) % nsf->songs;
-
-    if( nsf->song <= nsf->start-1 )
+    nsf->song += s;
+    bool result = true;
+    while (nsf->song >= nsf->songs)
     {
-      nsf->song = nsf->start-1;
-      return false;
+        nsf->song -=nsf->songs;
+        result = false;
     }
-    else
-      return true;
+    return result;
   }
 
   bool NSFPlayer::PrevSong (int s)
   {
-    nsf->song = nsf->song + ( nsf->songs << 8 ) - s;
-    nsf->song %= nsf->songs;
-    return true;
+    nsf->song -= s;
+    bool result = true;
+    while (nsf->song < 0)
+    {
+        nsf->song +=nsf->songs;
+        result = false;
+    }
+    return result;
   }
 
   int NSFPlayer::GetSong ()
