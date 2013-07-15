@@ -4,8 +4,6 @@ NSPlay 2.3 features to finish:
 - Emu: Rebalance APU1 vs APU2 (suspect APU2 may be to loud?)
 - Emu: Redo 5B and VRC6 volume balance, get the defaults to 128.
 - Emu: VRC6/VRC7 volumes need to be 128ed.
-- Emu: Triangle at freq 0 creates audible high frequency tone? Is this accurate? See Silver Surfer ends of tracks.
-- UI: for "REGION" setting 0="auto"(use 0 bit), 1=prefer pal, 2=prefer ntsc, 3=force pal, 4=force ntsc, 5=force dendy
 - Emu: during 5s fadeout seems to be a quiet 60hz buzz
 - UI: Test Japanese UI
 

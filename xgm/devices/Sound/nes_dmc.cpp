@@ -30,6 +30,7 @@ namespace xgm
     option[OPT_DPCM_ANTI_CLICK] = 0;
     option[OPT_NONLINEAR_MIXER] = 1;
     option[OPT_RANDOMIZE_NOISE] = 1;
+    option[OPT_TRI_MUTE] = 1;
     tnd_table[0][0][0][0] = 0;
     tnd_table[1][0][0][0] = 0;
 
@@ -180,7 +181,8 @@ namespace xgm
       7, 6, 5, 4, 3, 2, 1, 0
     };
 
-    if (linear_counter > 0 && length_counter[0] > 0)
+    if (linear_counter > 0 && length_counter[0] > 0
+        && (!option[OPT_TRI_MUTE] || tri_freq > 0))
     {
       counter[0] += clocks;
       while (counter[0] > tri_freq)

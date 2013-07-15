@@ -26,6 +26,7 @@ public:
 	BOOL	m_anti_click;
 	BOOL	m_randomize_noise;
 	BOOL	m_unmute;
+	BOOL	m_tri_mute;
 	//}}AFX_DATA
 
 public:
@@ -49,6 +50,7 @@ protected:
 	afx_msg void OnAntiNoise();
 	afx_msg void OnRandomizeNoise();
 	afx_msg void OnUnmute();
+	afx_msg void OnTriMute();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	//}}AFX_MSG

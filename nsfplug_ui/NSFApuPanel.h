@@ -22,7 +22,6 @@ public:
 	enum { IDD = IDD_APUPANEL };
 	BOOL	m_phase_refresh;
 	BOOL	m_unmute_on_reset;
-	BOOL	m_freq_limit;
 	BOOL	m_nonlinear_mixer;
 	BOOL	m_duty_swap;
 	//}}AFX_DATA

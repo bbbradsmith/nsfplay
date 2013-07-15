@@ -105,18 +105,18 @@ Device options:
   XXX_THRESHOLD: 0-100 compressor threshold (100=off)
   APU1_OPTION0: unmute on reset
   APU1_OPTION1: phase reset
-  APU1_OPTION2: frequency limit?
-  APU1_OPTION3: nonlinear mixing
-  APU1_OPTION4: famiclone swapped duty (1<->2)
+  APU1_OPTION2: nonlinear mixing
+  APU1_OPTION3: famiclone swapped duty (1<->2)
   APU2_OPTION0: enable $4011 writes
   APU2_OPTION1: enable periodic noise
   APU2_OPTION2: unmute on reset
   APU2_OPTION3: anti clicking (suppresses $4011 pop without disabling its nonlinear mix)
   APU2_OPTION4: nonlinear mixer
   APU2_OPTION5: randomize noise on reset
+  APU2_OPTION6: mute triangle on pitch 0 (prevents high frequency aliasing)
   FDS_OPTION0: (Hz) lowpass filter cutoff frequency (0=off, 2000=default)
   FDS_OPTION1: reset "phase" on $4085 write (works around timing issue in Bio Miracle Bokutte Upa)
-  FDS_OPTION2: write protect $8000-DFFF (for improperly formed multi-expansion NSFs)
+  FDS_OPTION2: write protect $8000-DFFF (for some multi-expansion NSFs)
   MMC5_OPTION0: nonlinear mixing
   MMC5_OPTION1: phase reset
   N163_OPTION0: serial multiplexing (more accurate sound for 6+ channels)
@@ -172,6 +172,8 @@ Emulation:
 - Replaced PREFER_PAL setting with REGION, containing more options including Dendy support.
 - Swapped duty option for APU1.
 - More effective implementation of DMC anti-click option.
+- Removed useless "frequency limiter" APU option.
+- Added optional mute for ultrasonic triangle.
 - Fixed broken oversampling filter.
 Other:
 - Better small icon.

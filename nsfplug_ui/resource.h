@@ -142,6 +142,7 @@
 #define IDC_RANDOMIZE_NOISE             2012
 #define IDC_LIMIT                       2013
 #define IDC_UNMUTE                      2013
+#define IDC_TRI_MUTE                    2014
 #define IDC_VELOCITY                    2015
 #define ID_READTAG                      2018
 #define IDC_SAVE                        2021
@@ -152,6 +153,7 @@
 #define IDC_HPF                         2027
 #define IDC_COMBO1                      2029
 #define IDC_COMBO                       2029
+#define IDC_REGION                      2029
 #define IDC_NONLINEAR_MIXER             2033
 #define IDC_NAME                        2034
 #define IDC_FDS_LOWPASS                 2035
@@ -159,7 +161,6 @@
 #define IDC_4085_RESET                  2036
 #define IDC_WRITE_PROTECT               2037
 #define IDC_SERIAL                      2037
-#define IDC_SWAP_DUTY                   2038
 #define IDD_TRKINFO                     2039
 #define IDC_DUTY_SWAP                   2039
 #define ID_TRKINFO                      2040
