@@ -1,12 +1,3 @@
-To do:
-
-NSPlay 2.3 features to finish:
-- Emu: Rebalance APU1 vs APU2 (suspect APU2 may be to loud?)
-- Emu: Redo 5B and VRC6 volume balance, get the defaults to 128.
-- Emu: VRC6/VRC7 volumes need to be 128ed.
-- Emu: during 5s fadeout seems to be a quiet 60hz buzz
-- UI: Test Japanese UI
-
 Emu:
 - full-emulation quality option (emulate at M2 speed and downsample)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
@@ -14,6 +5,7 @@ Emu:
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
+- During 5s fadeout seems to be a quiet 60hz buzz (fade is really granular, re-implement it better)
 UI:
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)

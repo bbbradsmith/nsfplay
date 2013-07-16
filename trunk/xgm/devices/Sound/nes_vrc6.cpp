@@ -173,6 +173,11 @@ namespace xgm
     b[1] += m[2] * sm[1][2];
     //b[1] >>= (7 - 7);
 
+    // master volume adjustment
+    const INT32 MASTER = INT32(256.0 * 1223.0 / 1920.0);
+    b[0] = (b[0] * MASTER) >> 8;
+    b[1] = (b[1] * MASTER) >> 8;
+
     return 2;
   }
 
