@@ -36,7 +36,7 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 	m_bAutoDetect = FALSE;
 	m_nDetectTime = 0;
 	m_bUpdatePlaylist = FALSE;
-	m_nLoopNum = 0;
+	m_nLoopNum = 1;
 	m_bMaskInit = FALSE;
 	m_format = _T("");
 	//}}AFX_DATA_INIT
@@ -134,7 +134,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDV_MinMaxUInt(pDX, m_nFadeTime, 0, 32767);
   DDV_MinMaxUInt(pDX, m_nPlayTime, 0, 32767);
   DDV_MinMaxUInt(pDX, m_nDetectTime, 0, 32767);
-  DDV_MinMaxUInt(pDX, m_nLoopNum, 1, 256);
+  DDV_MinMaxUInt(pDX, m_nLoopNum, 0, 256);
   DDX_CBIndex(pDX, IDC_PLAYFREQ, m_nPlayFreq);
   DDX_CBIndex(pDX, IDC_REGION, m_nRegion);
   DDV_MaxChars(pDX, m_format, 128);
