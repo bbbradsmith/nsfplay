@@ -128,7 +128,7 @@ void NES_FDS::Reset ()
 void NES_FDS::Tick (UINT32 clocks)
 {
     // clock envelopes
-    if (!env_halt && !wav_halt)
+    if (!env_halt && !wav_halt && (master_env_speed != 0))
     {
         for (int i=0; i<2; ++i)
         {
@@ -335,12 +335,13 @@ bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
     case 0x87: // $4087 mod frequency high / enable
         freq[TMOD] = (freq[TMOD] & 0x0FF) | ((val & 0x0F) << 8);
         mod_halt = ((val & 0x80) != 0);
+        if (mod_halt)
+            phase[TMOD] = phase[TMOD] & 0x3F0000; // reset accumulator phase
         return true;
     case 0x88: // $4088 mod table write
         if (mod_halt)
         {
             // writes to current playback position (there is no direct way to set phase)
-            phase[TMOD] = phase[TMOD] & 0x3F0000; // reset accumulator phase
             wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
             phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
             wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
