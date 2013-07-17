@@ -285,7 +285,7 @@ BEGIN
     CONTROL         "クリックノイズの除去(&E)",IDC_ANTI_NOISE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,114,25,76,10
     CONTROL         "起動時にランダムノイズ",IDC_RANDOMIZE_NOISE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,40,95,10
     CONTROL         "リセット時にミュート解除(&U)",IDC_UNMUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,114,39,83,10
-    CONTROL         "ミュート超音波三角形",IDC_TRI_MUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,54,89,11
+    CONTROL         "ミュート超音波三角形",IDC_TRI_MUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,55,89,11
 END
 #endif
 
@@ -1134,7 +1134,7 @@ BEGIN
     CONTROL         "&Eliminate clicking noise",IDC_ANTI_NOISE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,23,83,10
     CONTROL         "&Randomize noise on startup",IDC_RANDOMIZE_NOISE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,36,106,10
     CONTROL         "&Unmute on reset",IDC_UNMUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,36,83,10
-    CONTROL         "Mute &triangle at pitch 0",IDC_TRI_MUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,50,104,10
+    CONTROL         "Mute &triangle at pitch 0",IDC_TRI_MUTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,104,10
 END
 
 IDD_DEVICE DIALOGEX 0, 0, 256, 250
