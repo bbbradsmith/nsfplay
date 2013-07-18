@@ -225,9 +225,10 @@ UINT32 NES_N106::Render (INT32 b[2])
 
     // 8 bit approximation of master volume
     // max N163 vol vs max APU square
-    //const double MASTER_VOL = 8.5 * 1223.0; // from an Erika to Satoru cart
-    //const double MASTER_VOL = 6.6 * 1223.0; // from a Rolling Thunder cart
-    const double MASTER_VOL = 7.3 * 1223.0; // happy medium?
+    // unfortunately, games have been measured as low as 3.4x and as high as 8.5x
+    // with higher volumes on Erika, King of Kings, and Rolling Thunder
+    // and lower volumes on others. Using 5.5x as a rough "one size fits all".
+    const double MASTER_VOL = 5.5 * 1223.0;
     const double MAX_OUT = 15.0 * 15.0 * 256.0; // max digital value
     const INT32 GAIN = int((MASTER_VOL / MAX_OUT) * 256.0f);
     b[0] = (b[0] * GAIN) >> 8;
