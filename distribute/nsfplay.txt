@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.3 BETA 4 - 7/17/2013
+NSFPlay 2.3 - 7/19/2013
 Emulation:
 - All illegal 6502 opcodes are now emulated.
 - Audio emulation is now driven by CPU clock cycles, increases timing accuracy.
