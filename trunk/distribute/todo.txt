@@ -6,6 +6,7 @@ Emu:
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
 - During 5s fadeout seems to be a quiet 60hz buzz (fade is really granular, re-implement it better)
+- Better anti-click fadeoff?
 UI:
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
@@ -40,8 +41,3 @@ NSF validation:
 - IRQ usage
 - FDS vs other expansions
 - writes to register mirrors
-
-Unknown:
-- Channel mask caption is ????? in Japanese UI.
-- Settings Apply/Cacel buttons are ????? in Japanese UI.
-- Settings audio quality panel has ????? at bottom in Japanese UI.
