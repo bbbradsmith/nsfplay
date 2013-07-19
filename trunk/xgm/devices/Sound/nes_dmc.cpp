@@ -353,6 +353,11 @@ namespace xgm
         dmc_pop_follow = m[2]; // remember previous position
 
         m[2] += dmc_pop_offset; // apply offset
+
+        // TODO implement this in a better way
+        // roll off offset (not ideal, but prevents overflow)
+        if (dmc_pop_offset > 0) --dmc_pop_offset;
+        else if (dmc_pop_offset < 0) ++dmc_pop_offset;
     }
 
     b[0]  = m[0] * sm[0][0];
