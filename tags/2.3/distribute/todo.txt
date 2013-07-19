@@ -1,0 +1,43 @@
+Emu:
+- full-emulation quality option (emulate at M2 speed and downsample)
+- Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
+- VRC7 emulation accuracy
+- MMC5 squares, are they nonlinear, does PCM affect them?
+- Battletoads track 10, noise sounds much duller on hardware.
+- Triangle phase randomize init option.
+- During 5s fadeout seems to be a quiet 60hz buzz (fade is really granular, re-implement it better)
+- Better anti-click fadeoff?
+UI:
+- Command line wav could use fade out (actually set config param, also channel mask option).
+- Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
+Other:
+- Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
+
+Later version:
+- Bus/stack plugins: NSF validator, other export tools
+- Improve loop detection
+- APU debug pin emulation
+- wider resample window? (i.e. multi-lobe sinc?)
+- Mac/Linux versions?
+- Foobar2000 plugin
+- KB plugin
+- NSF2
+- Visualizer plugin system. Full register view capability.
+- De-MFC GUI, change to a .lib, and build directly into plugin.
+- Remove plugin stubs from xgm, these belong in the plugin project itself.
+- Consider adding a dendy mode to format? maybe save for NSF2?
+- Breakout window for info (nice for looking at NSFe text chunk).
+- One click button for keyboard view?
+- Vertical stacking for multiple key dots on same pitch?
+- Other: Infobox song position needs to be synched with true song position on open. (pass, this is a mess)
+- Other: Behaviour with 2 NSFs in a playlist is counterintuitive.
+
+NSFs:
+- Sesame Street Countdown does not play. Bad rip?
+
+NSF validation:
+- VRC7 speed limit? (hard)
+- illegal opcodes
+- IRQ usage
+- FDS vs other expansions
+- writes to register mirrors

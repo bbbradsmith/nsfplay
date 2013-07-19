@@ -1,0 +1,6 @@
+; nsf_setup.def : DLL のモジュール パラメータを宣言します。
+
+LIBRARY      "nsfplug_ui"
+
+EXPORTS
+    ; 明示的なエクスポートはここへ記述できます

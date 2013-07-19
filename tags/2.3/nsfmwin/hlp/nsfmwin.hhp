@@ -1,0 +1,29 @@
+[OPTIONS]
+Auto Index=Yes
+Compatibility=1.1 or later
+Compiled file=nsfmwin.chm
+Contents file=nsfmwin.hhc
+Index file=nsfmwin.hhk
+Default topic=INTRO.HTM
+Display compile progress=No
+Full-text search=Yes
+Language=0x411 “ú–{Œê
+
+
+[FILES]
+iNTRO.HTM
+HIDD_ROOT_DIALOG.HTM
+HIDD_OPTION.HTM
+TAG2PLS.HTM
+
+[ALIAS]
+HIDD_NSFMWIN_DIALOG = HIDD_ROOT_DIALOG.HTM
+HIDD_OPTION = HIDD_OPTION.HTM
+
+[MAP]
+#include HTMLDefines.h
+
+[TEXT POPUPS]
+HTMLDefines.h
+
+[INFOTYPES]
