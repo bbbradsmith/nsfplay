@@ -366,14 +366,14 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
                 m_pDCtrk->FillSolidRect(rect,RGB(0,0,0));
                 rect.bottom -=1;
                 int length = min(dynamic_cast<TrackInfoN106 *>(ti)->wavelen, rect.Width());
+                m_pDCtrk->MoveTo(rect.left,rect.bottom);
+                m_pDCtrk->LineTo(rect.left+length,rect.bottom);
                 if (ti->GetVolume() == 0 && length >= 128)
                 {
                     // hide waves that are muted and long
                     // (engines frequently wipe most or all of the length register when muted)
                     length = 0;
                 }
-                m_pDCtrk->MoveTo(rect.left,rect.bottom);
-                m_pDCtrk->LineTo(rect.left+length,rect.bottom);
                 for(i=0;i<length;i++)
                 {
                   m_pDCtrk->MoveTo(rect.left+i, rect.bottom); 
