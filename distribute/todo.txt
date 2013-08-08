@@ -13,6 +13,10 @@ UI:
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 Other:
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
+- FDS write protect > default on if multi-chip
+- suppress DMC pop if done in INIT (do one sample of output from mixer before play, then stick result in highpass DC filter)
+- disable auto-skip on 1 track NSFs by default
+
 
 Later version:
 - Bus/stack plugins: NSF validator, other export tools

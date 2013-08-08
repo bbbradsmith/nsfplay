@@ -169,7 +169,7 @@ static int is_sjis_prefix(int c)
           break;
         case 'L':
         case 'l':
-          wp += sprintf(print_title+wp, "%s", nsfe_entry[song].tlbl);
+          wp += sprintf(print_title+wp, "%s", nsfe_entry[nsfe_plst?nsfe_plst[song]:song].tlbl);
           format++;
           break;
         case 'N':
