@@ -12,7 +12,7 @@ Full source code is available at:
 If you have any questions, comments, or find any bugs, please send them to me.
 
 Brad Smith
-rainwarrior AT gmail.com
+nsfplay AT rainwarrior.ca
 http://rainwarrior.ca
 
 
