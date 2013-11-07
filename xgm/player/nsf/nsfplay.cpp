@@ -141,11 +141,13 @@ namespace xgm
     int log_level = (*config)["LOG_CPU"];
     logcpu->SetOption(0, log_level);
     logcpu->SetSoundchip(nsf->soundchip);
+    logcpu->SetNSF(nsf);
     if (log_level > 0)
     {
         logcpu->SetFilename((*config)["LOG_CPU_FILE"]);
         stack.Attach(logcpu);
         cpu.SetLogger(logcpu);
+        logcpu->SetCPU(&cpu);
     }
     else
     {

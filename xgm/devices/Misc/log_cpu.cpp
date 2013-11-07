@@ -1,4 +1,6 @@
 #include "log_cpu.h"
+#include "../CPU/nes_cpu.h"
+#include "../../player/nsf/nsf.h"
 
 namespace xgm
 {
@@ -8,6 +10,7 @@ namespace xgm
 //   1 - log APU writes only
 //   2 - log all writes
 //   3 - log all writes and reads
+//   4 - log only bank register writes
 
 CPULogger::CPULogger()
 {
@@ -16,6 +19,7 @@ CPULogger::CPULogger()
     file = NULL;
     filename = NULL;
     frame_count = 0;
+    cpu = NULL;
 }
 
 CPULogger::~CPULogger()
@@ -53,6 +57,26 @@ bool CPULogger::Write (UINT32 adr, UINT32 val, UINT32 id)
         if ((soundchip & 32) && adr == 0xE000)                  apu = true; // 5b
         if (!apu) return false;
     }
+    if (log_level == 4 && file)
+    {
+        // log bank switching
+        if (adr >= 0x5FF8 && adr <= 0x5FFF)
+        {
+            // log PC when bank switching
+            if (cpu)
+            {
+                unsigned int pc = cpu->GetPC();
+                unsigned int b = 0xFF;
+                if (nsf && pc >= 0x8000) b = bank[(pc-0x8000)/0x1000];
+                ::fprintf(file, "SWITCH_PC(%04X,%02X)\n", pc, b);
+            }
+            ::fprintf(file, "BANK(%1X000,%02X)\n", (adr - 0x5FF8)+8, val);
+            return false;
+        }
+        // only log RAM writes
+        else if (adr >= 0x8000) return false;
+        else if (adr >= 0x0800 && adr < 0x6000) return false;
+    }
 
     if (file)
         ::fprintf(file, "WRITE(%04X,%02X)\n", adr, val);
@@ -62,6 +86,12 @@ bool CPULogger::Write (UINT32 adr, UINT32 val, UINT32 id)
 
 bool CPULogger::Read (UINT32 adr, UINT32 & val, UINT32 id)
 {
+    if (log_level == 4) // only RAM reads
+    {
+        if (adr >= 0x8000) return false;
+        if (adr >= 0x800 && adr < 0x6000) return false;
+    }
+
     if (log_level > 2 && file)
         ::fprintf(file, "READ(%04X)\n", adr);
     return false;
@@ -123,15 +153,34 @@ void CPULogger::Begin (const char* title)
 
 void CPULogger::Init (UINT8 reg_a, UINT8 reg_x)
 {
+    if (file && log_level == 4 && nsf != NULL)
+    {
+        for (int i=0; i<8; ++i)
+        {
+            bank[i] = nsf->bankswitch[i];
+            ::fprintf(file, "BANK(%1X000,%02X)\n", i+8, bank[i]);
+        }
+    }
+
     if (file)
         ::fprintf(file, "INIT(%02X,%02X)\n", reg_a, reg_x);
 }
 
 void CPULogger::Play ()
 {
-    if (file)
+    if (file && (log_level != 4 || frame_count == 0))
         ::fprintf(file, "PLAY(%d)\n", frame_count);
     ++frame_count;
+}
+
+void CPULogger::SetCPU (NES_CPU* c)
+{
+    cpu = c;
+}
+
+void CPULogger::SetNSF (NSF* n)
+{
+    nsf = n;
 }
 
 } // namespace xgm

@@ -40,6 +40,7 @@ public:
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
   void SetLogger (CPULogger *logger);
+  unsigned int GetPC() const;
 };
 
 } // namespace xgm
