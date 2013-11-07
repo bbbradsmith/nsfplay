@@ -237,4 +237,9 @@ void NES_CPU::SetLogger (CPULogger* logger)
     log_cpu = logger;
 }
 
+unsigned int NES_CPU::GetPC() const
+{
+    return context.PC;
+}
+
 } // namespace xgm

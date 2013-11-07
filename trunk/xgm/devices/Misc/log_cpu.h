@@ -7,6 +7,9 @@
 namespace xgm
 {
 
+class NES_CPU; // forward
+class NSF; // forward
+
 class CPULogger : public IDevice
 {
 public:
@@ -26,6 +29,8 @@ public:
     void Begin (const char* title);
     void Init (UINT8 reg_a, UINT8 reg_x);
     void Play ();
+    void SetCPU (NES_CPU* c);
+    void SetNSF (NSF* n);
 
 protected:
     int log_level;
@@ -33,6 +38,9 @@ protected:
     FILE* file;
     char* filename;
     UINT32 frame_count;
+	NES_CPU* cpu;
+    NSF* nsf;
+    UINT8 bank[8];
 };
 
 }
