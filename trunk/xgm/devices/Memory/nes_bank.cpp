@@ -48,7 +48,9 @@ namespace xgm
     for (i = 0; i < 16; i++)
       bankdefault[i] = -1; // -1 is special empty bank
 
-    bankmax = (((offset & 0xfff) + size) / 0x1000) + 1;
+    int total_size = ((offset & 0xfff) + size);
+    bankmax = (total_size >> 12); // count of full banks
+    if (total_size & 0xfff) bankmax += 1; // include last partial bank
     if (bankmax > 256)
       return false;
 

@@ -81,7 +81,7 @@
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\in_nsf.def"
 				GenerateDebugInformation="true"
