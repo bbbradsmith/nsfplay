@@ -444,10 +444,8 @@ static int is_sjis_prefix(int c)
     speed_pal = image[0x78] | (image[0x79] << 8);
     pal_ntsc = image[0x7a];
 
-    if(speed_pal==0)
-      speed_pal = 0x4e20;
-    if(speed_ntsc==0)
-      speed_ntsc = 0x411A;
+    if(speed_pal==0 ) speed_pal  = 19997;
+    if(speed_ntsc==0) speed_ntsc = 16639;
 
     soundchip = image[0x7b];
 
@@ -534,8 +532,8 @@ static int is_sjis_prefix(int c)
           start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
 
           // NSFe doesn't allow custom speeds
-          speed_ntsc = 0x4100; // 60.09Hz
-          speed_pal  = 0x4E1D; // 50.00Hz
+          speed_ntsc = 16639; // 60.09Hz
+          speed_pal  = 19997; // 50.00Hz
 
           // other variables contained in other banks
           memset (bankswitch, 0, 8);
