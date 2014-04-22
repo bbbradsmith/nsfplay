@@ -162,6 +162,7 @@ Versions
 
 NSFPlay 2.4 - ?????????
 - Fixed NSFe track title display when using playlist.
+- Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
