@@ -5,7 +5,6 @@ Emu:
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
-- During 5s fadeout seems to be a quiet 60hz buzz (fade is really granular, re-implement it better)
 - Better anti-click fadeoff?
 - Play Metroid FDS 33 on hardware, make sure that wrapping is correct.
 UI:

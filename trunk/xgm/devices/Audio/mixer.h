@@ -9,13 +9,13 @@ namespace xgm
   {
   protected:
     typedef std::vector < IRenderable * >DeviceList;
-    const UINT32 FADE_AMOUNT_MAX;
-    UINT32 fade_speed, fade_amount;
+    UINT32 fade_pos, fade_end;
     DeviceList dlist;
 
   public:
-      Mixer ():FADE_AMOUNT_MAX (1 << 31)
+      Mixer ()
     {
+      Reset();
     }
 
      ~Mixer ()
@@ -34,39 +34,49 @@ namespace xgm
 
     void Reset ()
     {
-      fade_speed = 0;
-      fade_amount = 0;
+      fade_pos = 0;
+      fade_end = 1;
     }
 
     bool IsFadeEnd ()
     {
-      return (fade_speed && !fade_amount);
+      return (fade_pos >= fade_end);
     }
 
     bool IsFading ()
     {
-      return (fade_speed != 0);
+      return (fade_pos > 0);
     }
 
     void FadeStart (double rate, int fade_in_ms)
     {
       if (fade_in_ms)
-        fade_speed = (UINT32)(FADE_AMOUNT_MAX / (fade_in_ms * rate / 1000));
+      {
+        const UINT32 MAX_SAMPLES = ~0UL;
+        double samples = (double)fade_in_ms * rate / 1000.0;
+        if (samples < (double)MAX_SAMPLES)
+        {
+          fade_end = UINT32(samples);
+        }
+        else
+        {
+          fade_end = MAX_SAMPLES;
+        }
+      }
       else
-        fade_speed = FADE_AMOUNT_MAX;
-
-      if (fade_speed == 0)
-        fade_speed = 1;
-
-      fade_amount = FADE_AMOUNT_MAX;
+      {
+        fade_end = 1;
+      }
+      fade_pos = 1; // begin fade
     }
 
     void Skip (int length)
     {
-      if (fade_speed)
-        fade_amount =
-          (fade_amount <
-           fade_speed * length) ? 0 : fade_amount - (fade_speed * length);
+      if (fade_pos > 0)
+      {
+        if (fade_pos < fade_end) ++fade_pos;
+        else fade_pos = fade_end;
+      }
     }
 
     virtual void Tick (UINT32 clocks)
@@ -92,11 +102,14 @@ namespace xgm
         b[1] += tmp[1];
       }
 
-      if (fade_speed)
+      if (fade_pos > 0)
       {
-        fade_amount = fade_amount < fade_speed ? 0 : fade_amount - fade_speed;
-        b[0] = (INT32) (b[0] * (fade_amount >> 23)) >> 8;
-        b[1] = (INT32) (b[1] * (fade_amount >> 23)) >> 8;
+        double fade_amount = double(fade_end - fade_pos) / double(fade_end);
+        b[0] = INT32(fade_amount * b[0]);
+        b[1] = INT32(fade_amount * b[1]);
+
+        if (fade_pos < fade_end) ++fade_pos;
+        else fade_pos = fade_end;
       }
       return 2;
     }

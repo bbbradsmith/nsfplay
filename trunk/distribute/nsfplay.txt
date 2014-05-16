@@ -164,6 +164,7 @@ NSFPlay 2.4 - ?????????
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
 - Default NTSC speed changed from 16640 to 16639. (Slightly more accurate to hardware.)
+- More bits of precision on fade-out, creates smoother fade.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
