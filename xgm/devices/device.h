@@ -10,7 +10,7 @@
 namespace xgm
 {
   const double DEFAULT_CLOCK = 1789772.0;
-  const int DEFAULT_RATE = 44100;
+  const int DEFAULT_RATE = 48000;
 
   /**
    * エミュレータで使用するデバイスの抽象

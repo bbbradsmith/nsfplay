@@ -77,7 +77,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
 {
   int i, j;
 
-  CreateValue("RATE", 44100);
+  CreateValue("RATE", 48000);
   CreateValue("NCH",  2);
   CreateValue("BPS",  16);
   CreateValue("MASK", 0);
