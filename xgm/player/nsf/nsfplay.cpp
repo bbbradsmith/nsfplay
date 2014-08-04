@@ -8,6 +8,8 @@ namespace xgm
 {
   NSFPlayer::NSFPlayer () : PlayerMSP ()
   {
+    nsf = NULL;
+
     const type_info &ti = typeid(this);
     sc[APU] = (apu = new NES_APU());
     sc[DMC] = (dmc = new NES_DMC());
@@ -63,6 +65,8 @@ namespace xgm
 
   char *NSFPlayer::GetTitleString ()
   {
+    if (nsf == NULL) return "(not loaded)";
+
     static char buf[512];
     sprintf (buf, "%s", nsf->GetTitleString((*config)["TITLE_FORMAT"]));
     return buf;
@@ -633,6 +637,7 @@ namespace xgm
 
   int NSFPlayer::GetLength ()
   {
+    if (nsf == NULL) return 0;
     return nsf->GetLength ();
   }
 
