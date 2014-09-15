@@ -166,6 +166,7 @@ NSFPlay 2.4 - ?????????
 - Default NTSC speed changed from 16640 to 16639. (Slightly more accurate to hardware.)
 - More bits of precision on fade-out, creates smoother fade.
 - 48000Hz is the new default samplerate.
+- Fixed keyboard view wave string bias on N163/FDS.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
