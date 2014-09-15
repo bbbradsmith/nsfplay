@@ -7,6 +7,7 @@ Emu:
 - Triangle phase randomize init option.
 - Better anti-click fadeoff?
 - Play Metroid FDS 33 on hardware, make sure that wrapping is correct.
+- Conversion of float to int, use _controlfp? or floor if offline precalc
 UI:
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)

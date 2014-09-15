@@ -311,7 +311,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
             case NSFPlayer::FDS_TRK0:
               m_tonestr[NSFPlayer::FDS_TRK0]="";
               for(i=0;i<64;i++)
-                m_tonestr[NSFPlayer::FDS_TRK0].AppendFormat("%02d ", ((char)((dynamic_cast<TrackInfoFDS *>(ti)->wave[i])&0xFF))+32);
+                m_tonestr[NSFPlayer::FDS_TRK0].AppendFormat("%02d ", ((char)((dynamic_cast<TrackInfoFDS *>(ti)->wave[i])&0xFF)));
 
               if(!(int)CONFIG["GRAPHIC_MODE"])
               {
@@ -351,7 +351,7 @@ void NSFTrackDialog::OnTimer(UINT nIDEvent)
               
               m_tonestr[m_trkmap[trk]]="";
               for(i=0;i<dynamic_cast<TrackInfoN106 *>(ti)->wavelen;i++)
-                m_tonestr[m_trkmap[trk]].AppendFormat("%02d ", (static_cast<TrackInfoN106 *>(ti)->wave[i]+8)&0xF);
+                m_tonestr[m_trkmap[trk]].AppendFormat("%02d ", (static_cast<TrackInfoN106 *>(ti)->wave[i])&0xF);
 
               if(!(int)CONFIG["GRAPHIC_MODE"])
               {
