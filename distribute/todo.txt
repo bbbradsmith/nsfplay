@@ -8,6 +8,7 @@ Emu:
 - Better anti-click fadeoff?
 - Play Metroid FDS 33 on hardware, make sure that wrapping is correct.
 - Conversion of float to int, use _controlfp? or floor if offline precalc
+- N163 bad-emulation options (old-length, no-phase write)
 UI:
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
@@ -16,9 +17,12 @@ Other:
 - FDS write protect > default on if multi-chip
 - suppress DMC pop if done in INIT (do one sample of output from mixer before play, then stick result in highpass DC filter)
 - disable auto-skip on 1 track NSFs by default
+- Infinite playtime option
+- OPL2 notes, may help VRC7 implementation: https://docs.google.com/document/d/18IGx18NQY_Q1PJVZ-bHywao9bhsDoAqoIn1rIm42nwo
 
 
 Later version:
+- Sound device selection.
 - Bus/stack plugins: NSF validator, other export tools
 - Improve loop detection
 - APU debug pin emulation
