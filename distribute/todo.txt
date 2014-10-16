@@ -40,6 +40,7 @@ Later version:
 - Vertical stacking for multiple key dots on same pitch?
 - Other: Infobox song position needs to be synched with true song position on open. (pass, this is a mess)
 - Other: Behaviour with 2 NSFs in a playlist is counterintuitive.
+- Always On Top > wxSTAY_ON_TOP on wxFrame?
 
 NSFs:
 - Sesame Street Countdown does not play. Bad rip?
