@@ -60,7 +60,7 @@ int EmuOutDisk::Open(int rate, int nch, int bps, int buflen, int prebuf) {
   pwf.wf.nChannels = nch;
   pwf.wf.nSamplesPerSec  = rate;
   pwf.wf.nBlockAlign = nch * (bps / 8);
-  pwf.wf.nAvgBytesPerSec = rate * (bps / 8);
+  pwf.wf.nAvgBytesPerSec = nch * rate * (bps / 8);
   pwf.wBitsPerSample = bps;
 
   m_file = mmioOpen((LPSTR)m_filename, NULL, MMIO_ALLOCBUF | MMIO_READWRITE | MMIO_CREATE);

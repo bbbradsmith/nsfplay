@@ -107,7 +107,7 @@ int EmuOutMod::Open(int rate, int nch, int bps, int buflen, int prebuf) {
   wfx.wFormatTag = WAVE_FORMAT_PCM ;
   wfx.nChannels = nch ;
   wfx.nSamplesPerSec = rate ;
-  wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * (bps / 8);
+  wfx.nAvgBytesPerSec = wfx.nChannels * wfx.nSamplesPerSec * (bps / 8);
   wfx.wBitsPerSample = bps ;
   wfx.nBlockAlign = wfx.nChannels * (bps / 8);
   wfx.cbSize = 0 ;
