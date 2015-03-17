@@ -168,6 +168,7 @@ NSFPlay 2.4 - ?????????
 - More bits of precision on fade-out, creates smoother fade.
 - 48000Hz is the new default samplerate.
 - Fixed keyboard view wave string bias on N163/FDS.
+- Fixed frequency rounding for triangle/noise/DMC in keyboard display.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

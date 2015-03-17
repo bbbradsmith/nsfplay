@@ -45,7 +45,7 @@ namespace xgm
     bool dmc_pop;
     INT32 dmc_pop_offset;
     INT32 dmc_pop_follow;
-    UINT32 clock;
+    double clock;
     UINT32 rate;
     int pal;
     int mode;

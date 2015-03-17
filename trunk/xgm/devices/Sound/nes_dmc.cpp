@@ -375,7 +375,7 @@ namespace xgm
 
   void NES_DMC::SetClock (double c)
   {
-    clock = (UINT32)(c);
+    clock = c;
   }
 
   void NES_DMC::SetRate (double r)
