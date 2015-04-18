@@ -79,7 +79,7 @@ Global options:
   FREQ_MODE: 1=display Hz in keyboard view, 0=display hexadecimal pitch register
   LAST_PRESET: name of the last sound preset used
   INI_FILE: ?
-  LOG_CPU: log CPU writes to file (0=off, 1=sound only, 2=all writes, 3=all r/w)
+  LOG_CPU: log CPU writes to file (0=off, 1=sound only, 2=all writes, 3=all r/w, 4 bank and RAM writes)
   LOG_CPU_FILE: filename of CPU write log
 
 TITLE_FORMAT text replacement:
