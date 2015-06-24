@@ -342,9 +342,9 @@ bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
         if (mod_halt)
         {
             // writes to current playback position (there is no direct way to set phase)
-            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
+            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x07;
             phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
-            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x7F;
+            wave[TMOD][(phase[TMOD] >> 16) & 0x3F] = val & 0x07;
             phase[TMOD] = (phase[TMOD] + 0x010000) & 0x3FFFFF;
             mod_write_pos = phase[TMOD] >> 16; // used by OPT_4085_RESET
         }
@@ -369,7 +369,7 @@ bool NES_FDS::Write (UINT32 adr, UINT32 val, UINT32 id)
 
 bool NES_FDS::Read (UINT32 adr, UINT32 & val, UINT32 id)
 {
-    if (adr >= 0x4040 && adr < 0x407F)
+    if (adr >= 0x4040 && adr <= 0x407F)
     {
         // TODO: if wav_write is not enabled, the
         // read address may not be reliable? need
