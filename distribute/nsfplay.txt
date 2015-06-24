@@ -6,8 +6,8 @@ This is an NSF player program for Windows, and also a Winamp plugin. The origina
 To use as a Winamp plugin, simply copy the contents of the plugins folder to your Winamp plugins folder.
 
 Full source code is available at:
-- http://code.google.com/p/nsfplay/
 - http://rainwarrior.ca/projects/nsfplay/
+- http://github.com/bbbradsmith/nsfplay
 
 If you have any questions, comments, or find any bugs, please send them to me.
 
@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 1 - 4/18/2-15
+NSFPlay 2.4 beta 2 - ?
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -170,7 +170,7 @@ NSFPlay 2.4 beta 1 - 4/18/2-15
 - Fixed keyboard view wave string bias on N163/FDS.
 - Fixed frequency rounding for triangle/noise/DMC in keyboard display.
 - Fixed intermittent crash with Winamp starting up with NSF in playlist.
-- Fixed FDS mod table bit-mask and 
+- Fixed FDS mod table bit-mask and wavetable read address. (Minor.)
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

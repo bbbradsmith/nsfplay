@@ -1,8 +1,8 @@
 NSFPlay/NSFPlug 2.3 source code 7/19/2013
 
 This code is maintained by Brad Smith. It is a fork of NSFPlay/NSFPlug by Brezza. The latest version should be available at:
-- http://code.google.com/p/nsfplay/
 - http://rainwarrior.ca/projects/nsfplay/
+- http://github.com/bbbradsmith/nsfplay
 
 This code contains several modifications to original, see nsfplay.txt for a list of changes.
 

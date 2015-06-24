@@ -1,0 +1,7 @@
+cmd.exe.lnk
+Debug
+Release
+*.user
+nsfplug_ui/hlp/nsfplug.chm
+nsfplay.suo
+nsfplay.ncb
