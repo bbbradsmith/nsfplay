@@ -11,6 +11,7 @@ Emu:
 - Conversion of float to int, use _controlfp? or floor if offline precalc
 - N163 bad-emulation options (old-length, no-phase write)
 UI:
+- Play/pause/stop doesn't work like most player UI, revise their function.
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
 Other:
