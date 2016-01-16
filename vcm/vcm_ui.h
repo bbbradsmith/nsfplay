@@ -1,8 +1,6 @@
 #ifndef _VCM_UI_H_
 #define _VCM_UI_H_
 
-#include "vcm.h"
-
 namespace vcm
 {
   class ValueCtrl;
