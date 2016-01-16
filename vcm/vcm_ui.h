@@ -191,7 +191,7 @@ namespace vcm
     VC_LENGTH( unsigned long length ) : maxLength( length ) {} 
     virtual bool GetImportValue ( ValueCtrl *, Configuration &, const std::string &id, const Value &src_value, Value &result )
     {
-      if( ((std::string)src_value).length() <= maxLength )
+      if( (src_value.GetStr()).length() <= maxLength )
       {
         result = src_value;
         return true;
