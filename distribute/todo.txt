@@ -10,10 +10,13 @@ Emu:
 - Play Metroid FDS 33 on hardware, make sure that wrapping is correct.
 - Conversion of float to int, use _controlfp? or floor if offline precalc
 - N163 bad-emulation options (old-length, no-phase write)
+- Better post-processing controls: lowpass/highpass as specified cutoff, log slider, option for 2-pole etc., optional bandpass?, compressor, nonlinear distortion?
 UI:
 - Play/pause/stop doesn't work like most player UI, revise their function.
 - Command line wav could use fade out (actually set config param, also channel mask option).
 - Command line wave have an option that temporarily sets a config value and restores it later (can use for fades, channel mask)
+- Re-range volume sliders from 0 to 200%, default at centre.
+- Play + no file loaded = open?
 Other:
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
 - FDS write protect > default on if multi-chip
@@ -24,6 +27,7 @@ Other:
 
 
 Later version:
+- Seeking easier, seek when paused/stopped?
 - Sound device selection.
 - Bus/stack plugins: NSF validator, other export tools
 - Improve loop detection
