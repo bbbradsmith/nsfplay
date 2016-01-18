@@ -13,7 +13,7 @@ I have presumed based on text comments and readme files in the original code tha
 Feel free to contact me with questions or comments.
 
 Brad Smith
-rainwarrior AT gmail.com
+nsfplay AT rainwarrior.ca
 http://rainwarrior.ca
 
 Original NSFPlay/NFSPlug project available at: http://www.pokipoki.org/dsa/
