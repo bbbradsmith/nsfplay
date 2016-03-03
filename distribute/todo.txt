@@ -11,6 +11,11 @@ Emu:
 - Conversion of float to int, use _controlfp? or floor if offline precalc
 - N163 bad-emulation options (old-length, no-phase write)
 - Better post-processing controls: lowpass/highpass as specified cutoff, log slider, option for 2-pole etc., optional bandpass?, compressor, nonlinear distortion?
+- look at clock_of_frame / clock_per_frame fixed point math, currently good enough for default 2MHz CPU but how well is it bounded with custom CPU speed? 10 bits would probably be sufficient, and go to 20MHz custom.
+- mode for poll-style interrupts would be useful (to match poewrpak) vs NMI style (to match games/TNS)
+-- wonder if battletoads noise thing is just CPU spikes?
+-- (if frame length has exceeded, instead of break until next when it hits, run another frame and clear the counter)
+-- test against BotB 20492 djmaximum - lights of are minds (virtuansf1061 recommended).nsf
 UI:
 - Play/pause/stop doesn't work like most player UI, revise their function.
 - Command line wav could use fade out (actually set config param, also channel mask option).
