@@ -8,3 +8,12 @@ nsfplay.ncb
 distribute/nsfplay.exe
 distribute/plugins/in_yansf.dll
 distribute/plugins/nsfplug_ui.dll
+
+# CodeLite
+.clang
+.codelite
+.build-debug/
+.build-release/
+**/IDE/CodeLite/**/Makefile
+**/IDE/CodeLite/**/*.mk
+**/IDE/CodeLite/**/*.txt
