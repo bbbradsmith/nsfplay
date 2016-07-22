@@ -1,5 +1,7 @@
 #include "nes_fds.h"
 
+#include <cstring>
+
 namespace xgm {
 
 const int RC_BITS = 12;
@@ -84,7 +86,7 @@ void NES_FDS::Reset ()
 
     for (int i=0; i<2; ++i)
     {
-        ::memset(wave[i], 0, sizeof(wave[i]));
+        std::memset(wave[i], 0, sizeof(wave[i]));
         freq[i] = 0;
         phase[i] = 0;
     }

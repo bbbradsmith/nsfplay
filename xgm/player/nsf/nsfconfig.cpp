@@ -3,10 +3,10 @@
 #include "nsfconfig.h"
 #include "nsfplay.h"
 
-#include "../../devices/sound/nes_apu.h"
-#include "../../devices/sound/nes_dmc.h"
-#include "../../devices/sound/nes_fds.h"
-#include "../../devices/sound/nes_mmc5.h"
+#include "../../devices/Sound/nes_apu.h"
+#include "../../devices/Sound/nes_dmc.h"
+#include "../../devices/Sound/nes_fds.h"
+#include "../../devices/Sound/nes_mmc5.h"
 
 using namespace xgm;
 
@@ -114,8 +114,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   for (i = 0; i < NES_CHANNEL_MAX; ++i)
   {
       std::string str;
-      char num[5];
-      ::itoa(i, num, 10);
+      auto num = std::to_string(i);
       str = "CHANNEL_";
       if (i < 10) str += "0";
       str += num;
@@ -184,10 +183,14 @@ NSFPlayerConfig::~NSFPlayerConfig ()
 // Load one
 bool NSFPlayerConfig::Load (const char *path, const char *sect, const char *name)
 {
+#if defined (WIN32)
   char temp[256];
   GetPrivateProfileString(sect,name,data[name].GetStr().c_str(),temp,255,path);
   data[name] = vcm::Value(temp);
   return true;
+#else
+  return false;
+#endif
 }
 
 // Load all
@@ -201,8 +204,12 @@ bool NSFPlayerConfig::Load (const char *path, const char *sect)
 
 bool NSFPlayerConfig::Save (const char *path, const char *sect, const char *name)
 {
+#if defined (WIN32)
   WritePrivateProfileString (sect, name, data[name], path);
   return true;
+#else
+  return false;
+#endif
 }
 
 bool NSFPlayerConfig::Save (const char *path, const char *sect)

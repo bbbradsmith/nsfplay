@@ -9,20 +9,19 @@
 #include <vector>
 #include <list>
 #include <set>
-
-#include <windows.h> // for thread safety
+#include <mutex>
 
 namespace vcm
 {
-  // �l
+  // l
   class Value
   {
   public:
-    // ����
-    std::string data;    // �l�c�ǂ�Ȍ^�ł���ɕ�����Ƃ��ĕۑ�
-    bool update;         // �A�b�v�f�[�g���ꂽ�Ȃ�true
+    // ®«
+    std::string data;    // lcÇñÈ^ÅàíÉ¶ñÆµÄÛ¶
+    bool update;         // Abvf[g³ê½Èçtrue
 
-    // ����
+    // ì
     Value();
     Value(const char *);
     Value(const std::string &);
@@ -42,7 +41,7 @@ namespace vcm
     void SetStr( const char * );
   };
 
-  // �R���t�B�O���[�V�����{�̂̒�`
+  // RtBO[V{ÌÌè`
   class ObserverI
   {
   public:
@@ -92,40 +91,25 @@ namespace vcm
     std::map < std::string, Value > data;
 
     // thread safety
-    HANDLE mutex;
-    class MutexGuard {
-      protected:
-        Configuration *c;
-      public:
-        MutexGuard(Configuration* c_) { c = c_; ::WaitForSingleObject(c->mutex, INFINITE); }
-        ~MutexGuard() { ::ReleaseMutex(c->mutex); }
-    };
-
+    std::mutex mutex;
   public:
     // thread safety
-    Configuration()
-    {
-      mutex = ::CreateMutex(NULL, false, NULL);
-    }
-    ~Configuration()
-    {
-      ::CloseHandle(mutex);
-    }
-
-    // �l��ǂށD������΃G���[�D
+    Configuration() = default;
+    
+    // lðÇÞD³¯êÎG[D
     Value &operator[]( const std::string id )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       std::map< std::string, Value >::iterator it;
       if(( it = data.find( id ) )==data.end() )
         throw std::out_of_range( id );
       else
         return it->second;
     }
-    // �l����� �d�����č�낤�Ƃ���� false ���A���Ď��s
+    // lðìé d¡µÄìë¤Æ·éÆ false ªAÁÄ¸s
     bool CreateValue( const std::string id, const Value &value )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       std::map< std::string, Value >::iterator it;
       if(( it = data.find( id ) )!=data.end() )
         return false;
@@ -135,33 +119,33 @@ namespace vcm
         return true;
       }
     }
-    // �l���Z�b�g����D������΍��D
+    // lðZbg·éD³¯êÎìéD
     inline void SetValue( const std::string id, const Value &value )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       data[id] = value;
     }
-    // �l��ǂށD������Ύ����I�ɍ쐬�����D
+    // lðÇÞD³¯êÎ©®IÉì¬³êéD
     inline Value &GetValue( const std::string id )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       return data[id];
     }
     inline void Clear()
     { 
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       data.clear(); 
     }
     void Read( Configuration &src )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       std::map<std::string, Value>::iterator it;
       for(it=data.begin();it!=data.end();it++)
         it->second = src[it->first];
     }
     void Write( Configuration &src )
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       std::map<std::string, Value>::iterator it;
       for(it=data.begin();it!=data.end();it++)
         src[it->first]=it->second;

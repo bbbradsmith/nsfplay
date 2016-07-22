@@ -1,8 +1,9 @@
-#include <assert.h>
-#include <typeinfo>
 #include "nsfplay.h"
 
+#include <assert.h>
+#include <typeinfo>
 #include <time.h> // for srand() initialization
+#include <cstring>
 
 namespace xgm
 {
@@ -10,7 +11,7 @@ namespace xgm
   {
     nsf = NULL;
 
-    const type_info &ti = typeid(this);
+    const std::type_info &ti = typeid(this);
     sc[APU] = (apu = new NES_APU());
     sc[DMC] = (dmc = new NES_DMC());
     sc[FDS] = (fds = new NES_FDS());
@@ -25,7 +26,7 @@ namespace xgm
     dmc->SetAPU(apu); // set APU
     mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
 
-    /* �A���v���t�B���^�����[�g�R���o�[�^������ ��ڑ� */
+    /* Av©tB^©[gRo[^©¹¹ ðÚ± */
     for (int i = 0; i < NES_DEVICE_MAX; i++)
     {
       rconv[i].Attach (sc[i]);
@@ -54,7 +55,9 @@ namespace xgm
 
   void NSFPlayer::SetConfig(PlayerConfig *pc)
   {
+#if defined (WIN32)
     config = dynamic_cast<NSFPlayerConfig *>(pc);
+#endif
     PlayerMSP::SetConfig(pc);
   }
 
@@ -121,7 +124,7 @@ namespace xgm
     // select the loop detector
     if((*config)["DETECT_ALT"])
     {
-      const type_info &ti = typeid(ld);
+      const std::type_info &ti = typeid(ld);
       if(strcmp(ti.name(),"NESDetectorEx")!=0)
       {
         delete ld;
@@ -130,7 +133,7 @@ namespace xgm
     }
     else
     {
-      const type_info &ti = typeid(ld);
+      const std::type_info &ti = typeid(ld);
       if(strcmp(ti.name(),"NESDetector")!=0)
       {
         delete ld;
@@ -245,7 +248,7 @@ namespace xgm
     {
       int quality = config->GetDeviceConfig(i,"QUALITY");
 
-      // ���[�g�R���o�[�^���g�p����
+      // [gRo[^ðgp·é
       int MULT[NES_DEVICE_MAX][4] = { 
         1, 5, 8, 20, // APU1
         1, 5, 8, 20, // DMC
@@ -287,10 +290,10 @@ namespace xgm
       }
       else
       {
-        // ���[�g�R���o�[�^�͎g�p���Ȃ�
+        // [gRo[^ÍgpµÈ¢
         filter[i].Attach (sc[i]);
       }
-      // �t�B���^������g���̐ݒ�
+      // tB^®ìügÌÝè
       filter[i].SetRate(rate);
       filter[i].Reset();
     }
@@ -321,7 +324,7 @@ namespace xgm
     playtime_detected = false;
     click_mode = PRE_CLICK;
     total_render = 0;
-    frame_render = (int)(rate)/60; // ���t�����X�V�������
+    frame_render = (int)(rate)/60; // tîñðXV·éüú
     apu_clock_rest = 0.0;
     cpu_clock_rest = 0.0;
 
@@ -343,15 +346,15 @@ namespace xgm
     if (logcpu->GetLogLevel() > 0)
         logcpu->Begin(GetTitleString());
 
-    // ���t���RAM��Ԃ�j�󂳂��ꍇ������̂ŁC�ă��[�h
+    // tãÉRAMóÔðjó³êéêª éÌÅCÄ[h
     Reload ();
-    // ���[�g�̐ݒ��Reset���O�ɍs���Ă�������
+    // [gÌÝèÍResetæèOÉsÁÄ¨­±Æ
     SetPlayFreq (rate);
-    // �S�ẴR���t�B�O���[�V������K�p
+    // SÄÌRtBO[VðKp
     config->Notify (-1);
-    // �o�X�����Z�b�g 
+    // oXðZbg 
     stack.Reset ();
-    // CPU���Z�b�g�͕K���o�X����i�d�v�j
+    // CPUZbgÍK¸oXæèãidvj
     cpu.Reset ();
 
     double speed;
@@ -373,7 +376,7 @@ namespace xgm
 
     cpu.Start (nsf->init_address, nsf->play_address, speed, song, (region == REGION_PAL)?1:0);
 
-    // �}�X�N�X�V
+    // }XNXV
     apu->SetMask( (*config)["MASK"].GetInt()    );
     dmc->SetMask( (*config)["MASK"].GetInt()>>2 );
     fds->SetMask( (*config)["MASK"].GetInt()>>5 );

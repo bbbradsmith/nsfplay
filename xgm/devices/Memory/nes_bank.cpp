@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstring>
 #include "nes_bank.h"
 
 // this workaround solves a problem with mirrored FDS RAM writes
@@ -44,7 +45,7 @@ namespace xgm
   {
     int i;
 
-    // バンクスイッチの初期値は全て「バンク無効」
+    // ﾂバﾂδ督クﾂスﾂイﾂッﾂチﾂづ個渉可甘ｺﾂ値ﾂづ債全ﾂづ�ﾂ「ﾂバﾂδ督クﾂ鳴ｳﾂ古ｸﾂ」
     for (i = 0; i < 16; i++)
       bankdefault[i] = -1; // -1 is special empty bank
 
@@ -57,8 +58,8 @@ namespace xgm
     if (image)
       delete[]image;
     image = new UINT8[0x1000 * bankmax];
-    memset (image, 0, 0x1000 * bankmax);
-    memcpy (image + (offset & 0xfff), data, size);
+    std::memset(image, 0, 0x1000 * bankmax);
+    std::memcpy(image + (offset & 0xfff), data, size);
 
     #if FDS_MEMCPY
       if (fds_image)

@@ -1,10 +1,10 @@
+#if defined (WIN32)
+
 #include "nsf_tag.h"
 using namespace xgm;
 
 NSF_TAG::NSF_TAG() : sdat(NULL)
 {
-  memset(m_sect,0,sizeof(m_sect));
-  memset(m_tagf,0,sizeof(m_tagf));
 }
 
 NSF_TAG::NSF_TAG(NSF *nsf)
@@ -55,7 +55,7 @@ int NSF_TAG::WriteTagItem(int song, const char *title, int time, int loop, int f
   }
   else
   {
-    DEBUG_OUT("‘¶Ý‚µ‚È‚¢ƒZƒNƒVƒ‡ƒ“‚Ö‚Ì‘ž‚Ý\n");
+    DEBUG_OUT("Â‘Â¶ÂÃÂ‚ÂµÂ‚ÃˆÂ‚Â¢ÂƒZÂƒNÂƒVÂƒÂ‡ÂƒÂ“Â‚Ã–Â‚ÃŒÂÂ‘ÂÂžÂ‚Ã\n");
     return 0;
   }
 }
@@ -68,7 +68,7 @@ int NSF_TAG::InitTagItem(int song, const char *title_format)
   }
   else
   {
-    DEBUG_OUT("‘¶Ý‚µ‚È‚¢ƒZƒNƒVƒ‡ƒ“‚Ö‚Ì‘ž‚Ý\n");
+    DEBUG_OUT("Â‘Â¶ÂÃÂ‚ÂµÂ‚ÃˆÂ‚Â¢ÂƒZÂƒNÂƒVÂƒÂ‡ÂƒÂ“Â‚Ã–Â‚ÃŒÂÂ‘ÂÂžÂ‚Ã\n");
     return 0;
   }
 }
@@ -107,7 +107,7 @@ int NSF_TAG::CreateTag(const char *title_format)
   WritePrivateProfileString(m_sect,"Artist",sdat->artist,m_tagf);
   WritePrivateProfileString(m_sect,"Comment",sdat->copyright,m_tagf);
 
-  // ”N†‚ÌŽæ‚èo‚µ
+  // Â”NÂÂ†Â‚ÃŒÂŽÃ¦Â‚Ã¨ÂoÂ‚Âµ
   for(i=0,p=sdat->copyright;*p!='\0';p++)
   {
     if('0'<=(*p)&&(*p)<='9')
@@ -125,7 +125,7 @@ int NSF_TAG::CreateTag(const char *title_format)
 
   WriteEnable(true);
 
-  // ‘S‹È•ª‚Ì‘‚«ž‚Ý
+  // Â‘SÂ‹ÃˆÂ•ÂªÂ‚ÃŒÂÂ‘Â‚Â«ÂÂžÂ‚Ã
   for(i=sdat->start-1;i<sdat->songs;i++)
     InitTagItem(i,title_format);
 
@@ -261,3 +261,5 @@ bool NSF_TAG::IsWriteEnable()
   else
     return false;
 }
+
+#endif
