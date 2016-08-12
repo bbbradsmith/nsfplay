@@ -23,6 +23,7 @@ UI:
 - Re-range volume sliders from 0 to 200%, default at centre.
 - Play + no file loaded = open?
 - Winamp plugin: hover over taskbar, play controls work but track select does not work properly.
+- Winamp plugin: doesn't seem to save settings for a lot of people?
 Other:
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
 - FDS write protect > default on if multi-chip
