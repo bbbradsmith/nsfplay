@@ -261,7 +261,7 @@ static int is_sjis_prefix(int c)
     else
       goto Error_Exit;
 
-    filename[NSF_MAX_PATH] = '\0';
+    filename[NSF_MAX_PATH - 1] = '\0';
     fp = fopen (filename, "rb");
     if (fp == NULL)
       goto Error_Exit;
