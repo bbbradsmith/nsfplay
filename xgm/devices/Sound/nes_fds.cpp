@@ -109,11 +109,11 @@ void NES_FDS::Reset ()
     //   $4023 = $00
     //   $4023 = $83 enables master_io
     //   $4080 = $80 output volume = 0, envelope disabled
-    //   $408A = $FF master envelope speed set to slowest
+    //   $408A = $E8 master envelope speed
     Write(0x4023, 0x00);
     Write(0x4023, 0x83);
     Write(0x4080, 0x80);
-    Write(0x408A, 0xFF);
+    Write(0x408A, 0xE8);
 
     // reset other stuff
     Write(0x4082, 0x00); // wav freq 0
