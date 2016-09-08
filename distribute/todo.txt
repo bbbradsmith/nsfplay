@@ -1,4 +1,5 @@
 Emu:
+- option to not disable bankswitch registers with bank 0 0 0 0 0 0 0 0
 - full-emulation quality option (emulate at M2 speed and downsample)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
 - 5B does not support ImATrackMan's PWM envelope volume control (i.e. high freq square + env = half volume env)
