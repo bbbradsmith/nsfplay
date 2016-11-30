@@ -1,4 +1,7 @@
 #include "nes_dmc.h"
+
+#include <cstdlib>
+
 #include "nes_apu.h"
 
 namespace xgm
@@ -78,7 +81,7 @@ namespace xgm
       trkinfo[1].volume = noise_volume+(envelope_disable?0:0x10)+(envelope_loop?0x20:0);
       trkinfo[1].key = length_counter[1]>0 && enable[1] &&
                        (envelope_disable ? (noise_volume>0) : (envelope_counter>0));
-      trkinfo[1]._freq = reg[0x400e-0x4008]&0xF;
+      trkinfo[1]._freq = reg[0x400e - 0x4008] & 0xF;
       trkinfo[1].freq = clock/double(wavlen_table[pal][trkinfo[1]._freq] * ((noise_tap&(1<<6)) ? 93 : 1));
       trkinfo[1].tone = noise_tap & (1<<6);
       trkinfo[1].output = out[1];
@@ -170,7 +173,7 @@ namespace xgm
 
   }
 
-  // OŠp”gƒ`ƒƒƒ“ƒlƒ‹‚ÌŒvZ –ß‚è’l‚Í0-15
+  // ÂOÂŠpÂ”gÂƒ`ÂƒÂƒÂƒÂ“ÂƒlÂƒÂ‹Â‚ÃŒÂŒvÂZ Â–ÃŸÂ‚Ã¨Â’lÂ‚Ã0-15
   UINT32 NES_DMC::calc_tri (UINT32 clocks)
   {
     static UINT32 tritbl[32] = 
@@ -196,10 +199,10 @@ namespace xgm
     return ret;
   }
 
-  // ƒmƒCƒYƒ`ƒƒƒ“ƒlƒ‹‚ÌŒvZ –ß‚è’l‚Í0-127
-  // ’áƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg‚Å‡¬‚·‚é‚ÆƒGƒCƒŠƒAƒXƒmƒCƒY‚ªŒƒ‚µ‚¢‚Ì‚Å
-  // ƒmƒCƒY‚¾‚¯‚Í‚±‚ÌŠÖ”“à‚Å‚ƒNƒƒbƒN‡¬‚µAŠÈˆÕ‚ÈƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg
-  // •ÏŠ·‚ğs‚Á‚Ä‚¢‚éB
+  // ÂƒmÂƒCÂƒYÂƒ`ÂƒÂƒÂƒÂ“ÂƒlÂƒÂ‹Â‚ÃŒÂŒvÂZ Â–ÃŸÂ‚Ã¨Â’lÂ‚Ã0-127
+  // Â’Ã¡ÂƒTÂƒÂ“ÂƒvÂƒÂŠÂƒÂ“ÂƒOÂƒÂŒÂ[ÂƒgÂ‚Ã…ÂÂ‡ÂÂ¬Â‚Â·Â‚Ã©Â‚Ã†ÂƒGÂƒCÂƒÂŠÂƒAÂƒXÂƒmÂƒCÂƒYÂ‚ÂªÂŒÂƒÂ‚ÂµÂ‚Â¢Â‚ÃŒÂ‚Ã…
+  // ÂƒmÂƒCÂƒYÂ‚Â¾Â‚Â¯Â‚ÃÂ‚Â±Â‚ÃŒÂŠÃ–ÂÂ”Â“Ã Â‚Ã…ÂÂ‚ÂƒNÂƒÂÂƒbÂƒNÂÂ‡ÂÂ¬Â‚ÂµÂAÂŠÃˆÂˆÃ•Â‚ÃˆÂƒTÂƒÂ“ÂƒvÂƒÂŠÂƒÂ“ÂƒOÂƒÂŒÂ[Âƒg
+  // Â•ÃÂŠÂ·Â‚Ã°ÂsÂ‚ÃÂ‚Ã„Â‚Â¢Â‚Ã©ÂB
   UINT32 NES_DMC::calc_noise(UINT32 clocks)
   {
     UINT32 env = envelope_disable ? noise_volume : envelope_counter;
@@ -242,14 +245,14 @@ namespace xgm
     return accum / (clocks * count);
   }
 
-  // DMCƒ`ƒƒƒ“ƒlƒ‹‚ÌŒvZ –ß‚è’l‚Í0-127
+  // DMCÂƒ`ÂƒÂƒÂƒÂ“ÂƒlÂƒÂ‹Â‚ÃŒÂŒvÂZ Â–ÃŸÂ‚Ã¨Â’lÂ‚Ã0-127
   UINT32 NES_DMC::calc_dmc (UINT32 clocks)
   {
     counter[2] += clocks;
     assert (dfreq > 0); // prevent infinite loop
     while (counter[2] >= dfreq)
     {
-      if ( data != 0x100 ) // data = 0x100 ‚Í EMPTY ‚ğˆÓ–¡‚·‚éB
+      if ( data != 0x100 ) // data = 0x100 Â‚Ã EMPTY Â‚Ã°ÂˆÃ“Â–Â¡Â‚Â·Â‚Ã©ÂB
       {
         if ((data & 1) && (damp < 63))
           damp++;
@@ -261,7 +264,7 @@ namespace xgm
       if ( data == 0x100 && active )
       { 
         memory->Read (daddress, data);
-        data |= (data&0xFF)|0x10000; // 8bitƒVƒtƒg‚Å 0x100 ‚É‚È‚é
+        data |= (data&0xFF)|0x10000; // 8bitÂƒVÂƒtÂƒgÂ‚Ã… 0x100 Â‚Ã‰Â‚ÃˆÂ‚Ã©
         if ( length > 0 ) 
         {
           daddress = ((daddress+1)&0xFFFF)|0x8000 ;
@@ -269,7 +272,7 @@ namespace xgm
         }
       }
       
-      if ( length == 0 ) // ÅŒã‚ÌƒtƒFƒbƒ`‚ªI—¹‚µ‚½‚ç(Ä¶Š®—¹‚æ‚è‘O‚É)‘¦À‚ÉI’[ˆ—
+      if ( length == 0 ) // ÂÃ…ÂŒÃ£Â‚ÃŒÂƒtÂƒFÂƒbÂƒ`Â‚ÂªÂIÂ—Â¹Â‚ÂµÂ‚Â½Â‚Ã§(ÂÃ„ÂÂ¶ÂŠÂ®Â—Â¹Â‚Ã¦Â‚Ã¨Â‘OÂ‚Ã‰)Â‘Â¦ÂÃ€Â‚Ã‰ÂIÂ’[ÂÂˆÂ—Â
       {
         if (mode & 1)
         {
@@ -278,7 +281,7 @@ namespace xgm
         }
         else
         {
-          irq = (mode==2&&active)?1:0; // ’¼‘O‚ªactive‚¾‚Á‚½‚Æ‚«‚ÍIRQ”­s
+          irq = (mode==2&&active)?1:0; // Â’Â¼Â‘OÂ‚ÂªactiveÂ‚Â¾Â‚ÃÂ‚Â½Â‚Ã†Â‚Â«Â‚ÃIRQÂ”Â­Âs
           active = false;
         }
       }
@@ -477,7 +480,7 @@ namespace xgm
     noise_tap = (1<<1);
     if (option[OPT_RANDOMIZE_NOISE])
     {
-        noise |= ::rand();
+        noise |= std::rand();
     }
 
     SetRate(rate);
@@ -652,12 +655,12 @@ namespace xgm
 
     case 0x4012:
       adr_reg = val&0xff;
-      // ‚±‚±‚Ådaddress‚ÍXV‚³‚ê‚È‚¢
+      // Â‚Â±Â‚Â±Â‚Ã…daddressÂ‚ÃÂXÂVÂ‚Â³Â‚ÃªÂ‚ÃˆÂ‚Â¢
       break;
 
     case 0x4013:
       len_reg = val&0xff;
-      // ‚±‚±‚Ålength‚ÍXV‚³‚ê‚È‚¢
+      // Â‚Â±Â‚Â±Â‚Ã…lengthÂ‚ÃÂXÂVÂ‚Â³Â‚ÃªÂ‚ÃˆÂ‚Â¢
       break;
 
     default:

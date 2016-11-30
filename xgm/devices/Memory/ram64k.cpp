@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <cstring>
 #include "ram64k.h"
 
 namespace xgm
@@ -23,9 +24,9 @@ bool
 RAM64K::SetImage (UINT8 * data, UINT32 offset, UINT32 size)
 {
   if( offset + size < 0x10000 )
-    memcpy (image + offset, data, size );
+    std::memcpy(image + offset, data, size );
   else 
-    memcpy (image + offset, data, 0x10000 - offset);
+    std::memcpy(image + offset, data, 0x10000 - offset);
   return true;
 }
 

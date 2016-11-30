@@ -4,12 +4,12 @@
 
 namespace xgm
 {
-  /** デバイス毎の通し番号 */
+  /** ﾂデﾂバﾂイﾂスﾂ鳴按づ個津環つｵﾂ氾板債� */
   enum DeviceCode
   { APU = 0, DMC, FME7, MMC5, N106, VRC6, VRC7, FDS, NES_DEVICE_MAX };
 
   const int NES_CHANNEL_MAX = 29;
-
+  
   class NSFPlayerConfig : public PlayerConfig
   {
   public:
@@ -22,13 +22,13 @@ namespace xgm
 
     vcm::Value& GetDeviceConfig(int i, std::string key)
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       return data[(std::string)dname[i]+"_"+key];
     }
 
     vcm::Value& GetDeviceOption(int id, int opt)
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       static char itoa[] = "0123456789ABCDEF";
       return data[(std::string)dname[id]+"_OPTION"+itoa[opt]];
     }
@@ -36,11 +36,10 @@ namespace xgm
     // channel mix/pan config
     vcm::Value& GetChannelConfig(int id, std::string key)
     {
-      MutexGuard mg_(this);
+      std::lock_guard<std::mutex> mg_(mutex);
       if (id < 0) id = 0;
       if (id >= NES_CHANNEL_MAX) id = NES_CHANNEL_MAX-1;
-      char num[5];
-      ::itoa(id, num, 10);
+      auto num = std::to_string(id);
       std::string str;
       str = "CHANNEL_";
       if (id < 10) str += "0";
@@ -50,7 +49,7 @@ namespace xgm
       return data[str];
     }
 
-    /** デバイス毎の名前 */
+    /** ﾂデﾂバﾂイﾂスﾂ鳴按づ個鳴ｼﾂ前 */
     static char *dname[NES_DEVICE_MAX];
 
     // for channel/pan/mix

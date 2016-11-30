@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <cstring>
 #include "nes_cpu.h"
 
 #define DEBUG_RW 0
@@ -195,8 +196,8 @@ bool NES_CPU::Read (UINT32 adr, UINT32 & val, UINT32 id)
 
 void NES_CPU::Reset ()
 {
-  // KM6502のリセット
-  memset (&context, 0, sizeof (K6502_Context));
+  // KM6502ﾂづ個δ環セﾂッﾂト
+  std::memset(&context, 0, sizeof (K6502_Context));
   context.ReadByte = readByte;
   context.WriteByte = writeByte;
   context.iRequest = K6502_INIT;

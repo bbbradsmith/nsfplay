@@ -15,7 +15,7 @@ namespace xgm
   const unsigned int NSFE_ENTRIES = 256;
 
   /**
-   * NSFƒtƒ@ƒCƒ‹Œ^
+   * NSFÂƒtÂƒ@ÂƒCÂƒÂ‹ÂŒ^
    */
   class NSF : public SoundDataMSP
   {
@@ -57,30 +57,30 @@ namespace xgm
     int nsfe_plst_size;
     NSFE_Entry nsfe_entry[NSFE_ENTRIES];
 
-    /** Œ»İ‘I‘ğ’†‚Ì‹È”Ô† */
+    /** ÂŒÂ»ÂÃÂ‘IÂ‘Ã°Â’Â†Â‚ÃŒÂ‹ÃˆÂ”Ã”ÂÂ† */
     int song;
-    /** ƒvƒŒƒCƒŠƒXƒg‚©‚ç“Ç‚ñ‚¾ƒf[ƒ^‚È‚çtrue */
+    /** ÂƒvÂƒÂŒÂƒCÂƒÂŠÂƒXÂƒgÂ‚Â©Â‚Ã§Â“Ã‡Â‚Ã±Â‚Â¾ÂƒfÂ[Âƒ^Â‚ÃˆÂ‚Ã§true */
     bool playlist_mode;
-    /** ‰‰‘tŠÔ */
+    /** Â‰Â‰Â‘tÂÂÂŠÃ” */
     int time_in_ms, default_playtime;
-    /** ƒ‹[ƒvŠÔ */
+    /** ÂƒÂ‹Â[ÂƒvÂÂÂŠÃ” */
     int loop_in_ms;
-    /** ƒtƒF[ƒhŠÔ */
+    /** ÂƒtÂƒFÂ[ÂƒhÂÂÂŠÃ” */
     int fade_in_ms, default_fadetime;
-    /** ƒ‹[ƒv‰ñ” */
+    /** ÂƒÂ‹Â[ÂƒvÂ‰Ã±ÂÂ” */
     int loop_num, default_loopnum;
-    /** ‰‰‘tŠÔ‚ª•s–¾‚ÌtrueiƒfƒtƒHƒ‹ƒg‚Ì‰‰‘tŠÔ‚ğg—pj*/
+    /** Â‰Â‰Â‘tÂÂÂŠÃ”Â‚ÂªÂ•sÂ–Â¾Â‚ÃŒÂÂtrueÂiÂƒfÂƒtÂƒHÂƒÂ‹ÂƒgÂ‚ÃŒÂ‰Â‰Â‘tÂÂÂŠÃ”Â‚Ã°ÂgÂ—pÂj*/
     bool playtime_unknown;
     bool title_unknown;
 
       NSF ();
      ~NSF ();
     /**
-     * NSFƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
+     * NSFÂƒtÂƒ@ÂƒCÂƒÂ‹Â‚ÃŒÂ“Ã‡Â‚ÃÂÂÂ‚Ã
      *
-     * @param image ƒoƒCƒiƒŠƒCƒ[ƒW‚Ö‚Ìƒ|ƒCƒ“ƒ^
-     * @param size  ƒCƒ[ƒW‚ÌƒTƒCƒY
-     * @return ¬Œ÷ true ¸”s false
+     * @param image ÂƒoÂƒCÂƒiÂƒÂŠÂƒCÂƒÂÂ[ÂƒWÂ‚Ã–Â‚ÃŒÂƒ|ÂƒCÂƒÂ“Âƒ^
+     * @param size  ÂƒCÂƒÂÂ[ÂƒWÂ‚ÃŒÂƒTÂƒCÂƒY
+     * @return ÂÂ¬ÂŒÃ·ÂÂ true ÂÂ¸Â”sÂÂ false
      */
 
     // loads file (playlist or NSF or NSFe)
@@ -94,11 +94,11 @@ namespace xgm
 
     void DebugOut ();
     /**
-     * ƒ^ƒCƒgƒ‹•¶š—ñ‚Ìæ“¾
+     * Âƒ^ÂƒCÂƒgÂƒÂ‹Â•Â¶ÂÂšÂ—Ã±Â‚ÃŒÂÃ¦Â“Â¾
      *
-     * @return ƒ^ƒCƒgƒ‹•¶š—ñ (ì‹ÈÒ - ƒ^ƒCƒgƒ‹)
+     * @return Âƒ^ÂƒCÂƒgÂƒÂ‹Â•Â¶ÂÂšÂ—Ã± (ÂÃ¬Â‹ÃˆÂÃ’ - Âƒ^ÂƒCÂƒgÂƒÂ‹)
      */
-    char *GetTitleString (const char *format=NULL, int song=-1);
+    char *GetTitleString (const char *format = nullptr, int song=-1);
     char *GetPlaylistString (const char *format, bool b);
     int GetLength ();
     void SetTitleString (char *);

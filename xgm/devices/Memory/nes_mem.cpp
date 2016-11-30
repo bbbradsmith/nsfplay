@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <cstring>
 #include "nes_mem.h"
 
 namespace xgm
@@ -14,17 +15,17 @@ namespace xgm
 
   void NES_MEM::Reset ()
   {
-    memset (image, 0, 0x800);
-    //memset (image + 0x6000, 0, 0x2000); // •ª‚©‚Á‚Ä‚Ä‚ ‚¦‚Ä‰Šú‰»‚µ‚Ä‚Ü‚¹‚ñB
+    std::memset(image, 0, 0x800);
+    //memset (image + 0x6000, 0, 0x2000); // Â•ÂªÂ‚Â©Â‚ÃÂ‚Ã„Â‚Ã„Â‚Â Â‚Â¦Â‚Ã„ÂÂ‰ÂŠÃºÂ‰Â»Â‚ÂµÂ‚Ã„Â‚ÃœÂ‚Â¹Â‚Ã±ÂB
   }
 
   bool NES_MEM::SetImage (UINT8 * data, UINT32 offset, UINT32 size)
   {
-    memset (image, 0, 0x10000);
+    std::memset(image, 0, 0x10000);
     if( offset + size < 0x10000 )
-      memcpy (image + offset, data, size );
+      std::memcpy(image + offset, data, size );
     else 
-      memcpy (image + offset, data, 0x10000 - offset);
+      std::memcpy(image + offset, data, 0x10000 - offset);
     return true;
   }
 

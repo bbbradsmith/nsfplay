@@ -7,7 +7,7 @@
 namespace xgm
 {
   /**
-   * ƒV[ƒPƒ“ƒXŒ^‰‰‘tƒf[ƒ^
+   * ÂƒVÂ[ÂƒPÂƒÂ“ÂƒXÂŒ^Â‰Â‰Â‘tÂƒfÂ[Âƒ^
    */
   class SoundData
   {
@@ -15,45 +15,45 @@ namespace xgm
     SoundData(){};
     virtual ~SoundData(){};
     /**
-     * ƒoƒCƒiƒŠƒCƒ[ƒW‚©‚ç‚Ì“Ç‚İ‚İ
+     * ÂƒoÂƒCÂƒiÂƒÂŠÂƒCÂƒÂÂ[ÂƒWÂ‚Â©Â‚Ã§Â‚ÃŒÂ“Ã‡Â‚ÃÂÂÂ‚Ã
      *
-     * @param image ƒoƒCƒiƒŠƒCƒ[ƒW‚Ö‚Ìƒ|ƒCƒ“ƒ^
-     * @param size  ƒCƒ[ƒW‚ÌƒTƒCƒY
-     * @return ¬Œ÷ true ¸”s false
+     * @param image ÂƒoÂƒCÂƒiÂƒÂŠÂƒCÂƒÂÂ[ÂƒWÂ‚Ã–Â‚ÃŒÂƒ|ÂƒCÂƒÂ“Âƒ^
+     * @param size  ÂƒCÂƒÂÂ[ÂƒWÂ‚ÃŒÂƒTÂƒCÂƒY
+     * @return ÂÂ¬ÂŒÃ·ÂÂ true ÂÂ¸Â”sÂÂ false
      */
     virtual bool Load(UINT8 *data, UINT32 size){ return false; }
 
     /**
-     * ƒtƒ@ƒCƒ‹‚©‚ç‚Ì“Ç‚İ‚İ
-     * @param fn ƒtƒ@ƒCƒ‹–¼i‚Ü‚½‚Íƒtƒ@ƒCƒ‹î•ñ‚ğ¦‚·•¶š—ñj‚Ö‚Ìƒ|ƒCƒ“ƒ^
+     * ÂƒtÂƒ@ÂƒCÂƒÂ‹Â‚Â©Â‚Ã§Â‚ÃŒÂ“Ã‡Â‚ÃÂÂÂ‚Ã
+     * @param fn ÂƒtÂƒ@ÂƒCÂƒÂ‹Â–Â¼ÂiÂ‚ÃœÂ‚Â½Â‚ÃÂƒtÂƒ@ÂƒCÂƒÂ‹ÂÃ®Â•Ã±Â‚Ã°ÂÂ¦Â‚Â·Â•Â¶ÂÂšÂ—Ã±ÂjÂ‚Ã–Â‚ÃŒÂƒ|ÂƒCÂƒÂ“Âƒ^
      */
     virtual bool LoadFile(const char *fn){ return false; }
 
     /**
-     * ƒ^ƒCƒgƒ‹‚Ìæ“¾
-     * @return ƒ^ƒCƒgƒ‹î•ñ
+     * Âƒ^ÂƒCÂƒgÂƒÂ‹Â‚ÃŒÂÃ¦Â“Â¾
+     * @return Âƒ^ÂƒCÂƒgÂƒÂ‹ÂÃ®Â•Ã±
      */
-    virtual char *GetTitleString(const char *format=NULL){ return ""; }
+    virtual char *GetTitleString(const char *format = nullptr){ return ""; }
 
     /**
-     * ƒ^ƒCƒgƒ‹‚Ìİ’è
-     * @param title V‚µ‚¢ƒ^ƒCƒgƒ‹‚Ö‚Ìƒ|ƒCƒ“ƒ^(255•¶š‚Ü‚Å)
+     * Âƒ^ÂƒCÂƒgÂƒÂ‹Â‚ÃŒÂÃÂ’Ã¨
+     * @param title ÂVÂ‚ÂµÂ‚Â¢Âƒ^ÂƒCÂƒgÂƒÂ‹Â‚Ã–Â‚ÃŒÂƒ|ÂƒCÂƒÂ“Âƒ^(255Â•Â¶ÂÂšÂ‚ÃœÂ‚Ã…)
      */
     virtual void SetTitleString(char *title){}
 
     /**
-     * ‰‰‘tŠÔ(ms)‚Ìæ“¾
+     * Â‰Â‰Â‘tÂÂÂŠÃ”(ms)Â‚ÃŒÂÃ¦Â“Â¾
      */
     virtual int GetLength(){ return 3*60*1000; }
 
     /**
-     * ‰‰‘tŠÔ(ms)‚Ìİ’è
+     * Â‰Â‰Â‘tÂÂÂŠÃ”(ms)Â‚ÃŒÂÃÂ’Ã¨
      */
     virtual void SetLength(int time_in_ms){}
   };
 
   /**
-   * •¡”‹È“ü‚è‰‰‘tƒf[ƒ^
+   * Â•Â¡ÂÂ”Â‹ÃˆÂ“Ã¼Â‚Ã¨Â‰Â‰Â‘tÂƒfÂ[Âƒ^
    */
   class SoundDataMSP : public SoundData
   {

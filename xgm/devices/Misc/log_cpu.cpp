@@ -1,4 +1,7 @@
 #include "log_cpu.h"
+
+#include <cstring>
+
 #include "../CPU/nes_cpu.h"
 #include "../../player/nsf/nsf.h"
 
@@ -128,7 +131,7 @@ void CPULogger::SetFilename (const char * filename_)
         return;
     }
 
-    if (filename == NULL || ::strcmp(filename,filename_))
+    if (filename == NULL || std::strcmp(filename,filename_))
     {
         delete [] filename;
         filename = new char[::strlen(filename_)+1];
