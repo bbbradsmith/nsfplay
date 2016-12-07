@@ -186,7 +186,7 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
     m_info += ss;
   }
 
-  for (unsigned int i=0; i < nsf->songs; ++i)
+  for (unsigned int i=0; i < nsf->total_songs; ++i)
   {
     if (nsf->nsfe_entry[i].tlbl[0] != 0  ||
         nsf->nsfe_entry[i].time    != -1 ||

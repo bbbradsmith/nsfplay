@@ -422,7 +422,7 @@ static int is_sjis_prefix(int c)
       return false;
 
     version = image[0x05];
-    songs = image[0x06];
+    total_songs = songs = image[0x06];
     start = image[0x07];
     load_address = image[0x08] | (image[0x09] << 8);
     init_address = image[0x0a] | (image[0x0B] << 8);
@@ -530,6 +530,7 @@ static int is_sjis_prefix(int c)
           soundchip    = chunk[0x07];
           songs        = chunk[0x08];
           start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
+          total_songs  = songs;
 
           // NSFe doesn't allow custom speeds
           speed_ntsc = 16639; // 60.09Hz

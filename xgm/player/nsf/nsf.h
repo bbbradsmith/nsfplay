@@ -23,6 +23,7 @@ namespace xgm
     char magic[5];
     UINT8 version;
     UINT8 songs;
+    UINT8 total_songs;
     UINT8 start;
     UINT16 load_address;
     UINT16 init_address;
