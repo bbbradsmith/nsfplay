@@ -1,4 +1,5 @@
 Emu:
+- Option for what to do with long-PLAY lag. Wait for next interval, or run as much as possible?
 - Non-returning-init timeout option to support quietust's battletoads RIP
 -- http://www.qmtpro.com/~nes/nsf/battletoads_pcm.zip
 -- http://forums.nesdev.com/viewtopic.php?p=9220#p9220
