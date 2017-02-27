@@ -1,4 +1,8 @@
 Emu:
+- Non-returning-init timeout option to support quietust's battletoads RIP
+-- http://www.qmtpro.com/~nes/nsf/battletoads_pcm.zip
+-- http://forums.nesdev.com/viewtopic.php?p=9220#p9220
+- "APU clock" square should be 8 part not 16, and the divider should never reset manually, see: https://forums.nesdev.com/viewtopic.php?p=185505#p185505 / https://forums.nesdev.com/viewtopic.php?p=186129#p186129
 - option to not disable bankswitch registers with bank 0 0 0 0 0 0 0 0
 - full-emulation quality option (emulate at M2 speed and downsample)
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
