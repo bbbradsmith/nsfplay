@@ -1,4 +1,9 @@
 Emu:
+- Mirroring of chip registers
+-- create a "yoked" wrapper for multichip that responds to only lowest address?
+- VRC6 exhibits "vibrato click" at A-3, see: https://cdn.discordapp.com/attachments/239104268794200064/317404503986929664/test.nsf
+-- clicking does happen on hardware but seems to be exacerbated by NSFPlay, maybe this is a sampling granularity thing?
+-- Notice VRC6 has a 32-cycle delay after every sound register write in konami engines. Why?
 - Option for what to do with long-PLAY lag. Wait for next interval, or run as much as possible?
 - Non-returning-init timeout option to support quietust's battletoads RIP
 -- http://www.qmtpro.com/~nes/nsf/battletoads_pcm.zip
