@@ -27,6 +27,9 @@ Emu:
 -- wonder if battletoads noise thing is just CPU spikes?
 -- (if frame length has exceeded, instead of break until next when it hits, run another frame and clear the counter)
 -- test against BotB 20492 djmaximum - lights of are minds (virtuansf1061 recommended).nsf
+- See thread: https://twitter.com/ImATrackMan/status/940851266191855616
+-- Summary: Phase reset clicks are suffering from lack of timing precision, should be fixed when moving to a timing method that has cycle synchronization of writes and emulator.
+-- Summary: 5B exhibits phase reset from $0FF to $100 but not $100 to $0FF transition?
 UI:
 - Play/pause/stop doesn't work like most player UI, revise their function.
 - Command line wav could use fade out (actually set config param, also channel mask option).
@@ -35,6 +38,7 @@ UI:
 - Play + no file loaded = open?
 - Winamp plugin: hover over taskbar, play controls work but track select does not work properly.
 - Winamp plugin: doesn't seem to save settings for a lot of people?
+- Waveform visualizer
 Other:
 - Play speed override option (keyboard adjustment should have more than just 1-8 integers), maybe allow CPU speed adjustment too?
 - FDS write protect > default on if multi-chip
@@ -42,6 +46,8 @@ Other:
 - disable auto-skip on 1 track NSFs by default
 - Infinite playtime option
 - OPL2 notes, may help VRC7 implementation: https://docs.google.com/document/d/18IGx18NQY_Q1PJVZ-bHywao9bhsDoAqoIn1rIm42nwo
+- NSFLive memory access viewer: visual map of memory usage (like FCEUX code data log)
+- DPCM ripper
 
 
 Later version:
