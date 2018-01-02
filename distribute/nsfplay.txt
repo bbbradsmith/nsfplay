@@ -171,7 +171,8 @@ NSFPlay 2.4 beta 4 - ?
 - Fixed frequency rounding for triangle/noise/DMC in keyboard display.
 - Fixed intermittent crash with Winamp starting up with NSF in playlist.
 - Fixed FDS mod table bit-mask and wavetable read address. (Minor.)
-- Fixed broken playback rate for rates < 28 Hz
+- Fixed broken playback rate for rates < 28 Hz.
+- NSFe RATE chunk implemented.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

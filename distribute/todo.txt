@@ -48,6 +48,7 @@ Other:
 - OPL2 notes, may help VRC7 implementation: https://docs.google.com/document/d/18IGx18NQY_Q1PJVZ-bHywao9bhsDoAqoIn1rIm42nwo
 - NSFLive memory access viewer: visual map of memory usage (like FCEUX code data log)
 - DPCM ripper
+- $4011 writes during init should pre-load the output without causing a pop at start?
 
 
 Later version:
@@ -61,6 +62,12 @@ Later version:
 - Foobar2000 plugin
 - KB plugin
 - NSF2
+-- https://wiki.nesdev.com/w/index.php/NSF2
+-- register poll for "this is NSF2 compliant player"
+-- IRQ timer
+-- IRQ allowed (just uses current vector)
+-- non returning INIT allowed, register to signal "ready" for sound to begin
+-- metadata allow NSFe block of chunks to be appended to end
 - Visualizer plugin system. Full register view capability.
 - De-MFC GUI, change to a .lib, and build directly into plugin.
 - Remove plugin stubs from xgm, these belong in the plugin project itself.
