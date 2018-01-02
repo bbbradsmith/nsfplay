@@ -68,6 +68,7 @@ Later version:
 -- IRQ allowed (just uses current vector)
 -- non returning INIT allowed, register to signal "ready" for sound to begin
 -- metadata allow NSFe block of chunks to be appended to end
+-- register location debate, was it in conflict with discovered test register?
 - Visualizer plugin system. Full register view capability.
 - De-MFC GUI, change to a .lib, and build directly into plugin.
 - Remove plugin stubs from xgm, these belong in the plugin project itself.
