@@ -14,6 +14,7 @@ Emu:
 - Rewrite 5B implementation for better synchronization with clock (is currently independent of clock).
 - 5B does not support ImATrackMan's PWM envelope volume control (i.e. high freq square + env = half volume env)
 - VRC7 emulation accuracy
+- VRC patch update? evaluate this: https://forums.nesdev.com/viewtopic.php?p=206193#p206193
 - MMC5 squares, are they nonlinear, does PCM affect them?
 - Battletoads track 10, noise sounds much duller on hardware.
 - Triangle phase randomize init option.
