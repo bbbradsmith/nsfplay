@@ -52,6 +52,8 @@ Other:
 - DPCM ripper
 - $4011 writes during init should pre-load the output without causing a pop at start?
 - NSFe could use an N163 volume chunk. Maybe 64 = 8-channel full volume square = 2A03 level, or something? Should allow range that covers wider than existing usage, and produce a standard value that Famitracker could export, etc.
+-- signed 16-bit millibels (1/100 of dB) where 0 is equal to square
+-- allow an entry for each unit (i.e. APU tri/nse/dmc, each expansion), 0 indicates end of list
 
 
 Later version:
