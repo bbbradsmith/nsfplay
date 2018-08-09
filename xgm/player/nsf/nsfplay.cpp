@@ -750,7 +750,44 @@ namespace xgm
 
     filter[id].SetParam (4700.0, config->GetDeviceConfig(id,"FILTER").GetInt());
 
-    amp[id].SetVolume (config->GetDeviceConfig(id,"VOLUME"));
+    // adjust volume by NSFE mixe chunk
+
+    const int MIXE_DEVICE_MAP[NES_DEVICE_MAX] = { 0, 1, 7, 5, 6, 2, 3, 4 }; // map device ID to mixe
+    const int MIXE_DEVICE_ADJUST[NSFE_MIXES] =
+    {
+        // millibels difference between device "square" and APU square
+        0, // APU (1x)
+        0, // DMC TODO measure this (create test ROM/NSF)
+        0, // VRC6 (1x)
+        0, // VRC7 TODO measure this
+        760, // FDS (2.4x)
+        0, // MMC5 (1x)
+        1556, // N163 (6.0x)
+        0, // 5B TODO measure this
+    };
+
+    const int mixe_device = MIXE_DEVICE_MAP[id];
+    int mixe = MIXE_DEVICE_ADJUST[mixe_device];
+    if (nsf)
+    {
+        int new_mixe = nsf->nsfe_mixe[mixe_device];
+        if (new_mixe != NSFE_MIXE_DEFAULT)
+        {
+            mixe = new_mixe;
+        }
+    }
+    mixe -= MIXE_DEVICE_ADJUST[mixe_device]; // millibels to adjust volume
+
+    int device_volume = config->GetDeviceConfig(id,"VOLUME");
+    if (mixe != 0)
+    {
+        double adjust = ::pow(10,double(mixe)/2000.0); // millibels to amplitude change
+        device_volume = int(double(device_volume) * adjust);
+        if (device_volume > 1024) device_volume = 1024; // sanity clamp to 4x default
+        if (device_volume < 0) device_volume = 0; // should be impossible
+    }
+
+    amp[id].SetVolume (device_volume);
     amp[id].SetMute (config->GetDeviceConfig(id,"MUTE"));
     //amp[id].SetCompress (config->GetDeviceConfig(id,"THRESHOLD"), config->GetDeviceConfig(id,"TWEIGHT"));
     amp[id].SetCompress (config->GetDeviceConfig(id,"THRESHOLD"), -1);

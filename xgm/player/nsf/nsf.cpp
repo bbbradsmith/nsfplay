@@ -33,6 +33,7 @@ static int is_sjis_prefix(int c)
     nsfe_image = NULL;
     nsfe_plst = NULL;
     nsfe_plst_size = 0;
+    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
   }
 
   NSF::~NSF ()
@@ -408,6 +409,9 @@ static int is_sjis_prefix(int c)
       nsfe_entry[i].fade = -1;
     }
 
+    // 'mixe'
+    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
+
     // load the NSF or NSFe
 
     memcpy (magic, image, 4);
@@ -594,11 +598,8 @@ static int is_sjis_prefix(int c)
         {
           if (!info)
             return false;
-          if (chunk_size < 4)
-            return false;
-
-          speed_ntsc = chunk[0] | (chunk[1] << 8);
-          speed_pal  = chunk[2] | (chunk[3] << 8);
+          if (chunk_size >= 2) speed_ntsc  = chunk[0] | (chunk[1] << 8);
+          if (chunk_size >= 4) speed_pal   = chunk[2] | (chunk[3] << 8);
         }
         else if (!strcmp(cid, "auth"))
         {
@@ -673,6 +674,25 @@ static int is_sjis_prefix(int c)
         {
           text = reinterpret_cast<char*>(chunk);
           text_len = chunk_size;
+        }
+        else if (!strcmp(cid, "mixe"))
+        {
+          unsigned int pos = 0;
+          while (pos + 3 <= chunk_size)
+          {
+            unsigned int mixe_index = chunk[pos+0];
+            INT16 mixe_value = UINT16(chunk[pos+1] + (chunk[pos+2] << 8));
+
+            if (mixe_index == 0) break;
+            if (mixe_index >= NSFE_MIXES) return false; // invalid mixe index
+
+            // max value should never be used, but just in case, fake it with max-1
+            // (was using max value to specify "default" instead)
+            if (mixe_value == NSFE_MIXE_DEFAULT) mixe_value = NSFE_MIXE_DEFAULT-1;
+
+            nsfe_mixe[mixe_index] = mixe_value;
+            pos += 3;
+          }
         }
         else // unknown chunk
         {

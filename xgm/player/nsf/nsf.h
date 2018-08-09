@@ -13,6 +13,8 @@ namespace xgm
     INT32 fade;
   };
   const unsigned int NSFE_ENTRIES = 256;
+  const unsigned int NSFE_MIXES = 8;
+  const INT16 NSFE_MIXE_DEFAULT = 32767;
 
   /**
    * NSFファイル型
@@ -57,6 +59,7 @@ namespace xgm
     UINT8* nsfe_plst;
     int nsfe_plst_size;
     NSFE_Entry nsfe_entry[NSFE_ENTRIES];
+    INT16 nsfe_mixe[NSFE_MIXES];
 
     /** 現在選択中の曲番号 */
     int song;
