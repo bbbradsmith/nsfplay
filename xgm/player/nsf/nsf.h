@@ -60,6 +60,9 @@ namespace xgm
     int nsfe_plst_size;
     NSFE_Entry nsfe_entry[NSFE_ENTRIES];
     INT16 nsfe_mixe[NSFE_MIXES];
+    UINT16 speed_dendy;
+    UINT8 regn;
+    int regn_pref;
 
     /** Œ»İ‘I‘ğ’†‚Ì‹È”Ô† */
     int song;

@@ -101,8 +101,14 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
   m_vrc6 = (CString)(nsf->use_vrc6?"VRC6":"");
   m_vrc7 = (CString)(nsf->use_vrc7?"VRC7":"");
   m_n106 = (CString)(nsf->use_n106?"N163":"");
-  m_pal =  (CString)((nsf->pal_ntsc == 0) ? "NTSC" :
-      ((nsf->pal_ntsc == 1) ? "PAL" : "DUAL"));
+
+  const char* REGN_STRING[8] =
+  {
+      "None", "NTSC", "PAL", "Dual",
+      "Dendy", "D.N", "DP.", "DPN"
+  };
+  m_pal = (CString)REGN_STRING[nsf->regn];
+
   m_info = (CString)(buf);
   m_song = (nsf->song+1);
   m_songslider.SetRange(1, nsf->songs);
@@ -163,11 +169,13 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
       "Start track: %d of %d\r\n"
       "NTSC Speed: %fHz (%d)\r\n"
       "PAL Speed: %fHz (%d)\r\n"
+      "Dendy Speed: %fHz (%d)\r\n"
       "Banks: %02X %02X %02X %02X %02X %02X %02X %02X\r\n"
       "Load/Init/Play: %04X/%04X/%04X\r\n"
       , nsf->start, nsf->songs
       , 1000000.0 / nsf->speed_ntsc, nsf->speed_ntsc
       , 1000000.0 / nsf->speed_pal, nsf->speed_pal
+      , 1000000.0 / nsf->speed_dendy, nsf->speed_dendy
       , nsf->bankswitch[0]
       , nsf->bankswitch[1]
       , nsf->bankswitch[2]

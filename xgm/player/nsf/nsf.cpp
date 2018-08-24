@@ -13,6 +13,9 @@ extern "C"
 namespace xgm
 {
 
+UINT8 CONVERT_REGN[4]      = { 0x01, 0x02, 0x03, 0x03 }; // NTSC, PAL, DUAL, DUAL
+int   CONVERT_REGN_PREF[4] = {   -1,   -1,    0,    1 }; // Any,  Any, NTSC,  PAL
+
 static int is_sjis_prefix(int c)
 {
   if((0x81<=c&&c<=0x9F)||(0xE0<=c&&c<=0xFC)) return 1 ;
@@ -448,8 +451,12 @@ static int is_sjis_prefix(int c)
     speed_pal = image[0x78] | (image[0x79] << 8);
     pal_ntsc = image[0x7a];
 
-    if(speed_pal==0 ) speed_pal  = 19997;
-    if(speed_ntsc==0) speed_ntsc = 16639;
+    regn      = CONVERT_REGN[     pal_ntsc & 3];
+    regn_pref = CONVERT_REGN_PREF[pal_ntsc & 3];
+
+    if(speed_ntsc ==0) speed_ntsc  = 16639;
+    if(speed_pal  ==0) speed_pal   = 19997;
+    if(speed_dendy==0) speed_dendy = speed_pal;
 
     soundchip = image[0x7b];
 
@@ -491,6 +498,11 @@ static int is_sjis_prefix(int c)
     {
       return false;
     }
+
+    // NSFe has no speed specification by default (see RATE chunk)
+    speed_ntsc  = 16639; // 60.09Hz
+    speed_pal   = 19997; // 50.00Hz
+    speed_dendy = speed_pal;
 
     UINT32 chunk_offset = 4; // skip 'NSFE'
     while (true)
@@ -536,9 +548,8 @@ static int is_sjis_prefix(int c)
           start        = chunk[0x09] + 1; // note NSFe is 0 based, unlike NSF
           total_songs  = songs;
 
-          // NSFe doesn't allow custom speeds
-          speed_ntsc = 16639; // 60.09Hz
-          speed_pal  = 19997; // 50.00Hz
+          regn      = CONVERT_REGN[     pal_ntsc & 3];
+          regn_pref = CONVERT_REGN_PREF[pal_ntsc & 3];
 
           // other variables contained in other banks
           memset (bankswitch, 0, 8);
@@ -596,10 +607,10 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "RATE"))
         {
-          if (!info)
-            return false;
           if (chunk_size >= 2) speed_ntsc  = chunk[0] | (chunk[1] << 8);
           if (chunk_size >= 4) speed_pal   = chunk[2] | (chunk[3] << 8);
+          if (chunk_size >= 6) speed_dendy = chunk[4] | (chunk[5] << 8);
+          if (chunk_size <  6) speed_dendy = speed_pal;
         }
         else if (!strcmp(cid, "auth"))
         {
@@ -694,6 +705,11 @@ static int is_sjis_prefix(int c)
             pos += 3;
           }
         }
+        else if (!strcmp(cid, "regn"))
+        {
+            if (chunk_size >= 1) regn = chunk[0];
+            if (chunk_size >= 2) regn_pref = chunk[1];
+        }
         else // unknown chunk
         {
           if (cid[0] >= 'A' && cid[0] <= 'Z')
@@ -725,6 +741,7 @@ static int is_sjis_prefix(int c)
     DEBUG_OUT ("Copyright:%s\n", copyright);
     DEBUG_OUT ("Speed(N): %d\n", speed_ntsc);
     DEBUG_OUT ("Speed(P): %d\n", speed_pal);
+    DEBUG_OUT ("Speed(D): %d\n", speed_dendy);
 
     DEBUG_OUT ("Bank :");
     for (i = 0; i < 8; i++)
@@ -733,12 +750,10 @@ static int is_sjis_prefix(int c)
     }
     DEBUG_OUT ("\n");
 
-    if (pal_ntsc & 1)
-      DEBUG_OUT ("PAL mode.\n");
-    else
-      DEBUG_OUT ("NTSC mode.\n");
-    if (pal_ntsc & 2)
-      DEBUG_OUT ("Dual PAL and NTSC mode.\n");
+    if (regn & 1) DEBUG_OUT ("PAL\n");
+    if (regn & 2) DEBUG_OUT ("NTSC\n");
+    if (regn & 4) DEBUG_OUT ("Dendy\n");
+    if (regn == 0) DEBUG_OUT ("No region?\n");
 
     if (soundchip & 1)
       DEBUG_OUT ("VRC6 ");

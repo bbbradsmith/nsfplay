@@ -172,7 +172,7 @@ namespace xgm
     virtual IDeviceInfo *GetInfo(int time_in_ms, int device_id);
 
     /** Whether to use PAL/NTSC/Dendy based on flags and REGION config */
-    virtual int GetRegion(UINT8 flags);
+    virtual int GetRegion(UINT8 flags, int pref);
     enum {
         REGION_NTSC = 0,
         REGION_PAL,

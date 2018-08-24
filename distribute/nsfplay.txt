@@ -173,6 +173,7 @@ NSFPlay 2.4 beta 5 - ?
 - Fixed FDS mod table bit-mask and wavetable read address. (Minor.)
 - Fixed broken playback rate for rates < 28 Hz.
 - NSFe RATE chunk implemented.
+- NSFe regn chunk implemented, including full Dendy support.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
