@@ -29,6 +29,36 @@ const char* OP_NAME[256] = {
 namespace xgm
 {
 
+inline void exec(K6502_Context& context, xgm::IDevice* bus)
+{
+    #if TRACE
+        Uword TPC = context.PC;
+        UINT32 tb[3];
+        bus->Read((TPC+0) & 0xFFFF, tb[0]);
+        bus->Read((TPC+1) & 0xFFFF, tb[1]);
+        bus->Read((TPC+2) & 0xFFFF, tb[2]);
+        DEBUG_OUT("%04X: A=%02X X=%02X Y=%02X P=%02X S=%02X %c > ",
+            context.PC,
+            context.A, context.X, context.Y, context.P, context.S,
+            context.iRequest ? 'I':'i');
+    #endif
+
+    K6502_Exec(&context);
+
+    #if TRACE
+        DEBUG_OUT("%s", OP_NAME[context.lastcode]);
+        int oplen = context.PC - TPC; // not accurate for branch/jump but good enough
+        for (int i=0; i<3; ++i)
+        {
+            if (i == 0 || i < oplen)
+            {
+                DEBUG_OUT(" %02X", tb[i]);
+            }
+        }
+        DEBUG_OUT("\n");
+    #endif
+}
+
 // bits of fixed point for timing
 // 16 causes overflow at low update rate values (~27 Hz)
 // 15 should be sufficient for any NSF (~13.6 Hz), since the format only allows down to ~15.25 Hz
@@ -82,34 +112,7 @@ UINT32 NES_CPU::Exec (UINT32 clock)
     if (!breaked)
     {
       //DEBUG_OUT("PC: 0x%04X\n", context.PC);
-
-      #if TRACE
-        Uword TPC = context.PC;
-        UINT32 tb[3];
-        bus->Read((TPC+0) & 0xFFFF, tb[0]);
-        bus->Read((TPC+1) & 0xFFFF, tb[1]);
-        bus->Read((TPC+2) & 0xFFFF, tb[2]);
-        DEBUG_OUT("%04X: A=%02X X=%02X Y=%02X P=%02X S=%02X %c > ",
-            context.PC,
-            context.A, context.X, context.Y, context.P, context.S,
-            context.iRequest ? 'I':'i');
-      #endif
-
-      K6502_Exec (&context);
-
-      #if TRACE
-        DEBUG_OUT("%s", OP_NAME[context.lastcode]);
-        int oplen = context.PC - TPC;
-        for (int i=0; i<3; ++i)
-        {
-            if (i == 0 || i < oplen)
-            {
-                DEBUG_OUT(" %02X", tb[i]);
-            }
-        }
-        DEBUG_OUT("\n");
-      #endif
-
+      exec(context,bus);
       if (context.PC == breakpoint)
         breaked = true;
     }
@@ -209,7 +212,7 @@ void NES_CPU::Reset ()
   context.PC = breakpoint = 0xffff;
   context.illegal = 0;
   breaked = false;
-  K6502_Exec (&context);
+  exec(context, bus);
 }
 
 void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, int y)
@@ -230,7 +233,7 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
   context.Y = y;
   startup (start_adr);
 
-  for (int i = 0; (i < (NES_BASECYCLES / int_freq )) && !breaked; i++, K6502_Exec (&context))
+  for (int i = 0; (i < (NES_BASECYCLES / int_freq )) && !breaked; i++, exec(context,bus))
   {
     if (context.PC == breakpoint) breaked = true;
   }
