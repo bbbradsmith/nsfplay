@@ -222,7 +222,10 @@ void CnsfplayDlg::OnDropFiles(HDROP hDropInfo)
     nSize = DragQueryFile(hDropInfo, 0, NULL, 0);
     aryFile.SetSize(nSize+1);
     DragQueryFile(hDropInfo, 0, aryFile.GetData(), nSize+1);
-    m_emu->Play(aryFile.GetData());
+    if (m_emu->Play(aryFile.GetData()))
+    {
+      MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+    }
     m_last_len = -1;
     m_update_wait = 0;
   }

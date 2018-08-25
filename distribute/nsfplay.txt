@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 5 - ?
+NSFPlay 2.4 beta 5 - 8/24/2018
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -174,6 +174,8 @@ NSFPlay 2.4 beta 5 - ?
 - Fixed broken playback rate for rates < 28 Hz.
 - NSFe RATE chunk implemented.
 - NSFe regn chunk implemented, including full Dendy support.
+- NSF2 partial support for metadata (as NSFe chunks).
+- Drag and drop will now acknowledge a failed load with a pop-up alert.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

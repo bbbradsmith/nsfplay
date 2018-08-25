@@ -450,6 +450,10 @@ static int is_sjis_prefix(int c)
     memcpy (bankswitch, image + 0x70, 8);
     speed_pal = image[0x78] | (image[0x79] << 8);
     pal_ntsc = image[0x7a];
+    unsigned int suffix =
+        (image[0x7d] <<  0) |
+        (image[0x7e] <<  8) |
+        (image[0x7f] << 16) ;
 
     regn      = CONVERT_REGN[     pal_ntsc & 3];
     regn_pref = CONVERT_REGN_PREF[pal_ntsc & 3];
@@ -476,10 +480,18 @@ static int is_sjis_prefix(int c)
 
     song = start - 1;
 
+    if (suffix != 0)
+    {
+        suffix += 0x80; // add header to suffix location
+        int suffix_size = size - suffix;
+        if (suffix_size < 0) return false; // no data at suffix
+        return LoadNSFe(image + suffix, UINT32(suffix_size), true);
+    }
+
     return true;
   }
 
-  bool NSF::LoadNSFe (UINT8 * image, UINT32 size, bool info)
+  bool NSF::LoadNSFe (UINT8 * image, UINT32 size, bool nsf2)
   {
     // store entire file for string references, etc.
     delete[] nsfe_image;
@@ -488,23 +500,34 @@ static int is_sjis_prefix(int c)
     nsfe_image[size] = 0; // null terminator for safety
     image = nsfe_image;
 
-    if (size < 4) // no FourCC
-      return false;
-
-    memcpy (magic, image, 4);
-    magic[4] = '\0';
-
-    if (strcmp ("NSFE", magic))
+    bool info = false;
+    bool data = false;
+    UINT32 chunk_offset = 0;
+    if (!nsf2)
     {
-      return false;
+        if (size < 4) // no FourCC
+          return false;
+
+        memcpy (magic, image, 4);
+        magic[4] = '\0';
+
+        if (strcmp ("NSFE", magic))
+        {
+            return false;
+        }
+        chunk_offset = 4; // skip 'NSFE'
+
+        // NSFe has no speed specification by default (see RATE chunk)
+        speed_ntsc  = 16639; // 60.09Hz
+        speed_pal   = 19997; // 50.00Hz
+        speed_dendy = speed_pal;
+    }
+    else
+    {
+        info = true;
+        data = true;
     }
 
-    // NSFe has no speed specification by default (see RATE chunk)
-    speed_ntsc  = 16639; // 60.09Hz
-    speed_pal   = 19997; // 50.00Hz
-    speed_dendy = speed_pal;
-
-    UINT32 chunk_offset = 4; // skip 'NSFE'
     while (true)
     {
         if ((size-chunk_offset) < 8) // not enough data for chunk size + FourCC
@@ -535,6 +558,9 @@ static int is_sjis_prefix(int c)
 
         if (!strcmp(cid, "INFO"))
         {
+          if (info == true)
+            return false;
+
           if (chunk_size < 0x0A)
             return false;
 
@@ -587,19 +613,19 @@ static int is_sjis_prefix(int c)
         {
           if (!info)
             return false;
+          if (data)
+            return false;
 
           delete[]body;
           body = new  UINT8[chunk_size];
           memcpy (body, chunk, chunk_size);
           bodysize = chunk_size;
+
+          // DATA chunk read
+          data = true;
         }
         else if (!strcmp(cid, "BANK"))
         {
-          if (!info)
-            return false;
-          if (chunk_size < 8)
-            return false;
-
           for (unsigned int i=0; i < 8 && i < chunk_size; ++i)
           {
             bankswitch[i] = chunk[i];
@@ -611,6 +637,12 @@ static int is_sjis_prefix(int c)
           if (chunk_size >= 4) speed_pal   = chunk[2] | (chunk[3] << 8);
           if (chunk_size >= 6) speed_dendy = chunk[4] | (chunk[5] << 8);
           if (chunk_size <  6) speed_dendy = speed_pal;
+        }
+        else if (!strcmp(cid, "NSF2"))
+        {
+          version = 2;
+          // TODO
+          // contains the NSF2 feature bitfield (to be implemented in future)
         }
         else if (!strcmp(cid, "auth"))
         {

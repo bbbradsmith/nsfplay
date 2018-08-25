@@ -96,8 +96,8 @@ namespace xgm
     // loads NSF (or NSFe via LoadNSFe)
     bool Load (UINT8 * image, UINT32 size);
 
-    // loads NSFe, if info is false INFO chunk is required to initialize
-    bool LoadNSFe(UINT8* image, UINT32 size, bool info);
+    // loads NSFe, or NSFe suffix for NSF2
+    bool LoadNSFe(UINT8* image, UINT32 size, bool nsf2);
 
     void DebugOut ();
     /**
