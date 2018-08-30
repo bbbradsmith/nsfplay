@@ -450,10 +450,14 @@ static int is_sjis_prefix(int c)
     memcpy (bankswitch, image + 0x70, 8);
     speed_pal = image[0x78] | (image[0x79] << 8);
     pal_ntsc = image[0x7a];
+    soundchip = image[0x7b];
+    nsf2_bits = image[0x7c];
     unsigned int suffix =
         (image[0x7d] <<  0) |
         (image[0x7e] <<  8) |
         (image[0x7f] << 16) ;
+
+    if (version < 2) nsf2_bits = 0;
 
     regn      = CONVERT_REGN[     pal_ntsc & 3];
     regn_pref = CONVERT_REGN_PREF[pal_ntsc & 3];
@@ -461,8 +465,6 @@ static int is_sjis_prefix(int c)
     if(speed_ntsc ==0) speed_ntsc  = 16639;
     if(speed_pal  ==0) speed_pal   = 19997;
     if(speed_dendy==0) speed_dendy = speed_pal;
-
-    soundchip = image[0x7b];
 
     use_vrc6 = soundchip &  1 ? true : false;
     use_vrc7 = soundchip &  2 ? true : false;
@@ -485,7 +487,11 @@ static int is_sjis_prefix(int c)
         suffix += 0x80; // add header to suffix location
         int suffix_size = size - suffix;
         if (suffix_size < 0) return false; // no data at suffix
-        return LoadNSFe(image + suffix, UINT32(suffix_size), true);
+        bool result = LoadNSFe(image + suffix, UINT32(suffix_size), true);
+        if ((nsf2_bits & 0x80) && !result)
+        {
+            return false; // NSF2 bit 7 indicates metadata parsing is mandatory
+        }
     }
 
     return true;
@@ -530,6 +536,8 @@ static int is_sjis_prefix(int c)
 
     while (true)
     {
+        if ((size-chunk_offset) == 0) break; // end of file without NEND, acceptable?
+
         if ((size-chunk_offset) < 8) // not enough data for chunk size + FourCC
           return false;
 

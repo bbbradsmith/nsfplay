@@ -63,6 +63,7 @@ namespace xgm
     UINT16 speed_dendy;
     UINT8 regn;
     int regn_pref;
+    UINT8 nsf2_bits;
 
     /** Œ»İ‘I‘ğ’†‚Ì‹È”Ô† */
     int song;
