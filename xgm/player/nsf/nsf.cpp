@@ -734,7 +734,6 @@ static int is_sjis_prefix(int c)
             unsigned int mixe_index = chunk[pos+0];
             INT16 mixe_value = UINT16(chunk[pos+1] + (chunk[pos+2] << 8));
 
-            if (mixe_index == 0) break;
             if (mixe_index >= NSFE_MIXES) return false; // invalid mixe index
 
             // max value should never be used, but just in case, fake it with max-1
