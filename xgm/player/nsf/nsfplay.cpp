@@ -793,7 +793,7 @@ namespace xgm
     if (mixe != 0)
     {
         double adjust = ::pow(10,double(mixe)/2000.0); // millibels to amplitude change
-        device_volume = int(double(device_volume) * adjust);
+        device_volume = int(128.0 * adjust);
         if (device_volume > 1024) device_volume = 1024; // sanity clamp to 4x default
         if (device_volume < 0) device_volume = 0; // should be impossible
     }
