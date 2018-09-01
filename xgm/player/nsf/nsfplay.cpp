@@ -770,11 +770,11 @@ namespace xgm
         0,    // APU (1x)
         -220, // DMC
         0,    // VRC6 (1x)
-        1240, // VRC7 TODO measure this
-        760,  // FDS (2.4x)
+        1240, // VRC7
+        690,  // FDS (~2.4x)
         0,    // MMC5 (1x)
-        1556, // N163 (6.0x)
-        580,  // 5B TODO measure this
+        1540, // N163 (~6.0x)
+        580,  // 5B
     };
 
     const int mixe_device = MIXE_DEVICE_MAP[id];
