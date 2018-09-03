@@ -774,7 +774,7 @@ namespace xgm
         690,  // FDS (~2.4x)
         0,    // MMC5 (1x)
         1540, // N163 (~6.0x)
-        580,  // 5B
+        -250,  // 5B
     };
 
     const int mixe_device = MIXE_DEVICE_MAP[id];
