@@ -98,7 +98,8 @@ xgm::UINT32 NES_FME7::Render (xgm::INT32 b[2])
   b[1] >>= (7-4);
 
   // master volume adjustment
-  const INT32 MASTER = INT32(0.64 * 256.0);
+  //const INT32 MASTER = INT32(0.64 * 256.0);
+  const INT32 MASTER = INT32(0.736 * 256.0); // HACK working on this
   b[0] = (b[0] * MASTER) >> 8;
   b[1] = (b[1] * MASTER) >> 8;
 

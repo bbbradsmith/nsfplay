@@ -392,6 +392,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\devices\Audio\Compress5B.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\devices\Audio\Compress5B.h"
+					>
+				</File>
+				<File
 					RelativePath=".\devices\Audio\echo.cpp"
 					>
 				</File>

@@ -21,6 +21,7 @@
 #include "../../devices/audio/rconv.h"
 #include "../../devices/audio/echo.h"
 #include "../../devices/audio/MedianFilter.h"
+#include "../../devices/audio/Compress5B.h"
 #include "../../devices/misc/nes_detect.h"
 #include "../../devices/misc/log_cpu.h"
 
@@ -75,6 +76,7 @@ namespace xgm
     CPULogger *logcpu;                   // Logs CPU to file
     EchoUnit echo;
     MedianFilter *mfilter;               // プチノイズ対策のメディアンフィルタ
+    Compress5B c5b;
 
     // トラック番号の列挙
     enum {

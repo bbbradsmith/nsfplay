@@ -301,6 +301,8 @@ namespace xgm
     lpf.Reset();
     dcf.SetRate(rate);
     dcf.Reset(); 
+    c5b.SetRate(rate); // HACK
+    c5b.Reset(); // HACK
     DEBUG_OUT("rate: %f\n",rate);
   }
 
@@ -606,7 +608,8 @@ namespace xgm
 
       // echo.FastRender(buf);
       dcf.FastRender(buf);
-      lpf.FastRender(buf);
+      //lpf.FastRender(buf); // HACK test of 5B compressor
+      c5b.FastRender(buf); // HACK test of 5B compressor
       cmp.FastRender(buf);
 
       //mfilter->Put(buf[0]);
@@ -774,7 +777,8 @@ namespace xgm
         690,  // FDS (~2.4x)
         0,    // MMC5 (1x)
         1540, // N163 (~6.0x)
-        -250,  // 5B
+        //-250,  // 5B
+        -130, // 5B HACK working on this
     };
 
     const int mixe_device = MIXE_DEVICE_MAP[id];
