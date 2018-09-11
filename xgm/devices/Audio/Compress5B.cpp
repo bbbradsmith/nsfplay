@@ -34,7 +34,7 @@ UINT32 Compress5B::FastRender(INT32 b[2])
         double x = double(b[i]);
         double c = fabs(x) - double(threshold);
         if (c < 0.0) c = 0.0;
-        double g = pow(1+(c/threshold),(1/ratio)-1);
+        double g = pow(1+(c/threshold),(1/ratio)-1); // logarithmic ratio compression
         b[i] = int(g*x);
         //b[1] = c;
     }
