@@ -151,7 +151,10 @@ BOOL CnsfplayDlg::OnInitDialog()
     m_emu->SetVolume(v);
     
     if(m_init_file.GetLength()) {
-      m_emu->Play(m_init_file.GetBuffer());
+      if(m_emu->Play(m_init_file.GetBuffer()))
+      {
+        MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+      }
       m_update_wait = 0;
     }
 
