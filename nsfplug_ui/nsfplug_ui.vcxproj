@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0F0FB964-095F-464C-9A3C-12B01DF94FFA}</ProjectGuid>
+    <RootNamespace>nsfplug_ui</RootNamespace>
+    <Keyword>MFCDLLProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <XPDeprecationWarning>false</XPDeprecationWarning>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28127.55</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\plugins\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\plugins\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../xgm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>JAPANESE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>.\nsf_setup.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)nsf_setup.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>$(OutDir)..\vcm.lib;$(OutDir)..\xgm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildStep>
+      <Command />
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../xgm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>JAPANESE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>.\nsf_setup.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)nsf_setup.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>$(OutDir)..\vcm.lib;$(OutDir)..\xgm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="KeyDialog.cpp" />
+    <ClCompile Include="KeyHeader.cpp" />
+    <ClCompile Include="KeyWindow.cpp" />
+    <ClCompile Include="NSFApuPanel.cpp" />
+    <ClCompile Include="NSFAudioPanel.cpp" />
+    <ClCompile Include="NSFConfigDialog.cpp" />
+    <ClCompile Include="NSFConfigPageDevice.cpp" />
+    <ClCompile Include="NSFConfigPageMain.cpp" />
+    <ClCompile Include="NSFDialog.cpp" />
+    <ClCompile Include="NSFDialogs.cpp" />
+    <ClCompile Include="NSFDmcPanel.cpp" />
+    <ClCompile Include="NSFEasyDialog.cpp" />
+    <ClCompile Include="NSFFdsPanel.cpp" />
+    <ClCompile Include="NSFInfoDialog.cpp" />
+    <ClCompile Include="NSFMaskDialog.cpp" />
+    <ClCompile Include="NSFMemoryDialog.cpp" />
+    <ClCompile Include="NSFMixerDialog.cpp" />
+    <ClCompile Include="NSFMixerPanel.cpp" />
+    <ClCompile Include="NSFMMC5Panel.cpp" />
+    <ClCompile Include="NSFN106Panel.cpp" />
+    <ClCompile Include="NSFPanDialog.cpp" />
+    <ClCompile Include="NSFPanPanel.cpp" />
+    <ClCompile Include="NSFPresetDialog.cpp" />
+    <ClCompile Include="NSFTrackDialog.cpp" />
+    <ClCompile Include="NSFTrackSetupDialog.cpp" />
+    <ClCompile Include="nsf_setup.cpp" />
+    <ClCompile Include="PresetManager.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hlp\intro.htm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="hlp\nsfplug.hhc" />
+    <CustomBuild Include="hlp\nsfplug.hhp">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">start /wait hhc "hlp\nsfplug.hhp"
+if not exist "hlp\nsfplug.chm" goto :HelpError
+copy "hlp\nsfplug.chm" "$(OutDir)nsfplug.chm"
+goto :HelpDone
+:HelpError
+echo hlp\nsfplug.hhp(1) : error:ヘルプ ファイルを作成中に問題が発生しました。
+echo.
+:HelpDone
+echo.
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)nsfplug.chm;%(Outputs)</Outputs>
+    </CustomBuild>
+    <None Include="nsfplug.hhk" />
+    <None Include="nsf_setup.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KeyDialog.h" />
+    <ClInclude Include="KeyHeader.h" />
+    <ClInclude Include="KeyWindow.h" />
+    <ClInclude Include="NSFApuPanel.h" />
+    <ClInclude Include="NSFAudioPanel.h" />
+    <ClInclude Include="NSFConfigDialog.h" />
+    <ClInclude Include="NSFConfigPageDevice.h" />
+    <ClInclude Include="NSFConfigPageMain.h" />
+    <ClInclude Include="NSFDialog.h" />
+    <ClInclude Include="NSFDialogs.h" />
+    <ClInclude Include="NSFDmcPanel.h" />
+    <ClInclude Include="NSFEasyDialog.h" />
+    <ClInclude Include="NSFFdsPanel.h" />
+    <ClInclude Include="NSFInfoDialog.h" />
+    <ClInclude Include="NSFMaskDialog.h" />
+    <ClInclude Include="NSFMemoryDialog.h" />
+    <ClInclude Include="NSFMixerDialog.h" />
+    <ClInclude Include="NSFMixerPanel.h" />
+    <ClInclude Include="NSFMMC5Panel.h" />
+    <ClInclude Include="NSFN106Panel.h" />
+    <ClInclude Include="NSFPanDialog.h" />
+    <ClInclude Include="NSFPanPanel.h" />
+    <ClInclude Include="nsfplug_ui.h" />
+    <ClInclude Include="NSFPresetDialog.h" />
+    <ClInclude Include="NSFTrackDialog.h" />
+    <ClInclude Include="NSFTrackSetupDialog.h" />
+    <ClInclude Include="nsf_setup.h" />
+    <ClInclude Include="PresetManager.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="ico00001.ico" />
+    <Image Include="icon1.ico" />
+    <Image Include="icon2.ico" />
+    <Image Include="nsfplug.ico" />
+    <Image Include="res\ascii.bmp" />
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\digit.bmp" />
+    <Image Include="res\keyboard.bmp" />
+    <Image Include="res\keyheader.bmp" />
+    <Image Include="res\nsf.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="nsf_setup.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="nsf_setup.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

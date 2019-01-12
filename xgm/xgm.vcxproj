@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9A3DDFD1-D499-4AB2-A040-C1D5CB345045}</ProjectGuid>
+    <RootNamespace>xgm</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <XPDeprecationWarning>false</XPDeprecationWarning>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.28127.55</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <PrecompiledHeaderOutputFile>$(IntDir)xgm.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader />
+      <PrecompiledHeaderOutputFile>$(IntDir)xgm.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc90.pdb</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0411</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="debugout.h" />
+    <ClInclude Include="devices\all.h" />
+    <ClInclude Include="devices\Audio\amplifier.h" />
+    <ClInclude Include="devices\Audio\echo.h" />
+    <ClInclude Include="devices\Audio\filter.h" />
+    <ClInclude Include="devices\Audio\MedianFilter.h" />
+    <ClInclude Include="devices\Audio\mixer.h" />
+    <ClInclude Include="devices\Audio\rconv.h" />
+    <ClInclude Include="devices\CPU\km6502\km6280.h" />
+    <ClInclude Include="devices\CPU\km6502\km6280m.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502cd.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502ct.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502ex.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502ft.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502m.h" />
+    <ClInclude Include="devices\CPU\km6502\km6502ot.h" />
+    <ClInclude Include="devices\CPU\km6502\km65c02.h" />
+    <ClInclude Include="devices\CPU\km6502\km65c02m.h" />
+    <ClInclude Include="devices\CPU\km6502\kmconfig.h" />
+    <ClInclude Include="devices\CPU\nes_cpu.h" />
+    <ClInclude Include="devices\device.h" />
+    <ClInclude Include="devices\devinfo.h" />
+    <ClInclude Include="devices\Memory\nes_bank.h" />
+    <ClInclude Include="devices\Memory\nes_mem.h" />
+    <ClInclude Include="devices\Memory\ram64k.h" />
+    <ClInclude Include="devices\Misc\detect.h" />
+    <ClInclude Include="devices\Misc\log_cpu.h" />
+    <ClInclude Include="devices\Misc\nes_detect.h" />
+    <ClInclude Include="devices\Sound\legacy\2413tone.h" />
+    <ClInclude Include="devices\Sound\legacy\281btone.h" />
+    <ClInclude Include="devices\Sound\legacy\emu2149.h" />
+    <ClInclude Include="devices\Sound\legacy\emu2212.h" />
+    <ClInclude Include="devices\Sound\legacy\emu2413.h" />
+    <ClInclude Include="devices\Sound\legacy\emutypes.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_ft35.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_ft36.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_kt1.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_kt2.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_mo.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_rw.h" />
+    <ClInclude Include="devices\Sound\nes_apu.h" />
+    <ClInclude Include="devices\Sound\nes_dmc.h" />
+    <ClInclude Include="devices\Sound\nes_fds.h" />
+    <ClInclude Include="devices\Sound\nes_fme7.h" />
+    <ClInclude Include="devices\Sound\nes_mmc5.h" />
+    <ClInclude Include="devices\Sound\nes_n106.h" />
+    <ClInclude Include="devices\Sound\nes_vrc6.h" />
+    <ClInclude Include="devices\Sound\nes_vrc7.h" />
+    <ClInclude Include="player\all.h" />
+    <ClInclude Include="player\midi_interface.h" />
+    <ClInclude Include="player\nsf\nsf.h" />
+    <ClInclude Include="player\nsf\nsfconfig.h" />
+    <ClInclude Include="player\nsf\nsfplay.h" />
+    <ClInclude Include="player\nsf\pls\ppls.h" />
+    <ClInclude Include="player\nsf\pls\sstream.h" />
+    <ClInclude Include="player\player.h" />
+    <ClInclude Include="player\plugin\kbmedia\plugin.h" />
+    <ClInclude Include="player\plugin\kbmedia\sdk\kmp_pi.h" />
+    <ClInclude Include="player\plugin\winamp2\in_module.h" />
+    <ClInclude Include="player\plugin\winamp2\sdk\FRONTEND.H" />
+    <ClInclude Include="player\plugin\winamp2\sdk\IN2.H" />
+    <ClInclude Include="player\plugin\winamp2\sdk\OUT.H" />
+    <ClInclude Include="player\soundData.h" />
+    <ClInclude Include="utils\nsf_tag.h" />
+    <ClInclude Include="utils\tagctrl.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="xgm.h" />
+    <ClInclude Include="xtypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="devices\Audio\echo.cpp" />
+    <ClCompile Include="devices\Audio\filter.cpp" />
+    <ClCompile Include="devices\Audio\MedianFilter.cpp" />
+    <ClCompile Include="devices\Audio\rconv.cpp" />
+    <ClCompile Include="devices\CPU\nes_cpu.cpp" />
+    <ClCompile Include="devices\Memory\nes_bank.cpp" />
+    <ClCompile Include="devices\Memory\nes_mem.cpp" />
+    <ClCompile Include="devices\Memory\ram64k.cpp" />
+    <ClCompile Include="devices\Misc\detect.cpp" />
+    <ClCompile Include="devices\Misc\log_cpu.cpp" />
+    <ClCompile Include="devices\Misc\nes_detect.cpp" />
+    <ClCompile Include="devices\Sound\legacy\emu2149.c" />
+    <ClCompile Include="devices\Sound\legacy\emu2212.c" />
+    <ClCompile Include="devices\Sound\legacy\emu2413.c" />
+    <ClCompile Include="devices\Sound\nes_apu.cpp" />
+    <ClCompile Include="devices\Sound\nes_dmc.cpp" />
+    <ClCompile Include="devices\Sound\nes_fds.cpp" />
+    <ClCompile Include="devices\Sound\nes_fme7.cpp" />
+    <ClCompile Include="devices\Sound\nes_mmc5.cpp" />
+    <ClCompile Include="devices\Sound\nes_n106.cpp" />
+    <ClCompile Include="devices\Sound\nes_vrc6.cpp" />
+    <ClCompile Include="devices\Sound\nes_vrc7.cpp" />
+    <ClCompile Include="player\nsf\nsf.cpp" />
+    <ClCompile Include="player\nsf\nsfconfig.cpp" />
+    <ClCompile Include="player\nsf\nsfplay.cpp" />
+    <ClCompile Include="player\nsf\pls\ppls.cpp" />
+    <ClCompile Include="player\nsf\pls\sstream.cpp" />
+    <ClCompile Include="player\plugin\kbmedia\plugin.cpp" />
+    <ClCompile Include="player\plugin\winamp2\in_module.cpp" />
+    <ClCompile Include="player\plugin\winamp2\in_module_msp.cpp" />
+    <ClCompile Include="utils\nsf_tag.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
