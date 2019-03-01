@@ -112,6 +112,7 @@ namespace xgm
     if (s == 0 && (frame_sequence_steps == 4))
     {
         frame_irq = true;
+        cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, frame_irq & frame_irq_enable);
     }
 
     // 240hz clock
@@ -278,7 +279,11 @@ namespace xgm
         }
         else
         {
-          irq = (mode==2&&active)?1:0; // ’¼‘O‚ªactive‚¾‚Á‚½‚Æ‚«‚ÍIRQ”­s
+          if (active && mode==2)
+          {
+            irq = true;
+            cpu->UpdateIRQ(NES_CPU::IRQD_DMC, true);
+          }
           active = false;
         }
       }
@@ -451,6 +456,8 @@ namespace xgm
     frame_sequence_count = 0;
     frame_sequence_steps = 4;
     frame_sequence_step = 0;
+    cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, false);
+
 
     for (i = 0; i < 0x10; i++)
       Write (0x4008 + i, 0);
@@ -459,6 +466,7 @@ namespace xgm
     Write (0x4015, 0x00);
     if (option[OPT_UNMUTE_ON_RESET])
       Write (0x4015, 0x0f);
+    cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
 
     out[0] = out[1] = out[2] = 0;
     tri_freq = 0;
@@ -538,12 +546,14 @@ namespace xgm
         enable[2] = active = true;
         daddress = (0xC000 | (adr_reg << 6));
         length = (len_reg << 4) + 1;
-        irq = 0;
       }
       else if (!(val & 16))
       {
         enable[2] = active = false;
       }
+
+      irq = false;
+      cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
 
       reg[adr-0x4008] = val;
       return true;
@@ -553,7 +563,8 @@ namespace xgm
     {
       //DEBUG_OUT("4017 = %02X\n", val);
       frame_irq_enable = ((val & 0x40) == 0x40);
-      frame_irq = (frame_irq_enable ? frame_irq : 0);
+      cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, frame_irq & frame_irq_enable);
+
       frame_sequence_count = 0;
       if (val & 0x80)
       {
@@ -679,6 +690,7 @@ namespace xgm
           ;
 
       frame_irq = false;
+      cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, false);
       return true;
     }
     else if (0x4008<=adr&&adr<=0x4014)
@@ -690,4 +702,9 @@ namespace xgm
       return false;
   }
 
+  // IRQ support requires CPU read access
+  void NES_DMC::SetCPU(NES_CPU* cpu_)
+  {
+      cpu = cpu_;
+  }
 }                               // namespace

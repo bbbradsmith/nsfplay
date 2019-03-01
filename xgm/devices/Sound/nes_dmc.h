@@ -3,6 +3,7 @@
 
 #include "../device.h"
 #include "../audio/MedianFilter.h"
+#include "../CPU/nes_cpu.h"
 
 namespace xgm
 {
@@ -88,6 +89,8 @@ namespace xgm
     bool frame_irq;
     bool frame_irq_enable;
 
+    NES_CPU* cpu; // IRQ needs CPU access
+
     inline UINT32 calc_tri (UINT32 clocks);
     inline UINT32 calc_dmc (UINT32 clocks);
     inline UINT32 calc_noise (UINT32 clocks);
@@ -115,6 +118,8 @@ namespace xgm
     virtual void SetMask(int m){ mask = m; }
     virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);
+
+    void SetCPU(NES_CPU* cpu_);
   };
 
 }

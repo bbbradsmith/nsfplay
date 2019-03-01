@@ -104,7 +104,6 @@ External void K_EXEC(__CONTEXT)
 #else
 			__THIS__.P = (__THIS__.P & ~T_FLAG) | I_FLAG;	/* 6502 bug */
 #endif
-			__THIS__.iRequest &= ~IRQ_INT;
 			__THIS__.PC = KI_READWORD(__THISP_ VEC_INT);
 			KI_ADDCLOCK(__THISP_ 7);
 		}

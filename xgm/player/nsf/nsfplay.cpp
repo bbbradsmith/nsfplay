@@ -23,6 +23,7 @@ namespace xgm
     logcpu = new CPULogger();
 
     dmc->SetAPU(apu); // set APU
+    dmc->SetCPU(&cpu); // IRQ requires CPU access
     mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
 
     /* アンプ←フィルタ←レートコンバータ←音源 を接続 */
@@ -117,6 +118,8 @@ namespace xgm
     layer.DetachAll ();
     mixer.DetachAll ();
     apu_bus.DetachAll ();
+
+    cpu.EnableIRQ(config->GetValue("IRQ_ENABLE").GetInt());
 
     // select the loop detector
     if((*config)["DETECT_ALT"])

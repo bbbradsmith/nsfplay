@@ -177,6 +177,8 @@ NSFPlay 2.4 beta ?? - ??? (unofficial build)
 - NSFe mixe chunk implemented.
 - NSF2 partial support for metadata (as NSFe chunks).
 - Drag and drop will now acknowledge a failed load with a pop-up alert.
+- IRQ support.
+- Play now runs at next opportunity rather than always at the start of frame, similar to poll based players like PowerPak.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

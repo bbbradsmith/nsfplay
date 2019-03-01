@@ -40,6 +40,7 @@ public:
 	BOOL m_bVsync;
 	int m_nRegion;
 	BOOL m_bStereo;
+	BOOL m_bIRQEnable;
 	int m_nLimit;
 	int m_nThreshold;
 	int m_nVelocity;

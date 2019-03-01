@@ -20,6 +20,7 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 , m_bVsync(FALSE)
 , m_nRegion(0)
 , m_bStereo(FALSE)
+, m_bIRQEnable(TRUE)
 , m_bNSFePlaylist(FALSE)
 , m_nLimit(0)
 , m_nThreshold(0)
@@ -73,6 +74,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     m_bVsync          = CONFIG["VSYNC_ADJUST"];
     m_nRegion         = CONFIG["REGION"];
     m_bStereo         = (CONFIG["NCH"] == 2);
+    m_bIRQEnable      = CONFIG["IRQ_ENABLE"] != 0;
     m_bNSFePlaylist   = CONFIG["NSFE_PLAYLIST"];
     m_nLimit          = 100 - CONFIG["COMP_LIMIT"];
     m_nThreshold      = 100 - CONFIG["COMP_THRESHOLD"];
@@ -102,6 +104,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["VSYNC_ADJUST"]    = m_bVsync;
     CONFIG["REGION"]          = m_nRegion;
     CONFIG["NCH"]             = m_bStereo ? 2 : 1;
+    CONFIG["IRQ_ENABLE"]      = m_bIRQEnable ? 1 : 0;
     CONFIG["NSFE_PLAYLIST"]   = m_bNSFePlaylist;
     CONFIG["COMP_LIMIT"]      = 100 - m_nLimit;
     CONFIG["COMP_THRESHOLD"]  = 100 - m_nThreshold;
@@ -123,6 +126,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_USEALT, m_bUseAlt);
   DDX_Check(pDX, IDC_VSYNC, m_bVsync);
   DDX_Check(pDX, IDC_STEREO, m_bStereo);
+  DDX_Check(pDX, IDC_IRQENABLE, m_bIRQEnable);
   DDX_Check(pDX, IDC_NSFEPLS, m_bNSFePlaylist);
   DDX_Text(pDX, IDC_STOPSEC, m_nStopSec);
   DDX_Text(pDX, IDC_FADETIME, m_nFadeTime);

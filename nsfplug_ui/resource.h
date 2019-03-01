@@ -140,6 +140,7 @@
 #define IDC_STEREO2                     2011
 #define IDC_NSFEPLS                     2011
 #define IDC_RANDOMIZE_NOISE             2012
+#define IDC_IRQENABLE                   2012
 #define IDC_LIMIT                       2013
 #define IDC_UNMUTE                      2013
 #define IDC_TRI_MUTE                    2014
@@ -230,7 +231,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2096
+#define _APS_NEXT_RESOURCE_VALUE        2098
 #define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         2040
 #define _APS_NEXT_SYMED_VALUE           2000

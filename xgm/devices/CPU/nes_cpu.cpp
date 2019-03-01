@@ -70,6 +70,8 @@ NES_CPU::NES_CPU (double clock)
   NES_BASECYCLES = clock;
   bus = NULL;
   log_cpu = NULL;
+  irqs = 0;
+  enable_irqs = true;
 }
 
 NES_CPU::~NES_CPU ()
@@ -88,19 +90,19 @@ UINT32 Callback readByte (void *__THIS, UINT32 adr)
   return val;
 }
 
-void NES_CPU::startup (UINT32 address)
+void NES_CPU::run_from (UINT32 address)
 {
   breaked = false;
   context.PC = 0x4100;
   breakpoint = context.PC+3;
-  context.P = 0x26;                 // IRZ
+  //context.P = 0x26; // IRZ
   assert (bus);
   bus->Write (context.PC+0, 0x20);  // JSR 
   bus->Write (context.PC+1, address & 0xff);
   bus->Write (context.PC+2, address>>8);
-  bus->Write (context.PC+3, 0x4c);  // JMP 04103H 
+  bus->Write (context.PC+3, 0x4c);  // JMP $4103
   bus->Write (context.PC+4, breakpoint & 0xff);
-  bus->Write (context.PC+5, breakpoint>>8);
+  bus->Write (context.PC+5, breakpoint >> 8);
 }
 
 UINT32 NES_CPU::Exec (UINT32 clock)
@@ -109,12 +111,22 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 
   while ( context.clock < clock )
   {
+    if (breaked)
+    {
+      if (enable_irqs && !(context.P & K6502_I_FLAG) && context.iRequest)
+      {
+        breaked = false;
+      }
+    }
+
     if (!breaked)
     {
       //DEBUG_OUT("PC: 0x%04X\n", context.PC);
       exec(context,bus);
       if (context.PC == breakpoint)
+      {
         breaked = true;
+      }
     }
     else 
     {
@@ -124,16 +136,18 @@ UINT32 NES_CPU::Exec (UINT32 clock)
         context.clock = clock;
     }
 
-    // wait for interrupt
+    if (breaked && play_ready)
+    {
+      if (log_cpu)
+          log_cpu->Play();
+      run_from (play_addr);
+      play_ready = false;
+    }
+
+    // signal next play
     if ( (clock_of_frame >> FRAME_FIXED) < context.clock)
     {
-      if (breaked)
-      {
-        if (log_cpu)
-            log_cpu->Play();
-
-        startup (int_address);
-      }
+      play_ready = true;
       clock_of_frame += clock_per_frame;
       //DEBUG_OUT("NMI\n");
     }
@@ -212,15 +226,19 @@ void NES_CPU::Reset ()
   context.PC = breakpoint = 0xffff;
   context.illegal = 0;
   breaked = false;
+  irqs = 0;
+  play_ready = false;
   exec(context, bus);
 }
 
-void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, int y)
+void NES_CPU::Start (int init_addr, int play_addr_, double int_freq, int a, int x, int y)
 {
   // approximate frame timing as an integer number of CPU clocks
-  int_address = int_adr;
+  play_addr = play_addr_;
   clock_per_frame = (int)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / int_freq );
   clock_of_frame = 0;
+  play_ready = false;
+  irqs = 0;
 
   // count clock quarters
   frame_quarter = 3;
@@ -231,7 +249,9 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
   context.A = a;
   context.X = x;
   context.Y = y;
-  startup (start_adr);
+  context.P = 0x26; // IRZ
+
+  run_from (init_addr);
 
   for (int i = 0; (i < (NES_BASECYCLES / int_freq )) && !breaked; i++, exec(context,bus))
   {
@@ -239,6 +259,7 @@ void NES_CPU::Start (int start_adr, int int_adr, double int_freq, int a, int x, 
   }
 
   clock_of_frame = 0;
+  play_ready = true;
 }
 
 void NES_CPU::SetLogger (CPULogger* logger)
@@ -249,6 +270,28 @@ void NES_CPU::SetLogger (CPULogger* logger)
 unsigned int NES_CPU::GetPC() const
 {
     return context.PC;
+}
+
+void NES_CPU::UpdateIRQ(int device, bool irq)
+{
+	if (!enable_irqs) return;
+	if (device < 0 || device >= IRQD_COUNT) return;
+	UINT32 mask = 1 << device;
+	irqs &= ~mask;
+	if (irq) irqs |= mask;
+	if (irqs)
+	{
+		context.iRequest |= IRQ_INT;
+	}
+	else
+	{
+		context.iRequest &= ~Uword(IRQ_INT);
+	}
+}
+
+void NES_CPU::EnableIRQ(bool enable)
+{
+	enable_irqs = enable;
 }
 
 } // namespace xgm
