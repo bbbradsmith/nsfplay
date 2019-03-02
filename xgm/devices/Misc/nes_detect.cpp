@@ -36,6 +36,7 @@ namespace xgm
       ||(0x5011 == adr)
       ||(0xC000 == adr)                  // 5B
       ||(0xE000 == adr)
+      ||(0x401B <= adr && adr <= 0x401D) // NSF2 IRQ
       )
     {
         return BasicDetector::Write(adr, val, id);

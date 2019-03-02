@@ -26,7 +26,7 @@ namespace xgm
     bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     void SetBankDefault (UINT8 bank, int value);
     bool SetImage (UINT8 * data, UINT32 offset, UINT32 size);
-    void SetFDSMode (bool);
+    void SetFDSMode (bool); // enables banks 6/7 for FDS
   };
 
 }

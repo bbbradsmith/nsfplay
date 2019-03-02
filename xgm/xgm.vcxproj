@@ -132,10 +132,12 @@
     <ClInclude Include="devices\devinfo.h" />
     <ClInclude Include="devices\Memory\nes_bank.h" />
     <ClInclude Include="devices\Memory\nes_mem.h" />
+    <ClInclude Include="devices\Memory\nsf2_vectors.h" />
     <ClInclude Include="devices\Memory\ram64k.h" />
     <ClInclude Include="devices\Misc\detect.h" />
     <ClInclude Include="devices\Misc\log_cpu.h" />
     <ClInclude Include="devices\Misc\nes_detect.h" />
+    <ClInclude Include="devices\Misc\nsf2_irq.h" />
     <ClInclude Include="devices\Sound\legacy\2413tone.h" />
     <ClInclude Include="devices\Sound\legacy\281btone.h" />
     <ClInclude Include="devices\Sound\legacy\emu2149.h" />
@@ -185,10 +187,12 @@
     <ClCompile Include="devices\CPU\nes_cpu.cpp" />
     <ClCompile Include="devices\Memory\nes_bank.cpp" />
     <ClCompile Include="devices\Memory\nes_mem.cpp" />
+    <ClCompile Include="devices\Memory\nsf2_vectors.cpp" />
     <ClCompile Include="devices\Memory\ram64k.cpp" />
     <ClCompile Include="devices\Misc\detect.cpp" />
     <ClCompile Include="devices\Misc\log_cpu.cpp" />
     <ClCompile Include="devices\Misc\nes_detect.cpp" />
+    <ClCompile Include="devices\Misc\nsf2_irq.cpp" />
     <ClCompile Include="devices\Sound\legacy\emu2149.c" />
     <ClCompile Include="devices\Sound\legacy\emu2212.c" />
     <ClCompile Include="devices\Sound\legacy\emu2413.c" />

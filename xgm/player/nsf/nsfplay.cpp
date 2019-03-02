@@ -22,6 +22,7 @@ namespace xgm
     ld = new NESDetector();
     logcpu = new CPULogger();
 
+    nsf2_irq.SetCPU(&cpu); // IRQ
     dmc->SetAPU(apu); // set APU
     dmc->SetCPU(&cpu); // IRQ requires CPU access
     mmc5->SetCPU(&cpu); // MMC5 PCM read action requires CPU read access
@@ -119,8 +120,6 @@ namespace xgm
     mixer.DetachAll ();
     apu_bus.DetachAll ();
 
-    cpu.EnableIRQ(config->GetValue("IRQ_ENABLE").GetInt());
-
     // select the loop detector
     if((*config)["DETECT_ALT"])
     {
@@ -159,6 +158,35 @@ namespace xgm
     else
     {
         cpu.SetLogger(NULL);
+    }
+
+    // setup player program
+    const UINT8 PLAYER_PROGRAM[] =
+    {
+        0x20, 0x14, 0x41, // $4100 JSR PLAY ($4114 is a placeholder RTS)
+        0x4C, 0x03, 0x41, // $4103 JMP to self (do nothing loop for detecting end of frame)
+        0x48, 0x8A, 0x48, 0x98, 0x48, // $4106 PHA TXA PHA TYA PHA
+        0x20, 0x14, 0x41, // $410B JSR PLAY for non-returning INIT
+        0x68, 0xA8, 0x68, 0xAA, 0x68, // $410E PLA TAY PLA TAX PLA
+        0x40, // $4113 RTI
+        0x60, // $4114 RTS
+    };
+    const int PLAYER_PROGRAM_SIZE = sizeof(PLAYER_PROGRAM);
+    mem.SetReserved(PLAYER_PROGRAM, PLAYER_PROGRAM_SIZE);
+    // PLAYER_RESERVED is at $4100
+
+    if (nsf->nsf2_bits & 0x30) // uses IRQ or non-returning INIT
+    {
+        layer.Attach(&nsf2_vectors);
+        nsf2_vectors.ForceVector(0,PLAYER_RESERVED+0x06); // NMI routine that calls PLAY
+        nsf2_vectors.ForceVector(1,PLAYER_RESERVED+0x03); // Reset routine goes to "breaked" infinite loop (not used)
+        nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x13); // Default IRQ points to empty RTI.
+        mem.Write(0x410C,nsf->play_address & 0xFF);
+        mem.Write(0x410D,nsf->play_address >> 8);
+    }
+    if (nsf->nsf2_bits & 0x10) // uses IRQ
+    {
+        stack.Attach(&nsf2_irq);
     }
 
     if (bmax) layer.Attach (&bank);
@@ -202,14 +230,25 @@ namespace xgm
     if (nsf->use_fds)
     {
       bool write_enable = (config->GetDeviceOption(FDS, NES_FDS::OPT_WRITE_PROTECT).GetInt() == 0);
+      bool multichip = 
+        nsf->use_mmc5 ||
+        nsf->use_vrc6 ||
+        nsf->use_vrc7 ||
+        nsf->use_fme7 ||
+        nsf->use_n106 ;
+
+      if (multichip) write_enable = false;
 
       stack.Attach (sc[FDS]); // last before memory layer
       mixer.Attach (&amp[FDS]);
       mem.SetFDSMode (write_enable);
       bank.SetFDSMode (write_enable);
 
-      bank.SetBankDefault(6, nsf->bankswitch[6]);
-      bank.SetBankDefault(7, nsf->bankswitch[7]);
+      if (!multichip)
+      {
+        bank.SetBankDefault(6, nsf->bankswitch[6]);
+        bank.SetBankDefault(7, nsf->bankswitch[7]);
+      }
     }
     else
     {
@@ -379,13 +418,19 @@ namespace xgm
       song = nsf->nsfe_plst[song];
     }
 
-    int start_x = (region == REGION_PAL) ? 1 : 0;
-    if (region == REGION_DENDY && (nsf->regn & 4)) start_x = 2; // use 2 for Dendy iff explicitly supported, otherwise 0
+    int region_register = (region == REGION_PAL) ? 1 : 0;
+    if (region == REGION_DENDY && (nsf->regn & 4)) region_register = 2; // use 2 for Dendy iff explicitly supported, otherwise 0
 
-    // HACK
-    DEBUG_OUT("start_x: %d\n", start_x);
-
-    cpu.Start (nsf->init_address, nsf->play_address, speed, song, start_x);
+    int play_addr = (nsf->nsf2_bits & 0x40) ? -1 : nsf->play_address; // suppress play
+    cpu.Start (
+        nsf->init_address,
+        nsf->play_address,
+        speed,
+        song,
+        region_register,
+        nsf->nsf2_bits,
+        config->GetValue("IRQ_ENABLE").GetInt()!=0,
+        &nsf2_irq );
 
     // マスク更新
     apu->SetMask( (*config)["MASK"].GetInt()    );

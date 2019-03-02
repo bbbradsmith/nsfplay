@@ -15,21 +15,31 @@
 
 namespace xgm
 {
+
+class NSF2_IRQ; // forward declaration
+
 class NES_CPU : public IDevice
 {
 protected:
+  int init_addr;
   int play_addr;
+  int song;
+  int region;
   K6502_Context context;
   bool breaked;
   UINT32 clock_per_frame;
   UINT32 clock_of_frame;
-  UINT32 frame_quarter;
   UINT32 breakpoint;
   UINT32 irqs;
   bool enable_irqs;
+  bool extra_init;
+  bool nmi_play;
   bool play_ready;
   IDevice *bus;
+  UINT8 nsf2_bits;
+  NSF2_IRQ* nsf2_irq;
   CPULogger *log_cpu;
+
   void run_from (UINT32 address);
 
 public:
@@ -37,7 +47,15 @@ public:
   NES_CPU (double clock = DEFAULT_CLOCK);
   ~NES_CPU ();
   void Reset ();
-  void Start (int init_addr, int play_addr_, double f=60, int a=0, int x=0, int y=0);
+  void Start (
+    int init_addr_,
+    int play_addr_,
+    double play_rate,
+    int song_,
+    int region_,
+    UINT8 nsf2_bits_,
+    bool enable_irqs_,
+    NSF2_IRQ* nsf2_irq_);
   UINT32 Exec (UINT32 clock); // returns number of clocks executed
   void SetMemory (IDevice *);
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);

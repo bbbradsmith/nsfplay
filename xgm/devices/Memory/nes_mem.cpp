@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 #include "nes_mem.h"
 
 namespace xgm
@@ -40,7 +41,7 @@ namespace xgm
       image[adr] = val;
       return true;
     }
-    if (0x4100 <= adr && adr < 0x4110)
+    if (PLAYER_RESERVED <= adr && adr < (PLAYER_RESERVED + PLAYER_RESERVED_SIZE))
     {
       image[adr] = val;
       return true;
@@ -59,7 +60,7 @@ namespace xgm
       val = image[adr & 0x7ff];
       return true;
     }
-    if (0x4100 <= adr && adr < 0x4110)
+    if (PLAYER_RESERVED <= adr && adr < (PLAYER_RESERVED + PLAYER_RESERVED_SIZE))
     {
       val = image[adr];
       return true;
@@ -76,6 +77,12 @@ namespace xgm
   void NES_MEM::SetFDSMode (bool t)
   {
     fds_enable = t;
+  }
+
+  void NES_MEM::SetReserved (const UINT8* data, UINT32 size)
+  {
+    assert(size <= PLAYER_RESERVED_SIZE);
+    ::memcpy(image + PLAYER_RESERVED, data, size);
   }
 
 }                               // namespace

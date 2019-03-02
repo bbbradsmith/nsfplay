@@ -7,6 +7,7 @@
 #include "../../devices/cpu/nes_cpu.h"
 #include "../../devices/memory/nes_bank.h"
 #include "../../devices/memory/nes_mem.h"
+#include "../../devices/memory/nsf2_vectors.h"
 #include "../../devices/sound/nes_apu.h"
 #include "../../devices/sound/nes_vrc7.h"
 #include "../../devices/sound/nes_fme7.h"
@@ -21,6 +22,7 @@
 #include "../../devices/audio/rconv.h"
 #include "../../devices/audio/echo.h"
 #include "../../devices/audio/MedianFilter.h"
+#include "../../devices/misc/nsf2_irq.h"
 #include "../../devices/misc/nes_detect.h"
 #include "../../devices/misc/log_cpu.h"
 
@@ -63,6 +65,8 @@ namespace xgm
     NES_CPU cpu;
     NES_MEM mem;
     NES_BANK bank;
+    NSF2_Vectors nsf2_vectors;
+    NSF2_IRQ nsf2_irq;
 
     ISoundChip *sc[NES_DEVICE_MAX];      // サウンドチップのインスタンス
     RateConverter rconv[NES_DEVICE_MAX]; // サンプリングレートコンバータ
@@ -103,7 +107,6 @@ namespace xgm
     NES_MMC5 *mmc5;
     NES_N106 *n106;
     NES_FDS *fds;
-
 
   public:
     NSF *nsf;
