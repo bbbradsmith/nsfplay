@@ -41,9 +41,10 @@ public:
 	int m_nRegion;
 	BOOL m_bStereo;
 	BOOL m_bIRQEnable;
-	int m_nLimit;
-	int m_nThreshold;
-	int m_nVelocity;
+	//int m_nLimit;
+	//int m_nThreshold;
+	//int m_nVelocity;
+	int m_nQuality;
 	int m_nHpfValue;
 	int m_nLpfValue;
 	BOOL m_bNSFePlaylist;
@@ -84,11 +85,13 @@ public:
 	afx_msg void OnBnClickedUsealt();
 	afx_msg void OnBnClickedVsync();
 	virtual BOOL OnInitDialog();
-	CSliderCtrl m_limitCtrl;
-	CSliderCtrl m_threshCtrl;
-	CSliderCtrl m_velocityCtrl;
+	//CSliderCtrl m_limitCtrl;
+	//CSliderCtrl m_threshCtrl;
+	//CSliderCtrl m_velocityCtrl;
+	CSliderCtrl m_qualityCtrl;
 	CSliderCtrl m_hpfCtrl;
 	CSliderCtrl m_lpfCtrl;
+	afx_msg void OnNMCustomdrawLimit(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 //{{AFX_INSERT_LOCATION}}

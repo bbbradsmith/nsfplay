@@ -317,18 +317,11 @@ BEGIN
     GROUPBOX        "オーディオ再生(&P)",IDC_STATIC,6,6,120,56
     LTEXT           "再生周波数(&R)",IDC_STATIC,13,16,49,15,SS_CENTERIMAGE
     COMBOBOX        IDC_PLAYFREQ,65,16,51,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "コンプレッサ(&C)",IDC_STATIC,130,6,104,56
-    LTEXT           "振幅",IDC_STATIC,137,19,15,8
-    LTEXT           "大",IDC_STATIC,157,19,8,8
-    CONTROL         "",IDC_LIMIT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,165,18,54,12
-    LTEXT           "小",IDC_STATIC,220,19,8,8
-    LTEXT           "閾値",IDC_STATIC,137,31,15,8
-    LTEXT           "大",IDC_STATIC,157,31,8,8
-    CONTROL         "",IDC_THRESHOLD,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,165,30,54,12
-    LTEXT           "小",IDC_STATIC,220,31,8,8
-    LTEXT           "速度",IDC_STATIC,137,43,15,8
-    CONTROL         "",IDC_VELOCITY,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,165,42,54,12
-    LTEXT           "速",IDC_STATIC,220,43,8,8
+    GROUPBOX        "音",IDC_STATIC,130,6,104,56
+    LTEXT           "音質",IDC_STATIC,137,19,15,8
+    LTEXT           "小",IDC_STATIC,157,19,8,8
+    CONTROL         "",IDC_QUALITY,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,165,18,54,12
+    LTEXT           "大",IDC_STATIC,220,19,8,8
     LTEXT           "演奏時間(&P)",IDC_STATIC,13,79,45,14,SS_CENTERIMAGE
     EDITTEXT        IDC_PLAYTIME,58,79,20,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "秒",IDC_STATIC,83,79,12,15,SS_CENTERIMAGE
@@ -356,7 +349,6 @@ BEGIN
     LTEXT           "タイトル表示書式",IDC_STATIC,13,255,51,8
     EDITTEXT        IDC_FORMAT,63,253,163,12,ES_AUTOHSCROLL
     GROUPBOX        "シーケンサ(&S)",IDC_STATIC,6,67,228,102
-    LTEXT           "遅",IDC_STATIC,157,43,8,8
     LTEXT           "HPF強度(&H)",IDC_STATIC,13,47,36,8
     CONTROL         "",IDC_HPF,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,60,45,50,12
     LTEXT           "弱",IDC_STATIC,53,47,8,8
@@ -729,7 +721,6 @@ BEGIN
     END
     POPUP "オプション(&O)"
     BEGIN
-        MENUITEM "簡易設定(&E)",                    ID_EASY
         MENUITEM "詳細設定(&S)",                    ID_CONFIG
     END
 END
@@ -1156,13 +1147,9 @@ BEGIN
     GROUPBOX        "&Playback",IDC_STATIC,6,6,114,52
     LTEXT           "&Sample rate:",IDC_STATIC,16,15,44,15,SS_CENTERIMAGE
     COMBOBOX        IDC_PLAYFREQ,60,16,51,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "&Compressor",IDC_STATIC,126,6,108,52
-    LTEXT           "Limit",IDC_STATIC,134,18,36,8
-    CONTROL         "",IDC_LIMIT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,168,18,59,11
-    LTEXT           "Threshold",IDC_STATIC,134,30,35,8
-    CONTROL         "",IDC_THRESHOLD,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,168,30,59,11
-    LTEXT           "Velocity",IDC_STATIC,134,42,35,8
-    CONTROL         "",IDC_VELOCITY,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,168,42,59,11
+    GROUPBOX        "Sound",IDC_STATIC,126,6,108,52
+    LTEXT           "Quality",IDC_STATIC,134,18,36,8
+    CONTROL         "",IDC_QUALITY,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,168,18,59,11
     GROUPBOX        "&Sequencer",IDC_STATIC,6,60,228,98
     LTEXT           "Default &Playtime",IDC_STATIC,16,70,60,14,SS_CENTERIMAGE
     EDITTEXT        IDC_PLAYTIME,71,70,25,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -1469,7 +1456,6 @@ BEGIN
     END
     POPUP "&Options"
     BEGIN
-        MENUITEM "&Easy Setup",                 ID_EASY
         MENUITEM "&Settings",                   ID_CONFIG
     END
 END

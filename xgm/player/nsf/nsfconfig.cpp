@@ -98,10 +98,6 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("VRC7_PATCH", 0); // VRC7 patch set
   CreateValue("NSFE_PLAYLIST", 1); // use NSFe playlist
 
-  CreateValue("COMP_LIMIT",    100);
-  CreateValue("COMP_THRESHOLD",100);
-  CreateValue("COMP_VELOCITY", 100);
-
   CreateValue("NTSC_BASECYCLES", 1789773);
   CreateValue("PAL_BASECYCLES", 1662607);
   CreateValue("DENDY_BASECYCLES", 1773448);
@@ -110,6 +106,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("LOG_CPU", 0);
   CreateValue("LOG_CPU_FILE", "nsf_write.log");
 
+  CreateValue("QUALITY", 10);
   CreateValue("MASTER_VOLUME", 128);
 
   for (i = 0; i < NES_CHANNEL_MAX; ++i)
@@ -141,10 +138,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
     std::string str;
     str = dname[i];
     CreateValue((std::string)dname[i]+"_VOLUME", 128);
-    CreateValue((std::string)dname[i]+"_QUALITY", 3);
-    CreateValue((std::string)dname[i]+"_FILTER", 0);
     CreateValue((std::string)dname[i]+"_MUTE", 0);
-    CreateValue((std::string)dname[i]+"_THRESHOLD", 100);
 
     static const int DEVICE_OPTION_MAX[NES_DEVICE_MAX] =
     {

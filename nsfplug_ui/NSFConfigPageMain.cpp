@@ -22,9 +22,10 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 , m_bStereo(FALSE)
 , m_bIRQEnable(TRUE)
 , m_bNSFePlaylist(FALSE)
-, m_nLimit(0)
-, m_nThreshold(0)
-, m_nVelocity(0)
+//, m_nLimit(0)
+//, m_nThreshold(0)
+//, m_nVelocity(0)
+, m_nQuality(1)
 , m_nHpfValue(0)
 , m_nLpfValue(0)
 {
@@ -76,9 +77,10 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     m_bStereo         = (CONFIG["NCH"] == 2);
     m_bIRQEnable      = CONFIG["IRQ_ENABLE"] != 0;
     m_bNSFePlaylist   = CONFIG["NSFE_PLAYLIST"];
-    m_nLimit          = 100 - CONFIG["COMP_LIMIT"];
-    m_nThreshold      = 100 - CONFIG["COMP_THRESHOLD"];
-    m_nVelocity       = 100 - CONFIG["COMP_VELOCITY"];
+    //m_nLimit          = 100 - CONFIG["COMP_LIMIT"];
+    //m_nThreshold      = 100 - CONFIG["COMP_THRESHOLD"];
+    //m_nVelocity       = 100 - CONFIG["COMP_VELOCITY"];
+	m_nQuality        = CONFIG["QUALITY"];
     
     if(m_hWnd) UpdateData(FALSE);
   }
@@ -106,9 +108,10 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["NCH"]             = m_bStereo ? 2 : 1;
     CONFIG["IRQ_ENABLE"]      = m_bIRQEnable ? 1 : 0;
     CONFIG["NSFE_PLAYLIST"]   = m_bNSFePlaylist;
-    CONFIG["COMP_LIMIT"]      = 100 - m_nLimit;
-    CONFIG["COMP_THRESHOLD"]  = 100 - m_nThreshold;
-    CONFIG["COMP_VELOCITY"]   = 100 - m_nVelocity;
+    //CONFIG["COMP_LIMIT"]      = 100 - m_nLimit;
+    //CONFIG["COMP_THRESHOLD"]  = 100 - m_nThreshold;
+    //CONFIG["COMP_VELOCITY"]   = 100 - m_nVelocity;
+    CONFIG["QUALITY"]         = m_nQuality;
 
     pm->cf->Notify(-1);
   }
@@ -142,14 +145,16 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDX_CBIndex(pDX, IDC_PLAYFREQ, m_nPlayFreq);
   DDX_CBIndex(pDX, IDC_REGION, m_nRegion);
   DDV_MaxChars(pDX, m_format, 128);
-  DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
-  DDX_Control(pDX, IDC_THRESHOLD, m_threshCtrl);
-  DDX_Control(pDX, IDC_VELOCITY, m_velocityCtrl);
+  //DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
+  //DDX_Control(pDX, IDC_THRESHOLD, m_threshCtrl);
+  //DDX_Control(pDX, IDC_VELOCITY, m_velocityCtrl);
+  DDX_Control(pDX, IDC_QUALITY, m_qualityCtrl);
   DDX_Control(pDX, IDC_HPF, m_hpfCtrl);
   DDX_Control(pDX, IDC_LPF, m_lpfCtrl);
-  DDX_Slider(pDX, IDC_LIMIT, m_nLimit);
-  DDX_Slider(pDX, IDC_THRESHOLD, m_nThreshold);
-  DDX_Slider(pDX, IDC_VELOCITY, m_nVelocity);
+  //DDX_Slider(pDX, IDC_LIMIT, m_nLimit);
+  //DDX_Slider(pDX, IDC_THRESHOLD, m_nThreshold);
+  //DDX_Slider(pDX, IDC_VELOCITY, m_nVelocity);
+  DDX_Slider(pDX, IDC_QUALITY, m_nQuality);
   DDX_Slider(pDX, IDC_HPF, m_nHpfValue);
   DDX_Slider(pDX, IDC_LPF, m_nLpfValue);
   //}}AFX_DATA_MAP
@@ -171,6 +176,7 @@ BEGIN_MESSAGE_MAP(NSFConfigPageMain, CPropertyPage)
 	ON_BN_CLICKED(IDC_USEALT, OnBnClickedUsealt)
 	ON_BN_CLICKED(IDC_VSYNC, OnBnClickedVsync)
 	//}}AFX_MSG_MAP
+	//ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIMIT, &NSFConfigPageMain::OnNMCustomdrawLimit)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -251,18 +257,22 @@ BOOL NSFConfigPageMain::OnInitDialog()
 {
   __super::OnInitDialog();
 
-  m_limitCtrl.SetRange(0,100);
-  m_limitCtrl.SetPageSize(5);
-  m_limitCtrl.SetLineSize(1);
-  m_limitCtrl.SetTicFreq(10);
-  m_threshCtrl.SetRange(0,100);
-  m_threshCtrl.SetPageSize(5);
-  m_threshCtrl.SetTicFreq(10);
-  m_threshCtrl.SetLineSize(1);
-  m_velocityCtrl.SetRange(0,100);
-  m_velocityCtrl.SetTicFreq(10);
-  m_velocityCtrl.SetPageSize(5);
-  m_velocityCtrl.SetLineSize(1);
+  //m_limitCtrl.SetRange(0,100);
+  //m_limitCtrl.SetPageSize(5);
+  //m_limitCtrl.SetLineSize(1);
+  //m_limitCtrl.SetTicFreq(10);
+  //m_threshCtrl.SetRange(0,100);
+  //m_threshCtrl.SetPageSize(5);
+  //m_threshCtrl.SetTicFreq(10);
+  //m_threshCtrl.SetLineSize(1);
+  //m_velocityCtrl.SetRange(0,100);
+  //m_velocityCtrl.SetTicFreq(10);
+  //m_velocityCtrl.SetPageSize(5);
+  //m_velocityCtrl.SetLineSize(1);
+  m_qualityCtrl.SetRange(1,40);
+  m_qualityCtrl.SetTicFreq(2);
+  m_qualityCtrl.SetPageSize(4);
+  m_qualityCtrl.SetLineSize(1);
   m_hpfCtrl.SetRange(0,256);
   m_hpfCtrl.SetTicFreq(32);
   m_hpfCtrl.SetPageSize(16);
@@ -274,4 +284,12 @@ BOOL NSFConfigPageMain::OnInitDialog()
 
   return TRUE;  // return TRUE unless you set the focus to a control
   // 例外 : OCX プロパティ ページは必ず FALSE を返します。
+}
+
+
+void NSFConfigPageMain::OnNMCustomdrawLimit(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	*pResult = 0;
 }

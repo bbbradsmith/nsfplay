@@ -7,7 +7,7 @@
 // NSFConfigPageDevice.h : ヘッダー ファイル
 //
 #include "NSFDialog.h"
-#include "NSFAudioPanel.h"
+//#include "NSFAudioPanel.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // NSFConfigPageDevice ダイアログ
@@ -32,7 +32,7 @@ public:
 // ユーザー追加
 public:
   int device_id;
-  NSFAudioPanel *audioPanel;
+  //NSFAudioPanel *audioPanel;
   NSFDialog *mainPanel;
   int mainPanel_id;
   void SetPanel(NSFDialog *p, int id);

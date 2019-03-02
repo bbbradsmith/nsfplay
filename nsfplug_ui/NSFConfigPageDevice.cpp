@@ -23,13 +23,13 @@ NSFConfigPageDevice::NSFConfigPageDevice() : CPropertyPage(NSFConfigPageDevice::
 	//{{AFX_DATA_INIT(NSFConfigPageDevice)
 		// メモ - ClassWizard はこの位置にマッピング用のマクロを追加または削除します。
 	//}}AFX_DATA_INIT
-  audioPanel = new NSFAudioPanel(this);
+  //audioPanel = new NSFAudioPanel(this);
   mainPanel = NULL;
 }
 
 NSFConfigPageDevice::~NSFConfigPageDevice()
 {
-  delete audioPanel;
+  //delete audioPanel;
 }
 
 void NSFConfigPageDevice::DoDataExchange(CDataExchange* pDX)
@@ -43,7 +43,7 @@ void NSFConfigPageDevice::DoDataExchange(CDataExchange* pDX)
 void NSFConfigPageDevice::SetDeviceID(int id)
 {
   device_id = id;
-  audioPanel->SetDeviceID(device_id);
+  //audioPanel->SetDeviceID(device_id);
   m_psp.dwFlags |= PSP_USETITLE;
   m_psp.pszTitle = NSFPlayerConfig::dname[device_id];
 }
@@ -57,7 +57,7 @@ void NSFConfigPageDevice::SetPanel(NSFDialog *p, int id)
 void NSFConfigPageDevice::SetDialogManager(NSFDialogManager *p)
 {
   NSFDialog::SetDialogManager(p);
-  audioPanel->SetDialogManager(p);
+  //audioPanel->SetDialogManager(p);
   if(mainPanel)
     mainPanel->SetDialogManager(p);
 }
@@ -66,7 +66,7 @@ void NSFConfigPageDevice::UpdateNSFPlayerConfig(bool b)
 {
   NSFDialog::UpdateNSFPlayerConfig(b);
 
-  audioPanel->UpdateNSFPlayerConfig(b);
+  //audioPanel->UpdateNSFPlayerConfig(b);
   if(mainPanel)
     mainPanel->UpdateNSFPlayerConfig(b);
 }
@@ -85,12 +85,13 @@ BOOL NSFConfigPageDevice::OnInitDialog()
 	CPropertyPage::OnInitDialog();
 
   int x = 16, y = 56;
-  RECT rect1;
-  audioPanel->Create(IDD_AUDIOPANEL, this);
-  dynamic_cast<CDialog *>(audioPanel)->GetClientRect(&rect1);
-  int cx = rect1.right, cy = rect1.bottom;
-  audioPanel->SetWindowPos(0,x,y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-  audioPanel->ShowWindow(SW_SHOW);
+  //RECT rect1;
+  //audioPanel->Create(IDD_AUDIOPANEL, this);
+  //dynamic_cast<CDialog *>(audioPanel)->GetClientRect(&rect1);
+  //int cx = rect1.right, cy = rect1.bottom;
+  //audioPanel->SetWindowPos(0,x,y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+  //audioPanel->ShowWindow(SW_SHOW);
+  int cx = x, cy = y;
 
   if(mainPanel)
   {

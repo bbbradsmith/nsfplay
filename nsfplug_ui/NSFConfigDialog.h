@@ -9,7 +9,6 @@
 #include "NSFDialog.h"
 #include "NSFConfigPageMain.h"
 #include "NSFConfigPageDevice.h"
-#include "NSFAudioPanel.h"
 #include "NSFApuPanel.h"
 #include "NSFFdsPanel.h"
 #include "NSFDmcPanel.h"

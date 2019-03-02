@@ -30,11 +30,11 @@ namespace xgm
     /* アンプ←フィルタ←レートコンバータ←音源 を接続 */
     for (int i = 0; i < NES_DEVICE_MAX; i++)
     {
-      rconv[i].Attach (sc[i]);
-      filter[i].Attach (&rconv[i]);
-      amp[i].Attach (&filter[i]);
+      amp[i].Attach (sc[i]);
     }
-    mfilter = new MedianFilter(5);
+
+    rconv.Attach(&mixer);
+    fader.Attach(&rconv);
 
     nch = 1;
   }
@@ -51,7 +51,6 @@ namespace xgm
     delete vrc7;
     delete ld;
     delete logcpu;
-    delete mfilter;
   }
 
   void NSFPlayer::SetConfig(PlayerConfig *pc)
@@ -275,76 +274,51 @@ namespace xgm
     cpu.SetMemory (&stack);
   }
 
-  void NSFPlayer::SetPlayFreq (double r)
-  {
-    rate = r;
+void NSFPlayer::SetPlayFreq (double r)
+{
+	rate = r;
 
-    int region = GetRegion(nsf->regn, nsf->regn_pref);
-    bool pal = (region == REGION_PAL);
-    dmc->SetPal(pal);
+	int region = GetRegion(nsf->regn, nsf->regn_pref);
+	bool pal = (region == REGION_PAL);
+	dmc->SetPal(pal);
 
-    for (int i = 0; i < NES_DEVICE_MAX; i++)
-    {
-      int quality = config->GetDeviceConfig(i,"QUALITY");
+	int quality = config->GetValue("QUALITY").GetInt();
 
-      // レートコンバータを使用する
-      int MULT[NES_DEVICE_MAX][4] = { 
-        1, 5, 8, 20, // APU1
-        1, 5, 8, 20, // DMC
-        1, 5, 8,  8, // FME7
-        1, 5, 8, 20, // MMC5
-        1, 5, 8, 20, // N106
-        1, 5, 8, 20, // VRC6
-        1, 3, 3,  3, // VRC7
-        1, 5, 8, 20  // FDS
-      };
+	double clock;
+	switch (region)
+	{
+		default:
+		case REGION_NTSC:
+			clock = config->GetValue("NTSC_BASECYCLES").GetInt();
+			break;
+		case REGION_PAL:
+			clock = config->GetValue("PAL_BASECYCLES").GetInt();
+			break;
+		case REGION_DENDY:
+			clock = config->GetValue("DENDY_BASECYCLES").GetInt();
+			break;
+	}
+	double oversample = rate * quality;
+	if (oversample > clock) oversample = clock;
+	if (oversample < rate) oversample = rate;
 
-      double clock;
-      switch (region)
-      {
-          default:
-          case REGION_NTSC:
-              clock = config->GetValue("NTSC_BASECYCLES").GetInt();
-              break;
-          case REGION_PAL:
-              clock = config->GetValue("PAL_BASECYCLES").GetInt();
-              break;
-          case REGION_DENDY:
-              clock = config->GetValue("DENDY_BASECYCLES").GetInt();
-              break;
-      }
-      sc[i]->SetClock(clock);
+	for (int i = 0; i < NES_DEVICE_MAX; i++)
+	{
+		sc[i]->SetClock(clock);
+		sc[i]->SetRate(oversample);
+	}
+	rconv.SetClock(oversample);
+	rconv.SetRate(rate);
 
-      int mult = config->GetDeviceConfig(i,"QUALITY").GetInt() & 3;
-
-      sc[i]->SetRate(rate * MULT[i][mult]);
-
-      rconv[i].SetClock(rate * MULT[i][mult]);
-      rconv[i].SetRate(rate);
-      rconv[i].Reset();
-
-      if (quality)
-      {
-        filter[i].Attach (&rconv[i]);
-      }
-      else
-      {
-        // レートコンバータは使用しない
-        filter[i].Attach (sc[i]);
-      }
-      // フィルタ動作周波数の設定
-      filter[i].SetRate(rate);
-      filter[i].Reset();
-    }
-    mixer.Reset ();
-    echo.SetRate(rate);
-    echo.Reset();
-    lpf.SetRate(rate);
-    lpf.Reset();
-    dcf.SetRate(rate);
-    dcf.Reset(); 
-    DEBUG_OUT("rate: %f\n",rate);
-  }
+	mixer.Reset();
+	rconv.Reset();
+	fader.Reset();
+	lpf.SetRate(rate);
+	lpf.Reset();
+	dcf.SetRate(rate);
+	dcf.Reset(); 
+	DEBUG_OUT("rate: %f\n",rate);
+}
 
   void NSFPlayer::SetChannels(int channels)
   {
@@ -357,7 +331,6 @@ namespace xgm
   {
     ::srand((unsigned)::time(NULL)); // randomizing random generator
 
-    mfilter->Reset();
     time_in_ms = 0;  
     silent_length = 0; 
     playtime_detected = false;
@@ -453,7 +426,7 @@ namespace xgm
 
   void NSFPlayer::DetectSilent ()
   {
-    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
+    if (fader.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
       return;
 
     if ((*config)["MASK"].GetInt()==0 && (*config)["AUTO_STOP"].GetInt() &&
@@ -468,7 +441,7 @@ namespace xgm
 
   void NSFPlayer::DetectLoop ()
   {
-    if (mixer.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
+    if (fader.IsFading () || playtime_detected || !nsf->playtime_unknown || nsf->UseNSFePlaytime())
       return;
 
     if ((*config)["AUTO_DETECT"])
@@ -485,11 +458,11 @@ namespace xgm
 
   void NSFPlayer::CheckTerminal ()
   {
-    if (mixer.IsFading ())
+    if (fader.IsFading ())
       return;
 
     if (time_in_ms + nsf->GetFadeTime () >= nsf->GetLength ())
-      mixer.FadeStart (rate, nsf->GetFadeTime ());
+      fader.FadeStart (rate, nsf->GetFadeTime ());
   }
 
   UINT32 NSFPlayer::Skip (UINT32 length)
@@ -522,12 +495,12 @@ namespace xgm
         int apu_clocks = (int)(apu_clock_rest);
         if (apu_clocks > 0)
         {
-            //mixer.Tick(apu_clocks);
+            //fader.Tick(apu_clocks);
             apu_clock_rest -= (double)(apu_clocks);
         }
       }
 
-      mixer.Skip (length);
+      fader.Skip (length);
       time_in_ms += (int)(1000 * length / rate * ((*config)["MULT_SPEED"].GetInt()) / 256) ;
       CheckTerminal ();
       DetectLoop ();
@@ -538,9 +511,9 @@ namespace xgm
   void NSFPlayer::FadeOut (int fade_in_ms)
   {
     if (fade_in_ms < 0)
-      mixer.FadeStart (rate, (*config)["FADE_TIME"]);
+      fader.FadeStart (rate, (*config)["FADE_TIME"]);
     else
-      mixer.FadeStart (rate, fade_in_ms);
+      fader.FadeStart (rate, fade_in_ms);
   }
 
   void NSFPlayer::UpdateInfo()
@@ -642,12 +615,12 @@ namespace xgm
       int apu_clocks = (int)(apu_clock_rest);
       if (apu_clocks > 0)
       {
-          mixer.Tick(apu_clocks);
+          fader.Tick(apu_clocks);
           apu_clock_rest -= (double)(apu_clocks);
       }
 
       // render output
-      mixer.Render(buf);
+      fader.Render(buf);
       outm = (buf[0] + buf[1]) >> 1; // mono mix
       if (outm == last_out) silent_length++; else silent_length = 0;
       last_out = outm;
@@ -655,10 +628,6 @@ namespace xgm
       // echo.FastRender(buf);
       dcf.FastRender(buf);
       lpf.FastRender(buf);
-      cmp.FastRender(buf);
-
-      //mfilter->Put(buf[0]);
-      //out = mfilter->Get();
 
       out[0] = buf[0];
       out[1] = buf[1];
@@ -702,7 +671,7 @@ namespace xgm
 
   bool NSFPlayer::IsStopped ()
   {
-    return mixer.IsFadeEnd ();
+    return fader.IsFadeEnd ();
   }
 
   bool NSFPlayer::SetSong (int s)
@@ -793,11 +762,6 @@ namespace xgm
       for (i = 0; i < NES_DEVICE_MAX; i++)
         Notify (i);
 
-      cmp.SetParam(
-        0.01 * ((*config)["COMP_LIMIT"]), 
-        0.01 * ((*config)["COMP_THRESHOLD"]),
-        0.01 * ((*config)["COMP_VELOCITY"]));
-
       dcf.SetParam(270,(*config)["HPF"]);
       lpf.SetParam(4700.0,(*config)["LPF"]);
 
@@ -806,8 +770,6 @@ namespace xgm
 
       return;
     }
-
-    filter[id].SetParam (4700.0, config->GetDeviceConfig(id,"FILTER").GetInt());
 
     // adjust volume by NSFE mixe chunk
 
@@ -848,8 +810,6 @@ namespace xgm
 
     amp[id].SetVolume (device_volume);
     amp[id].SetMute (config->GetDeviceConfig(id,"MUTE"));
-    //amp[id].SetCompress (config->GetDeviceConfig(id,"THRESHOLD"), config->GetDeviceConfig(id,"TWEIGHT"));
-    amp[id].SetCompress (config->GetDeviceConfig(id,"THRESHOLD"), -1);
 
     switch (id)
     {

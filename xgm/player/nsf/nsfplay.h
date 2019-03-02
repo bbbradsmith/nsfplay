@@ -18,6 +18,7 @@
 #include "../../devices/sound/nes_fds.h"
 #include "../../devices/audio/filter.h"
 #include "../../devices/audio/mixer.h"
+#include "../../devices/audio/fader.h"
 #include "../../devices/audio/amplifier.h"
 #include "../../devices/audio/rconv.h"
 #include "../../devices/audio/echo.h"
@@ -61,6 +62,7 @@ namespace xgm
     Layer stack;
     Layer layer;
     Mixer mixer;
+    Fader fader;
 
     NES_CPU cpu;
     NES_MEM mem;
@@ -69,16 +71,12 @@ namespace xgm
     NSF2_IRQ nsf2_irq;
 
     ISoundChip *sc[NES_DEVICE_MAX];      // サウンドチップのインスタンス
-    RateConverter rconv[NES_DEVICE_MAX]; // サンプリングレートコンバータ
-    Filter filter[NES_DEVICE_MAX];       // ローパスフィルター
     Amplifier amp[NES_DEVICE_MAX];       // アンプ
+    RateConverter rconv;
     DCFilter dcf;                        // 最終出力段に掛ける直流フィルタ
     Filter lpf;                          // 最終出力に掛けるローパスフィルタ
-    Compressor cmp;                      // 最終出力段に掛けるコンプレッサ
     ILoopDetector *ld;                   // ループ検出器
     CPULogger *logcpu;                   // Logs CPU to file
-    EchoUnit echo;
-    MedianFilter *mfilter;               // プチノイズ対策のメディアンフィルタ
 
     // トラック番号の列挙
     enum {

@@ -115,6 +115,7 @@
     <ClInclude Include="devices\Audio\MedianFilter.h" />
     <ClInclude Include="devices\Audio\mixer.h" />
     <ClInclude Include="devices\Audio\rconv.h" />
+    <ClInclude Include="devices\Audio\fader.h" />
     <ClInclude Include="devices\CPU\km6502\km6280.h" />
     <ClInclude Include="devices\CPU\km6502\km6280m.h" />
     <ClInclude Include="devices\CPU\km6502\km6502.h" />

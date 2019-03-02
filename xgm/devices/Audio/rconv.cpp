@@ -38,7 +38,7 @@ void RateConverter::Reset ()
   if(clock&&rate)
   {
     mult = (int)(clock/rate);
-    if(mult<2) return ;
+    if(mult<2) mult=1;
 
     int m = (mult*2+1)/2;
 
