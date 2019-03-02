@@ -123,6 +123,7 @@ static int is_sjis_prefix(int c)
     if(fname!=NULL) *(fname++) = '\0'; else fname = fpath;
 
     if(song<0) song = this->song;
+    UINT8 nsfe_ei = nsfe_plst ? nsfe_plst[song] : song;
 
     if (!title_unknown)
     {
@@ -163,7 +164,10 @@ static int is_sjis_prefix(int c)
           break;
         case 'A':
         case 'a':
-          wp += sprintf(print_title+wp, "%s", this->artist);
+          if (nsfe_entry[nsfe_ei].taut[0] != 0)
+            wp += sprintf(print_title+wp, "%s", nsfe_entry[nsfe_ei].taut);
+          else
+            wp += sprintf(print_title+wp, "%s", this->artist);
           format++;
           break;
         case 'C':
@@ -173,7 +177,7 @@ static int is_sjis_prefix(int c)
           break;
         case 'L':
         case 'l':
-          wp += sprintf(print_title+wp, "%s", nsfe_entry[nsfe_plst?nsfe_plst[song]:song].tlbl);
+          wp += sprintf(print_title+wp, "%s", nsfe_entry[nsfe_ei].tlbl);
           format++;
           break;
         case 'N':
@@ -398,18 +402,22 @@ static int is_sjis_prefix(int c)
     if (size < 4) // no FourCC
       return false;
 
+    nsf2_bits = 0;
+
     // fill NSFe values with defaults
 
     // 'plst'
     nsfe_plst = NULL;
     nsfe_plst_size = 0;
 
-    // entries 'tlbl', 'time', 'fade'
+    // entries 'tlbl', 'taut', 'time', 'fade', 'psfx'
     for (int i=0; i < NSFE_ENTRIES; ++i)
     {
       nsfe_entry[i].tlbl = "";
+      nsfe_entry[i].taut = "";
       nsfe_entry[i].time = -1;
       nsfe_entry[i].fade = -1;
+      nsfe_entry[i].psfx = false;
     }
 
     // 'mixe'
@@ -499,6 +507,13 @@ static int is_sjis_prefix(int c)
 
   bool NSF::LoadNSFe (UINT8 * image, UINT32 size, bool nsf2)
   {
+    // helper for parsing strings
+    #define NSFE_STRING(p) \
+      if (n >= chunk_size) break; \
+      p = reinterpret_cast<char*>(chunk+n); \
+      while (n < chunk_size && chunk[n] != 0) ++n; \
+      if(chunk[n] == 0) ++n;
+
     // store entire file for string references, etc.
     delete[] nsfe_image;
     nsfe_image = new UINT8[size+1];
@@ -649,17 +664,11 @@ static int is_sjis_prefix(int c)
         else if (!strcmp(cid, "NSF2"))
         {
           version = 2;
-          // TODO
-          // contains the NSF2 feature bitfield (to be implemented in future)
+          if (chunk_size < 1) return false;
+          nsf2_bits = chunk[0];
         }
         else if (!strcmp(cid, "auth"))
         {
-          #define NSFE_STRING(p) \
-            if (n >= chunk_size) break; \
-            p = reinterpret_cast<char*>(chunk+n); \
-            while (n < chunk_size && chunk[n] != 0) ++n; \
-            if(chunk[n] == 0) ++n;
-
           unsigned int n=0;
           while (true)
           {
@@ -709,16 +718,27 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "tlbl"))
         {
-          #define NSFE_STRING(p) \
-            if (n >= chunk_size) break; \
-            p = reinterpret_cast<char*>(chunk+n); \
-            while (n < chunk_size && chunk[n] != 0) ++n; \
-            if(chunk[n] == 0) ++n;
-
           unsigned int n=0;
           for (unsigned int i=0; i < NSFE_ENTRIES; ++i)
           {
             NSFE_STRING(nsfe_entry[i].tlbl);
+          }
+        }
+        else if (!strcmp(cid, "taut"))
+        {
+          unsigned int n=0;
+          for (unsigned int i=0; i < NSFE_ENTRIES; ++i)
+          {
+            NSFE_STRING(nsfe_entry[i].taut);
+          }
+        }
+        else if (!strcmp(cid, "psfx"))
+        {
+          unsigned int n=0;
+          for (unsigned int i=0; i<chunk_size; ++i)
+          {
+            UINT8 track = chunk[i];
+            nsfe_entry[i].psfx = true;
           }
         }
         else if (!strcmp(cid, "text"))

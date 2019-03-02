@@ -8,9 +8,11 @@ namespace xgm
 {
   struct NSFE_Entry
   {
-    char* tlbl;
+    const char* tlbl;
+    const char* taut;
     INT32 time;
     INT32 fade;
+    bool psfx;
   };
   const unsigned int NSFE_ENTRIES = 256;
   const unsigned int NSFE_MIXES = 8;

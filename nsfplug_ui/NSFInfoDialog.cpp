@@ -200,11 +200,14 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
         nsf->nsfe_entry[i].time    != -1 ||
         nsf->nsfe_entry[i].fade    != -1 )
     {
-      ss.Format("NSFe track %d: %s, %d, %d\r\n",
+      ss.Format("NSFe track %d: %s, %s, %d, %d%s\r\n",
           i,
-          nsf->nsfe_entry[i].tlbl,
+          nsf->nsfe_entry[i].tlbl[0]!=0 ? nsf->nsfe_entry[i].tlbl : "(untitled)",
+          nsf->nsfe_entry[i].taut[0]!=0 ? nsf->nsfe_entry[i].taut : nsf->artist,
           nsf->nsfe_entry[i].time,
-          nsf->nsfe_entry[i].fade);
+          nsf->nsfe_entry[i].fade,
+          nsf->nsfe_entry[i].psfx ? " SFX": ""
+          );
       m_info += ss;
     }
   }
