@@ -33,6 +33,7 @@ bool NSF2_IRQ::Read(UINT32 adr, UINT32 & val, UINT32 id)
 		break;
 	case 0x401D:
 		val = irq ? 0x80 : 0x00; // return IRQ state
+		val |= active ? 0x01 : 0x00; // return active state
 		irq = false; // acknowledge IRQ
 		cpu->UpdateIRQ(NES_CPU::IRQD_NSF2, false);
 		break;
