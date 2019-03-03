@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 9 - 3/02/2019
+NSFPlay 2.4 beta 10 - ?
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -181,6 +181,8 @@ NSFPlay 2.4 beta 9 - 3/02/2019
 - Play now runs at next opportunity rather than always at the start of frame, similar to poll based players like PowerPak.
 - Other expansions with FDS automatically disables FDS RAM writes, and FDS banking for $6000-7FFF.
 - Full NSF2 implementation. (non-returning INIT, suppress play, IRQ, NSFe metadata.)
+- Removed non-functional filters, compressors, etc. from the audio chain.
+- Removed per-channel quality settings, created a single master quality setting.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
