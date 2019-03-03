@@ -4,6 +4,7 @@ namespace xgm{
 
 #define GETA 16
 #define PI (3.14159265358979)
+#define PRECISION 16
 
 static double window(int n, int M)
 {
@@ -39,6 +40,7 @@ void RateConverter::Reset ()
   {
     mult = (int)(clock/rate);
     if(mult<2) mult=1;
+    if(mult>63) mult=63;
 
     int m = (mult*2+1)/2;
 
@@ -55,10 +57,11 @@ void RateConverter::Reset ()
     for(int i=0; i<=m; i++)
     {
       hr[i] /= gain;
+      hri[i] = INT64(hr[i] * (1<<PRECISION));
     }
 
     for(int i=0; i<=mult*2; i++) 
-      tap[i][0] = tap[i][1] = 0;
+      tap[0][i] = tap[1][i] = 0;
   }
 
 }
@@ -90,12 +93,14 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
 {
   assert (target);
 
-  double out[2];
+  //double out[2];
+  INT64 out[2];
+  static INT32 t[2];
 
   for(int i=0; i<=mult; i++)
   {
-    tap[i][0] = tap[i+mult][0];
-    tap[i][1] = tap[i+mult][1];
+    tap[0][i] = tap[0][i+mult];
+    tap[1][i] = tap[1][i+mult];
   }
 
   // divide clock ticks among samples evenly
@@ -109,22 +114,30 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
       target->Tick(sub_clocks);
       mclocks -= (sub_clocks * mult);
     }
-    target->Render(tap[mult+i]);
+    target->Render(t);
+    tap[0][mult+i] = t[0];
+    tap[1][mult+i] = t[1];
   }
   assert (mclocks == 0); // all clocks must be used
   clocks = 0;
 
-  out[0] = hr[0] * tap[mult][0];
-  out[1] = hr[0] * tap[mult][1];
+  //out[0] = hr[0] * tap[0][mult];
+  //out[1] = hr[0] * tap[1][mult];
+  out[0] = hri[0] * tap[0][mult];
+  out[1] = hri[0] * tap[1][mult];
 
   for(int i=1; i<=mult; i++)
   {
-    out[0] += hr[i] * (tap[mult+i][0]+tap[mult-i][0]);
-    out[1] += hr[i] * (tap[mult+i][1]+tap[mult-i][1]);
+    //out[0] += hr[i] * (tap[0][mult+i]+tap[0][mult-i]);
+    //out[1] += hr[i] * (tap[1][mult+i]+tap[1][mult-i]);
+    out[0] += hri[i] * (tap[0][mult+i]+tap[0][mult-i]);
+    out[1] += hri[i] * (tap[1][mult+i]+tap[1][mult-i]);
   }
 
-  b[0] = (INT32)out[0];
-  b[1] = (INT32)out[1];
+  //b[0] = (INT32)out[0];
+  //b[1] = (INT32)out[1];
+  b[0] = INT32(out[0] >> PRECISION);
+  b[1] = INT32(out[1] >> PRECISION);
 
   return 2;
 }

@@ -14,8 +14,9 @@ namespace xgm
     IRenderable * target;
     double clock ,rate;
     int mult;          // オーバーサンプリング倍率(奇数)
-    INT32  tap[128][2];
+    INT32  tap[2][128];
     double hr[128];    // H(z)
+    INT64  hri[128];
     UINT32 clocks; // clocks pending Tick execution
 
     SimpleFIR *fir;
