@@ -53,10 +53,8 @@ bool NSF2_IRQ::Write(UINT32 adr, UINT32 val, UINT32 id)
 		reload = (reload & 0x00FF) | ((val & 0x00FF) << 8);
 		break;
 	case 0x401D:
+		if (!active) count = reload;
 		active = (val & 0x01) != 0;
-		count = reload;
-		irq = false;
-		cpu->UpdateIRQ(NES_CPU::IRQD_NSF2, false);
 		break;
 	}
 	return true;
