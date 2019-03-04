@@ -159,29 +159,33 @@ namespace xgm
         cpu.SetLogger(NULL);
     }
 
-    // setup player program
+    // setup player program at PLAYER_RESERVED ($4100)
     const UINT8 PLAYER_PROGRAM[] =
     {
-        0x20, 0x14, 0x41, // $4100 JSR PLAY ($4114 is a placeholder RTS)
+        0x20, 0x1E, 0x41, // $4100 JSR PLAY ($411E is a placeholder RTS)
         0x4C, 0x03, 0x41, // $4103 JMP to self (do nothing loop for detecting end of frame)
         0x48, 0x8A, 0x48, 0x98, 0x48, // $4106 PHA TXA PHA TYA PHA
-        0x20, 0x14, 0x41, // $410B JSR PLAY for non-returning INIT
-        0x68, 0xA8, 0x68, 0xAA, 0x68, // $410E PLA TAY PLA TAX PLA
-        0x40, // $4113 RTI
-        0x60, // $4114 RTS
+        0xA9, 0x00, 0x8D, 0x00, 0x20, // $410B LDA #$00 STA $2000 (disable NMI re-entry)
+        0x20, 0x1E, 0x41, // $4110 JSR PLAY for non-returning INIT ($411E placeholder)
+        0xA9, 0x80, 0x8D, 0x00, 0x20, // $4113 LDA #$80 STA $2000 (re-enable NMI)
+        0x68, 0xA8, 0x68, 0xAA, 0x68, // $4118 PLA TAY PLA TAX PLA
+        0x40, // $411D RTI
+        0x60, // $411E RTS
     };
     const int PLAYER_PROGRAM_SIZE = sizeof(PLAYER_PROGRAM);
     mem.SetReserved(PLAYER_PROGRAM, PLAYER_PROGRAM_SIZE);
-    // PLAYER_RESERVED is at $4100
+    // Note: PLAYER_RESERVED+1,2 are used directly in nes_cpu.cpp.
+    //       If the JSR PLAY at the start ever moves or changes, be sure to update that.
 
     if (nsf->nsf2_bits & 0x30) // uses IRQ or non-returning INIT
     {
         layer.Attach(&nsf2_vectors);
+		nsf2_vectors.SetCPU(&cpu);
         nsf2_vectors.ForceVector(0,PLAYER_RESERVED+0x06); // NMI routine that calls PLAY
         nsf2_vectors.ForceVector(1,PLAYER_RESERVED+0x03); // Reset routine goes to "breaked" infinite loop (not used)
-        nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x13); // Default IRQ points to empty RTI.
-        mem.Write(0x410C,nsf->play_address & 0xFF);
-        mem.Write(0x410D,nsf->play_address >> 8);
+        nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x1D); // Default IRQ points to empty RTI.
+        mem.Write(PLAYER_RESERVED+0x11,nsf->play_address & 0xFF);
+        mem.Write(PLAYER_RESERVED+0x12,nsf->play_address >> 8);
     }
     if (nsf->nsf2_bits & 0x10) // uses IRQ
     {

@@ -73,7 +73,8 @@ NES_CPU::NES_CPU (double clock)
   bus = NULL;
   log_cpu = NULL;
   irqs = 0;
-  enable_irqs = true;
+  enable_irq = true;
+  enable_nmi = false;
   nsf2_bits = 0;
   nsf2_irq = NULL;
 }
@@ -97,11 +98,11 @@ UINT32 Callback readByte (void *__THIS, UINT32 adr)
 void NES_CPU::run_from (UINT32 address)
 {
 	breaked = false;
-	context.PC = PLAYER_RESERVED;
+	context.PC = PLAYER_RESERVED; // JSR, followed by infinite loop ("breaked")
 	breakpoint = context.PC+3;
 	assert (bus);
-	bus->Write (context.PC+1, address & 0xff);
-	bus->Write (context.PC+2, address>>8);
+	bus->Write (PLAYER_RESERVED+1, address & 0xff);
+	bus->Write (PLAYER_RESERVED+2, address>>8);
 	// see PLAYER_PROGRAM in nsfplay.cpp
 }
 
@@ -115,6 +116,7 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 		{
 			if (extra_init)
 			{
+				enable_nmi = true;
 				run_from(init_addr);
 				extra_init = false;
 				context.A = song;
@@ -122,7 +124,7 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 				context.Y = 1;
 			}
 
-			if (enable_irqs && !(context.P & K6502_I_FLAG) && context.iRequest)
+			if (enable_irq && !(context.P & K6502_I_FLAG) && context.iRequest)
 			{
 				breaked = false;
 			}
@@ -167,10 +169,13 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 			{
 				if (nmi_play) // trigger play by NMI
 				{
-					if (log_cpu)
-						log_cpu->Play();
-					context.iRequest |= IRQ_NMI;
-					breaked = false;
+					if (enable_nmi)
+					{
+						if (log_cpu)
+							log_cpu->Play();
+						context.iRequest |= IRQ_NMI;
+						breaked = false;
+					}
 					play_ready = false;
 				}
 				else
@@ -268,7 +273,7 @@ void NES_CPU::Start (
 	int song_,
 	int region_,
 	UINT8 nsf2_bits_,
-	bool enable_irqs_,
+	bool enable_irq_,
 	NSF2_IRQ* nsf2_irq_)
 {
 	// approximate frame timing as an integer number of CPU clocks
@@ -282,10 +287,11 @@ void NES_CPU::Start (
 	irqs = 0;
 	nsf2_bits = nsf2_bits_;
 	nsf2_irq = nsf2_irq_;
-	enable_irqs = enable_irqs_;
+	enable_irq = enable_irq_;
+	enable_nmi = false;
 
 	// enable NSF2 IRQ
-	if (nsf2_bits & 0x10) enable_irqs = true;
+	if (nsf2_bits & 0x10) enable_irq = true;
 	else nsf2_irq = NULL;
 
 	// NSF2 disable PLAY
@@ -314,11 +320,12 @@ void NES_CPU::Start (
 
 	// run up to 60 frames of init before starting real playback (this allows INIT to modify $4011 etc. silently)
 	int timeout = int((60.0 * NES_BASECYCLES) / play_rate);
-	// TODO use real exec??
+	// Should this use Exec or is exec okay?
 	for (int i = 0; (i < timeout) && !breaked; i++, exec(context,bus))
 	{
 		if (context.PC == breakpoint)
 		{
+			if (nmi_play) enable_nmi = true;
 			breaked = true;
 		}
 	}
@@ -337,9 +344,14 @@ unsigned int NES_CPU::GetPC() const
 	return context.PC;
 }
 
+void NES_CPU::EnableNMI(bool enable)
+{
+	enable_nmi = enable;
+}
+
 void NES_CPU::UpdateIRQ(int device, bool irq)
 {
-	if (!enable_irqs) return;
+	if (!enable_irq) return;
 	if (device < 0 || device >= IRQD_COUNT) return;
 	UINT32 mask = 1 << device;
 	irqs &= ~mask;
