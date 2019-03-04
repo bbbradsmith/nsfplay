@@ -180,7 +180,7 @@ namespace xgm
     if (nsf->nsf2_bits & 0x30) // uses IRQ or non-returning INIT
     {
         layer.Attach(&nsf2_vectors);
-		nsf2_vectors.SetCPU(&cpu);
+        nsf2_vectors.SetCPU(&cpu);
         nsf2_vectors.ForceVector(0,PLAYER_RESERVED+0x06); // NMI routine that calls PLAY
         nsf2_vectors.ForceVector(1,PLAYER_RESERVED+0x03); // Reset routine goes to "breaked" infinite loop (not used)
         nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x1D); // Default IRQ points to empty RTI.
