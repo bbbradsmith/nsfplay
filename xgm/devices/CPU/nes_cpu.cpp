@@ -174,7 +174,9 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 					play_ready = false;
 				}
 				else
+				{
 					play_ready = true;
+				}
 			}
 			clock_of_frame += clock_per_frame;
 			//DEBUG_OUT("NMI\n");
@@ -321,7 +323,7 @@ void NES_CPU::Start (
 		}
 	}
 
-	clock_of_frame = 0;
+	clock_of_frame = clock_per_frame;
 	play_ready = breaked && !extra_init;
 }
 
