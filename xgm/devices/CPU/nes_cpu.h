@@ -27,8 +27,8 @@ protected:
   int region;
   K6502_Context context;
   bool breaked;
-  UINT32 clock_per_frame;
-  UINT32 clock_of_frame;
+  UINT32 fclocks_per_frame; // fCPU clocks per frame timer with fixed point precision
+  UINT32 fclocks_left_in_frame;
   UINT32 breakpoint;
   UINT32 irqs;
   bool enable_irqs;
