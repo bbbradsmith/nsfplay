@@ -97,7 +97,6 @@
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
@@ -213,7 +212,6 @@
     <ClCompile Include="player\nsf\nsfplay.cpp" />
     <ClCompile Include="player\nsf\pls\ppls.cpp" />
     <ClCompile Include="player\nsf\pls\sstream.cpp" />
-    <ClCompile Include="player\plugin\kbmedia\plugin.cpp" />
     <ClCompile Include="player\plugin\winamp2\in_module.cpp" />
     <ClCompile Include="player\plugin\winamp2\in_module_msp.cpp" />
     <ClCompile Include="utils\nsf_tag.cpp" />
