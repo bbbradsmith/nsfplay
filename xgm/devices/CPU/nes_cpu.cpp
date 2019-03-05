@@ -117,11 +117,11 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 			if (extra_init)
 			{
 				enable_nmi = true;
-				run_from(init_addr);
 				extra_init = false;
 				context.A = song;
 				context.X = region;
-				context.Y = 1;
+				context.Y = 0x81;
+				run_from(init_addr);
 			}
 
 			if (enable_irq && !(context.P & K6502_I_FLAG) && context.iRequest)
@@ -313,7 +313,7 @@ void NES_CPU::Start (
 
 	context.A = song;
 	context.X = region;
-	context.Y = 0;
+	context.Y = extra_init ? 0x80 : 0;
 	context.P = 0x26; // VIZ
 
 	run_from (init_addr);
