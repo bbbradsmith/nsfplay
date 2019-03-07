@@ -262,6 +262,7 @@ namespace xgm
       if ( data == 0x100 && active )
       { 
         memory->Read (daddress, data);
+        cpu->StealCycles(2); // DMC read takes 2 CPU cycles
         data |= (data&0xFF)|0x10000; // 8bitƒVƒtƒg‚Å 0x100 ‚É‚È‚é
         if ( length > 0 ) 
         {

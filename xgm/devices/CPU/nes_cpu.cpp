@@ -106,11 +106,12 @@ void NES_CPU::run_from (UINT32 address)
 	// see PLAYER_PROGRAM in nsfplay.cpp
 }
 
-UINT32 NES_CPU::Exec (UINT32 clock)
+UINT32 NES_CPU::Exec (UINT32 clocks)
 {
-	context.clock = 0;
+	context.clock = stolen_cycles;
+	stolen_cycles = 0;
 
-	while ( context.clock < clock )
+	while ( context.clock < clocks )
 	{
 		if (breaked)
 		{
@@ -144,10 +145,10 @@ UINT32 NES_CPU::Exec (UINT32 clock)
 		}
 		else 
 		{
-			if ( (fclocks_left_in_frame >> FRAME_FIXED) < clock )
+			if ( (fclocks_left_in_frame >> FRAME_FIXED) < clocks )
 				context.clock = (fclocks_left_in_frame >> FRAME_FIXED)+1;
 			else
-				context.clock = clock;
+				context.clock = clocks;
 		}
 		if (nsf2_irq) nsf2_irq->Clock(context.clock-clock_start);
 
@@ -342,6 +343,11 @@ void NES_CPU::SetLogger (CPULogger* logger)
 unsigned int NES_CPU::GetPC() const
 {
 	return context.PC;
+}
+
+void NES_CPU::StealCycles(unsigned int cycles)
+{
+	stolen_cycles += cycles;
 }
 
 void NES_CPU::EnableNMI(bool enable)

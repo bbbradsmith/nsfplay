@@ -31,6 +31,7 @@ protected:
   UINT32 fclocks_left_in_frame;
   UINT32 breakpoint;
   UINT32 irqs;
+  unsigned int stolen_cycles;
   bool enable_irq;
   bool enable_nmi;
   bool extra_init;
@@ -63,6 +64,7 @@ public:
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
   void SetLogger (CPULogger *logger);
   unsigned int GetPC() const;
+  void StealCycles(unsigned int cycles);
   void EnableNMI(bool enable);
 
   // IRQ devices
