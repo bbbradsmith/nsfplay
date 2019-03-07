@@ -263,6 +263,7 @@ void NES_CPU::Reset ()
   context.illegal = 0;
   breaked = false;
   irqs = 0;
+  stolen_cycles = 0;
   play_ready = false;
   exec(context, bus);
 }
@@ -284,6 +285,7 @@ void NES_CPU::Start (
 	region = region_;
 	fclocks_per_frame = (int)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / play_rate );
 	fclocks_left_in_frame = 0;
+	stolen_cycles = 0;
 	play_ready = false;
 	irqs = 0;
 	nsf2_bits = nsf2_bits_;
