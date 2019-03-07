@@ -183,6 +183,7 @@ NSFPlay 2.4 beta 12 - ?
 - Full NSF2 implementation. (non-returning INIT, suppress play, IRQ, NSFe metadata.)
 - Removed non-functional filters, compressors, etc. from the audio chain.
 - Removed per-channel quality settings, created a single master quality setting.
+- DPCM byte read now correctly takes 2 cycles.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
