@@ -29,6 +29,7 @@ class EmuWinamp {
   EmuOutMod m_eom;
   EmuOutDisk m_eod;
   In_Module *m_in_mod;
+  const char * (*m_load_error)();
   char m_fn[2048];
   char m_wo[2048]; // waveout filename
   bool m_playing;
@@ -54,6 +55,7 @@ public:
   int GetBufferUsage();
   void SetVolume(int volume);
   void Waveout(const char* wavefile);
+  const char* LoadError();
 };
 
 

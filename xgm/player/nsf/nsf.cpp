@@ -268,15 +268,19 @@ static int is_sjis_prefix(int c)
       goto Error_Exit;
     }
 
+    // find last . in filename
+    const char* ext = strchr(fn,'.');
+    const char* ext_next;
+    while (ext_next = strchr(ext+1,'.')) ext = ext_next;
+
     if (pls->type == 3)
+    {
       strncpy (filename, pls->filename, NSF_MAX_PATH);
-    else if (
-         strstr (fn, ".nsf")
-      || strstr (fn, ".NSF")
-      || strstr (fn, ".nsfe")
-      || strstr (fn, ".NSFE")
-      )
+    }
+    else if (ext && (!stricmp(ext, ".nsf") || !stricmp(ext, ".nsfe")))
+    {
       strncpy (filename, fn, NSF_MAX_PATH);
+    }
     else
     {
       nsf_error = "File extension not recognized.";
@@ -575,7 +579,8 @@ static int is_sjis_prefix(int c)
 
         if (strcmp ("NSFE", magic))
         {
-            nsfe_error = "NSFe FourCC does not match 'NSFE'.";
+            // note anything that's not NESM (NSF) ends up here, not just NSFE
+            nsfe_error = "Unknown FourCC ID at start of file.";
             return false;
         }
         chunk_offset = 4; // skip 'NSFE'
@@ -611,7 +616,7 @@ static int is_sjis_prefix(int c)
 
         if ((size-chunk_offset) < (chunk_size+8)) // not enough data for chunk
         {
-          nsfe_error = "Incomplete chunk at end of file? Not enough data.";
+          nsfe_error = "Incomplete NSFe chunk at end of file? Not enough data.";
           return false;
         }
 
@@ -841,7 +846,7 @@ static int is_sjis_prefix(int c)
         {
           if (cid[0] >= 'A' && cid[0] <= 'Z')
           {
-            snprintf(nsfe_error_,NSFE_ERROR_SIZE,"Unknown mandatory chunk type: '%s'",cid);
+            snprintf(nsfe_error_,NSFE_ERROR_SIZE,"Unknown mandatory NSFe chunk: '%s'",cid);
             nsfe_error_[NSFE_ERROR_SIZE-1] = 0;
             nsfe_error = nsfe_error_;
             return false;

@@ -185,6 +185,7 @@ NSFPlay 2.4 beta 12 - ?
 - Removed per-channel quality settings, created a single master quality setting.
 - DPCM byte read now correctly takes 2 cycles.
 - Improved NES CPU vs APU/audio synchronization (controlled by quality setting).
+- Better error messages for files that can't be loaded.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

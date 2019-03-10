@@ -38,6 +38,7 @@ static int dsp_dosamples(short int *samples, int numsamples, int bps, int nch, i
 static void SetInfo(int bitrate, int srate, int stereo, int synched){}
 
 typedef In_Module *(*WINAMP_GET_IN_MODULE)() ;
+typedef const char *(*LOAD_ERROR)();
 
 LRESULT CALLBACK EmuWinamp::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
@@ -109,6 +110,8 @@ EmuWinamp::EmuWinamp(char *dll_name) {
   SetProp(m_in_mod->hMainWindow,"WinampEmu",(HANDLE)this);
   printf("hMainWindow :%p\n",m_in_mod->hMainWindow);
   m_in_mod->hDllInstance = m_dll;
+
+  m_load_error = (LOAD_ERROR)GetProcAddress(m_dll, "nsfLoadError");
 
   m_in_mod->Init();
   m_in_mod->outMod->Init();
@@ -247,4 +250,10 @@ void EmuWinamp::Prev() {
 
 void EmuWinamp::Waveout(const char* filename) {
   ::strcpy_s(m_wo, sizeof(m_wo), filename);
+}
+
+const char* EmuWinamp::LoadError()
+{
+  if (m_load_error) return m_load_error();
+  return "Unknown file load error.";
 }

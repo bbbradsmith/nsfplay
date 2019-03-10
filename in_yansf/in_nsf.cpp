@@ -197,5 +197,10 @@ extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
   mod.SetPan = SetPan;
   mod.EQSet = EQSet;
   pPlugin->SetModule(&mod);
-	return &mod;
+  return &mod;
+}
+
+extern "C" __declspec( dllexport ) const char * nsfLoadError()
+{
+  return sdat->LoadError();
 }

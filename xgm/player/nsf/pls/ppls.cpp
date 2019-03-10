@@ -98,12 +98,9 @@ static char *get_title(SST *sst)
 
 static int str2type(const char *str)
 {
-  if(!strcmp(str,"KSS")) return 1 ;
-  if(!strcmp(str,"kss")) return 1 ;
-  if(!strcmp(str,"MSX")) return 2 ;
-  if(!strcmp(str,"msx")) return 2 ;
-  if(!strcmp(str,"NSF")) return 3 ;
-  if(!strcmp(str,"nsf")) return 3 ;
+  if(!stricmp(str,"kss")) return 1 ;
+  if(!stricmp(str,"msx")) return 2 ;
+  if(!stricmp(str,"nsf")) return 3 ;
   return 0 ;
 }
 

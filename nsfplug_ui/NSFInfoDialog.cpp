@@ -402,7 +402,7 @@ void NSFInfoDialog::OnSave()
   CFileDialog fd(FALSE,".ini","in_yansf",OFN_OVERWRITEPROMPT,"INI files (*.ini)|*.ini||",this);
 
   if(fd.DoModal()==IDOK)
-    pm->cf->Save(fd.GetPathName().GetBuffer(1),"NSFPlug");	
+    pm->cf->Save(fd.GetPathName().GetBuffer(1),"NSFPlug");
 }
 
 void NSFInfoDialog::OnAbout()

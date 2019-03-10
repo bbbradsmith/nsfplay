@@ -153,7 +153,7 @@ BOOL CnsfplayDlg::OnInitDialog()
     if(m_init_file.GetLength()) {
       if(m_emu->Play(m_init_file.GetBuffer()))
       {
-        MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
       }
       m_update_wait = 0;
     }
@@ -227,7 +227,7 @@ void CnsfplayDlg::OnDropFiles(HDROP hDropInfo)
     DragQueryFile(hDropInfo, 0, aryFile.GetData(), nSize+1);
     if (m_emu->Play(aryFile.GetData()))
     {
-      MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+      MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
     }
     m_last_len = -1;
     m_update_wait = 0;
@@ -396,7 +396,7 @@ void CnsfplayDlg::OnBnClickedOpen()
   if(fd.DoModal()==IDOK) {
     if (m_emu->Play(fd.GetPathName().GetBuffer()))
     {
-      MessageBox("Unable to read file.","Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+      MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
     }
     m_last_len = -1;
     m_update_wait = 0;

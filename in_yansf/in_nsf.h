@@ -56,7 +56,7 @@ public:
         *length_in_ms = nsf.GetLength();
       }
       else
-        strcpy(title,"Not a NSF file.");
+        strcpy(title,nsf.LoadError());
     }
   }
 
