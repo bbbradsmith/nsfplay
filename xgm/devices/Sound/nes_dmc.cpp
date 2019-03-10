@@ -111,7 +111,7 @@ namespace xgm
 
     if (s == 0 && (frame_sequence_steps == 4))
     {
-        frame_irq = true;
+        if (frame_irq_enable) frame_irq = true;
         cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, frame_irq & frame_irq_enable);
     }
 
@@ -563,8 +563,9 @@ namespace xgm
     if (adr == 0x4017)
     {
       //DEBUG_OUT("4017 = %02X\n", val);
-      frame_irq_enable = ((val & 0x40) == 0x40);
-      cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, frame_irq & frame_irq_enable);
+      frame_irq_enable = ((val & 0x40) != 0x40);
+      if (frame_irq_enable) frame_irq = false;
+      cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, false);
 
       frame_sequence_count = 0;
       if (val & 0x80)
