@@ -16,6 +16,12 @@ namespace xgm
 UINT8 CONVERT_REGN[4]      = { 0x01, 0x02, 0x03, 0x03 }; // NTSC, PAL, DUAL, DUAL
 int   CONVERT_REGN_PREF[4] = {   -1,   -1,    0,    1 }; // Any,  Any, NTSC,  PAL
 
+const int NSFE_ERROR_SIZE = 256;
+static char nsfe_error_[NSFE_ERROR_SIZE];
+
+static const char* nsfe_error = "(no NSFe loaded)";
+static const char* nsf_error = "(no NSF loaded)";
+
 static int is_sjis_prefix(int c)
 {
   if((0x81<=c&&c<=0x9F)||(0xE0<=c&&c<=0xFC)) return 1 ;
@@ -252,10 +258,15 @@ static int is_sjis_prefix(int c)
     UINT8 *buf = NULL;          //MAX 256KB
     PLSITEM *pls = NULL;
     int size, rsize;
+    nsf_error = "";
+    nsfe_error = "";
 
     pls = PLSITEM_new (fn);
     if (!pls)
+    {
+      nsf_error = "Could not create playlist?";
       goto Error_Exit;
+    }
 
     if (pls->type == 3)
       strncpy (filename, pls->filename, NSF_MAX_PATH);
@@ -267,12 +278,18 @@ static int is_sjis_prefix(int c)
       )
       strncpy (filename, fn, NSF_MAX_PATH);
     else
+    {
+      nsf_error = "File extension not recognized.";
       goto Error_Exit;
+    }
 
     filename[NSF_MAX_PATH - 1] = '\0';
     fp = fopen (filename, "rb");
     if (fp == NULL)
+    {
+      nsf_error = "Could not open file.";
       goto Error_Exit;
+    }
 
     fseek (fp, 0L, SEEK_END);
     size = ftell (fp);
@@ -281,9 +298,15 @@ static int is_sjis_prefix(int c)
     rsize = fread (buf, 1, size, fp);
 
     if (size != rsize)
+    {
+      nsf_error = "File size mismatch? Corrupt file?";
       goto Error_Exit;
+    }
     if (Load (buf, size) == false)
+    {
+      //nsf_error set by Load
       goto Error_Exit;
+    }
 
     if (pls->type == 3)
     {
@@ -314,6 +337,7 @@ static int is_sjis_prefix(int c)
     delete[]buf;
     PLSITEM_delete (pls);
 
+    nsf_error = "";
     return true;
 
   Error_Exit:
@@ -323,6 +347,7 @@ static int is_sjis_prefix(int c)
       delete[]buf;
     if (fp)
       fclose (fp);
+    //nsf_error set above
     return false;
   }
 
@@ -399,8 +424,14 @@ static int is_sjis_prefix(int c)
 
   bool NSF::Load (UINT8 * image, UINT32 size)
   {
+    nsf_error = "";
+    nsfe_error = "";
+
     if (size < 4) // no FourCC
+    {
+      nsf_error = "File too small for FourCC ID.";
       return false;
+    }
 
     nsf2_bits = 0;
 
@@ -430,11 +461,16 @@ static int is_sjis_prefix(int c)
 
     if (strcmp ("NESM", magic))
     {
-      return LoadNSFe(image, size, false);
+      bool result = LoadNSFe(image, size, false);
+      nsf_error = nsfe_error;
+      return result;
     }
 
     if (size < 0x80) // no header?
+    {
+      nsf_error = "File too small for NSF header.";
       return false;
+    }
 
     version = image[0x05];
     total_songs = songs = image[0x06];
@@ -494,14 +530,16 @@ static int is_sjis_prefix(int c)
     {
         suffix += 0x80; // add header to suffix location
         int suffix_size = size - suffix;
-        if (suffix_size < 0) return false; // no data at suffix
+        if (suffix_size < 0) suffix_size = 0; // shouldn't happen?
         bool result = LoadNSFe(image + suffix, UINT32(suffix_size), true);
         if ((nsf2_bits & 0x80) && !result)
         {
+            nsf_error = nsfe_error;
             return false; // NSF2 bit 7 indicates metadata parsing is mandatory
         }
     }
 
+    nsf_error = "";
     return true;
   }
 
@@ -527,13 +565,17 @@ static int is_sjis_prefix(int c)
     if (!nsf2)
     {
         if (size < 4) // no FourCC
+        {
+          nsfe_error = "File too small for FourCC ID.";
           return false;
+        }
 
         memcpy (magic, image, 4);
         magic[4] = '\0';
 
         if (strcmp ("NSFE", magic))
         {
+            nsfe_error = "NSFe FourCC does not match 'NSFE'.";
             return false;
         }
         chunk_offset = 4; // skip 'NSFE'
@@ -551,10 +593,13 @@ static int is_sjis_prefix(int c)
 
     while (true)
     {
-        if ((size-chunk_offset) == 0) break; // end of file without NEND, acceptable?
+        if ((size-chunk_offset) == 0) break; // end of file without NEND, acceptable.
 
         if ((size-chunk_offset) < 8) // not enough data for chunk size + FourCC
+        {
+          nsfe_error = "Incomplete chunk header at end of file? Less than 8 bytes remain.";
           return false;
+        }
 
         UINT8* chunk = image + chunk_offset;
 
@@ -565,7 +610,10 @@ static int is_sjis_prefix(int c)
           + (chunk[3] << 24);
 
         if ((size-chunk_offset) < (chunk_size+8)) // not enough data for chunk
+        {
+          nsfe_error = "Incomplete chunk at end of file? Not enough data.";
           return false;
+        }
 
         char cid[5];
         memcpy (cid, chunk+4, 4);
@@ -582,10 +630,16 @@ static int is_sjis_prefix(int c)
         if (!strcmp(cid, "INFO"))
         {
           if (info == true)
+          {
+            nsfe_error = "Duplicate 'INFO' chunk.";
             return false;
+          }
 
           if (chunk_size < 0x0A)
+          {
+            nsfe_error = "'INFO' chunk too small.";
             return false;
+          }
 
           version = 1;
           load_address = chunk[0x00] | (chunk[0x01] << 8);
@@ -635,9 +689,15 @@ static int is_sjis_prefix(int c)
         else if (!strcmp(cid, "DATA"))
         {
           if (!info)
+          {
+            nsfe_error = "'DATA' chunk appears before 'INFO' chunk.";
             return false;
+          }
           if (data)
+          {
+            nsfe_error = "Duplicate 'DATA' chunk found.";
             return false;
+          }
 
           delete[]body;
           body = new  UINT8[chunk_size];
@@ -664,7 +724,11 @@ static int is_sjis_prefix(int c)
         else if (!strcmp(cid, "NSF2"))
         {
           version = 2;
-          if (chunk_size < 1) return false;
+          if (chunk_size < 1)
+          {
+              nsfe_error = "'NSF2' chunk size too small.";
+              return false;
+          }
           nsf2_bits = chunk[0];
         }
         else if (!strcmp(cid, "auth"))
@@ -754,7 +818,11 @@ static int is_sjis_prefix(int c)
             unsigned int mixe_index = chunk[pos+0];
             INT16 mixe_value = UINT16(chunk[pos+1] + (chunk[pos+2] << 8));
 
-            if (mixe_index >= NSFE_MIXES) return false; // invalid mixe index
+            if (mixe_index >= NSFE_MIXES)
+            {
+                nsfe_error = "'MIXE' device index out of range.";
+                return false; // invalid mixe index
+            }
 
             // max value should never be used, but just in case, fake it with max-1
             // (was using max value to specify "default" instead)
@@ -773,6 +841,9 @@ static int is_sjis_prefix(int c)
         {
           if (cid[0] >= 'A' && cid[0] <= 'Z')
           {
+            snprintf(nsfe_error_,NSFE_ERROR_SIZE,"Unknown mandatory chunk type: '%s'",cid);
+            nsfe_error_[NSFE_ERROR_SIZE-1] = 0;
+            nsfe_error = nsfe_error_;
             return false;
           }
         }
@@ -781,7 +852,13 @@ static int is_sjis_prefix(int c)
         chunk_offset += chunk_size;
     }
 
+    nsfe_error = "";
     return true;
+  }
+
+  const char* NSF::LoadError()
+  {
+    return nsf_error;
   }
 
   void NSF::DebugOut ()

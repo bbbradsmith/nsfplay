@@ -102,6 +102,9 @@ namespace xgm
     // loads NSFe, or NSFe suffix for NSF2
     bool LoadNSFe(UINT8* image, UINT32 size, bool nsf2);
 
+    // returns descriptive error of last Load (English only)
+    const char* LoadError();
+
     void DebugOut ();
     /**
      * ƒ^ƒCƒgƒ‹•¶Žš—ñ‚ÌŽæ“¾
