@@ -653,8 +653,11 @@ namespace xgm
 
     case 0x4010:
       mode = (val >> 6) & 3;
-      irq = false;
-      cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
+      if (!(mode & 2))
+      {
+        irq = false;
+        cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
+      }
       dfreq = freq_table[pal][val&15];
       if (counter[2] > dfreq) counter[2] = dfreq;
       break;
@@ -689,11 +692,11 @@ namespace xgm
   {
     if (adr == 0x4015)
     {
-      val |= (irq?128:0)
-          | (frame_irq ? 0x40 : 0)
-          | ((dlength>0) ? 0x10 : 0)
-          | (length_counter[1] ? 8 : 0)
-          | (length_counter[0] ? 4 : 0)
+      val |=(irq               ? 0x80 : 0)
+          | (frame_irq         ? 0x40 : 0)
+          | ((dlength>0)       ? 0x10 : 0)
+          | (length_counter[1] ? 0x08 : 0)
+          | (length_counter[0] ? 0x04 : 0)
           ;
 
       frame_irq = false;
