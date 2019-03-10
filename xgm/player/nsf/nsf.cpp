@@ -807,7 +807,7 @@ static int is_sjis_prefix(int c)
           for (unsigned int i=0; i<chunk_size; ++i)
           {
             UINT8 track = chunk[i];
-            nsfe_entry[i].psfx = true;
+            nsfe_entry[track].psfx = true;
           }
         }
         else if (!strcmp(cid, "text"))
