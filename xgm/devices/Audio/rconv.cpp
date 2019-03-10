@@ -134,7 +134,7 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
   int mcclocks = 0;
   for(int i=1; i<=mult; i++)
   {
-
+    // CPU first
     mcclocks += cpu_clocks;
     if (mcclocks >= mult)
     {
@@ -143,6 +143,7 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
       mcclocks -= (sub_clocks * mult);
     }
 
+    // Audio devices second
     mclocks += clocks;
     if (mclocks >= mult)
     {
