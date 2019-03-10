@@ -86,7 +86,7 @@ namespace xgm
     case 2:
       trkinfo[2].max_volume = 127;
       trkinfo[2].volume = reg[0x4011-0x4008]&0x7F;
-      trkinfo[2].key = active;
+      trkinfo[2].key = dlength > 0;
       trkinfo[2]._freq = reg[0x4010-0x4008]&0xF;
       trkinfo[2].freq = clock/double(freq_table[pal][trkinfo[2]._freq]);
       trkinfo[2].tone = (0xc000|(adr_reg<<6));
@@ -243,57 +243,61 @@ namespace xgm
     return accum / (clocks * count);
   }
 
-  // DMCチャンネルの計算 戻り値は0-127
-  UINT32 NES_DMC::calc_dmc (UINT32 clocks)
-  {
-    counter[2] += clocks;
-    assert (dfreq > 0); // prevent infinite loop
-    while (counter[2] >= dfreq)
-    {
-      if ( data != 0x100 ) // data = 0x100 は EMPTY を意味する。
-      {
-        if ((data & 1) && (damp < 63))
-          damp++;
-        else if (!(data & 1) && (0 < damp))
-          damp--;
-        data >>=1;
-      }
+	// Tick the DMC for the number of clocks, and return output counter;
+	UINT32 NES_DMC::calc_dmc (UINT32 clocks)
+	{
+		counter[2] += clocks;
+		assert (dfreq > 0); // prevent infinite loop
+		while (counter[2] >= dfreq)
+		{
+			counter[2] -= dfreq;
 
-      if ( data == 0x100 && active )
-      { 
-        memory->Read (daddress, data);
-        cpu->StealCycles(2); // DMC read takes 2 CPU cycles
-        data |= (data&0xFF)|0x10000; // 8bitシフトで 0x100 になる
-        if ( length > 0 ) 
-        {
-          daddress = ((daddress+1)&0xFFFF)|0x8000 ;
-          length --;
-        }
-      }
-      
-      if ( length == 0 ) // 最後のフェッチが終了したら(再生完了より前に)即座に終端処理
-      {
-        if (mode & 1)
-        {
-          daddress = ((adr_reg<<6)|0xC000);
-          length = (len_reg<<4)+1;
-        }
-        else
-        {
-          if (active && mode==2)
-          {
-            irq = true;
-            cpu->UpdateIRQ(NES_CPU::IRQD_DMC, true);
-          }
-          active = false;
-        }
-      }
+			if ( data > 0x100 ) // data = 0x100 when shift register is empty
+			{
+				if (!empty)
+				{
+					if ((data & 1) && (damp < 63))
+						damp++;
+					else if (!(data & 1) && (0 < damp))
+						damp--;
+				}
+				data >>=1;
+			}
 
-      counter[2] -= dfreq;
-    }
+			if ( data <= 0x100 ) // shift register is empty
+			{
+				if (dlength > 0)
+				{
+					memory->Read (daddress, data);
+					cpu->StealCycles(2); // DMC read takes 2 CPU cycles
+					data |= (data&0xFF)|0x10000; // read 8 bits, use an extra bit to signal end of data
+					empty = false;
+					daddress = ((daddress+1)&0xFFFF)|0x8000 ;
+					--dlength;
+					if (dlength == 0)
+					{
+						if (mode & 1) // looped DPCM = auto-reload
+						{
+							daddress = ((adr_reg<<6)|0xC000);
+							dlength = (len_reg<<4)+1;
+						}
+						else if (mode & 2) // IRQ and not looped
+						{
+							irq = true;
+							cpu->UpdateIRQ(NES_CPU::IRQD_DMC, true);
+						}
+					}
+				}
+				else
+				{
+					data = 0x10000; // DMC will do nothing
+					empty = true;
+				}
+			}
+		}
 
-    return (damp<<1) + dac_lsb;
-  }
+		return (damp<<1) + dac_lsb;
+	}
 
   void NES_DMC::TickFrameSequence (UINT32 clocks)
   {
@@ -477,9 +481,9 @@ namespace xgm
     dmc_pop_follow = 0;
     dac_lsb = 0;
     data = 0x100;
+    empty = true;
     adr_reg = 0;
-    active = false;
-    length = 0;
+    dlength = 0;
     len_reg = 0;
     daddress = 0;
     noise = 1;
@@ -542,15 +546,14 @@ namespace xgm
           length_counter[1] = 0;
       }
 
-      if ((val & 16)&&!active)
+      if ((val & 16) && dlength == 0)
       {
-        enable[2] = active = true;
         daddress = (0xC000 | (adr_reg << 6));
-        length = (len_reg << 4) + 1;
+        dlength = (len_reg << 4) + 1;
       }
       else if (!(val & 16))
       {
-        enable[2] = active = false;
+        dlength = 0;
       }
 
       irq = false;
@@ -650,6 +653,8 @@ namespace xgm
 
     case 0x4010:
       mode = (val >> 6) & 3;
+      irq = false;
+      cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
       dfreq = freq_table[pal][val&15];
       if (counter[2] > dfreq) counter[2] = dfreq;
       break;
@@ -686,9 +691,9 @@ namespace xgm
     {
       val |= (irq?128:0)
           | (frame_irq ? 0x40 : 0)
-          | (active?16:0)
-          | (length_counter[1]?8:0)
-          | (length_counter[0]?4:0)
+          | ((dlength>0) ? 0x10 : 0)
+          | (length_counter[1] ? 8 : 0)
+          | (length_counter[0] ? 4 : 0)
           ;
 
       frame_irq = false;

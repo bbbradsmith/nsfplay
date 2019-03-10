@@ -39,8 +39,9 @@ namespace xgm
     IDevice *memory;
     UINT32 out[3];
     UINT32 daddress;
-    UINT32 length;
+    UINT32 dlength;
     UINT32 data;
+    bool empty;
     INT16 damp;
     int dac_lsb;
     bool dmc_pop;
@@ -51,7 +52,6 @@ namespace xgm
     int pal;
     int mode;
     bool irq;
-    bool active;
 
     UINT32 counter[3]; // frequency dividers
     int tphase;        // triangle phase
@@ -75,7 +75,7 @@ namespace xgm
     int envelope_div;
     int envelope_counter;
 
-    bool enable[3];
+    bool enable[2]; // tri/noise enable
     int length_counter[2]; // 0=tri, 1=noise
 
     TrackInfoBasic trkinfo[3];
