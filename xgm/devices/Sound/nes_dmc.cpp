@@ -464,8 +464,9 @@ namespace xgm
     cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, false);
 
 
-    for (i = 0; i < 0x10; i++)
+    for (i = 0; i < 0x0F; i++)
       Write (0x4008 + i, 0);
+    Write (0x4017, 0x40);
 
     irq = false;
     Write (0x4015, 0x00);
