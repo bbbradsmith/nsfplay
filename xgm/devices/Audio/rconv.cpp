@@ -1,9 +1,13 @@
 #include "rconv.h"
+#include "../CPU/nes_cpu.h"
+#include "../Sound/nes_dmc.h"
+#include "../Sound/nes_mmc5.h"
+#include "../../player/nsf/nsfplay.h"
 
 namespace xgm{
 
 #define GETA 16
-#define PI (3.14159265358979)
+//#define PI (3.14159265358979)
 #define PRECISION 16
 
 static double window(int n, int M)
@@ -18,7 +22,8 @@ static double window(int n, int M)
   return 0.54 + 0.46 * cos(PI*double(n)/double(M));
 }
 
-RateConverter::RateConverter () : clock(0.0), rate(0.0), mult(0), clocks(0)
+RateConverter::RateConverter () : clock(0.0), rate(0.0), mult(0), clocks(0),
+	cpu(NULL), dmc(NULL), mmc5(NULL), cpu_clocks(0), cpu_rest(0), update_info(false)
 {
 }
 
@@ -35,6 +40,9 @@ void RateConverter::Attach (IRenderable * t)
 void RateConverter::Reset ()
 {
   clocks = 0; // cancel any pending ticks
+  cpu_clocks = 0;
+  cpu_rest = 0;
+  update_info = false;
 
   if(clock&&rate)
   {
@@ -88,6 +96,24 @@ UINT32 RateConverter::Render (INT32 b[2])
   return FastRender(b);
 }
 
+void RateConverter::ClockCPU(int c)
+{
+	UINT32 real_cpu_clocks = 0;
+	if (cpu)
+	{
+		cpu_rest += c;
+		if (cpu_rest > 0)
+		{
+			real_cpu_clocks = cpu->Exec(cpu_rest);
+			cpu_rest -= real_cpu_clocks;
+		}
+	}
+	if (dmc) dmc->TickFrameSequence(real_cpu_clocks);
+	if (mmc5) mmc5->TickFrameSequence(real_cpu_clocks);
+	if (nsfplayer && update_info) nsfplayer->UpdateInfo();
+	update_info = false;
+}
+
 // ì¸óÕÇÕ-32768Å`+32767Ç‹Ç≈
 inline UINT32 RateConverter::FastRender (INT32 b[2])
 {
@@ -105,8 +131,18 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
 
   // divide clock ticks among samples evenly
   int mclocks = 0;
+  int mcclocks = 0;
   for(int i=1; i<=mult; i++)
   {
+
+    mcclocks += cpu_clocks;
+    if (mcclocks >= mult)
+    {
+      int sub_clocks = mcclocks / mult;
+      ClockCPU(sub_clocks);
+      mcclocks -= (sub_clocks * mult);
+    }
+
     mclocks += clocks;
     if (mclocks >= mult)
     {
@@ -114,12 +150,15 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
       target->Tick(sub_clocks);
       mclocks -= (sub_clocks * mult);
     }
+
     target->Render(t);
     tap[0][mult+i] = t[0];
     tap[1][mult+i] = t[1];
   }
   assert (mclocks == 0); // all clocks must be used
+  assert (mcclocks == 0);
   clocks = 0;
+  cpu_clocks = 0;
 
   //out[0] = hr[0] * tap[0][mult];
   //out[1] = hr[0] * tap[1][mult];

@@ -205,10 +205,16 @@ namespace xgm
     mixer.Attach (&amp[APU]);
     mixer.Attach (&amp[DMC]);
 
+    rconv.SetCPU(&cpu);
+    rconv.SetDMC(dmc);
+    rconv.SetMMC5(NULL);
+    rconv.SetNSFPlayer(this);
+
     if (nsf->use_mmc5)
     {
       stack.Attach (sc[MMC5]);
       mixer.Attach (&amp[MMC5]);
+      rconv.SetMMC5(mmc5);
     }
     if (nsf->use_vrc6)
     {
@@ -483,16 +489,19 @@ void NSFPlayer::SetPlayFreq (double r)
         // tick CPU
         cpu_clock_rest += cpu_clock_per_sample;
         int cpu_clocks = (int)(cpu_clock_rest);
-        if (cpu_clocks > 0)
-        {
-            UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
-            cpu_clock_rest -= (double)(real_cpu_clocks);
-
-            // tick APU frame sequencer
-            dmc->TickFrameSequence(real_cpu_clocks);
-            if (nsf->use_mmc5)
-                mmc5->TickFrameSequence(real_cpu_clocks);
-        }
+        // Moved to RateConverter:
+        //if (cpu_clocks > 0)
+        //{
+        //    UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+        //    cpu_clock_rest -= (double)(real_cpu_clocks);
+        //
+        //  // tick APU frame sequencer
+        //  dmc->TickFrameSequence(real_cpu_clocks);
+        //  if (nsf->use_mmc5)
+        //      mmc5->TickFrameSequence(real_cpu_clocks);
+        //}
+        rconv.TickCPU(cpu_clocks);
+        cpu_clock_rest -= double(cpu_clocks);
 
         // skip APU / expansions
         apu_clock_rest += apu_clock_per_sample;
@@ -601,18 +610,21 @@ void NSFPlayer::SetPlayFreq (double r)
       // tick CPU
       cpu_clock_rest += cpu_clock_per_sample;
       int cpu_clocks = (int)(cpu_clock_rest);
-      if (cpu_clocks > 0)
-      {
-          UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
-          cpu_clock_rest -= (double)(real_cpu_clocks);
-
-          // tick APU frame sequencer
-          dmc->TickFrameSequence(real_cpu_clocks);
-          if (nsf->use_mmc5)
-              mmc5->TickFrameSequence(real_cpu_clocks);
-      }
-
-      UpdateInfo();
+      // Moved to RateConverter:
+      //if (cpu_clocks > 0)
+      //{
+      //    UINT32 real_cpu_clocks = cpu.Exec ( cpu_clocks );
+      //    cpu_clock_rest -= (double)(real_cpu_clocks);
+      //
+      //    // tick APU frame sequencer
+      //    dmc->TickFrameSequence(real_cpu_clocks);
+      //    if (nsf->use_mmc5)
+      //        mmc5->TickFrameSequence(real_cpu_clocks);
+      //}
+      //UpdateInfo();
+      rconv.TickCPU(cpu_clocks);
+      rconv.UpdateInfo();
+      cpu_clock_rest -= double(cpu_clocks);
 
       // tick APU / expansions
       apu_clock_rest += apu_clock_per_sample;

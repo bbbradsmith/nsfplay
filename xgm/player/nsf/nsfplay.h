@@ -55,9 +55,10 @@ namespace xgm
     void DetectLoop ();
     void DetectSilent ();
     void CheckTerminal ();
-    void UpdateInfo();
 
   public:
+    void UpdateInfo();
+
     Bus apu_bus;
     Layer stack;
     Layer layer;

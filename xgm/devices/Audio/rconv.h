@@ -5,33 +5,58 @@
 
 namespace xgm
 {
-  /**
-   * サンプリングレートコンバータ
-   */
-  class RateConverter : public IRenderable
-  {
-  protected:
-    IRenderable * target;
-    double clock ,rate;
-    int mult;          // オーバーサンプリング倍率(奇数)
-    INT32  tap[2][128];
-    double hr[128];    // H(z)
-    INT64  hri[128];
-    UINT32 clocks; // clocks pending Tick execution
 
-    SimpleFIR *fir;
+class NES_CPU; // forward
+class NES_DMC;
+class NES_MMC5;
+class NSFPlayer;
 
-  public:
-    RateConverter ();
-    virtual ~ RateConverter ();
-    void Attach (IRenderable * t);
-    void Reset ();
-    void SetClock (double clock);
-    void SetRate (double rate);
-    virtual void Tick (UINT32 clocks_); // ticks get executed during Render
-    virtual UINT32 Render (INT32 b[2]);
-    inline UINT32 FastRender(INT32 b[2]);
-  };
+// RateConverter
+//
+// Subdivides clocks of Tick and passes to each attached IRenderable.
+// Also responsible for clocking the CPU (and related devices)
+// before the IRenderables.
+
+class RateConverter : public IRenderable
+{
+protected:
+	IRenderable * target;
+	double clock ,rate;
+	int mult;
+	INT32  tap[2][128];
+	double hr[128]; // H(z)
+	INT64  hri[128];
+	UINT32 clocks; // render clocks pending Tick
+	NES_CPU* cpu;
+	NES_DMC* dmc;
+	NES_MMC5* mmc5;
+	NSFPlayer* nsfplayer;
+	int cpu_clocks; // CPU clocks pending Tick
+	int cpu_rest; // extra clock accumulator (instructions will get ahead by a few clocks)
+	bool update_info;
+
+	void ClockCPU(int c);
+
+public:
+	RateConverter ();
+	virtual ~ RateConverter ();
+	void Attach (IRenderable * t);
+	void Reset ();
+	void SetClock (double clock);
+	void SetRate (double rate);
+	virtual void Tick (UINT32 clocks_); // ticks get executed during Render
+	virtual UINT32 Render (INT32 b[2]);
+	inline UINT32 FastRender(INT32 b[2]);
+
+	// call TickCPU before each Tick
+	void TickCPU(int t) { cpu_clocks+=t; }
+	void UpdateInfo() { update_info=true; }
+
+	void SetCPU(NES_CPU* c) { cpu=c; }
+	void SetDMC(NES_DMC* d) { dmc=d; }
+	void SetMMC5(NES_MMC5* m) { mmc5=m; }
+	void SetNSFPlayer(NSFPlayer* p) { nsfplayer=p; }
+};
 
 } // namespace
 #endif
