@@ -270,8 +270,12 @@ static int is_sjis_prefix(int c)
 
     // find last . in filename
     const char* ext = strchr(fn,'.');
-    const char* ext_next;
-    while (ext_next = strchr(ext+1,'.')) ext = ext_next;
+    if (ext)
+    {
+      const char* ext_next;
+      while (ext_next = strchr(ext+1,'.')) ext = ext_next;
+    }
+    else ext = "";
 
     if (pls->type == 3)
     {
