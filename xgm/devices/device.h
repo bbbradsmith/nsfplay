@@ -69,12 +69,14 @@ namespace xgm
      */
     virtual UINT32 Render (INT32 b[2]) = 0;
 
+    // When seeking, this replaces Render
+    virtual void Skip () {}
+
     /**
      *  chip update/operation is now bound to CPU clocks
      *  Render() now simply mixes and outputs sound
      */
     virtual void Tick (UINT32 clocks) {}
-
   };
 
   /**

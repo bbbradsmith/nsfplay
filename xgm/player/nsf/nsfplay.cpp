@@ -503,17 +503,17 @@ void NSFPlayer::SetPlayFreq (double r)
         rconv.TickCPU(cpu_clocks);
         cpu_clock_rest -= double(cpu_clocks);
 
-        // skip APU / expansions
         apu_clock_rest += apu_clock_per_sample;
         int apu_clocks = (int)(apu_clock_rest);
         if (apu_clocks > 0)
         {
-            //fader.Tick(apu_clocks);
+            fader.Tick(apu_clocks); // ticks CPU via rconv as well
             apu_clock_rest -= (double)(apu_clocks);
         }
+
+        fader.Skip(); // execute CPU/APU ticks via rconv.Skip
       }
 
-      fader.Skip (length);
       time_in_ms += (int)(1000 * length / rate * ((*config)["MULT_SPEED"].GetInt()) / 256) ;
       CheckTerminal ();
       DetectLoop ();
@@ -631,7 +631,7 @@ void NSFPlayer::SetPlayFreq (double r)
       int apu_clocks = (int)(apu_clock_rest);
       if (apu_clocks > 0)
       {
-          fader.Tick(apu_clocks);
+          fader.Tick(apu_clocks); // ticks CPU via rconv as well
           apu_clock_rest -= (double)(apu_clocks);
       }
 

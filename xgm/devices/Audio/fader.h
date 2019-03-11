@@ -65,13 +65,14 @@ namespace xgm
       fade_pos = 1; // begin fade
     }
 
-    void Skip (int length)
+    virtual void Skip ()
     {
       if (fade_pos > 0)
       {
         if (fade_pos < fade_end) ++fade_pos;
         else fade_pos = fade_end;
       }
+      d->Skip();
     }
 
     virtual void Tick (UINT32 clocks)

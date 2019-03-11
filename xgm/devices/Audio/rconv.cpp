@@ -23,7 +23,8 @@ static double window(int n, int M)
 }
 
 RateConverter::RateConverter () : clock(0.0), rate(0.0), mult(0), clocks(0),
-	cpu(NULL), dmc(NULL), mmc5(NULL), cpu_clocks(0), cpu_rest(0), update_info(false)
+	cpu(NULL), dmc(NULL), mmc5(NULL), cpu_clocks(0), cpu_rest(0), update_info(false),
+	fast_skip(true)
 {
 }
 
@@ -112,6 +113,49 @@ void RateConverter::ClockCPU(int c)
 	if (mmc5) mmc5->TickFrameSequence(real_cpu_clocks);
 	if (nsfplayer && update_info) nsfplayer->UpdateInfo();
 	update_info = false;
+}
+
+void RateConverter::Skip ()
+{
+	if (fast_skip) // behaves like quality=1
+	{
+		ClockCPU(cpu_clocks);
+		target->Tick(clocks);
+		cpu_clocks = 0;
+		clocks = 0;
+	}
+	else // divide clock ticks among samples evenly
+	{
+		int mclocks = 0;
+		int mcclocks = 0;
+		for(int i=1; i<=mult; i++)
+		{
+			// CPU first
+			mcclocks += cpu_clocks;
+			if (mcclocks >= mult)
+			{
+				int sub_clocks = mcclocks / mult;
+				ClockCPU(sub_clocks);
+				mcclocks -= (sub_clocks * mult);
+			}
+
+			// Audio devices second
+			mclocks += clocks;
+			if (mclocks >= mult)
+			{
+				int sub_clocks = mclocks / mult;
+				target->Tick(sub_clocks);
+				mclocks -= (sub_clocks * mult);
+			}
+
+			// Render is skipped
+			//target->Skip(); // Should do this, but nothing currently requires it (see also: mixer.h)
+		}
+		assert (mclocks == 0); // all clocks must be used
+		assert (mcclocks == 0);
+		clocks = 0;
+		cpu_clocks = 0;
+	}
 }
 
 // ì¸óÕÇÕ-32768Å`+32767Ç‹Ç≈

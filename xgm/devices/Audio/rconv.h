@@ -34,6 +34,7 @@ protected:
 	int cpu_clocks; // CPU clocks pending Tick
 	int cpu_rest; // extra clock accumulator (instructions will get ahead by a few clocks)
 	bool update_info;
+	bool fast_skip;
 
 	void ClockCPU(int c);
 
@@ -46,6 +47,7 @@ public:
 	void SetRate (double rate);
 	virtual void Tick (UINT32 clocks_); // ticks get executed during Render
 	virtual UINT32 Render (INT32 b[2]);
+	virtual void Skip(); // Does ticks in lieu of Render
 	inline UINT32 FastRender(INT32 b[2]);
 
 	// call TickCPU before each Tick
