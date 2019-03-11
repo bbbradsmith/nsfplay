@@ -58,6 +58,7 @@ public:
 	void SetDMC(NES_DMC* d) { dmc=d; }
 	void SetMMC5(NES_MMC5* m) { mmc5=m; }
 	void SetNSFPlayer(NSFPlayer* p) { nsfplayer=p; }
+	void SetFastSkip(bool s) { fast_skip=s; }
 };
 
 } // namespace

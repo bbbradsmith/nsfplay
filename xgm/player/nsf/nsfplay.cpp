@@ -319,6 +319,7 @@ void NSFPlayer::SetPlayFreq (double r)
 	}
 	rconv.SetClock(oversample);
 	rconv.SetRate(rate);
+	rconv.SetFastSkip(config->GetValue("FAST_SEEK")!=0);
 
 	mixer.Reset();
 	rconv.Reset();

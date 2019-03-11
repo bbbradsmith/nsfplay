@@ -117,7 +117,7 @@ void RateConverter::ClockCPU(int c)
 
 void RateConverter::Skip ()
 {
-	if (fast_skip) // behaves like quality=1
+	if (fast_skip) // behaves like quality=1, fine except for rare cases that need sub-sample synchronization
 	{
 		ClockCPU(cpu_clocks);
 		target->Tick(clocks);

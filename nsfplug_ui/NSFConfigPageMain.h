@@ -45,6 +45,7 @@ public:
 	//int m_nThreshold;
 	//int m_nVelocity;
 	int m_nQuality;
+	BOOL m_bFastSeek;
 	int m_nHpfValue;
 	int m_nLpfValue;
 	BOOL m_bNSFePlaylist;

@@ -26,6 +26,7 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 //, m_nThreshold(0)
 //, m_nVelocity(0)
 , m_nQuality(1)
+, m_bFastSeek(TRUE)
 , m_nHpfValue(0)
 , m_nLpfValue(0)
 {
@@ -80,7 +81,9 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     //m_nLimit          = 100 - CONFIG["COMP_LIMIT"];
     //m_nThreshold      = 100 - CONFIG["COMP_THRESHOLD"];
     //m_nVelocity       = 100 - CONFIG["COMP_VELOCITY"];
-	m_nQuality        = CONFIG["QUALITY"];
+    m_nQuality        = CONFIG["QUALITY"];
+    m_bFastSeek       = CONFIG["FAST_SEEK"] != 0;
+
     
     if(m_hWnd) UpdateData(FALSE);
   }
@@ -112,6 +115,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     //CONFIG["COMP_THRESHOLD"]  = 100 - m_nThreshold;
     //CONFIG["COMP_VELOCITY"]   = 100 - m_nVelocity;
     CONFIG["QUALITY"]         = m_nQuality;
+    CONFIG["FAST_SEEK"]       = m_bFastSeek;
 
     pm->cf->Notify(-1);
   }
@@ -131,6 +135,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_STEREO, m_bStereo);
   DDX_Check(pDX, IDC_IRQENABLE, m_bIRQEnable);
   DDX_Check(pDX, IDC_NSFEPLS, m_bNSFePlaylist);
+  DDX_Check(pDX, IDC_FASTSEEK, m_bFastSeek);
   DDX_Text(pDX, IDC_STOPSEC, m_nStopSec);
   DDX_Text(pDX, IDC_FADETIME, m_nFadeTime);
   DDX_Text(pDX, IDC_PLAYTIME, m_nPlayTime);
