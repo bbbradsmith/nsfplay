@@ -2,12 +2,11 @@
 #include "../CPU/nes_cpu.h"
 #include "../Sound/nes_dmc.h"
 #include "../Sound/nes_mmc5.h"
-#include "../../player/nsf/nsfplay.h"
 
 namespace xgm{
 
 #define GETA 16
-//#define PI (3.14159265358979)
+#define PI (3.14159265358979)
 #define PRECISION 16
 
 static double window(int n, int M)
@@ -183,7 +182,6 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
       ClockCPU(sub_clocks);
       mcclocks -= (sub_clocks * mult);
     }
-    if (nsfplayer) nsfplayer->UpdateInfo();
 
     // Audio devices second
     mclocks += clocks;

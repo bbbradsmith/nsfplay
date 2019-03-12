@@ -18,7 +18,8 @@ namespace xgm
     OPLL *opll;
     UINT32 divider; // clock divider
     double clock, rate;
-    TrackInfoBasic trkinfo[6];
+    //TrackInfoBasic trkinfo[6];
+    TrackInfoBasic trkinfo[9]; // HACK to support YM2413
   public:
       NES_VRC7 ();
      ~NES_VRC7 ();

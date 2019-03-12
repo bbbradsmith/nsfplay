@@ -208,7 +208,6 @@ namespace xgm
     rconv.SetCPU(&cpu);
     rconv.SetDMC(dmc);
     rconv.SetMMC5(NULL);
-    rconv.SetNSFPlayer(this);
 
     if (nsf->use_mmc5)
     {
@@ -565,6 +564,9 @@ void NSFPlayer::SetPlayFreq (double r)
       {
         for(i=0; i<6; i++)
           infobuf[VRC7_TRK0+i].AddInfo(total_render,vrc7->GetTrackInfo(i));
+        if (nsf->vrc7_type == 1)
+          for(i=6; i<9; i++)
+            infobuf[VRC7_TRK6+i-6].AddInfo(total_render,vrc7->GetTrackInfo(i));
       }
 
       if(nsf->use_mmc5)
@@ -675,6 +677,7 @@ void NSFPlayer::SetPlayFreq (double r)
       b += nch;
     }
 
+    UpdateInfo();
     time_in_ms += (int)(1000 * length / rate * mult_speed / 256);
 
     CheckTerminal ();

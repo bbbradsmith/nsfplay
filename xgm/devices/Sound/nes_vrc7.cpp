@@ -71,7 +71,8 @@ namespace xgm
 
   ITrackInfo *NES_VRC7::GetTrackInfo(int trk)
   {
-    if(opll&&trk<6)
+    //if(opll&&trk<6)
+    if(opll&&trk<9) // HACK YM2413
     {
       trkinfo[trk].max_volume = 15;
       trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
