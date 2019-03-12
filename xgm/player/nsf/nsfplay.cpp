@@ -675,9 +675,10 @@ void NSFPlayer::SetPlayFreq (double r)
               b[0] = outm;
       }
       b += nch;
+
+      UpdateInfo();
     }
 
-    UpdateInfo();
     time_in_ms += (int)(1000 * length / rate * mult_speed / 256);
 
     CheckTerminal ();
