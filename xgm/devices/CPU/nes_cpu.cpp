@@ -106,21 +106,14 @@ void NES_CPU::run_from (UINT32 address)
 	// see PLAYER_PROGRAM in nsfplay.cpp
 }
 
-UINT32 NES_CPU::Exec (UINT32 clocks)
+int NES_CPU::Exec (int clocks)
 {
 	// DPCM cycle stealing
-	if (stolen_cycles > 0)
+	clocks -= stolen_cycles;
+	if (clocks < 0)
 	{
-		if (clocks >= stolen_cycles)
-		{
-			clocks -= stolen_cycles;
-			stolen_cycles = 0;
-		}
-		else
-		{
-			stolen_cycles -= clocks;
-			clocks = 0;
-		}
+		stolen_cycles = -clocks;
+		clocks = 0;
 	}
 
 	context.clock = 0;
@@ -148,10 +141,8 @@ UINT32 NES_CPU::Exec (UINT32 clocks)
 		Uword clock_start = context.clock;
 		if (!breaked)
 		{
-
 			//DEBUG_OUT("PC: 0x%04X\n", context.PC);
 			exec(context,bus);
-
 			if (context.PC == breakpoint)
 			{
 				breaked = true;
@@ -159,7 +150,7 @@ UINT32 NES_CPU::Exec (UINT32 clocks)
 		}
 		else 
 		{
-			if ( (fclocks_left_in_frame >> FRAME_FIXED) < clocks )
+			if ( (fclocks_left_in_frame >> FRAME_FIXED) < INT64(clocks) )
 				context.clock = (fclocks_left_in_frame >> FRAME_FIXED)+1;
 			else
 				context.clock = clocks;
@@ -297,7 +288,7 @@ void NES_CPU::Start (
 	play_addr = play_addr_;
 	song = song_;
 	region = region_;
-	fclocks_per_frame = (int)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / play_rate );
+	fclocks_per_frame = (INT64)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / play_rate );
 	fclocks_left_in_frame = 0;
 	stolen_cycles = 0;
 	play_ready = false;
@@ -337,7 +328,7 @@ void NES_CPU::Start (
 
 	// run up to 60 frames of init before starting real playback (this allows INIT to modify $4011 etc. silently)
 	int timeout = int((60.0 * NES_BASECYCLES) / play_rate);
-	// Should this use Exec or is exec okay?
+	// Should really use Exec for this (could rely on IRQ or something?), but must disable play
 	for (int i = 0; (i < timeout) && !breaked; i++, exec(context,bus))
 	{
 		if (context.PC == breakpoint)

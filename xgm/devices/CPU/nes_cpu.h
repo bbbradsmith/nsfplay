@@ -27,8 +27,8 @@ protected:
   int region;
   K6502_Context context;
   bool breaked;
-  UINT32 fclocks_per_frame; // fCPU clocks per frame timer with fixed point precision
-  UINT32 fclocks_left_in_frame;
+  INT64 fclocks_per_frame; // fCPU clocks per frame timer with fixed point precision
+  INT64 fclocks_left_in_frame;
   UINT32 breakpoint;
   UINT32 irqs;
   unsigned int stolen_cycles;
@@ -58,7 +58,7 @@ public:
     UINT8 nsf2_bits_,
     bool enable_irq_,
     NSF2_IRQ* nsf2_irq_);
-  UINT32 Exec (UINT32 clock); // returns number of clocks executed
+  int Exec (int clock); // returns number of clocks executed
   void SetMemory (IDevice *);
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
