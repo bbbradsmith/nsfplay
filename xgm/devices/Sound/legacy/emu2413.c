@@ -76,7 +76,7 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
   },
   {
 #include "281btone.h"
-  }
+  },
 };
 
 /* Size of Sintable ( 8 -- 18 can be used. 9 recommended.) */
@@ -1020,6 +1020,24 @@ OPLL_reset_patch (OPLL * opll, e_int32 type)
 
   for (i = 0; i < 19 * 2; i++)
     OPLL_copyPatch (opll, i, &default_patch[type % OPLL_TONE_NUM][i]);
+}
+
+const e_uint8 zero_dump[8] = { 0,0,0,0,0,0,0,0 };
+
+void
+OPLL_reset_patch_custom_VRC7 (OPLL * opll, const e_uint8* data)
+{
+  // 16 x 8 byte VRC7 style patch dump
+  e_int32 i;
+  OPLL_PATCH patch[2];
+  for (i = 0; i < 19; ++i)
+  {
+    const e_uint8* dump = data + (i*8);
+    if (i >= 16) dump = zero_dump;
+    OPLL_dump2patch(dump, patch);
+    OPLL_copyPatch(opll, (i*2)+0, &patch[0]);
+    OPLL_copyPatch(opll, (i*2)+1, &patch[1]);
+  }
 }
 
 /* Reset whole of OPLL except patch datas. */

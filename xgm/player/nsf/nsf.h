@@ -62,6 +62,8 @@ namespace xgm
     int nsfe_plst_size;
     NSFE_Entry nsfe_entry[NSFE_ENTRIES];
     INT16 nsfe_mixe[NSFE_MIXES];
+    int vrc7_type;
+    const UINT8* vrc7_patches;
     UINT16 speed_dendy;
     UINT8 regn;
     int regn_pref;

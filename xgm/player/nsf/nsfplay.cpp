@@ -223,7 +223,11 @@ namespace xgm
     }
     if (nsf->use_vrc7)
     {
-      vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
+      int patch_set = (*config)["VRC7_PATCH"].GetInt();
+      if (nsf->vrc7_type == 1) // YM2413 (not properly implemented yet though)
+        patch_set = 6;
+      vrc7->SetPatchSet(patch_set);
+      vrc7->SetPatchSetCustom(nsf->vrc7_patches);
       stack.Attach (sc[VRC7]);
       mixer.Attach (&amp[VRC7]);
     }

@@ -442,6 +442,8 @@ static int is_sjis_prefix(int c)
     }
 
     nsf2_bits = 0;
+    vrc7_type = -1; // default
+    vrc7_patches = NULL; // none
 
     // fill NSFe values with defaults
 
@@ -739,6 +741,29 @@ static int is_sjis_prefix(int c)
               return false;
           }
           nsf2_bits = chunk[0];
+        }
+        else if (!strcmp(cid, "VRC7"))
+        {
+          if (chunk_size < 1)
+          {
+              nsfe_error = "'VRC7' chunk size too small.";
+              return false;
+          }
+          else if (chunk_size > 1 && chunk_size < (1+16*8))
+          {
+              nsfe_error = "'VRC7' chunk patch set incomplete.";
+              return false;
+          }
+          vrc7_type = chunk[0];
+          if (vrc7_type > 1)
+          {
+              nsfe_error = "'VRC7' variant unknown.";
+              return false;
+          }
+          if (chunk_size >= (1+16*8))
+          {
+              vrc7_patches = chunk+1;
+          }
         }
         else if (!strcmp(cid, "auth"))
         {

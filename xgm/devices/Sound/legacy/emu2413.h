@@ -127,6 +127,7 @@ EMU2413_API void OPLL_delete(OPLL *) ;
 /* Setup */
 EMU2413_API void OPLL_reset(OPLL *) ;
 EMU2413_API void OPLL_reset_patch(OPLL *, e_int32) ;
+EMU2413_API void OPLL_reset_patch_custom_VRC7(OPLL *, const e_uint8 *) ;
 EMU2413_API void OPLL_set_rate(OPLL *opll, e_uint32 r) ;
 EMU2413_API void OPLL_set_quality(OPLL *opll, e_uint32 q) ;
 EMU2413_API void OPLL_set_pan(OPLL *, e_uint32 ch, e_uint32 pan);

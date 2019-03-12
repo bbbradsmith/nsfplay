@@ -5,13 +5,15 @@ namespace xgm
   NES_VRC7::NES_VRC7 ()
   {
     patch_set = OPLL_VRC7_RW_TONE;
+    patch_custom = NULL;
 
     opll = OPLL_new ( 3579545, DEFAULT_RATE);
     OPLL_reset_patch (opll, patch_set);
     SetClock(DEFAULT_CLOCK);
 
     for(int c=0;c<2;++c)
-        for(int t=0;t<6;++t)
+        //for(int t=0;t<6;++t)
+        for(int t=0;t<9;++t) // HACK for YM2413 support
             sm[c][t] = 128;
   }
 
@@ -20,9 +22,14 @@ namespace xgm
     OPLL_delete (opll);
   }
 
-  void NES_VRC7::SetPatchSet(unsigned int p)
+  void NES_VRC7::SetPatchSet(int p)
   {
     patch_set = p;
+  }
+
+  void NES_VRC7::SetPatchSetCustom (const UINT8* pset)
+  {
+    patch_custom = pset;
   }
 
   void NES_VRC7::SetClock (double c)
@@ -49,6 +56,8 @@ namespace xgm
 
     divider = 0;
     OPLL_reset_patch (opll, patch_set);
+    if (patch_custom)
+        OPLL_reset_patch_custom_VRC7(opll, patch_custom);
     OPLL_reset (opll);
   }
 
@@ -111,7 +120,8 @@ namespace xgm
   UINT32 NES_VRC7::Render (INT32 b[2])
   {
     b[0] = b[1] = 0;
-    for (int i=0; i < 6; ++i)
+    //for (int i=0; i < 6; ++i)
+    for (int i=0; i < 9; ++i) // HACK for YM2413 support
     {
         INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
         b[0] += val * sm[0][i];
