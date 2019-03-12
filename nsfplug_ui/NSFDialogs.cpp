@@ -38,7 +38,6 @@ NSFDialogManager::NSFDialogManager(NSFplug_Model *p, int mode = 0)
   easy->Create(easy->IDD);
   mask->Create(mask->IDD);
   CString path;
-  preset->Reset(CONFIG["INI_FILE"].GetStr().c_str());
   preset->Create(preset->IDD); config->Create(NULL,WS_SYSMENU|WS_POPUP|WS_CAPTION|DS_MODALFRAME|DS_CONTEXTHELP);
 
   wa2mod = NULL;

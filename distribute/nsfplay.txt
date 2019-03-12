@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 14 - 3/12/2019
+NSFPlay 2.4 beta 15 - ?
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -187,6 +187,7 @@ NSFPlay 2.4 beta 14 - 3/12/2019
 - Improved NES CPU vs APU/audio synchronization (controlled by quality setting).
 - Better error messages for files that can't be loaded.
 - Fixed broken seek, and restored the "fask seek" option. (Seeks as if quality=1, normally OK.)
+- If in_yansf.ini can't be found or created next to in_yansf.dll, will try to save settings to %AppData%\NSFPlay\ instead.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

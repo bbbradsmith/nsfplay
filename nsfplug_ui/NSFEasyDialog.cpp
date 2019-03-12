@@ -59,7 +59,6 @@ void NSFEasyDialog::UpdateNSFPlayerConfig(bool b)
   if(b)
   {
     std::set<CString> list;
-    pman.Reset(CONFIG["INI_FILE"].GetStr().c_str());
     list = pman.GetPresetNames();
     m_comboCtrl.ResetContent();
     for(std::set<CString>::iterator it=list.begin();it!=list.end();it++)

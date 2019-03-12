@@ -1,3 +1,5 @@
+#include <shlobj.h>
+#include <shlwapi.h>
 #include "in_nsf.h"
 
 using namespace xgm;
@@ -13,11 +15,13 @@ static NSFplug_UI_DLL *ui;
 static NSFplug_Model npm;
 
 static char DllPath[MAX_PATH];
+static char IniPath[MAX_PATH+32];
+const char* INI_FILENAME = "in_yansf.ini";
+
 static HANDLE hDbgfile;
 
 BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-  char path[MAX_PATH+16];
   switch (ul_reason_for_call)
   {
   case DLL_PROCESS_ATTACH:
@@ -50,13 +54,30 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     npm.cf->CreateValue("GRAPHIC_MODE", 1);
     npm.cf->CreateValue("FREQ_MODE", 1);
     npm.cf->CreateValue("LAST_PRESET", "Default");
-    npm.cf->CreateValue("INI_FILE", "");
     
-    // コンフィグレーションのロード
-    strcpy(path,DllPath);
-    strcat(path,"in_yansf.ini");
-    npm.cf->Load(path,"NSFplug");
-    (*(npm.cf))["INI_FILE"] = path;
+    // configuration
+    strcpy(IniPath,DllPath);
+    strcat(IniPath,INI_FILENAME);
+    if (FALSE == PathFileExists(IniPath)) // if an INI file does not exists next to the plugin already...
+    {
+      // first try to see if we have permission to create a new one in that location...
+      HANDLE f = CreateFile(IniPath,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+      if (f != INVALID_HANDLE_VALUE)
+      {
+        CloseHandle(f);
+      }
+      else  // Otherwise, attempt to use AppData instead.
+      {
+        if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, IniPath)))
+        {
+          strcat(IniPath,"\\NSFPlay");
+          CreateDirectory(IniPath,NULL);
+          strcat(IniPath,"\\");
+          strcat(IniPath,INI_FILENAME);
+        }
+      }
+    }
+    npm.cf->Load(IniPath,"NSFplug");
 
     if((*(npm.cf))["MASK_INIT"]) (*(npm.cf))["MASK"] = 0;
 
@@ -68,10 +89,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     break;
 
   case DLL_PROCESS_DETACH:
-    // コンフィグレーションのセーブ
-    strcpy(path,DllPath);
-    strcat(path,"in_yansf.ini");
-    npm.cf->Save(path,"NSFplug");
+    npm.cf->Save(IniPath,"NSFplug");
 
     delete pPlugin;
     delete npm.pl;

@@ -1,6 +1,8 @@
 /*
  * NSFplug for KbMediaPlayer on XGM Framework
  */
+#include <shlobj.h>
+#include <shlwapi.h>
 #ifdef _DEBUG
 #include <crtdbg.h>
 #endif
@@ -10,6 +12,8 @@
 using namespace xgm;
 
 static char DllPath[MAX_PATH];
+static char IniPath[MAX_PATH+32];
+const char* INI_FILENAME = "in_yansf.ini";
 
 HINSTANCE ghPlugin;
 std::set<KMP_NSF *>kmp_set;
@@ -125,13 +129,30 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     npm.cf->CreateValue("MASK_INIT", 1);
     npm.cf->CreateValue("UPDATE_PLAYLIST", 1);
     npm.cf->CreateValue("LAST_PRESET", "Default");
-    npm.cf->CreateValue("INI_FILE", "");
 
-    // コンフィグレーション読み込み
-    strcpy(path,DllPath);
-    strcat(path,"in_nsf.ini");
-    npm.cf->Load(path,"NSFplug");
-    (*(npm.cf))["INI_FILE"] = path;
+    // configuration
+    strcpy(IniPath,DllPath);
+    strcat(IniPath,INI_FILENAME);
+    if (FALSE == PathFileExists(IniPath)) // if an INI file does not exists next to the plugin already...
+    {
+      // first try to see if we have permission to create a new one in that location...
+      HANDLE f = CreateFile(IniPath,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+      if (f != INVALID_HANDLE_VALUE)
+      {
+        CloseHandle(f);
+      }
+      else  // Otherwise, attempt to use AppData instead.
+      {
+        if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, IniPath)))
+        {
+          strcat(IniPath,"\\NSFPlay");
+          CreateDirectory(IniPath,NULL);
+          strcat(IniPath,"\\");
+          strcat(IniPath,INI_FILENAME);
+        }
+      }
+    }
+    npm.cf->Load(IniPath,"NSFplug");
 
     // GUIのロード
     strcpy(path,DllPath);
@@ -143,9 +164,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
   case DLL_PROCESS_DETACH:
     // コンフィグレーション破棄
     if(ui&&ui->GetModule()) kmp_unhack();
-    strcpy(path,DllPath);
-    strcat(path,"in_nsf.ini");
-    npm.cf->Save(path,"NSFplug");
+    npm.cf->Save(IniPath,"NSFplug");
     delete npm.cf;
     delete ui;
     break;
