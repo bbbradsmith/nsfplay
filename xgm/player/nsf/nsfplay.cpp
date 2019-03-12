@@ -479,9 +479,10 @@ void NSFPlayer::SetPlayFreq (double r)
   UINT32 NSFPlayer::Skip (UINT32 length)
   {
     if (length)
-    { 
+    {
+      int mult_speed = (*config)["MULT_SPEED"].GetInt();
       double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
-      double cpu_clock_per_sample = apu_clock_per_sample * ((double)((*config)["MULT_SPEED"].GetInt())/256.0);
+      double cpu_clock_per_sample = apu_clock_per_sample * ((double)(mult_speed)/256.0);
 
       for (UINT32 i = 0; i < length; i++)
       {
@@ -515,7 +516,7 @@ void NSFPlayer::SetPlayFreq (double r)
         fader.Skip(); // execute CPU/APU ticks via rconv.Skip
       }
 
-      time_in_ms += (int)(1000 * length / rate * ((*config)["MULT_SPEED"].GetInt()) / 256) ;
+      time_in_ms += (int)(1000 * length / rate * mult_speed / 256) ;
       CheckTerminal ();
       DetectLoop ();
     }
@@ -601,8 +602,9 @@ void NSFPlayer::SetPlayFreq (double r)
 
     master_volume = (*config)["MASTER_VOLUME"];
 
+    int mult_speed = (*config)["MULT_SPEED"].GetInt();
     double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
-    double cpu_clock_per_sample = apu_clock_per_sample * ((double)((*config)["MULT_SPEED"].GetInt())/256.0);
+    double cpu_clock_per_sample = apu_clock_per_sample * ((double)(mult_speed)/256.0);
 
     for (i = 0; i < length; i++)
     {
@@ -624,20 +626,19 @@ void NSFPlayer::SetPlayFreq (double r)
       //}
       //UpdateInfo();
       rconv.TickCPU(cpu_clocks);
-      rconv.UpdateInfo();
       cpu_clock_rest -= double(cpu_clocks);
 
-      // tick APU / expansions
+      // tick fader and queue accumulated ticks for APU/CPU to be done during Render
       apu_clock_rest += apu_clock_per_sample;
       int apu_clocks = (int)(apu_clock_rest);
       if (apu_clocks > 0)
       {
-          fader.Tick(apu_clocks); // ticks CPU via rconv as well
+          fader.Tick(apu_clocks);
           apu_clock_rest -= (double)(apu_clocks);
       }
 
       // render output
-      fader.Render(buf);
+      fader.Render(buf); // ticks APU/CPU and renders with subdivision and resampling (also does UpdateInfo)
       outm = (buf[0] + buf[1]) >> 1; // mono mix
       if (outm == last_out) silent_length++; else silent_length = 0;
       last_out = outm;
@@ -671,7 +672,7 @@ void NSFPlayer::SetPlayFreq (double r)
       b += nch;
     }
 
-    time_in_ms += (int)(1000 * length / rate * ((*config)["MULT_SPEED"].GetInt()) / 256);
+    time_in_ms += (int)(1000 * length / rate * mult_speed / 256);
 
     CheckTerminal ();
     DetectLoop ();

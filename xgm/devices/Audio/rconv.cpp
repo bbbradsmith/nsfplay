@@ -23,7 +23,7 @@ static double window(int n, int M)
 }
 
 RateConverter::RateConverter () : clock(0.0), rate(0.0), mult(0), clocks(0),
-	cpu(NULL), dmc(NULL), mmc5(NULL), cpu_clocks(0), cpu_rest(0), update_info(false),
+	cpu(NULL), dmc(NULL), mmc5(NULL), cpu_clocks(0), cpu_rest(0),
 	fast_skip(true)
 {
 }
@@ -43,7 +43,6 @@ void RateConverter::Reset ()
   clocks = 0; // cancel any pending ticks
   cpu_clocks = 0;
   cpu_rest = 0;
-  update_info = false;
 
   if(clock&&rate)
   {
@@ -111,8 +110,6 @@ void RateConverter::ClockCPU(int c)
 	}
 	if (dmc) dmc->TickFrameSequence(real_cpu_clocks);
 	if (mmc5) mmc5->TickFrameSequence(real_cpu_clocks);
-	if (nsfplayer && update_info) nsfplayer->UpdateInfo();
-	update_info = false;
 }
 
 void RateConverter::Skip ()
@@ -186,6 +183,7 @@ inline UINT32 RateConverter::FastRender (INT32 b[2])
       ClockCPU(sub_clocks);
       mcclocks -= (sub_clocks * mult);
     }
+    if (nsfplayer) nsfplayer->UpdateInfo();
 
     // Audio devices second
     mclocks += clocks;

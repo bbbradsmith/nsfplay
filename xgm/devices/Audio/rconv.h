@@ -33,7 +33,6 @@ protected:
 	NSFPlayer* nsfplayer;
 	int cpu_clocks; // CPU clocks pending Tick
 	int cpu_rest; // extra clock accumulator (instructions will get ahead by a few clocks)
-	bool update_info;
 	bool fast_skip;
 
 	void ClockCPU(int c);
@@ -52,7 +51,6 @@ public:
 
 	// call TickCPU before each Tick
 	void TickCPU(int t) { cpu_clocks+=t; }
-	void UpdateInfo() { update_info=true; }
 
 	void SetCPU(NES_CPU* c) { cpu=c; }
 	void SetDMC(NES_DMC* d) { dmc=d; }
