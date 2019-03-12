@@ -72,7 +72,7 @@ namespace xgm
   ITrackInfo *NES_VRC7::GetTrackInfo(int trk)
   {
     //if(opll&&trk<6)
-    if(opll&&trk<9) // HACK YM2413
+    if(opll&&trk<9) // HACK YM2413 (percussion mode isn't very diagnostic this way though)
     {
       trkinfo[trk].max_volume = 15;
       trkinfo[trk].volume = 15 - ((opll->reg[0x30+trk])&15);
@@ -80,7 +80,8 @@ namespace xgm
       int blk = (opll->reg[0x20+trk]>>1)&7;
       trkinfo[trk].freq = clock*trkinfo[trk]._freq/(double)(0x80000>>blk);
       trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
-      trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
+      //trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
+      trkinfo[trk].key = (opll->key_status[trk])?true:false;
       return &trkinfo[trk];
     }
     else

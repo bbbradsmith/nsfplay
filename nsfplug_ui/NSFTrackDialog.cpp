@@ -126,8 +126,9 @@ static int keyColMap[NSFPlayer::NES_TRACK_MAX] =
   0xFFC000, 0xFFC000, 0x000000, //MMC5
   0x0000FF, 0x0000FF, 0x0000FF, 0x0000FF, 0x000000, //FME7
   0xFF8000, 0xFF8000, 0xFF8000, //VRC6
-  0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF,//VRC7
-  0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080  //N106
+  0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, 0x8000FF, //VRC7
+  0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080, 0xFF0080,  //N106
+  0x8000FF, 0x8000FF, 0x8000FF, //VRC7 (YM2413)
 };
 
 void NSFTrackDialog::OnTimer(UINT nIDEvent)
@@ -411,6 +412,7 @@ void NSFTrackDialog::InitList()
     {"VRC6:0","VRC6:1","VRC6:2",NULL},
     {"VRC7:0", "VRC7:1", "VRC7:2", "VRC7:3", "VRC7:4", "VRC7:5", NULL},
     {"N163:0", "N163:1", "N163:2", "N163:3","N163:4", "N163:5", "N163:6", "N163:7",NULL},
+    {"VRC7:6", "VRC7:7", "VRC7:8", NULL},
     NULL 
   };
 
@@ -443,6 +445,9 @@ void NSFTrackDialog::InitList()
         break;
       case 6:
         if(!nsf->use_n106) continue;
+        break;
+      case 7:
+        if(!nsf->use_vrc7 || nsf->vrc7_type!=1) continue;
         break;
       default:
         continue;
