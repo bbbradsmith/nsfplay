@@ -189,6 +189,7 @@ NSFPlay 2.4 beta 15 - ?
 - Fixed broken seek, and restored the "fask seek" option. (Seeks as if quality=1, normally OK.)
 - If in_yansf.ini can't be found or created next to in_yansf.dll, will try to save settings to %AppData%\NSFPlay\ instead.
 - N163 compatbility options for phase write protect and limited wavelength. (Supports old NSFs that are not hardware accurate.)
+- Option to randomize starting triangle phase.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
