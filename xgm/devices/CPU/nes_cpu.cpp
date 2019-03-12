@@ -109,14 +109,8 @@ void NES_CPU::run_from (UINT32 address)
 int NES_CPU::Exec (int clocks)
 {
 	// DPCM cycle stealing
-	clocks -= stolen_cycles;
-	if (clocks < 0)
-	{
-		stolen_cycles = -clocks;
-		clocks = 0;
-	}
-
-	context.clock = 0;
+	context.clock = stolen_cycles;
+	stolen_cycles = 0;
 
 	while ( int(context.clock) < clocks )
 	{
