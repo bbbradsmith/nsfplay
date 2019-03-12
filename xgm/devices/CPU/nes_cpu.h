@@ -45,7 +45,7 @@ protected:
   void run_from (UINT32 address);
 
 public:
-  double NES_BASECYCLES;
+  double nes_basecycles;
   NES_CPU (double clock = DEFAULT_CLOCK);
   ~NES_CPU ();
   void Reset ();

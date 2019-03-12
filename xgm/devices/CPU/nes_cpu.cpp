@@ -69,7 +69,7 @@ const int FRAME_FIXED = 14;
 
 NES_CPU::NES_CPU (double clock)
 {
-  NES_BASECYCLES = clock;
+  nes_basecycles = clock;
   bus = NULL;
   log_cpu = NULL;
   irqs = 0;
@@ -118,7 +118,7 @@ int NES_CPU::Exec (int clocks)
 
 	context.clock = 0;
 
-	while ( context.clock < clocks )
+	while ( int(context.clock) < clocks )
 	{
 		if (breaked)
 		{
@@ -151,7 +151,12 @@ int NES_CPU::Exec (int clocks)
 		else 
 		{
 			if ( (fclocks_left_in_frame >> FRAME_FIXED) < INT64(clocks) )
-				context.clock = (fclocks_left_in_frame >> FRAME_FIXED)+1;
+			{
+				if (fclocks_left_in_frame < 0)
+					context.clock = 0;
+				else
+					context.clock = unsigned int(fclocks_left_in_frame >> FRAME_FIXED)+1;
+			}
 			else
 				context.clock = clocks;
 		}
@@ -288,7 +293,7 @@ void NES_CPU::Start (
 	play_addr = play_addr_;
 	song = song_;
 	region = region_;
-	fclocks_per_frame = (INT64)((double)((1 << FRAME_FIXED) * NES_BASECYCLES) / play_rate );
+	fclocks_per_frame = (INT64)((double)((1 << FRAME_FIXED) * nes_basecycles) / play_rate );
 	fclocks_left_in_frame = 0;
 	stolen_cycles = 0;
 	play_ready = false;
@@ -326,17 +331,21 @@ void NES_CPU::Start (
 
 	run_from (init_addr);
 
-	// run up to 60 frames of init before starting real playback (this allows INIT to modify $4011 etc. silently)
-	int timeout = int((60.0 * NES_BASECYCLES) / play_rate);
-	// Should really use Exec for this (could rely on IRQ or something?), but must disable play
-	for (int i = 0; (i < timeout) && !breaked; i++, exec(context,bus))
+	// temporarily disable PLAY for INIT
+	int play_addr_temp = play_addr;
+	play_addr = -1;
+
+	// run up to 1 second of init before starting real playback (this allows INIT to modify $4011 etc. silently)
+	int timeout = nes_basecycles;
+	while (timeout > 0)
 	{
-		if (context.PC == breakpoint)
+		timeout -= Exec(1);
+		if (breaked)
 		{
 			if (nmi_play) enable_nmi = true;
-			breaked = true;
 		}
 	}
+	play_addr = play_addr_temp; // restore PLAY
 
 	fclocks_left_in_frame = fclocks_per_frame;
 	play_ready = breaked && !extra_init;

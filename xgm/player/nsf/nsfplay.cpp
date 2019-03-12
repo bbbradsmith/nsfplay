@@ -356,13 +356,13 @@ void NSFPlayer::SetPlayFreq (double r)
     {
         default:
         case REGION_NTSC:
-            cpu.NES_BASECYCLES = config->GetValue("NTSC_BASECYCLES").GetInt();
+            cpu.nes_basecycles = config->GetValue("NTSC_BASECYCLES").GetInt();
             break;
         case REGION_PAL:
-            cpu.NES_BASECYCLES = config->GetValue("PAL_BASECYCLES").GetInt();
+            cpu.nes_basecycles = config->GetValue("PAL_BASECYCLES").GetInt();
             break;
         case REGION_DENDY:
-            cpu.NES_BASECYCLES = config->GetValue("DENDY_BASECYCLES").GetInt();
+            cpu.nes_basecycles = config->GetValue("DENDY_BASECYCLES").GetInt();
             break;
     }
 
@@ -481,7 +481,7 @@ void NSFPlayer::SetPlayFreq (double r)
     if (length)
     {
       int mult_speed = (*config)["MULT_SPEED"].GetInt();
-      double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
+      double apu_clock_per_sample = cpu.nes_basecycles / rate;
       double cpu_clock_per_sample = apu_clock_per_sample * ((double)(mult_speed)/256.0);
 
       for (UINT32 i = 0; i < length; i++)
@@ -603,7 +603,7 @@ void NSFPlayer::SetPlayFreq (double r)
     master_volume = (*config)["MASTER_VOLUME"];
 
     int mult_speed = (*config)["MULT_SPEED"].GetInt();
-    double apu_clock_per_sample = cpu.NES_BASECYCLES / rate;
+    double apu_clock_per_sample = cpu.nes_basecycles / rate;
     double cpu_clock_per_sample = apu_clock_per_sample * ((double)(mult_speed)/256.0);
 
     for (i = 0; i < length; i++)

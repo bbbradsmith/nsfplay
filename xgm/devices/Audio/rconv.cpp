@@ -98,7 +98,7 @@ UINT32 RateConverter::Render (INT32 b[2])
 
 void RateConverter::ClockCPU(int c)
 {
-	UINT32 real_cpu_clocks = 0;
+	int real_cpu_clocks = 0;
 	if (cpu)
 	{
 		cpu_rest += c;
