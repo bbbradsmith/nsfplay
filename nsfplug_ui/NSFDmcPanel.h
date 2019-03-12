@@ -27,6 +27,7 @@ public:
 	BOOL	m_randomize_noise;
 	BOOL	m_unmute;
 	BOOL	m_tri_mute;
+	BOOL	m_randomize_tri;
 	//}}AFX_DATA
 
 public:

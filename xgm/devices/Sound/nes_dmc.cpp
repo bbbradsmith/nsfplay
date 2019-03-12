@@ -30,6 +30,7 @@ namespace xgm
     option[OPT_DPCM_ANTI_CLICK] = 0;
     option[OPT_NONLINEAR_MIXER] = 1;
     option[OPT_RANDOMIZE_NOISE] = 1;
+	option[OPT_RANDOMIZE_TRI] = 1;
     option[OPT_TRI_MUTE] = 1;
     tnd_table[0][0][0][0] = 0;
     tnd_table[1][0][0][0] = 0;
@@ -489,9 +490,14 @@ namespace xgm
     daddress = 0;
     noise = 1;
     noise_tap = (1<<1);
+
     if (option[OPT_RANDOMIZE_NOISE])
     {
         noise |= ::rand();
+    }
+    if (option[OPT_RANDOMIZE_TRI])
+    {
+        tphase = ::rand() & 31;
     }
 
     SetRate(rate);

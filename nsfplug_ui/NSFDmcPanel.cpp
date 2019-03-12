@@ -1,4 +1,4 @@
-WM// NSFDmcPanel.cpp : インプリメンテーション ファイル
+// NSFDmcPanel.cpp : インプリメンテーション ファイル
 //
 
 #include "stdafx.h"
@@ -25,6 +25,7 @@ NSFDmcPanel::NSFDmcPanel(CWnd* pParent /*=NULL*/)
   , m_randomize_noise(TRUE)
   , m_unmute(TRUE)
   , m_tri_mute(TRUE)
+  , m_randomize_tri(TRUE)
 {
 }
 
@@ -38,6 +39,7 @@ void NSFDmcPanel::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_RANDOMIZE_NOISE, m_randomize_noise);
   DDX_Check(pDX, IDC_UNMUTE, m_unmute);
   DDX_Check(pDX, IDC_TRI_MUTE, m_tri_mute);
+  DDX_Check(pDX, IDC_RANDOMIZE_TRI, m_randomize_tri);
 }
 
 void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
@@ -55,6 +57,7 @@ void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
     m_randomize_noise = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_NOISE).GetInt();
     m_unmute          = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_UNMUTE_ON_RESET).GetInt();
     m_tri_mute        = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_TRI_MUTE       ).GetInt();
+    m_randomize_tri   = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_TRI  ).GetInt();
     UpdateData(FALSE);
   }
   else
@@ -67,6 +70,7 @@ void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_NOISE) = m_randomize_noise;
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_UNMUTE_ON_RESET) = m_unmute;
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_TRI_MUTE       ) = m_tri_mute;
+    pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_TRI  ) = m_randomize_tri;
     pm->cf->Notify(DMC);
   }
 }

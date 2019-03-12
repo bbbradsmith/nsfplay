@@ -22,6 +22,7 @@ namespace xgm
       OPT_NONLINEAR_MIXER,
       OPT_RANDOMIZE_NOISE,
       OPT_TRI_MUTE,
+      OPT_RANDOMIZE_TRI,
       OPT_END 
     };
   protected:
