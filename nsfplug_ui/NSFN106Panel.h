@@ -16,7 +16,9 @@ public:
 
 	//{{AFX_DATA(NSF106Panel)
 	enum { IDD = IDD_N106PANEL };
-	BOOL	m_serial;
+	BOOL m_serial;
+	BOOL m_phase_read_only;
+	BOOL m_limit_wavelength;
 	//}}AFX_DATA
 
 public:

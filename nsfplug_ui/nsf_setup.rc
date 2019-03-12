@@ -590,6 +590,8 @@ FONT 9, "MS UI Gothic", 400, 0, 0x80
 BEGIN
     GROUPBOX        "オプション(&O)",-1,0,0,225,54
     CONTROL         "時分割多重化",IDC_SERIAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,11,171,11
+    CONTROL         "Write Protect Phase",IDC_PHASE_READ_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,24,171,11
+    CONTROL         "Limit Wavelength",IDC_LIMIT_WAVELENGTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,36,171,11
 END
 #endif
 
@@ -947,6 +949,10 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 86
     END
+
+    "IDD_N106PANEL$(JAPANESE)", DIALOG
+    BEGIN
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -965,6 +971,23 @@ IDB_ASCII               BITMAP                  "res\\ascii.bmp"
 IDB_KEYHEADER           BITMAP                  "res\\keyheader.bmp"
 
 IDB_MAIN                BITMAP                  "res\\bitmap1.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+#if defined(APSTUDIO_INVOKED) || defined(JAPANESE)
+#if defined(APSTUDIO_INVOKED)
+IDD_N106PANEL$(JAPANESE) AFX_DIALOG_LAYOUT
+#else
+IDD_N106PANEL AFX_DIALOG_LAYOUT
+#endif
+BEGIN
+    0
+END
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1378,6 +1401,8 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     GROUPBOX        "&Options",-1,0,0,225,54
     CONTROL         "Serial multiplex mixing",IDC_SERIAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,10,200,10
+    CONTROL         "Write Protect Phase",IDC_PHASE_READ_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,21,200,10
+    CONTROL         "Limit Wavelength",IDC_LIMIT_WAVELENGTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,32,200,10
 END
 
 
@@ -1635,6 +1660,10 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 86
     END
+
+    IDD_N106PANEL, DIALOG
+    BEGIN
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1645,6 +1674,11 @@ END
 //
 
 IDD_EASY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_N106PANEL AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

@@ -162,8 +162,10 @@
 #define IDC_4085_RESET                  2036
 #define IDC_WRITE_PROTECT               2037
 #define IDC_SERIAL                      2037
+#define IDC_PHASE_READ_ONLY             2038
 #define IDD_TRKINFO                     2039
 #define IDC_DUTY_SWAP                   2039
+#define IDC_LIMIT_WAVELENGTH            2039
 #define ID_TRKINFO                      2040
 #define IDD_TRKINFO_SETUP               2058
 #define IDB_DIGIT                       2062
@@ -231,7 +233,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2098
+#define _APS_NEXT_RESOURCE_VALUE        2101
 #define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         2040
 #define _APS_NEXT_SYMED_VALUE           2000

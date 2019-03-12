@@ -5,6 +5,8 @@ namespace xgm {
 NES_N106::NES_N106 ()
 {
     option[OPT_SERIAL] = 0;
+    option[OPT_PHASE_READ_ONLY] = 0;
+    option[OPT_LIMIT_WAVELENGTH] = 0;
     SetClock (DEFAULT_CLOCK);
     SetRate (DEFAULT_RATE);
     for (int i=0; i < 8; ++i)
@@ -252,6 +254,29 @@ bool NES_N106::Write (UINT32 adr, UINT32 val, UINT32 id)
     }
     else if (adr == 0x4800) // register write
     {
+        if (option[OPT_PHASE_READ_ONLY]) // old emulators didn't know phase was stored here
+        {
+            int c = 15 - (reg_select/8);
+            int r = reg_select & 7;
+            if (c < get_channels() &&
+                (r == 1 ||
+                 r == 3 ||
+                 r == 5))
+            {
+                if (reg_advance)
+                    reg_select = (reg_select + 1) & 0x7F;
+                return true;
+            }
+        }
+        if (option[OPT_LIMIT_WAVELENGTH]) // old emulators ignored top 3 bits of length
+        {
+            int c = 15 - (reg_select/8);
+            int r = reg_select & 7;
+            if (c < get_channels() && r == 4)
+            {
+                val |= 0xE0;
+            }
+        }
         reg[reg_select] = val;
         if (reg_advance)
             reg_select = (reg_select + 1) & 0x7F;

@@ -21,6 +21,8 @@ NSFN106Panel::NSFN106Panel(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(NSFN106Panel)
 	m_serial = FALSE;
+	m_phase_read_only = FALSE;
+	m_limit_wavelength = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -34,12 +36,16 @@ void NSFN106Panel::UpdateNSFPlayerConfig(bool b)
   if(b)
   {
     m_serial = pm->cf->GetDeviceOption(N106,NES_N106::OPT_SERIAL).GetInt();
+    m_phase_read_only = pm->cf->GetDeviceOption(N106,NES_N106::OPT_PHASE_READ_ONLY).GetInt();
+    m_limit_wavelength = pm->cf->GetDeviceOption(N106,NES_N106::OPT_LIMIT_WAVELENGTH).GetInt();
     UpdateData(FALSE);
   }
   else
   {
     UpdateData(TRUE);
 	pm->cf->GetDeviceOption(N106, NES_N106::OPT_SERIAL) = m_serial;
+	pm->cf->GetDeviceOption(N106, NES_N106::OPT_PHASE_READ_ONLY) = m_phase_read_only;
+	pm->cf->GetDeviceOption(N106, NES_N106::OPT_LIMIT_WAVELENGTH) = m_limit_wavelength;
     pm->cf->Notify(N106);
   }
 }
@@ -49,6 +55,8 @@ void NSFN106Panel::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(NSFN106Panel)
 	DDX_Check(pDX, IDC_SERIAL, m_serial);
+	DDX_Check(pDX, IDC_PHASE_READ_ONLY, m_phase_read_only);
+	DDX_Check(pDX, IDC_LIMIT_WAVELENGTH, m_limit_wavelength);
 	//}}AFX_DATA_MAP
 }
 

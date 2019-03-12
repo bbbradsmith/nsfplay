@@ -18,6 +18,8 @@ public:
     enum
     {
         OPT_SERIAL = 0,
+        OPT_PHASE_READ_ONLY = 1,
+        OPT_LIMIT_WAVELENGTH = 2,
         OPT_END
     };
 
