@@ -223,6 +223,7 @@ namespace xgm
     }
     if (nsf->use_vrc7)
     {
+      vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
       stack.Attach (sc[VRC7]);
       mixer.Attach (&amp[VRC7]);
     }
@@ -425,8 +426,6 @@ void NSFPlayer::SetPlayFreq (double r)
     vrc6->SetMask((*config)["MASK"].GetInt()>>12);
     vrc7->SetMask((*config)["MASK"].GetInt()>>15);
     n106->SetMask((*config)["MASK"].GetInt()>>21);
-
-    vrc7->SetPatchSet((*config)["VRC7_PATCH"].GetInt());
 
     for(int i=0;i<NES_TRACK_MAX;i++)
       infobuf[i].Clear();
