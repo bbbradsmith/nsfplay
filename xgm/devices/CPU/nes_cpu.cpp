@@ -336,6 +336,13 @@ void NES_CPU::Start (
 	play_addr = -1;
 
 	// run up to 1 second of init before starting real playback (this allows INIT to modify $4011 etc. silently)
+	// note: things like DMC, Frame Counter, NSF2 IRQ, MMC Frame Counter, etc. aren't receiving cycles here
+	//       but this should be OK?
+	//       - Use of IRQs should really be taking place in PLAY or non-returning second INIT.
+	//       - Timing between end of INIT and first PLAY is not guaranteed by the player and should not be relied on.
+	//       - For NSFs that do not reset $4017 this leaves the envelope starting in synch with the first PLAY.
+	//       - Waiting on an IRQ during the first init should hit the timeout and eventually trigger.
+	//         (Could be a problem if they're trying to count cycles there?)
 	int timeout = int(nes_basecycles);
 	while (timeout > 0)
 	{
