@@ -336,7 +336,7 @@ void NES_CPU::Start (
 	play_addr = -1;
 
 	// run up to 1 second of init before starting real playback (this allows INIT to modify $4011 etc. silently)
-	int timeout = nes_basecycles;
+	int timeout = int(nes_basecycles);
 	while (timeout > 0)
 	{
 		timeout -= Exec(1);
@@ -347,6 +347,7 @@ void NES_CPU::Start (
 	}
 	play_addr = play_addr_temp; // restore PLAY
 
+	// start of first frame
 	fclocks_left_in_frame = fclocks_per_frame;
 	play_ready = breaked && !extra_init;
 }
