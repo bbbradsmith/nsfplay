@@ -1334,7 +1334,6 @@ calc_slot_tom (OPLL_SLOT * slot)
     return 0;
 
   return DB2LIN_TABLE[slot->sintbl[slot->pgout] + slot->egout];
-
 }
 
 /* SNARE */
@@ -1445,10 +1444,13 @@ calc (OPLL * opll)
   }
   else
   {
+    opll->out_hat = 0;
+    opll->out_snare = 0;
     if (!(opll->mask & OPLL_MASK_HH) && (MOD(opll,7)->eg_mode != FINISH))
-      perc += calc_slot_hat (MOD(opll,7), CAR(opll,8)->pgout, opll->noise_seed&1);
+      opll->out_hat = calc_slot_hat (MOD(opll,7), CAR(opll,8)->pgout, opll->noise_seed&1);
     if (!(opll->mask & OPLL_MASK_SD) && (CAR(opll,7)->eg_mode != FINISH))
-      perc -= calc_slot_snare (CAR(opll,7), opll->noise_seed&1);
+      opll->out_snare = calc_slot_snare (CAR(opll,7), opll->noise_seed&1);
+    perc += opll->out_hat - opll->out_snare;
   }
 
   /* CH8 */
@@ -1459,10 +1461,13 @@ calc (OPLL * opll)
   }
   else
   {
+    opll->out_tom = 0;
+    opll->out_cym = 0;
     if (!(opll->mask & OPLL_MASK_TOM) && (MOD(opll,8)->eg_mode != FINISH))
-      perc += calc_slot_tom (MOD(opll,8));
+      opll->out_tom = calc_slot_tom (MOD(opll,8));
     if (!(opll->mask & OPLL_MASK_CYM) && (CAR(opll,8)->eg_mode != FINISH))
-      perc -= calc_slot_cym (CAR(opll,8), MOD(opll,7)->pgout);
+      opll->out_cym = calc_slot_cym (CAR(opll,8), MOD(opll,7)->pgout);
+    perc += opll->out_tom - opll->out_cym;
   }
 
   out = inst + (perc << 1);

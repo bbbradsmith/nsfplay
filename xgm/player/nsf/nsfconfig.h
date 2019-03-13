@@ -8,7 +8,7 @@ namespace xgm
   enum DeviceCode
   { APU = 0, DMC, FME7, MMC5, N106, VRC6, VRC7, FDS, NES_DEVICE_MAX };
 
-  const int NES_CHANNEL_MAX = 29;
+  const int NES_CHANNEL_MAX = 32;
 
   class NSFPlayerConfig : public PlayerConfig
   {

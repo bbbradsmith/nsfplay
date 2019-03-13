@@ -21,7 +21,8 @@ char *NSFPlayerConfig::channel_name[NES_CHANNEL_MAX] =
       "5B:0", "5B:1", "5B:2",
       "VRC6:S0", "VRC6:S1", "VRC6:SAW",
       "VRC7:0", "VRC7:1", "VRC7:2", "VRC7:3", "VRC7:4", "VRC7:5",
-      "N163:0", "N163:1", "N163:2", "N163:3", "N163:4", "N163:5", "N163:6", "N163:7"
+      "N163:0", "N163:1", "N163:2", "N163:3", "N163:4", "N163:5", "N163:6", "N163:7",
+      "VRC7:6", "VRC7:7", "VRC7:8",
   };
 
 int NSFPlayerConfig::channel_device[NES_CHANNEL_MAX] =
@@ -32,7 +33,8 @@ int NSFPlayerConfig::channel_device[NES_CHANNEL_MAX] =
       FME7, FME7, FME7,
       VRC6, VRC6, VRC6,
       VRC7, VRC7, VRC7, VRC7, VRC7, VRC7,
-      N106, N106, N106, N106, N106, N106, N106, N106
+      N106, N106, N106, N106, N106, N106, N106, N106,
+      VRC7, VRC7, VRC7,
   };
 
 int NSFPlayerConfig::channel_device_index[NES_CHANNEL_MAX] =
@@ -43,7 +45,8 @@ int NSFPlayerConfig::channel_device_index[NES_CHANNEL_MAX] =
       0, 1, 2,
       0, 1, 2,
       0, 1, 2, 3, 4, 5,
-      0, 1, 2, 3, 4, 5, 6, 7
+      0, 1, 2, 3, 4, 5, 6, 7,
+      6, 7, 8,
   };
 
 int NSFPlayerConfig::channel_track[NES_CHANNEL_MAX] =
@@ -57,7 +60,8 @@ int NSFPlayerConfig::channel_track[NES_CHANNEL_MAX] =
     NSFPlayer::VRC7_TRK0, NSFPlayer::VRC7_TRK1, NSFPlayer::VRC7_TRK2,
     NSFPlayer::VRC7_TRK3, NSFPlayer::VRC7_TRK4, NSFPlayer::VRC7_TRK5,
     NSFPlayer::N106_TRK0, NSFPlayer::N106_TRK1, NSFPlayer::N106_TRK2, NSFPlayer::N106_TRK3,
-    NSFPlayer::N106_TRK4, NSFPlayer::N106_TRK5, NSFPlayer::N106_TRK6, NSFPlayer::N106_TRK7
+    NSFPlayer::N106_TRK4, NSFPlayer::N106_TRK5, NSFPlayer::N106_TRK6, NSFPlayer::N106_TRK7,
+    NSFPlayer::VRC7_TRK6, NSFPlayer::VRC7_TRK7, NSFPlayer::VRC7_TRK8,
   };
 
 static const char* DEFAULT_CHANNEL_COL[NES_CHANNEL_MAX] = {
@@ -68,7 +72,8 @@ static const char* DEFAULT_CHANNEL_COL[NES_CHANNEL_MAX] = {
   "0000FF", "0000FF", "0000FF", // 0000FF, 000000, //FME7
   "FF8000", "FF8000", "FF8000", //VRC6
   "8000FF", "8000FF", "8000FF", "8000FF", "8000FF", "8000FF",//VRC7
-  "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080"  //N106
+  "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", "FF0080", //N106
+  "8000FF", "8000FF", "8000FF", //VRC7
   };
 static const char* DEFAULT_5B_ENVELOPE_COL = "0000FF";
 static const char* DEFAULT_5B_NOISE_COL = "000000";

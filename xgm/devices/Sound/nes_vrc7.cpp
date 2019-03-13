@@ -64,7 +64,8 @@ namespace xgm
   void NES_VRC7::SetStereoMix(int trk, xgm::INT16 mixl, xgm::INT16 mixr)
   {
       if (trk < 0) return;
-      if (trk > 5) return;
+      //if (trk > 5) return;
+      if (trk > 8) return; // HACK YM2413
       sm[0][trk] = mixl;
       sm[1][trk] = mixr;
   }
@@ -82,6 +83,8 @@ namespace xgm
       trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
       //trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
       trkinfo[trk].key = (opll->key_status[trk])?true:false;
+      if      (trk == 7) trkinfo[trk].key |= opll->slot_on_flag[14] | opll->slot_on_flag[15];
+      else if (trk == 8) trkinfo[trk].key |= opll->slot_on_flag[16] | opll->slot_on_flag[17];
       return &trkinfo[trk];
     }
     else
@@ -122,13 +125,27 @@ namespace xgm
   UINT32 NES_VRC7::Render (INT32 b[2])
   {
     b[0] = b[1] = 0;
-    //for (int i=0; i < 6; ++i)
-    for (int i=0; i < 9; ++i) // HACK for YM2413 support
+    for (int i=0; i < 6; ++i)
     {
         INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
         b[0] += val * sm[0][i];
         b[1] += val * sm[1][i];
     }
+    // HACK for YM2413 support
+    for (int i=6; i < 9; ++i)
+    {
+        INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
+        if (opll->patch_number[i] > 15) // rhytm mode
+        {
+            //      (i == 6) bass drum is normal 2-op, but double volume
+            if      (i == 7) val = opll->out_hat - opll->out_snare;
+            else if (i == 8) val = opll->out_tom - opll->out_cym;
+            val <<= 1;
+        }
+        b[0] += val * sm[0][i];
+        b[1] += val * sm[1][i];
+    }
+
     b[0] >>= (7 - 4);
     b[1] >>= (7 - 4);
 

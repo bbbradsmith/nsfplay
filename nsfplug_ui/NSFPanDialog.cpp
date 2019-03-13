@@ -79,7 +79,7 @@ BOOL NSFPanDialog::OnInitDialog()
   rect.left = 0;
   rect.right = 0;
 
-  const int SPLIT = 15;
+  const int SPLIT = 16;
 
   for(int i=0;i<NES_CHANNEL_MAX; ++i)
   {
@@ -134,7 +134,8 @@ void NSFPanDialog::OnPanSpread()
       128-70, 128+70, 128+15, // 5B
       128-90, 128+90, 128+10, // VRC6
       128-30, 128+30, 128-70, 128+70, 128-90, 128+90, // VRC7
-      128-20, 128+20, 128-40, 128+40, 128-75, 128+75, 128-99, 128+99 // N163
+      128-20, 128+20, 128-40, 128+40, 128-75, 128+75, 128-99, 128+99, // N163
+      128, 128, 128, // VRC7
   };
 
   for(int i=0;i<NES_CHANNEL_MAX; i++)
