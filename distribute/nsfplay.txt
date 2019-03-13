@@ -160,7 +160,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 15 - ?
+NSFPlay 2.4 beta 15 - 3/13/2019
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -190,6 +190,7 @@ NSFPlay 2.4 beta 15 - ?
 - If in_yansf.ini can't be found or created next to in_yansf.dll, will try to save settings to %AppData%\NSFPlay\ instead.
 - N163 compatbility options for phase write protect and limited wavelength. (Supports old NSFs that are not hardware accurate.)
 - Option to randomize starting triangle phase.
+- NSFE VRC7 chunk implemented, provisional support for YM2413 variant.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:
