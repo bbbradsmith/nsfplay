@@ -130,14 +130,15 @@ Channel options:
   5B_NOISE_COL: keyboard colour for 5B noise
 
 VRC7 patch sets: (VRC7_PATCH)
-  0 - VRC7 set by rainwarrior 8/01/2012 (used by Famitracker 0.4.0)
-  1 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.6)
-  2 - VRC7 set by Mitsutaka Okazaki 6/24/2001 (used by Famitracker 0.3.5 and prior)
-  3 - VRC7 set by Mitsutaka Okazaki 4/10/2004
-  4 - VRC7 set by kevtris 11/15/1999 (second set in vrcvii.txt)
-  5 - VRC7 set by kevtris 11/14/1999 (first set in vrcvii.txt)
-  6 - YM2413 set by Mitsutaka Okazaki 4/10/2004
-  7 - YMF281B set by Chabin 4/10/2004
+  0 - VRC7 set by Nuke.KYT 3/15/2019 (dumped from VRC7 via special debug mode)
+  1 - VRC7 set by rainwarrior 8/01/2012 (used by Famitracker 0.4.0)
+  2 - VRC7 set by quietust 1/18/2004 (used by Famitracker 0.3.6)
+  3 - VRC7 set by Mitsutaka Okazaki 6/24/2001 (used by Famitracker 0.3.5 and prior)
+  4 - VRC7 set by Mitsutaka Okazaki 4/10/2004
+  5 - VRC7 set by kevtris 11/15/1999 (second set in vrcvii.txt)
+  6 - VRC7 set by kevtris 11/14/1999 (first set in vrcvii.txt)
+  7 - YM2413 set by Mitsutaka Okazaki 4/10/2004
+  8 - YMF281B set by Chabin 4/10/2004
 
 
 Playlists
@@ -160,7 +161,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 16 - 3/13/2019
+NSFPlay 2.4 beta 17 - 3/19/2019
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -191,6 +192,7 @@ NSFPlay 2.4 beta 16 - 3/13/2019
 - N163 compatbility options for phase write protect and limited wavelength. (Supports old NSFs that are not hardware accurate.)
 - Option to randomize starting triangle phase.
 - NSFe VRC7 chunk implemented, provisional support for YM2413 variant.
+- VRC7 patch set dump via Nuke.YKT
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

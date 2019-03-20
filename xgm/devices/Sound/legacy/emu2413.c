@@ -51,8 +51,11 @@
 #include <math.h>
 #include "emu2413.h"
 
-#define OPLL_TONE_NUM 8
+#define OPLL_TONE_NUM 9
 static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 16] = {
+  {
+#include "vrc7tone_nuke.h"
+  },
   {
 #include "vrc7tone_rw.h"
   },

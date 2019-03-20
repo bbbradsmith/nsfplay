@@ -4,6 +4,7 @@ namespace xgm
 {
   NES_VRC7::NES_VRC7 ()
   {
+    use_all_channels = false;
     patch_set = OPLL_VRC7_RW_TONE;
     patch_custom = NULL;
 
@@ -20,6 +21,11 @@ namespace xgm
   NES_VRC7::~NES_VRC7 ()
   {
     OPLL_delete (opll);
+  }
+
+  void NES_VRC7::UseAllChannels(bool b)
+  {
+    use_all_channels = b;
   }
 
   void NES_VRC7::SetPatchSet(int p)
@@ -83,8 +89,8 @@ namespace xgm
       trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
       //trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
       trkinfo[trk].key = (opll->key_status[trk])?true:false;
-      if      (trk == 7) trkinfo[trk].key |= opll->slot_on_flag[14] | opll->slot_on_flag[15];
-      else if (trk == 8) trkinfo[trk].key |= opll->slot_on_flag[16] | opll->slot_on_flag[17];
+      if      (trk == 7) trkinfo[trk].key |= ((opll->slot_on_flag[14] | opll->slot_on_flag[15]) !=0);
+      else if (trk == 8) trkinfo[trk].key |= ((opll->slot_on_flag[16] | opll->slot_on_flag[17]) !=0);
       return &trkinfo[trk];
     }
     else
@@ -131,19 +137,23 @@ namespace xgm
         b[0] += val * sm[0][i];
         b[1] += val * sm[1][i];
     }
+
     // HACK for YM2413 support
-    for (int i=6; i < 9; ++i)
+    if (use_all_channels)
     {
-        INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
-        if (opll->patch_number[i] > 15) // rhytm mode
+        for (int i=6; i < 9; ++i)
         {
-            //      (i == 6) bass drum is normal 2-op, but double volume
-            if      (i == 7) val = opll->out_hat - opll->out_snare;
-            else if (i == 8) val = opll->out_tom - opll->out_cym;
-            val <<= 1;
+            INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
+            if (opll->patch_number[i] > 15) // rhytm mode
+            {
+                //      (i == 6) bass drum is normal 2-op, but double volume
+                if      (i == 7) val = opll->out_hat - opll->out_snare;
+                else if (i == 8) val = opll->out_tom - opll->out_cym;
+                val <<= 1;
+            }
+            b[0] += val * sm[0][i];
+            b[1] += val * sm[1][i];
         }
-        b[0] += val * sm[0][i];
-        b[1] += val * sm[1][i];
     }
 
     b[0] >>= (7 - 4);

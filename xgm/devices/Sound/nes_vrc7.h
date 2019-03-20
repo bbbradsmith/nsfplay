@@ -20,6 +20,7 @@ namespace xgm
     double clock, rate;
     //TrackInfoBasic trkinfo[6];
     TrackInfoBasic trkinfo[9]; // HACK to support YM2413
+    bool use_all_channels;
   public:
       NES_VRC7 ();
      ~NES_VRC7 ();
@@ -29,6 +30,7 @@ namespace xgm
     virtual UINT32 Render (INT32 b[2]);
     virtual bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
+    virtual void UseAllChannels (bool b);
     virtual void SetPatchSet (int p);
     virtual void SetPatchSetCustom (const UINT8* pset);
     virtual void SetClock (double);
