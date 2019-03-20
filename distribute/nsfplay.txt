@@ -159,7 +159,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.4 beta 17 - 3/19/2019
+NSFPlay 2.4 beta 18 - 3/20/2019
 - Fixed incorrect bytes per second in stereo WAV output.
 - Fixed NSFe track title display when using playlist.
 - Fixed crash issue with 1MB NSF files. (Bank counting was incorrect.)
@@ -191,7 +191,7 @@ NSFPlay 2.4 beta 17 - 3/19/2019
 - N163 compatbility options for phase write protect and limited wavelength. (Supports old NSFs that are not hardware accurate.)
 - Option to randomize starting triangle phase.
 - NSFe VRC7 chunk implemented, provisional support for YM2413 variant.
-- VRC7 patch set dump via Nuke.YKT
+- VRC7 patch set dump by Nuke.YKT.
 
 NSFPlay 2.3 - 7/19/2013
 Emulation:

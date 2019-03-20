@@ -326,7 +326,9 @@ void NES_CPU::Start (
 	run_from (init_addr);
 
 	// temporarily disable PLAY for INIT
+	bool extra_init_temp = extra_init;
 	int play_addr_temp = play_addr;
+	extra_init = false;
 	play_addr = -1;
 
 	// run up to 1 second of init before starting real playback (this allows INIT to modify $4011 etc. silently)
@@ -346,6 +348,7 @@ void NES_CPU::Start (
 			if (nmi_play) enable_nmi = true;
 		}
 	}
+	extra_init = extra_init_temp; // restore extra_init
 	play_addr = play_addr_temp; // restore PLAY
 
 	// start of first frame
