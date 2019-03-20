@@ -152,6 +152,7 @@
     <ClInclude Include="devices\Sound\legacy\vrc7tone_kt1.h" />
     <ClInclude Include="devices\Sound\legacy\vrc7tone_kt2.h" />
     <ClInclude Include="devices\Sound\legacy\vrc7tone_mo.h" />
+    <ClInclude Include="devices\Sound\legacy\vrc7tone_nuke.h" />
     <ClInclude Include="devices\Sound\legacy\vrc7tone_rw.h" />
     <ClInclude Include="devices\Sound\nes_apu.h" />
     <ClInclude Include="devices\Sound\nes_dmc.h" />
