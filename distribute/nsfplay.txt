@@ -43,6 +43,7 @@ The default configuration file is in_yansf.ini, found in the plugins folder.
 
 Global options:
   RATE: samplerate
+  QUALITY: oversampling (1-40)
   NCH: 1-2 number of channels
   BPS: 16 bits per sample (don't change this)
   MASK: bitfield channel mask (1 bit mutes channel)
@@ -59,9 +60,6 @@ Global options:
   DETECT_ALT: 1=use alternate loop detection algorithm
   VSYNC_ADJUST: 1=ignore NSF frame length setting
   MULT_SPEED: clock multiplier (256 = no multiplier)
-  COMP_LIMIT: 0-100 compressor limit
-  COMP_THRESHOLD: 0-100 compressor threshold
-  COMP_VELOCITY: 0-100 compressor velocity
   NTSC_BASECYCLES: NTSC master clock speed
   PAL_BASECYCLES: PAL master clock speed
   DENDY_BASECYCLES: DENDY master clock speed
@@ -99,10 +97,7 @@ TITLE_FORMAT text replacement:
 Device options:
   Devices (XXX) are: APU1, APU2, 5B, MMC5, N163, VRC6, VRC7, FDS
   XXX_VOLUME: 0-255 device volume
-  XXX_QUALITY: 0-3 oversampling control
-  XXX_FILTER: 0-400 lowpass filter (0=off, 400=full)
   XXX_MUTE: 1/0 mute channel yes/no
-  XXX_THRESHOLD: 0-100 compressor threshold (100=off)
   APU1_OPTION0: unmute on reset
   APU1_OPTION1: phase reset
   APU1_OPTION2: nonlinear mixing
@@ -114,12 +109,15 @@ Device options:
   APU2_OPTION4: nonlinear mixer
   APU2_OPTION5: randomize noise on reset
   APU2_OPTION6: mute triangle on pitch 0 (prevents high frequency aliasing)
+  APU2_OPTION7: randomize triangle on reset
   FDS_OPTION0: (Hz) lowpass filter cutoff frequency (0=off, 2000=default)
   FDS_OPTION1: reset "phase" on $4085 write (works around timing issue in Bio Miracle Bokutte Upa)
   FDS_OPTION2: write protect $8000-DFFF (for some multi-expansion NSFs)
   MMC5_OPTION0: nonlinear mixing
   MMC5_OPTION1: phase reset
   N163_OPTION0: serial multiplexing (more accurate sound for 6+ channels)
+  N163_OPTION1: Read-Only phase (for old NSFs that overwrite phase every frame)
+  N163_OPTION2: Limit wavelength (for old NSFs that do not set the high bits)
 
 Channel options:
   There are 29 channels, as appear vertically in the channel mixer, numbered (XX) from 00 to 28.
@@ -176,6 +174,7 @@ NSFPlay 2.4 beta 17 - 3/19/2019
 - NSFe RATE chunk implemented.
 - NSFe regn chunk implemented, including full Dendy support.
 - NSFe mixe chunk implemented.
+- NSFe taut, psfx chunk implemented.
 - Drag and drop will now acknowledge a failed load with a pop-up alert.
 - Migrate to VS2017.
 - IRQ support.
