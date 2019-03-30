@@ -91,7 +91,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("STOP_SEC", 3);
   CreateValue("LOOP_NUM", 2);
   CreateValue("AUTO_STOP", 1);
-  CreateValue("AUTO_DETECT", 1);
+  CreateValue("AUTO_DETECT", 0);
   CreateValue("DETECT_TIME", 30*1000);
   CreateValue("DETECT_INT", 5000);
   CreateValue("LPF", 112);
