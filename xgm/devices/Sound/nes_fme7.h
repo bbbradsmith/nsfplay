@@ -8,7 +8,13 @@ namespace xgm
 
   class NES_FME7:public ISoundChip
   {
+  public:
+    enum
+    {
+      OPT_END
+    };
   protected:
+    //int option[OPT_END];
     INT32 sm[2][3]; // stereo mix
     INT16 buf[2];
     PSG *psg;
@@ -25,6 +31,7 @@ namespace xgm
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual void SetClock (double);
     virtual void SetRate (double);
+    virtual void SetOption (int, int);
     virtual void SetMask (int m){ if(psg) PSG_setMask(psg,m); }
     virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);

@@ -169,6 +169,7 @@
 #define IDC_LIMIT_WAVELENGTH            2039
 #define ID_TRKINFO                      2040
 #define IDC_SWEEP_INIT                  2040
+#define IDC_OPLL                        2041
 #define IDD_TRKINFO_SETUP               2058
 #define IDB_DIGIT                       2062
 #define IDB_KEYBOARD                    2063
@@ -189,7 +190,10 @@
 #define ID_DOWNALL                      2089
 #define IDD_N106PANEL                   2089
 #define ID_COMMAND_UP                   2090
+#define IDD_VRC6PANEL                   2090
 #define ID_COMMAND_DOWN                 2091
+#define IDD_VRC7PANEL                   2091
+#define IDD_FME7PANEL                   2092
 #define IDR_TRKINFOMENU                 2093
 #define ID_COPY                         2094
 #define IDR_PANMENU                     2094
@@ -235,9 +239,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2104
+#define _APS_NEXT_RESOURCE_VALUE        2108
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         2041
+#define _APS_NEXT_CONTROL_VALUE         2043
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

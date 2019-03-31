@@ -7,12 +7,18 @@ namespace xgm
 
   class NES_VRC6:public ISoundChip
   {
+  public:
+    enum
+    {
+      OPT_END
+    };
   protected:
     UINT32 counter[3]; // frequency divider
     UINT32 phase[3];   // phase counter
     UINT32 freq2[3];   // adjusted frequency
     int count14;       // saw 14-stage counter
 
+    //int option[OPT_END];
     int mask;
     INT32 sm[2][3]; // stereo mix
     int duty[2];
@@ -39,6 +45,7 @@ namespace xgm
     virtual bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
     virtual void SetClock (double);
     virtual void SetRate (double);
+    virtual void SetOption (int, int);
     virtual void SetMask (int m){ mask = m; }
     virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);

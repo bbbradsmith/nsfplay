@@ -47,6 +47,12 @@ NSFConfigDialog::NSFConfigDialog(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSel
   devicePage[MMC5]->SetPanel(mmc5Panel, IDD_MMC5PANEL);
   n106Panel = new NSFN106Panel();
   devicePage[N106]->SetPanel(n106Panel, IDD_N106PANEL);
+  vrc6Panel = new NSFVRC6Panel();
+  devicePage[VRC6]->SetPanel(vrc6Panel, IDD_VRC6PANEL);
+  vrc7Panel = new NSFVRC7Panel();
+  devicePage[VRC7]->SetPanel(vrc7Panel, IDD_VRC7PANEL);
+  fme7Panel = new NSFFME7Panel();
+  devicePage[FME7]->SetPanel(fme7Panel, IDD_FME7PANEL);
 }
 
 void NSFConfigDialog::SetDialogManager(NSFDialogManager *p)
@@ -67,6 +73,9 @@ NSFConfigDialog::~NSFConfigDialog()
   delete dmcPanel;
   delete mmc5Panel;
   delete n106Panel;
+  delete vrc6Panel;
+  delete vrc7Panel;
+  delete fme7Panel;
 }
 
 void NSFConfigDialog::Open()

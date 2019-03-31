@@ -35,8 +35,8 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
 
   if(b)
   {
-    m_nCutoff = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CUTOFF).GetInt();
-    m_4085_reset = pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_4085_RESET).GetInt();
+    m_nCutoff       = pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CUTOFF).GetInt();
+    m_4085_reset    = pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_4085_RESET).GetInt();
     m_write_protect = pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_WRITE_PROTECT).GetInt();
     UpdateData(FALSE);
   }
@@ -44,8 +44,8 @@ void NSFFdsPanel::UpdateNSFPlayerConfig(bool b)
   {
     UpdateData(TRUE);
     pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_CUTOFF) = m_nCutoff; 
-    pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_4085_RESET) = m_4085_reset;
-	pm->cf->GetDeviceOption(FDS, NES_FDS::OPT_WRITE_PROTECT) = m_write_protect;
+    pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_4085_RESET) = m_4085_reset;
+	pm->cf->GetDeviceOption(FDS,NES_FDS::OPT_WRITE_PROTECT) = m_write_protect;
     pm->cf->Notify(FDS);
   }
 }

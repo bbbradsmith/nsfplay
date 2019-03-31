@@ -64,6 +64,14 @@ namespace xgm
     rate = r ? r : DEFAULT_RATE;
   }
 
+  void NES_VRC6::SetOption (int id, int val)
+  {
+    if(id<OPT_END)
+    {
+      //option[id] = val;
+    }
+  }
+
   void NES_VRC6::Reset ()
   {
     Write (0x9003, 0);

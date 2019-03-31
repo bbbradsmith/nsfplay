@@ -223,9 +223,16 @@ namespace xgm
     if (nsf->use_vrc7)
     {
       int patch_set = (*config)["VRC7_PATCH"].GetInt();
-      if (nsf->vrc7_type == 1) // YM2413 (not properly implemented yet though)
+      bool opll = nsf->vrc7_type == 1;
+      if (config->GetDeviceOption(VRC7, NES_VRC7::OPT_OPLL).GetInt() != 0)
+      {
+        opll = true;
+        nsf->vrc7_type = 1; // don't really want to modify nsf but this lets NSFTrackDialog notice the extra channels
+      }
+
+      if (opll) // YM2413 / OPLL
         patch_set = 7;
-      vrc7->UseAllChannels(nsf->vrc7_type == 1);
+      vrc7->UseAllChannels(opll);
       vrc7->SetPatchSet(patch_set);
       vrc7->SetPatchSetCustom(nsf->vrc7_patches);
       stack.Attach (sc[VRC7]);
@@ -860,12 +867,18 @@ void NSFPlayer::SetPlayFreq (double r)
       mmc5->SetMask((*config)["MASK"].GetInt()>>6);
       break;
     case FME7:
+      for (i = 0; i < NES_FME7::OPT_END; i++)
+        fme7->SetOption (i, config->GetDeviceOption(id,i));
       fme7->SetMask((*config)["MASK"].GetInt()>>9);
       break;
     case VRC6:
+      for (i = 0; i < NES_VRC6::OPT_END; i++)
+        vrc6->SetOption (i, config->GetDeviceOption(id,i));
       vrc6->SetMask((*config)["MASK"].GetInt()>>12);
       break;
     case VRC7:
+      for (i = 0; i < NES_VRC7::OPT_END; i++)
+        vrc7->SetOption (i, config->GetDeviceOption(id,i));
       vrc7->SetMask((*config)["MASK"].GetInt()>>15);
       break;
     case N106:

@@ -52,6 +52,14 @@ namespace xgm
     OPLL_set_rate(opll,(e_uint32)rate);
   }
 
+  void NES_VRC7::SetOption (int id, int val)
+  {
+    if(id<OPT_END)
+    {
+      option[id] = val;
+    }
+  }
+
   void NES_VRC7::Reset ()
   {
     for (int i=0; i < 0x40; ++i)

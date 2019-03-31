@@ -32,6 +32,14 @@ void NES_FME7::SetRate (double r)
     PSG_set_rate (psg, (e_uint32)rate);
 }
 
+void NES_FME7::SetOption (int id, int val)
+{
+  if(id<OPT_END)
+  {
+    //option[id] = val;
+  }
+}
+
 void NES_FME7::Reset ()
 {
   for (int i=0; i<16; ++i) // blank all registers

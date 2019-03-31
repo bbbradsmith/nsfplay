@@ -150,11 +150,11 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
     {
         NES_APU::OPT_END,
         NES_DMC::OPT_END,
-        0, // 5B
+        NES_FME7::OPT_END,
         NES_MMC5::OPT_END,
         NES_N106::OPT_END,
-        0, // VRC6
-        0, // VRC7
+        NES_VRC6::OPT_END,
+        NES_VRC7::OPT_END,
         NES_FDS::OPT_END,
     };
 

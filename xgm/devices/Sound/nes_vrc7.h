@@ -8,7 +8,14 @@ namespace xgm
 
   class NES_VRC7 : public ISoundChip
   {
+  public:
+    enum
+    {
+      OPT_OPLL=0,
+      OPT_END
+    };
   protected:
+    int option[OPT_END];
     int mask;
     int patch_set;
     const UINT8* patch_custom;
@@ -35,6 +42,7 @@ namespace xgm
     virtual void SetPatchSetCustom (const UINT8* pset);
     virtual void SetClock (double);
     virtual void SetRate (double);
+    virtual void SetOption (int, int);
     virtual void SetMask (int m){ mask = m; if(opll) OPLL_setMask(opll, m); }
     virtual void SetStereoMix (int trk, xgm::INT16 mixl, xgm::INT16 mixr);
     virtual ITrackInfo *GetTrackInfo(int trk);

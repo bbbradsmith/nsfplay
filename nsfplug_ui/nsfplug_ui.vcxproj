@@ -150,6 +150,7 @@
     <ClCompile Include="NSFDmcPanel.cpp" />
     <ClCompile Include="NSFEasyDialog.cpp" />
     <ClCompile Include="NSFFdsPanel.cpp" />
+    <ClCompile Include="NSFFME7Panel.cpp" />
     <ClCompile Include="NSFInfoDialog.cpp" />
     <ClCompile Include="NSFMaskDialog.cpp" />
     <ClCompile Include="NSFMemoryDialog.cpp" />
@@ -162,6 +163,8 @@
     <ClCompile Include="NSFPresetDialog.cpp" />
     <ClCompile Include="NSFTrackDialog.cpp" />
     <ClCompile Include="NSFTrackSetupDialog.cpp" />
+    <ClCompile Include="NSFVRC6Panel.cpp" />
+    <ClCompile Include="NSFVRC7Panel.cpp" />
     <ClCompile Include="nsf_setup.cpp" />
     <ClCompile Include="PresetManager.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -204,6 +207,7 @@ echo.
     <ClInclude Include="NSFDmcPanel.h" />
     <ClInclude Include="NSFEasyDialog.h" />
     <ClInclude Include="NSFFdsPanel.h" />
+    <ClInclude Include="NSFFME7Panel.h" />
     <ClInclude Include="NSFInfoDialog.h" />
     <ClInclude Include="NSFMaskDialog.h" />
     <ClInclude Include="NSFMemoryDialog.h" />
@@ -217,6 +221,8 @@ echo.
     <ClInclude Include="NSFPresetDialog.h" />
     <ClInclude Include="NSFTrackDialog.h" />
     <ClInclude Include="NSFTrackSetupDialog.h" />
+    <ClInclude Include="NSFVRC6Panel.h" />
+    <ClInclude Include="NSFVRC7Panel.h" />
     <ClInclude Include="nsf_setup.h" />
     <ClInclude Include="PresetManager.h" />
     <ClInclude Include="Resource.h" />
