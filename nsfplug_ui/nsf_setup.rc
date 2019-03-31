@@ -407,6 +407,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,35,150,10
     CONTROL         "非線形チャンネルミキサ有効(&N)",IDC_NONLINEAR_MIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,11,105,10
     CONTROL         "交換デューティ1/2",IDC_DUTY_SWAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,49,164,11
+    CONTROL         "INIT $4001, $4005 = $08 (Sweep unmute)",IDC_SWEEP_INIT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,61,164,11
 END
 #endif
 
@@ -1001,6 +1003,17 @@ BEGIN
 END
 #endif
 
+#if defined(APSTUDIO_INVOKED) || defined(JAPANESE)
+#if defined(APSTUDIO_INVOKED)
+IDD_APUPANEL$(JAPANESE) AFX_DIALOG_LAYOUT
+#else
+IDD_APUPANEL AFX_DIALOG_LAYOUT
+#endif
+BEGIN
+    0
+END
+#endif
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1268,6 +1281,8 @@ BEGIN
     CONTROL         "Use &non-linear channel mixer.",IDC_NONLINEAR_MIXER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,11,200,10
     CONTROL         "Swap &duty 1/2",IDC_DUTY_SWAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,45,191,10
+    CONTROL         "Initialize sweep unmute ($4001, $4005 = $08)",IDC_SWEEP_INIT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,191,10
 END
 
 IDD_INFOBOX2 DIALOGEX 0, 0, 216, 95
@@ -1697,6 +1712,11 @@ BEGIN
 END
 
 IDD_DMCPANEL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_APUPANEL AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

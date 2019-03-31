@@ -15,6 +15,7 @@ namespace xgm
         OPT_PHASE_REFRESH,
         OPT_NONLINEAR_MIXER,
         OPT_DUTY_SWAP,
+        OPT_NEGATE_SWEEP_INIT,
         OPT_END };
 
     enum

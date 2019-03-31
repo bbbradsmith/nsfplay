@@ -23,6 +23,7 @@ NSFApuPanel::NSFApuPanel(CWnd* pParent /*=NULL*/)
 	m_unmute_on_reset = TRUE;
 	m_nonlinear_mixer = TRUE;
 	m_duty_swap = FALSE;
+	m_sweep_init = FALSE;
 	//}}AFX_DATA_INIT
 }
 
@@ -35,6 +36,7 @@ void NSFApuPanel::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_UNMUTE_ON_RESET, m_unmute_on_reset);
 	DDX_Check(pDX, IDC_NONLINEAR_MIXER, m_nonlinear_mixer);
 	DDX_Check(pDX, IDC_DUTY_SWAP, m_duty_swap);
+	DDX_Check(pDX, IDC_SWEEP_INIT, m_sweep_init);
 	//}}AFX_DATA_MAP
 }
 
@@ -51,16 +53,18 @@ void NSFApuPanel::UpdateNSFPlayerConfig(bool b)
     m_phase_refresh   = pm->cf->GetDeviceOption(APU, NES_APU::OPT_PHASE_REFRESH).GetInt();
     m_nonlinear_mixer = pm->cf->GetDeviceOption(APU, NES_APU::OPT_NONLINEAR_MIXER).GetInt();
     m_duty_swap       = pm->cf->GetDeviceOption(APU, NES_APU::OPT_DUTY_SWAP).GetInt();
+    m_sweep_init      = pm->cf->GetDeviceOption(APU, NES_APU::OPT_NEGATE_SWEEP_INIT).GetInt();
     UpdateData(FALSE);
   }
   else
   {
     UpdateData(TRUE);
-    pm->cf->GetDeviceOption(APU, NES_APU::OPT_UNMUTE_ON_RESET) = m_unmute_on_reset;
-    pm->cf->GetDeviceOption(DMC, NES_DMC::OPT_UNMUTE_ON_RESET) = m_unmute_on_reset;
-    pm->cf->GetDeviceOption(APU, NES_APU::OPT_PHASE_REFRESH  ) = m_phase_refresh;
-    pm->cf->GetDeviceOption(APU, NES_APU::OPT_NONLINEAR_MIXER) = m_nonlinear_mixer;
-    pm->cf->GetDeviceOption(APU, NES_APU::OPT_DUTY_SWAP      ) = m_duty_swap;
+    pm->cf->GetDeviceOption(APU, NES_APU::OPT_UNMUTE_ON_RESET  ) = m_unmute_on_reset;
+    pm->cf->GetDeviceOption(DMC, NES_DMC::OPT_UNMUTE_ON_RESET  ) = m_unmute_on_reset;
+    pm->cf->GetDeviceOption(APU, NES_APU::OPT_PHASE_REFRESH    ) = m_phase_refresh;
+    pm->cf->GetDeviceOption(APU, NES_APU::OPT_NONLINEAR_MIXER  ) = m_nonlinear_mixer;
+    pm->cf->GetDeviceOption(APU, NES_APU::OPT_DUTY_SWAP        ) = m_duty_swap;
+    pm->cf->GetDeviceOption(APU, NES_APU::OPT_NEGATE_SWEEP_INIT) = m_sweep_init;
     pm->cf->Notify(APU);
   }
 }
@@ -71,6 +75,7 @@ BEGIN_MESSAGE_MAP(NSFApuPanel, CDialog)
 	ON_BN_CLICKED(IDC_UNMUTE_ON_RESET, OnUnmuteOnReset)
 	ON_BN_CLICKED(IDC_NONLINEAR_MIXER, OnNonlinearMixer)
 	ON_BN_CLICKED(IDC_DUTY_SWAP, OnDutySwap)
+	ON_BN_CLICKED(IDC_SWEEP_INIT, OnSweepInit)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -98,6 +103,11 @@ void NSFApuPanel::OnNonlinearMixer()
 }
 
 void NSFApuPanel::OnDutySwap() 
+{
+  //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(true);
+}
+
+void NSFApuPanel::OnSweepInit() 
 {
   //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(true);
 }

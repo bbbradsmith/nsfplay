@@ -24,6 +24,7 @@ public:
 	BOOL	m_unmute_on_reset;
 	BOOL	m_nonlinear_mixer;
 	BOOL	m_duty_swap;
+	BOOL	m_sweep_init;
 	//}}AFX_DATA
 
 public:
@@ -46,6 +47,7 @@ protected:
 	afx_msg void OnFreqLimit();
 	afx_msg void OnNonlinearMixer();
 	afx_msg void OnDutySwap();
+	afx_msg void OnSweepInit();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

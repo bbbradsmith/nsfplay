@@ -168,6 +168,7 @@
 #define IDC_DUTY_SWAP                   2039
 #define IDC_LIMIT_WAVELENGTH            2039
 #define ID_TRKINFO                      2040
+#define IDC_SWEEP_INIT                  2040
 #define IDD_TRKINFO_SETUP               2058
 #define IDB_DIGIT                       2062
 #define IDB_KEYBOARD                    2063
@@ -234,9 +235,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2102
+#define _APS_NEXT_RESOURCE_VALUE        2104
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         2040
+#define _APS_NEXT_CONTROL_VALUE         2041
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

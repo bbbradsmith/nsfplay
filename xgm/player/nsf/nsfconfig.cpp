@@ -160,7 +160,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
 
     static const int DEFAULT_DEVICE_OPTION[NES_DEVICE_MAX][16] =
     {
-        { 1, 1, 1, 0 },
+        { 1, 1, 1, 0, 0 },
         { 1, 1, 1, 0, 1, 1, 1 },
         {},
         { 1, 1 },

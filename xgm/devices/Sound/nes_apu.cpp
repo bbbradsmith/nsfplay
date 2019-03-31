@@ -188,6 +188,7 @@ namespace xgm
     option[OPT_PHASE_REFRESH] = true;
     option[OPT_NONLINEAR_MIXER] = true;
     option[OPT_DUTY_SWAP] = false;
+    option[OPT_NEGATE_SWEEP_INIT] = false;
 
     square_table[0] = 0;
     for(int i=1;i<32;i++) 
@@ -228,6 +229,11 @@ namespace xgm
     Write (0x4015, 0);
     if (option[OPT_UNMUTE_ON_RESET])
       Write (0x4015, 0x0f);
+    if (option[OPT_NEGATE_SWEEP_INIT])
+    {
+      Write (0x4001, 0x08);
+      Write (0x4005, 0x08);
+    }
 
     for (i = 0; i < 2; i++)
       out[i] = 0;
