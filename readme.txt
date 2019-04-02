@@ -17,3 +17,5 @@ nsfplay AT rainwarrior.ca
 http://rainwarrior.ca
 
 Original NSFPlay/NFSPlug project available at: http://www.pokipoki.org/dsa/
+
+Appveyor Test
