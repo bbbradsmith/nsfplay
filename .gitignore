@@ -5,6 +5,7 @@ nsfplug_ui/hlp/nsfplug.chm
 distribute/nsfplay.exe
 distribute/plugins/in_yansf.dll
 distribute/plugins/nsfplug_ui.dll
+artifact
 
 # Visual Studio
 # user files
