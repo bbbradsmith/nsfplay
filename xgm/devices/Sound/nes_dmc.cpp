@@ -270,7 +270,8 @@ namespace xgm
 				if (dlength > 0)
 				{
 					memory->Read (daddress, data);
-					cpu->StealCycles(2); // DMC read takes 2 CPU cycles
+					cpu->StealCycles(4); // DMC read takes 3 or 4 CPU cycles, usually 4
+					// (checking for the 3-cycle case would require sub-instruction emulation)
 					data |= (data&0xFF)|0x10000; // read 8 bits, use an extra bit to signal end of data
 					empty = false;
 					daddress = ((daddress+1)&0xFFFF)|0x8000 ;
