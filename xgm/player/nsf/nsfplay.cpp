@@ -811,7 +811,7 @@ void NSFPlayer::SetPlayFreq (double r)
     {
         // millibels difference between device "square" and APU square
         0,    // APU (1x)
-        -220, // DMC
+        -20, // DMC
         0,    // VRC6 (1x)
         1340, // VRC7
         690,  // FDS (~2.4x)

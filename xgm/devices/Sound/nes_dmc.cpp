@@ -410,11 +410,13 @@ namespace xgm
   // Initializing TRI, NOISE, DPCM mixing table
   void NES_DMC::InitializeTNDTable(double wt, double wn, double wd) {
 
-    // volume adjusted by 0.75 based on empirical measurements
-    const double MASTER = 8192.0 * 0.75;
+    // volume adjusted by 0.95 based on empirical measurements
+    const double MASTER = 8192.0 * 0.95;
     // truthfully, the nonlinear curve does not appear to match well
-    // with my tests, triangle in particular seems too quiet relatively.
-    // do more testing of the APU/DMC DAC later
+    // with my tests. Do more testing of the APU/DMC DAC later.
+    // this value keeps the triangle consistent with measured levels,
+    // but not necessarily the rest of this APU channel,
+    // because of the lack of a good DAC model, currently.
 
     { // Linear Mixer
       for(int t=0; t<16 ; t++) {

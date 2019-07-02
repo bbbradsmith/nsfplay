@@ -164,6 +164,7 @@ NSFPlay 2.5 beta - ???
 - Negate sweep init option (compatibility with old SuperNSF, etc. that relies on nonstandard sweep init).
 - Option to force VRC7 replacement with YM2413 (OPLL).
 - DPCM read delay adjusted (4 cycles is a more accurate approximation than 2).
+- Default volume of APU 2 raised to match measured triangle volumes.
 
 NSFPlay 2.4 - 3/30/2019
 - Fixed incorrect bytes per second in stereo WAV output.
