@@ -177,10 +177,10 @@ namespace xgm
   {
     static UINT32 tritbl[32] = 
     {
+     15,14,13,12,11,10, 9, 8,
+      7, 6, 5, 4, 3, 2, 1, 0,
       0, 1, 2, 3, 4, 5, 6, 7,
       8, 9,10,11,12,13,14,15,
-     15,14,13,12,11,10, 9, 8,
-      7, 6, 5, 4, 3, 2, 1, 0
     };
 
     if (linear_counter > 0 && length_counter[0] > 0
@@ -207,7 +207,7 @@ namespace xgm
     UINT32 env = envelope_disable ? noise_volume : envelope_counter;
     if (length_counter[1] < 1) env = 0;
 
-    UINT32 last = (noise & 0x4000) ? env : 0;
+    UINT32 last = (noise & 0x4000) ? 0 : env;
     if (clocks < 1) return last;
 
     // simple anti-aliasing (noise requires it, even when oversampling is off)
@@ -224,7 +224,7 @@ namespace xgm
 
         ++count;
         accum += last;
-        last = (noise & 0x4000) ? env : 0;
+        last = (noise & 0x4000) ? 0 : env;
 
         counter[1] -= nfreq;
     }
