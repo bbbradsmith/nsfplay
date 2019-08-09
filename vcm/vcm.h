@@ -3,6 +3,7 @@
 //
 // Versatile Configuration Management Library
 //
+#include <stdexcept>
 #include <string>
 #include <map>
 #include <deque>
