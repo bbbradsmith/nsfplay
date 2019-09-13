@@ -267,6 +267,10 @@ void NSFInfoDialog::SetInfo(char *fn)
     GetDlgItem(IDC_INFO)->SetWindowText("Not a NSF file");
     return;
   }
+  if(CONFIG["NSFE_PLAYLIST"] && nsf.nsfe_plst)
+  {
+    nsf.songs = nsf.nsfe_plst_size;
+  }
 
   SetInfo(&nsf);
 }

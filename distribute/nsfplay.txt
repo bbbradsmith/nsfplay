@@ -166,6 +166,7 @@ NSFPlay 2.5 beta - ???
 - DPCM read delay adjusted (4 cycles is a more accurate approximation than 2).
 - Default volume of APU 2 raised to match measured triangle volumes.
 - Fixed triangle and noise being logically inverted.
+- Fixed error in track selector length when using NSFe playlists.
 
 NSFPlay 2.4 - 3/30/2019
 - Fixed incorrect bytes per second in stereo WAV output.
