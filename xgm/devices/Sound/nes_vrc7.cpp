@@ -30,17 +30,7 @@ namespace xgm
 
   void NES_VRC7::SetPatchSet(int p)
   {
-    switch (p) {
-    case 7:
-      patch_set = OPLL_2413_TONE;
-      break;
-    case 8:
-      patch_set = OPLL_281B_TONE;
-      break;
-    default:
-      patch_set = OPLL_VRC7_TONE;
-      break;
-    }
+    patch_set = p;
   }
 
   void NES_VRC7::SetPatchSetCustom (const UINT8* pset)
