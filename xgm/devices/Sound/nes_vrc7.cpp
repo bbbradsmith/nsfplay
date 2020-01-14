@@ -5,7 +5,7 @@ namespace xgm
   NES_VRC7::NES_VRC7 ()
   {
     use_all_channels = false;
-    patch_set = OPLL_VRC7_RW_TONE;
+    patch_set = OPLL_VRC7_TONE;
     patch_custom = NULL;
 
     opll = OPLL_new ( 3579545, DEFAULT_RATE);
@@ -30,7 +30,17 @@ namespace xgm
 
   void NES_VRC7::SetPatchSet(int p)
   {
-    patch_set = p;
+    switch (p) {
+    case 7:
+      patch_set = OPLL_2413_TONE;
+      break;
+    case 8:
+      patch_set = OPLL_281B_TONE;
+      break;
+    default:
+      patch_set = OPLL_VRC7_TONE;
+      break;
+    }
   }
 
   void NES_VRC7::SetPatchSetCustom (const UINT8* pset)
@@ -49,7 +59,7 @@ namespace xgm
     (void)r; // rate is ignored
     rate = 49716;
     OPLL_set_quality(opll, 1); // quality always on (not really a CPU hog)
-    OPLL_set_rate(opll,(e_uint32)rate);
+    OPLL_set_rate(opll,(uint32_t)rate);
   }
 
   void NES_VRC7::SetOption (int id, int val)
@@ -70,8 +80,13 @@ namespace xgm
 
     divider = 0;
     OPLL_reset_patch (opll, patch_set);
-    if (patch_custom)
-        OPLL_reset_patch_custom_VRC7(opll, patch_custom);
+    if (patch_custom) 
+    {
+      uint8_t dump[19 * 8];
+      memcpy(dump, patch_custom, 16 * 8);
+      memset(dump + 16 * 8, 0, 3 * 8);
+      OPLL_setPatch(opll, dump);
+    }
     OPLL_reset (opll);
   }
 
@@ -96,9 +111,7 @@ namespace xgm
       trkinfo[trk].freq = clock*trkinfo[trk]._freq/(double)(0x80000>>blk);
       trkinfo[trk].tone = (opll->reg[0x30+trk]>>4)&15;
       //trkinfo[trk].key = (opll->reg[0x20+trk]&0x10)?true:false;
-      trkinfo[trk].key = (opll->key_status[trk])?true:false;
-      if      (trk == 7) trkinfo[trk].key |= ((opll->slot_on_flag[14] | opll->slot_on_flag[15]) !=0);
-      else if (trk == 8) trkinfo[trk].key |= ((opll->slot_on_flag[16] | opll->slot_on_flag[17]) !=0);
+      trkinfo[trk].key = opll->slot_key_status & (3 << trk)?true:false;
       return &trkinfo[trk];
     }
     else
@@ -141,7 +154,7 @@ namespace xgm
     b[0] = b[1] = 0;
     for (int i=0; i < 6; ++i)
     {
-        INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
+        INT32 val = (mask & (1<<i)) ? 0 : opll->ch_out[i] >> 4;
         b[0] += val * sm[0][i];
         b[1] += val * sm[1][i];
     }
@@ -151,14 +164,20 @@ namespace xgm
     {
         for (int i=6; i < 9; ++i)
         {
-            INT32 val = (mask & (1<<i)) ? 0 : opll->slot[(i<<1)|1].output[1];
+            if (mask & (1<<i)) continue;
+            
+            INT32 val;
             if (opll->patch_number[i] > 15) // rhytm mode
             {
-                //      (i == 6) bass drum is normal 2-op, but double volume
-                if      (i == 7) val = opll->out_hat - opll->out_snare;
-                else if (i == 8) val = opll->out_tom - opll->out_cym;
-                val <<= 1;
+              if      (i == 6) val = opll->ch_out[9]; // BD
+              else if (i == 7) val = opll->ch_out[10] + opll->ch_out[11]; // HH&SD
+              else if (i == 8) val = opll->ch_out[12] + opll->ch_out[13]; // TOM&CYM
             }
+            else
+            {
+              val = opll->ch_out[i];
+            }
+            val >>= 4;
             b[0] += val * sm[0][i];
             b[1] += val * sm[1][i];
         }
