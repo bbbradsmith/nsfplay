@@ -59,31 +59,31 @@ Lagrange point filter analysis by kevtris:
 
 static const uint8_t DEFAULT_INST[VRC7_NUM_PATCH_SETS][(16 + 3) * 16] = {
   {
-#include "patch-sets/vrc7tone_nuke.h"
+#include "vrc7tone_nuke.h"
   },
   {
-#include "patch-sets/vrc7tone_rw.h"
+#include "vrc7tone_rw.h"
   },
   {
-#include "patch-sets/vrc7tone_ft36.h"
+#include "vrc7tone_ft36.h"
   },
   {
-#include "patch-sets/vrc7tone_ft35.h"
+#include "vrc7tone_ft35.h"
   },
   {
-#include "patch-sets/vrc7tone_mo.h"
+#include "vrc7tone_mo.h"
   },
   {
-#include "patch-sets/vrc7tone_kt2.h"
+#include "vrc7tone_kt2.h"
   },
   {
-#include "patch-sets/vrc7tone_kt1.h"
+#include "vrc7tone_kt1.h"
   },
   {
-#include "patch-sets/2413tone.h" 
+#include "2413tone.h" 
   },
   {
-#include "patch-sets/281btone.h"
+#include "281btone.h"
   },
 };
 

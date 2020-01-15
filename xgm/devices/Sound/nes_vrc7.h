@@ -1,13 +1,19 @@
 #ifndef _NES_VRC7_H_
 #define _NES_VRC7_H_
 #include "../device.h"
-#include "../../../../VRC7-sound/VRC7-sound/vrc7_sound.h"
+#include "legacy/vrc7_sound.h"
 
 namespace xgm
 {
 
   class NES_VRC7 : public ISoundChip
   {
+  public:
+    enum
+    {
+      OPT_OPLL=0, // not functional in VRC7-Sound
+      OPT_END,
+    };
   protected:
     int mask;
     int patch_set;
