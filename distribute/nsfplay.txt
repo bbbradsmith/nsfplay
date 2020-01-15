@@ -167,7 +167,7 @@ NSFPlay 2.5 beta - ???
 - Default volume of APU 2 raised to match measured triangle volumes.
 - Fixed triangle and noise being logically inverted.
 - Fixed error in track selector length when using NSFe playlists.
-- Integrated VRC7 (YM2143) emulation update from Mitsutaka Okazaki.
+- Integrated VRC7-Sound emulation from 0xJonas: https://github.com/0xJonas/VRC7-Sound
 
 NSFPlay 2.4 - 3/30/2019
 - Fixed incorrect bytes per second in stereo WAV output.
