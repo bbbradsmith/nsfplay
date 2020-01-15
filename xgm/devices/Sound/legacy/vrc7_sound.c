@@ -57,7 +57,7 @@ Lagrange point filter analysis by kevtris:
 //1 + 240,000 / 4,300
 #define VRC7_AMPLIFIER_GAIN 56.81395349
 
-static const uint8_t DEFAULT_INST[VRC7_NUM_PATCH_SETS][(16 + 3) * 16] = {
+static const uint8_t DEFAULT_INST[VRC7_NUM_PATCH_SETS][(16 + 3) * 8] = {
   {
 #include "vrc7tone_nuke.h"
   },
@@ -942,7 +942,7 @@ VRC7SOUND_API void vrc7_reg_to_patch(const uint8_t *reg, struct vrc7_patch *patc
 }
 
 VRC7SOUND_API void vrc7_get_default_patch(int set, uint32_t index, struct vrc7_patch *patch) {
-	const uint8_t *start = DEFAULT_INST[set] + index * 16 * sizeof(unsigned char);
+	const uint8_t *start = DEFAULT_INST[set] + index * 8 * sizeof(unsigned char);
 	vrc7_reg_to_patch(start, patch);
 }
 
