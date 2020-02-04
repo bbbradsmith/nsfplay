@@ -11,7 +11,7 @@
 #define External __inline
 #include "km6502/km6502m.h"
 
-#include "../misc/log_cpu.h"
+#include "../Misc/log_cpu.h"
 
 namespace xgm
 {
