@@ -1,6 +1,6 @@
 #define OP__(i) \
-	case 0x##i##: \
-		Opcode##i##(__THISP); \
+	case 0x##i: \
+		Opcode##i(__THISP); \
 		break;
 
 /* BS - option to disable decimal execution for NES */
@@ -8,34 +8,34 @@
 #define OP_d OP__
 #else
 #define OP_d(i) \
-	case 0x##i##: \
+	case 0x##i: \
 		if (__THIS__.P & D_FLAG) \
-			D_Opco##i##(__THISP); \
+			D_Opco##i(__THISP); \
 		else \
-			Opcode##i##(__THISP); \
+			Opcode##i(__THISP); \
 		break;
 #endif
 
 #if BUILD_HUC6280
 #define OPtd(i) \
-	case 0x##i##: \
+	case 0x##i: \
 		if (__THIS__.P & T_FLAG) \
 			if (__THIS__.P & D_FLAG) \
-				TD_Opc##i##(__THISP); \
+				TD_Opc##i(__THISP); \
 			else \
-				T_Opco##i##(__THISP); \
+				T_Opco##i(__THISP); \
 		else \
 			if (__THIS__.P & D_FLAG) \
-				D_Opco##i##(__THISP); \
+				D_Opco##i(__THISP); \
 			else \
-				Opcode##i##(__THISP); \
+				Opcode##i(__THISP); \
 		break;
 #define OPt_(i) \
-	case 0x##i##: \
+	case 0x##i: \
 		if (__THIS__.P & T_FLAG) \
-			T_Opco##i##(__THISP); \
+			T_Opco##i(__THISP); \
 		else \
-			Opcode##i##(__THISP); \
+			Opcode##i(__THISP); \
 		break;
 #else
 #define OPtd OP_d
@@ -45,8 +45,8 @@
 /* BS - allowing illegal opcode implementation */
 #if ILLEGAL_OPCODES
 #define OPxx(i) \
-	case 0x##i##: \
-		Opcode##i##(__THISP); \
+	case 0x##i: \
+		Opcode##i(__THISP); \
 		__THIS__.illegal = 1; \
 		break;
 #else
