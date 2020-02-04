@@ -3,10 +3,10 @@
 #include "nsfconfig.h"
 #include "nsfplay.h"
 
-#include "../../devices/sound/nes_apu.h"
-#include "../../devices/sound/nes_dmc.h"
-#include "../../devices/sound/nes_fds.h"
-#include "../../devices/sound/nes_mmc5.h"
+#include "../../devices/Sound/nes_apu.h"
+#include "../../devices/Sound/nes_dmc.h"
+#include "../../devices/Sound/nes_fds.h"
+#include "../../devices/Sound/nes_mmc5.h"
 
 using namespace xgm;
 
