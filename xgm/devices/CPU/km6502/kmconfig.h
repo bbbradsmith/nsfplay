@@ -36,8 +36,8 @@ typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
 #endif
 #define CCall __cdecl
 #define FastCall __fastcall
-#define RTO16(w) ((Uword)(w & 0xFFFF))	/* Round to 16bit integer */
-#define RTO8(w) ((Uword)(w & 0xFF))		/* Round to  8bit integer */
+#define RTO16(w) ((Uword)((w) & 0xFFFF))	/* Round to 16bit integer */
+#define RTO8(w) ((Uword)((w) & 0xFF))		/* Round to  8bit integer */
 #elif defined(__BORLANDC__)
 typedef unsigned int Uword;				/* (0-0xFFFF) */
 typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
@@ -46,8 +46,8 @@ typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
 #endif
 #define CCall __cdecl
 #define FastCall
-#define RTO16(w) ((Uword)(w & 0xFFFF))	/* Round to 16bit integer */
-#define RTO8(w) ((Uword)(w & 0xFF))		/* Round to  8bit integer */
+#define RTO16(w) ((Uword)((w) & 0xFFFF))	/* Round to 16bit integer */
+#define RTO8(w) ((Uword)((w) & 0xFF))		/* Round to  8bit integer */
 #elif defined(__GNUC__)
 typedef unsigned int Uword;				/* (0-0xFFFF) */
 typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
@@ -56,8 +56,8 @@ typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
 #endif
 #define CCall
 #define FastCall /* __attribute__((regparm(2))) */
-#define RTO16(w) ((Uword)(w & 0xFFFF))	/* Round to 16bit integer */
-#define RTO8(w) ((Uword)(w & 0xFF))		/* Round to  8bit integer */
+#define RTO16(w) ((Uword)((w) & 0xFFFF))	/* Round to 16bit integer */
+#define RTO8(w) ((Uword)((w) & 0xFF))		/* Round to  8bit integer */
 #else
 typedef unsigned int Uword;				/* (0-0xFFFF) */
 typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
@@ -70,8 +70,8 @@ typedef unsigned char Ubyte;			/* unsigned 8bit integer for table */
 #ifndef FastCall
 #define FastCall
 #endif
-#define RTO16(w) ((Uword)(w & 0xFFFF))	/* Round to 16bit integer */
-#define RTO8(w) ((Uword)(w & 0xFF))		/* Round to  8bit integer */
+#define RTO16(w) ((Uword)((w) & 0xFFFF))	/* Round to 16bit integer */
+#define RTO8(w) ((Uword)((w) & 0xFF))		/* Round to  8bit integer */
 #endif
 
 #define Callback FastCall
