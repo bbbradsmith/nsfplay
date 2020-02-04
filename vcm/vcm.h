@@ -11,7 +11,28 @@
 #include <list>
 #include <set>
 
+#if (defined(_MSC_VER) || defined(__MINGW32__))
 #include <windows.h> // for thread safety
+#define VCM_MUTEX_TYPE HANDLE
+#define VCM_MUTEX_LOCK(m) ::WaitForSingleObject(m,INFINITE)
+#define VCM_MUTEX_UNLOCK(m) ::ReleaseMutex(m)
+#define VCM_MUTEX_INIT(m) m = ::CreateMutex(NULL, false, NULL)
+#define VCM_MUTEX_DESTROY(m) ::CloseHandle(m)
+#elif __cplusplus >= 201103L
+#include <mutex>
+#define VCM_MUTEX_TYPE std::mutex
+#define VCM_MUTEX_LOCK(m) m.lock()
+#define VCM_MUTEX_UNLOCK(m) m.unlock()
+#define VCM_MUTEX_INIT(m)
+#define VCM_MUTEX_DESTROY(m)
+#else
+#include <pthread.h>
+#define VCM_MUTEX_TYPE pthread_mutex_t
+#define VCM_MUTEX_LOCK(m) pthread_mutex_lock(&(m))
+#define VCM_MUTEX_UNLOCK(m) pthread_mutex_unlock(&(m))
+#define VCM_MUTEX_INIT(m) pthread_mutex_init(&(m),NULL)
+#define VCM_MUTEX_DESTROY(m) pthread_mutex_destroy(&(m))
+#endif
 
 namespace vcm
 {
@@ -93,24 +114,24 @@ namespace vcm
     std::map < std::string, Value > data;
 
     // thread safety
-    HANDLE mutex;
+    VCM_MUTEX_TYPE mutex;
     class MutexGuard {
       protected:
         Configuration *c;
       public:
-        MutexGuard(Configuration* c_) { c = c_; ::WaitForSingleObject(c->mutex, INFINITE); }
-        ~MutexGuard() { ::ReleaseMutex(c->mutex); }
+        MutexGuard(Configuration* c_) { c = c_; VCM_MUTEX_LOCK(c->mutex); }
+        ~MutexGuard() { VCM_MUTEX_UNLOCK(c->mutex); }
     };
 
   public:
     // thread safety
     Configuration()
     {
-      mutex = ::CreateMutex(NULL, false, NULL);
+      VCM_MUTEX_INIT(mutex);
     }
     ~Configuration()
     {
-      ::CloseHandle(mutex);
+      VCM_MUTEX_DESTROY(mutex);
     }
 
     // 値を読む．無ければエラー．
