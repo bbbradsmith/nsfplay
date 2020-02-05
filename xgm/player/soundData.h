@@ -3,6 +3,7 @@
 
 #include "../xtypes.h"
 #include "../debugout.h"
+#include <stddef.h>
 
 namespace xgm
 {
