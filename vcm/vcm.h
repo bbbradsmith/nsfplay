@@ -18,7 +18,23 @@
 #define VCM_MUTEX_UNLOCK(m) ::ReleaseMutex(m)
 #define VCM_MUTEX_INIT(m) m = ::CreateMutex(NULL, false, NULL)
 #define VCM_MUTEX_DESTROY(m) ::CloseHandle(m)
-#elif __cplusplus >= 201103L
+#define vcm_itoa(v,s,b) ::itoa(v,s,b)
+#else
+static char *vcm_itoa(int value, char *str, int base) {
+    const char *oct_fmt = "%o";
+    const char *dec_fmt = "%d";
+    const char *hex_fmt = "%x";
+    const char *fmt;
+    switch(base) {
+        case 8: fmt = oct_fmt; break;
+        case 10: fmt = dec_fmt; break;
+        case 16: fmt = hex_fmt; break;
+        default: return NULL;
+    }
+    sprintf(str,fmt,value);
+    return str;
+}
+#if __cplusplus >= 201103L
 #include <mutex>
 #define VCM_MUTEX_TYPE std::mutex
 #define VCM_MUTEX_LOCK(m) m.lock()
@@ -32,6 +48,7 @@
 #define VCM_MUTEX_UNLOCK(m) pthread_mutex_unlock(&(m))
 #define VCM_MUTEX_INIT(m) pthread_mutex_init(&(m),NULL)
 #define VCM_MUTEX_DESTROY(m) pthread_mutex_destroy(&(m))
+#endif
 #endif
 
 namespace vcm

@@ -119,7 +119,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   {
       std::string str;
       char num[5];
-      ::itoa(i, num, 10);
+      vcm_itoa(i, num, 10);
       str = "CHANNEL_";
       if (i < 10) str += "0";
       str += num;

@@ -40,7 +40,7 @@ namespace xgm
       if (id < 0) id = 0;
       if (id >= NES_CHANNEL_MAX) id = NES_CHANNEL_MAX-1;
       char num[5];
-      ::itoa(id, num, 10);
+      vcm_itoa(id, num, 10);
       std::string str;
       str = "CHANNEL_";
       if (id < 10) str += "0";
