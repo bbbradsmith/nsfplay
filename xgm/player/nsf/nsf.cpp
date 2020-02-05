@@ -1,4 +1,9 @@
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <windows.h>
+#else
+#define stricmp strcasecmp
+#endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -258,6 +263,8 @@ static int is_sjis_prefix(int c)
     UINT8 *buf = NULL;          //MAX 256KB
     PLSITEM *pls = NULL;
     int size, rsize;
+    const char *ext;
+    const char *ext_next;
     nsf_error = "";
     nsfe_error = "";
 
@@ -269,10 +276,9 @@ static int is_sjis_prefix(int c)
     }
 
     // find last . in filename
-    const char* ext = strchr(fn,'.');
+    ext = strchr(fn,'.');
     if (ext)
     {
-      const char* ext_next;
       while (ext_next = strchr(ext+1,'.')) ext = ext_next;
     }
     else ext = "";
