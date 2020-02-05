@@ -149,7 +149,7 @@ int NES_CPU::Exec (int clocks)
 				if (fclocks_left_in_frame < 0)
 					context.clock = 0;
 				else
-					context.clock = unsigned int(fclocks_left_in_frame >> FRAME_FIXED)+1;
+					context.clock = (unsigned int)(fclocks_left_in_frame >> FRAME_FIXED)+1;
 			}
 			else
 				context.clock = clocks;
