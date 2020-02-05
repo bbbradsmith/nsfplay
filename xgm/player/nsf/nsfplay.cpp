@@ -10,7 +10,7 @@ namespace xgm
   {
     nsf = NULL;
 
-    const type_info &ti = typeid(this);
+    const std::type_info &ti = typeid(this);
     sc[APU] = (apu = new NES_APU());
     sc[DMC] = (dmc = new NES_DMC());
     sc[FDS] = (fds = new NES_FDS());
@@ -122,7 +122,7 @@ namespace xgm
     // select the loop detector
     if((*config)["DETECT_ALT"])
     {
-      const type_info &ti = typeid(ld);
+      const std::type_info &ti = typeid(ld);
       if(strcmp(ti.name(),"NESDetectorEx")!=0)
       {
         delete ld;
@@ -131,7 +131,7 @@ namespace xgm
     }
     else
     {
-      const type_info &ti = typeid(ld);
+      const std::type_info &ti = typeid(ld);
       if(strcmp(ti.name(),"NESDetector")!=0)
       {
         delete ld;
