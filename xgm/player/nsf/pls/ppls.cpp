@@ -7,8 +7,10 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <crtdbg.h>
+#else
+#define stricmp strcasecmp
 #endif
 
 #include "ppls.h"
