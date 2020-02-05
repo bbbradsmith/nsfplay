@@ -2,7 +2,7 @@
 #define _NES_DMC_H_
 
 #include "../device.h"
-#include "../audio/MedianFilter.h"
+#include "../Audio/MedianFilter.h"
 #include "../CPU/nes_cpu.h"
 
 namespace xgm
