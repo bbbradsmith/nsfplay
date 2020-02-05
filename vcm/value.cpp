@@ -51,14 +51,14 @@ void Value::SetInt( int i )
 {
   char buf[16];
   this->update = true;
-  this->data = itoa( i, buf, 10 );
+  this->data = vcm_itoa( i, buf, 10 );
 }
 
 Value &Value::operator = ( int i )
 {
   char buf[16];
   this->update = true;
-  this->data = itoa( i, buf, 10 );
+  this->data = vcm_itoa( i, buf, 10 );
   return *this;
 }
 
