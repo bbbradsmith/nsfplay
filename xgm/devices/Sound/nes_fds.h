@@ -31,7 +31,7 @@ protected:
     int option[OPT_END];
 
     bool master_io;
-    UINT master_vol;
+    UINT32 master_vol;
     UINT32 last_freq; // for trackinfo
     UINT32 last_vol;  // for trackinfo
 
