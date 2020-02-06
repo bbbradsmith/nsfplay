@@ -4,7 +4,7 @@
 #include <crtdbg.h>
 #include <stdio.h>
 #include <assert.h>
-#include "../../player.h"
+#include "player/player.h"
 extern "C"
 {
 #include "sdk/IN2.H"

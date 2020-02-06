@@ -3,6 +3,7 @@
 #include "xgm.h"
 #include "utils/nsf_tag.h"
 #include "nsfplug_ui.h"
+#include "in_module.h"
 
 class WA2NSF : public WA2InputModuleMSP
 {

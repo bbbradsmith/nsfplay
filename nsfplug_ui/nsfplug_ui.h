@@ -1,6 +1,7 @@
 #ifndef _NSFPLUG_UI_
 #define _NSFPLUG_UI_
 #include "xgm.h"
+#include "in_module.h"
 
 class NSFplug_Model
 {
