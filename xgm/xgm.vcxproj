@@ -170,14 +170,7 @@
     <ClInclude Include="player\nsf\pls\ppls.h" />
     <ClInclude Include="player\nsf\pls\sstream.h" />
     <ClInclude Include="player\player.h" />
-    <ClInclude Include="player\plugin\kbmedia\plugin.h" />
-    <ClInclude Include="player\plugin\kbmedia\sdk\kmp_pi.h" />
-    <ClInclude Include="player\plugin\winamp2\in_module.h" />
-    <ClInclude Include="player\plugin\winamp2\sdk\FRONTEND.H" />
-    <ClInclude Include="player\plugin\winamp2\sdk\IN2.H" />
-    <ClInclude Include="player\plugin\winamp2\sdk\OUT.H" />
     <ClInclude Include="player\soundData.h" />
-    <ClInclude Include="utils\nsf_tag.h" />
     <ClInclude Include="utils\tagctrl.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="xgm.h" />
@@ -213,9 +206,6 @@
     <ClCompile Include="player\nsf\nsfplay.cpp" />
     <ClCompile Include="player\nsf\pls\ppls.cpp" />
     <ClCompile Include="player\nsf\pls\sstream.cpp" />
-    <ClCompile Include="player\plugin\winamp2\in_module.cpp" />
-    <ClCompile Include="player\plugin\winamp2\in_module_msp.cpp" />
-    <ClCompile Include="utils\nsf_tag.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
