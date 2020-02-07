@@ -5,6 +5,7 @@
 #include "utils/nsf_tag.h"
 #include "debugout.h"
 #include "nsfplug_ui.h"
+#include "plugin/kbmedia/plugin.h"
 
 
 class KMP_NSF : public xgm::KbMediaPluginMSP

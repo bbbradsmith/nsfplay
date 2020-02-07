@@ -2,7 +2,7 @@
 #define _KBM_PLUGIN_H_
 #include <windows.h>
 #include "sdk/kmp_pi.h"
-#include "../../player.h"
+#include "../../../xgm/player/player.h"
 
 namespace xgm
 {
