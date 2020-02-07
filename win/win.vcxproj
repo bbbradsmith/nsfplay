@@ -71,6 +71,8 @@
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -116,11 +118,13 @@
     <ClInclude Include="plugin\winamp2\sdk\IN2.H" />
     <ClInclude Include="plugin\winamp2\sdk\OUT.H" />
     <ClInclude Include="nsf_tag.h" />
+    <ClInclude Include="nsfconfig_ini.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="plugin\winamp2\in_module.cpp" />
     <ClCompile Include="plugin\winamp2\in_module_msp.cpp" />
     <ClCompile Include="nsf_tag.cpp" />
+    <ClCompile Include="nsfconfig_ini.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

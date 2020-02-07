@@ -15,10 +15,6 @@ namespace xgm
   public:
     NSFPlayerConfig ();
     virtual ~NSFPlayerConfig();
-    virtual bool Load(const char * path, const char *sect);
-    virtual bool Save(const char * path, const char *sect);
-    virtual bool Load(const char * path, const char *sect, const char *name);
-    virtual bool Save(const char * path, const char *sect, const char *name);
 
     vcm::Value& GetDeviceConfig(int i, std::string key)
     {

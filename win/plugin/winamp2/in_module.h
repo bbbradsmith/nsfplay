@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "../../../xgm/player/player.h"
+
 extern "C"
 {
 #include "sdk/IN2.H"
