@@ -4,18 +4,19 @@
 #include "utils/nsf_tag.h"
 #include "nsfplug_ui.h"
 #include "plugin/winamp2/in_module.h"
+#include "nsfconfig_ini.h"
 
 class WA2NSF : public WA2InputModuleMSP
 {
 protected:
   xgm::NSFPlayer *pl;
-  xgm::NSFPlayerConfig *cf;
+  xgm::NSFPlayerConfigIni *cf;
   xgm::NSF *sdat;
   NSFplug_UI *ui;
   NSF_TAG *ntag;
 
 public:
-  WA2NSF(xgm::NSFPlayer *p, xgm::NSFPlayerConfig *c, xgm::NSF *s) 
+  WA2NSF(xgm::NSFPlayer *p, xgm::NSFPlayerConfigIni *c, xgm::NSF *s)
     : pl(p), cf(c), sdat(s), WA2InputModuleMSP(p,c,s)
   {
     ntag = new NSF_TAG(s);

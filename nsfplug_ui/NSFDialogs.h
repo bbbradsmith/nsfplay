@@ -42,7 +42,7 @@ public:
   NSFDialogManager(NSFplug_Model *, int mode);
   virtual ~NSFDialogManager();
   virtual NSFPlayer *GetPlayer(){ return pm->pl; }
-  virtual NSFPlayerConfig *GetConfig(){ return pm->cf; }
+  virtual NSFPlayerConfigIni *GetConfig(){ return pm->cf; }
   virtual void UpdateNSFPlayerConfig(bool b);
   virtual void SetPlayerWindow(HWND hwnd);
   virtual void SetWA2InputModule(WA2InputModule *p){ wa2mod = p; }

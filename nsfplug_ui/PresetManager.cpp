@@ -54,7 +54,7 @@ void PresetManager::Reset(const CString &filepath)
 }
 
 bool
-PresetManager::CreatePreset( xgm::NSFPlayerConfig *cfg, const CString &name )
+PresetManager::CreatePreset( xgm::NSFPlayerConfigIni *cfg, const CString &name )
 {
   CString sect;
 
@@ -90,7 +90,7 @@ PresetManager::DeletePreset( const CString &name )
 }
 
 bool
-PresetManager::LoadPreset(xgm::NSFPlayerConfig *cfg, const CString &name)
+PresetManager::LoadPreset(xgm::NSFPlayerConfigIni *cfg, const CString &name)
 {
   for(int i=0;preset_range[i]!=NULL;i++)
     cfg->Load(path, presetName2Sect[name], preset_range[i]);
@@ -100,7 +100,7 @@ PresetManager::LoadPreset(xgm::NSFPlayerConfig *cfg, const CString &name)
 }
 
 bool
-PresetManager::SavePreset(xgm::NSFPlayerConfig *cfg, const CString &name)
+PresetManager::SavePreset(xgm::NSFPlayerConfigIni *cfg, const CString &name)
 {
   for(int i=0;preset_range[i]!=NULL;i++)
     cfg->Save(path, presetName2Sect[name], preset_range[i]);

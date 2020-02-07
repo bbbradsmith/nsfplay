@@ -15,11 +15,6 @@ namespace xgm {
    */
   class PlayerConfig : public vcm::Configuration
   {
-  public:
-    virtual bool Load(const char *file, const char *sect)=0;
-    virtual bool Save(const char *file, const char *sect)=0;
-    virtual bool Load(const char *file, const char *sect, const char *name)=0;
-    virtual bool Save(const char *file, const char *sect, const char *name)=0;
   };
 
   /**

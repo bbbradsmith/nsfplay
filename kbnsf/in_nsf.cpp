@@ -121,7 +121,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     strrchr(DllPath,'\\')[1] = '\0';
 
     // コンフィグレーション作成
-    npm.cf = new xgm::NSFPlayerConfig();
+    npm.cf = new xgm::NSFPlayerConfigIni();
 
     // KbMediaPlayerにおける拡張項目を作成
     npm.cf->CreateValue("WRITE_TAGINFO", 0);
