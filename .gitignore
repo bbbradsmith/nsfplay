@@ -7,6 +7,14 @@ distribute/plugins/in_yansf.dll
 distribute/plugins/nsfplug_ui.dll
 artifact
 
+contrib/.deps
+contrib/.objs
+contrib/*.a
+contrib/*.so
+contrib/*.dll
+contrib/*.exe
+contrib/nsf2wav
+
 # Visual Studio
 # user files
 *.suo
