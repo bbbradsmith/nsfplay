@@ -1,3 +1,4 @@
+#include <cstring>
 #include "nes_fds.h"
 
 namespace xgm {

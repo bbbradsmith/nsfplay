@@ -1,3 +1,4 @@
+#include <cstring>
 #include "echo.h"
 
 using namespace xgm;

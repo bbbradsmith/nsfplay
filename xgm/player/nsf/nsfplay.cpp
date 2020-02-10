@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <typeinfo>
+#include <cstring>
 #include "nsfplay.h"
 
 #include <time.h> // for srand() initialization
