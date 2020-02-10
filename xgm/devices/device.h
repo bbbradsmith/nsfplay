@@ -52,6 +52,7 @@ namespace xgm
      * 各種オプションを設定する(もしあれば)
      */
     virtual void SetOption (int id, int val){};
+    virtual ~IDevice() {};
   };
 
   /**
@@ -77,6 +78,7 @@ namespace xgm
      *  Render() now simply mixes and outputs sound
      */
     virtual void Tick (UINT32 clocks) {}
+    virtual ~IRenderable() {};
   };
 
   /**
@@ -124,6 +126,7 @@ namespace xgm
      * Track info for keyboard view.
      */
     virtual ITrackInfo *GetTrackInfo(int trk){ return NULL; }
+    virtual ~ISoundChip() {};
   };
 
   /**
