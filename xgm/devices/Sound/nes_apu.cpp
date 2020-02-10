@@ -165,8 +165,8 @@ namespace xgm
     }
     else
     {
-        m[0] = out[0] << 6;
-        m[1] = out[1] << 6;
+        m[0] = (out[0] * square_linear) / 15;
+        m[1] = (out[1] * square_linear) / 15;
     }
 
     b[0]  = m[0] * sm[0][0];
@@ -193,6 +193,8 @@ namespace xgm
     square_table[0] = 0;
     for(int i=1;i<32;i++) 
         square_table[i]=(INT32)((8192.0*95.88)/(8128.0/i+100));
+
+    square_linear = square_table[15]; // match linear scale to one full volume square of nonlinear
 
     for(int c=0;c<2;++c)
         for(int t=0;t<2;++t)

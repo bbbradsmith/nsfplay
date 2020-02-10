@@ -169,6 +169,7 @@ NSFPlay 2.5 beta - ???
 - Fixed triangle and noise being logically inverted.
 - Fixed error in track selector length when using NSFe playlists.
 - Integrated VRC7 (YM2143) emulation update from Mitsutaka Okazaki.
+- Linear square mix level now matches nonlinear at 1 full square.
 
 NSFPlay 2.4 - 3/30/2019
 - Fixed incorrect bytes per second in stereo WAV output.

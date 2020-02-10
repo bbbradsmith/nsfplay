@@ -32,6 +32,7 @@ namespace xgm
     double rate, clock;
 
     INT32 square_table[32];     // nonlinear mixer
+    INT32 square_linear;        // linear mix approximation
 
     int scounter[2];            // frequency divider
     int sphase[2];              // phase counter
