@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <cstring>
 #include "nes_cpu.h"
 #include "../Memory/nes_mem.h"
 #include "../Misc/nsf2_irq.h"

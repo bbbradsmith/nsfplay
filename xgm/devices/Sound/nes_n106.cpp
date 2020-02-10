@@ -1,3 +1,4 @@
+#include <cstring>
 #include "nes_n106.h"
 
 namespace xgm {

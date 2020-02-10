@@ -1,3 +1,4 @@
+#include <cstring>
 #include "nes_vrc7.h"
 
 namespace xgm
