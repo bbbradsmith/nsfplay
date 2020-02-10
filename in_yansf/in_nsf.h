@@ -1,7 +1,7 @@
 #ifndef _IN_NSF_H_
 #define _IN_NSF_H_
 #include "xgm.h"
-#include "utils/nsf_tag.h"
+#include "nsf_tag.h"
 #include "nsfplug_ui.h"
 #include "plugin/winamp2/in_module.h"
 #include "nsfconfig_ini.h"

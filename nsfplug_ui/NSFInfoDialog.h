@@ -7,7 +7,7 @@
 // NSFInfoDialog.h : ヘッダー ファイル
 //
 #include "NSFDialog.h"
-#include "utils/nsf_tag.h"
+#include "nsf_tag.h"
 #include "NSFPresetDialog.h"
 
 using namespace xgm;

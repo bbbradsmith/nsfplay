@@ -2,7 +2,7 @@
 #define _IN_NSF_H_
 #include <windows.h>
 #include "xgm.h"
-#include "utils/nsf_tag.h"
+#include "nsf_tag.h"
 #include "debugout.h"
 #include "nsfplug_ui.h"
 #include "plugin/kbmedia/plugin.h"
