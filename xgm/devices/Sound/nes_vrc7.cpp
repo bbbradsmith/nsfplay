@@ -162,7 +162,8 @@ namespace xgm
             {
               if      (i == 6) val = opll->ch_out[9]; // BD
               else if (i == 7) val = opll->ch_out[10] + opll->ch_out[11]; // HH&SD
-              else if (i == 8) val = opll->ch_out[12] + opll->ch_out[13]; // TOM&CYM
+              else             val = opll->ch_out[12] + opll->ch_out[13]; // TOM&CYM
+                  /*  (i == 8) is implied */
             }
             else
             {
