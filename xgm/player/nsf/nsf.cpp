@@ -47,7 +47,7 @@ static int is_sjis_prefix(int c)
     nsfe_image = NULL;
     nsfe_plst = NULL;
     nsfe_plst_size = 0;
-    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
+    for (unsigned int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
   }
 
   NSF::~NSF ()
@@ -66,12 +66,11 @@ static int is_sjis_prefix(int c)
   static const char *print_time (int time)
   {
     static char buf[32];
-    int h, m, s, ss = 0;
+    int h, m, s = 0;
 
     if (time < 0)
       return "";
 
-    ss = (time % 1000) / 10;
     time /= 1000;
     s = time % 60;
     time /= 60;
@@ -458,7 +457,7 @@ static int is_sjis_prefix(int c)
     nsfe_plst_size = 0;
 
     // entries 'tlbl', 'taut', 'time', 'fade', 'psfx'
-    for (int i=0; i < NSFE_ENTRIES; ++i)
+    for (unsigned int i=0; i < NSFE_ENTRIES; ++i)
     {
       nsfe_entry[i].tlbl = "";
       nsfe_entry[i].taut = "";
@@ -468,7 +467,7 @@ static int is_sjis_prefix(int c)
     }
 
     // 'mixe'
-    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
+    for (unsigned int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
 
     // load the NSF or NSFe
 
