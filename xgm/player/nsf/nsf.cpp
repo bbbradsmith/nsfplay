@@ -903,7 +903,6 @@ static int is_sjis_prefix(int c)
   void NSF::DebugOut ()
   {
     int i;
-    char buf[256] = "";
 
     DEBUG_OUT ("Magic:    %4s\n", magic);
     DEBUG_OUT ("Version:  %d\n", version);
@@ -948,8 +947,7 @@ static int is_sjis_prefix(int c)
     DEBUG_OUT ("Extra:     ");
     for (i = 0; i < 4; i++)
     {
-      DEBUG_OUT (buf, "[%02x]", extra[i]);
-      DEBUG_OUT (buf);
+      DEBUG_OUT ("[%02x]", extra[i]);
     }
     DEBUG_OUT ("\n");
     DEBUG_OUT ("DataSize: %d\n", bodysize);
