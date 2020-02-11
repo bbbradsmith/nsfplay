@@ -23,7 +23,7 @@
 #if defined(__GNUC__)
 #define UNUSED __attribute__((unused))
 #else
-#define UNUSEED
+#define UNUSED
 #endif
 UNUSED
 static char *vcm_itoa(int value, char *str, int base) {
