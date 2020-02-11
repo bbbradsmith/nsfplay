@@ -63,7 +63,7 @@ static int is_sjis_prefix(int c)
     default_loopnum = l;
   }
 
-  static char *print_time (int time)
+  static const char *print_time (int time)
   {
     static char buf[32];
     int h, m, s, ss = 0;
@@ -87,12 +87,12 @@ static int is_sjis_prefix(int c)
     return buf;
   }
 
-  char *NSF::GetPlaylistString (const char *format, bool b)
+  const char *NSF::GetPlaylistString (const char *format, bool b)
   {
     static char buf[NSF_MAX_PATH + 128];
     char *p = buf;
 
-    char *t = GetTitleString (format);
+    const char *t = GetTitleString (format);
 
     p += sprintf (p, "%s::NSF,$%02x,", filename, song + 1);
 
@@ -124,7 +124,7 @@ static int is_sjis_prefix(int c)
   }
 
 
-  char *NSF::GetTitleString (const char *format, int song)
+  const char *NSF::GetTitleString (const char *format, int song)
   {
     int wp=0;
 

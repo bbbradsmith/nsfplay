@@ -65,7 +65,7 @@ namespace xgm
     return playtime_detected;
   }
 
-  char *NSFPlayer::GetTitleString ()
+  const char *NSFPlayer::GetTitleString ()
   {
     if (nsf == NULL) return "(not loaded)";
 

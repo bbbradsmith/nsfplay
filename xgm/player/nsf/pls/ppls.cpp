@@ -326,7 +326,7 @@ void PLSITEM_delete(PLSITEM *elem)
   free(elem) ;
 }
 
-static char *print_time(int time)
+static const char *print_time(int time)
 {
   static char buf[32] ;
   int h,m,s,ss = 0 ;

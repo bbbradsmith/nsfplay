@@ -148,7 +148,7 @@ namespace xgm
     virtual UINT32 Skip (UINT32 length);
 
     /** ‹È–¼‚ðŽæ“¾‚·‚é */
-    virtual char *GetTitleString ();
+    virtual const char *GetTitleString ();
 
     /** ‰‰‘tŽžŠÔ‚ðŽæ“¾‚·‚é */
     virtual int GetLength ();

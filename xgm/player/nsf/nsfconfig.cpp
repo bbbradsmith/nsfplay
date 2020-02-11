@@ -10,10 +10,10 @@
 
 using namespace xgm;
 
-char *NSFPlayerConfig::dname[NES_DEVICE_MAX] =
+const char *NSFPlayerConfig::dname[NES_DEVICE_MAX] =
   { "APU1", "APU2", "5B", "MMC5", "N163", "VRC6", "VRC7", "FDS" };
 
-char *NSFPlayerConfig::channel_name[NES_CHANNEL_MAX] =
+const char *NSFPlayerConfig::channel_name[NES_CHANNEL_MAX] =
   {
       "SQR0", "SQR1", "TRI", "NOISE", "DMC",
       "FDS",
