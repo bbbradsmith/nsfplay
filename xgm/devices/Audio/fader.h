@@ -47,7 +47,7 @@ namespace xgm
     {
       if (fade_in_ms)
       {
-        const UINT32 MAX_SAMPLES = ~0UL;
+        const UINT32 MAX_SAMPLES = (UINT32)~0UL;
         double samples = (double)fade_in_ms * rate / 1000.0;
         if (samples < (double)MAX_SAMPLES)
         {
