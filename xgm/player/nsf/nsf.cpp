@@ -279,7 +279,7 @@ static int is_sjis_prefix(int c)
     ext = strchr(fn,'.');
     if (ext)
     {
-      while (ext_next = strchr(ext+1,'.')) ext = ext_next;
+      while ((ext_next = strchr(ext+1,'.'))) ext = ext_next;
     }
     else ext = "";
 
