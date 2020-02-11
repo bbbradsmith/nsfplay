@@ -8,6 +8,7 @@ namespace xgm
   {
   public:
     virtual IDeviceInfo *Clone()=0;
+    virtual ~IDeviceInfo() {};
   };
 
   class ITrackInfo : public IDeviceInfo

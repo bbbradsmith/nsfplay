@@ -20,6 +20,12 @@
 #define VCM_MUTEX_DESTROY(m) ::CloseHandle(m)
 #define vcm_itoa(v,s,b) ::itoa(v,s,b)
 #else
+#if defined(__GNUC__)
+#define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#endif
+UNUSED
 static char *vcm_itoa(int value, char *str, int base) {
     const char *oct_fmt = "%o";
     const char *dec_fmt = "%d";

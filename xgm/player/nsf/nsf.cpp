@@ -47,7 +47,7 @@ static int is_sjis_prefix(int c)
     nsfe_image = NULL;
     nsfe_plst = NULL;
     nsfe_plst_size = 0;
-    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
+    for (unsigned int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
   }
 
   NSF::~NSF ()
@@ -63,15 +63,14 @@ static int is_sjis_prefix(int c)
     default_loopnum = l;
   }
 
-  static char *print_time (int time)
+  static const char *print_time (int time)
   {
     static char buf[32];
-    int h, m, s, ss = 0;
+    int h, m, s = 0;
 
     if (time < 0)
       return "";
 
-    ss = (time % 1000) / 10;
     time /= 1000;
     s = time % 60;
     time /= 60;
@@ -87,12 +86,12 @@ static int is_sjis_prefix(int c)
     return buf;
   }
 
-  char *NSF::GetPlaylistString (const char *format, bool b)
+  const char *NSF::GetPlaylistString (const char *format, bool b)
   {
     static char buf[NSF_MAX_PATH + 128];
     char *p = buf;
 
-    char *t = GetTitleString (format);
+    const char *t = GetTitleString (format);
 
     p += sprintf (p, "%s::NSF,$%02x,", filename, song + 1);
 
@@ -124,7 +123,7 @@ static int is_sjis_prefix(int c)
   }
 
 
-  char *NSF::GetTitleString (const char *format, int song)
+  const char *NSF::GetTitleString (const char *format, int song)
   {
     int wp=0;
 
@@ -279,7 +278,7 @@ static int is_sjis_prefix(int c)
     ext = strchr(fn,'.');
     if (ext)
     {
-      while (ext_next = strchr(ext+1,'.')) ext = ext_next;
+      while ((ext_next = strchr(ext+1,'.'))) ext = ext_next;
     }
     else ext = "";
 
@@ -458,7 +457,7 @@ static int is_sjis_prefix(int c)
     nsfe_plst_size = 0;
 
     // entries 'tlbl', 'taut', 'time', 'fade', 'psfx'
-    for (int i=0; i < NSFE_ENTRIES; ++i)
+    for (unsigned int i=0; i < NSFE_ENTRIES; ++i)
     {
       nsfe_entry[i].tlbl = "";
       nsfe_entry[i].taut = "";
@@ -468,7 +467,7 @@ static int is_sjis_prefix(int c)
     }
 
     // 'mixe'
-    for (int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
+    for (unsigned int i=0; i<NSFE_MIXES; ++i) nsfe_mixe[i] = NSFE_MIXE_DEFAULT;
 
     // load the NSF or NSFe
 
@@ -838,7 +837,6 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "psfx"))
         {
-          unsigned int n=0;
           for (unsigned int i=0; i<chunk_size; ++i)
           {
             UINT8 track = chunk[i];
@@ -904,7 +902,6 @@ static int is_sjis_prefix(int c)
   void NSF::DebugOut ()
   {
     int i;
-    char buf[256] = "";
 
     DEBUG_OUT ("Magic:    %4s\n", magic);
     DEBUG_OUT ("Version:  %d\n", version);
@@ -949,8 +946,7 @@ static int is_sjis_prefix(int c)
     DEBUG_OUT ("Extra:     ");
     for (i = 0; i < 4; i++)
     {
-      DEBUG_OUT (buf, "[%02x]", extra[i]);
-      DEBUG_OUT (buf);
+      DEBUG_OUT ("[%02x]", extra[i]);
     }
     DEBUG_OUT ("\n");
     DEBUG_OUT ("DataSize: %d\n", bodysize);

@@ -101,7 +101,8 @@ bool NSF_TAG::IsExistSection(bool local)
 int NSF_TAG::CreateTag(const char *title_format)
 {
   int i;
-  char temp[8], *p;
+  char temp[8];
+  const char *p;
 
   WritePrivateProfileString(m_sect,"Title",sdat->title,m_tagf);
   WritePrivateProfileString(m_sect,"Artist",sdat->artist,m_tagf);

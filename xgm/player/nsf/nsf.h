@@ -37,11 +37,11 @@ namespace xgm
     char title_nsf[32];
     char artist_nsf[32];
     char copyright_nsf[32];
-    char* title;
-    char* artist;
-    char* copyright;
-    char* ripper; // NSFe only
-    char* text; // NSFe only
+    const char* title;
+    const char* artist;
+    const char* copyright;
+    const char* ripper; // NSFe only
+    const char* text; // NSFe only
     UINT32 text_len; // NSFe only
     UINT16 speed_ntsc;
     UINT8 bankswitch[8];
@@ -113,8 +113,8 @@ namespace xgm
      *
      * @return タイトル文字列 (作曲者 - タイトル)
      */
-    char *GetTitleString (const char *format=NULL, int song=-1);
-    char *GetPlaylistString (const char *format, bool b);
+    const char *GetTitleString (const char *format=NULL, int song=-1);
+    const char *GetPlaylistString (const char *format, bool b);
     int GetLength ();
     void SetTitleString (char *);
     void SetDefaults (int playtime, int fadetime, int loopnum);

@@ -8,20 +8,20 @@ static double HAMMING_window(int n, int M)
   return 0.54 + 0.46 * cos(pi*n/M);
 }
 
-static double HANNING_window(int n, int M)
-{
-  return 0.5 * (1.0 + cos(pi*n/M));
-}
+//static double HANNING_window(int n, int M)
+//{
+//    return 0.5 * (1.0 + cos(pi * n / M));
+//}
 
-static double BERTLET_window(int n, int M)
-{
-  return 1.0 - (double)n/M;
-}
+//static double BERTLET_window(int n, int M)
+//{
+//    return 1.0 - (double)n / M;
+//}
 
-static double SQR_window(int n, int M)
-{
-  return 1.0;
-}
+//static double SQR_window(int n, int M)
+//{
+//    return 1.0;
+//}
 
 SimpleFIR::SimpleFIR(int tap_num) {
   N = tap_num|1;

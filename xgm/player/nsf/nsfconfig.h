@@ -47,10 +47,10 @@ namespace xgm
     }
 
     /** デバイス毎の名前 */
-    static char *dname[NES_DEVICE_MAX];
+    static const char *dname[NES_DEVICE_MAX];
 
     // for channel/pan/mix
-    static char *channel_name[NES_CHANNEL_MAX]; // name of channel
+    static const char *channel_name[NES_CHANNEL_MAX]; // name of channel
     static int channel_device[NES_CHANNEL_MAX]; // device enum of channel
     static int channel_device_index[NES_CHANNEL_MAX]; // device channel index
     static int channel_track[NES_CHANNEL_MAX]; // trackinfo for channel

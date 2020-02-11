@@ -29,9 +29,9 @@ namespace vcm
   {
   public:
     enum CtrlType { CT_INVALID, CT_CHECK, CT_SPIN, CT_SLIDER, CT_TEXT, CT_COMBO, CT_ENUM, CT_NOBREAK, CT_USER };
-    const int ctrlType;
     std::string label;
     std::string desc;
+    const int ctrlType;
     std::vector<ValueConv *> vcs;
 
     explicit ValueCtrl ( const std::string &l, const std::string &d, const CtrlType t )

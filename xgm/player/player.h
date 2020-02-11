@@ -128,7 +128,7 @@ namespace xgm {
      NEVER_LOOPの場合はループしないデータ，INFINITE_LOOPの場合は無限ループするデータである．
      */
     virtual int  GetLoopCount(){ return NEVER_LOOP; }
-    virtual char* GetTitleString(){ return "UNKNOWN"; }
+    virtual const char* GetTitleString(){ return "UNKNOWN"; }
     virtual int GetLength(){ return 5*60*1000; }
     
     /* 番号idの時間timeでのデバイス情報を取得 time==-1の時は現在のデバイス情報を返す */
