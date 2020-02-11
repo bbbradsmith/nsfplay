@@ -838,7 +838,6 @@ static int is_sjis_prefix(int c)
         }
         else if (!strcmp(cid, "psfx"))
         {
-          unsigned int n=0;
           for (unsigned int i=0; i<chunk_size; ++i)
           {
             UINT8 track = chunk[i];

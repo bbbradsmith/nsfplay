@@ -11,7 +11,6 @@ namespace xgm
   {
     nsf = NULL;
 
-    const std::type_info &ti = typeid(this);
     sc[APU] = (apu = new NES_APU());
     sc[DMC] = (dmc = new NES_DMC());
     sc[FDS] = (fds = new NES_FDS());
@@ -96,7 +95,6 @@ namespace xgm
   void NSFPlayer::Reload ()
   {
     int i, bmax = 0;
-    UINT32 offset = 0;
 
     assert (nsf);
 
@@ -418,7 +416,6 @@ void NSFPlayer::SetPlayFreq (double r)
     int region_register = (region == REGION_PAL) ? 1 : 0;
     if (region == REGION_DENDY && (nsf->regn & 4)) region_register = 2; // use 2 for Dendy iff explicitly supported, otherwise 0
 
-    int play_addr = (nsf->nsf2_bits & 0x40) ? -1 : nsf->play_address; // suppress play
     cpu.Start (
         nsf->init_address,
         nsf->play_address,
