@@ -28,7 +28,11 @@ namespace xgm
 }
 
 #else
+#ifdef NDEBUG
+#define DEBUG_OUT(...)
+#else
 #define DEBUG_OUT printf
+#endif
 #endif
 
 #endif
