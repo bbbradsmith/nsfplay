@@ -8,6 +8,9 @@ devices, saving configuration options to files, and so on.
 
 Currently experimental, your mileage may vary.
 
+Also contains an example application for converting NSF(e) tracks
+to WAV files.
+
 ## Building
 
 cd into this directory and run make:
@@ -24,7 +27,7 @@ Run `make release` to make an optimized build, and `make release_debug`
 to perform an optimized build with debug info.
 
 `release` and `release_debug` builds are always from-scratch, `debug`
-builds use the usage Make semantics for determining what needs building.
+builds use the usual Make semantics for determining what needs building.
 
 ## Customization
 

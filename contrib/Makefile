@@ -1,9 +1,10 @@
-.PHONY: all clean debug release release_debug
+.PHONY: all clean debug release release_debug demo
 
 STATIC_PREFIX=lib
 DYNLIB_PREFIX=lib
 STATIC_EXT=.a
 DYNLIB_EXT=.so
+EXE_EXT=
 
 OBJDIR := .objs
 DEPDIR := .deps
@@ -92,6 +93,11 @@ release:
 release_debug:
 	"$(MAKE)" clean
 	"$(MAKE)" "CC=$(CC)" "CXX=$(CXX)" "STATIC_PREFIX=$(STATIC_PREFIX)" "DYNLIB_PREFIX=$(DYNLIB_PREFIX)" "STATIC_EXT=$(STATIC_EXT)" "DYNLIB_EXT=$(DYNLIB_EXT)" "CFLAGS=$(CFLAGS_RELEASE_DEBUG)" "CXXFLAGS=$(CXXFLAGS_RELEASE_DEBUG)" "$(LIB_STATIC)" "$(LIB_DYNLIB)"
+
+demo: nsf2wav$(EXE_EXT)
+
+nsf2wav$(EXE_EXT): $(OBJDIR)/nsf2wav.o $(LIB_STATIC)
+	$(CXX) -o $@ $^
 
 $(LIB_STATIC): $(OBJS)
 	$(AR) rcs $@ $^
