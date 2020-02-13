@@ -48,3 +48,18 @@ Example: To cross-compile a Windows DLL just named `nsfplay.dll`, in the release
 make CC=i686-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ DYNLIB_PREFIX= DYNLIB_EXT=.dll release
 ```
 
+## Installation
+
+This Makefile supports installing the library and header files via `make install`
+
+`install` uses the following variables:
+
+* `DESTDIR` to install to a staging directory.
+* `PREFIX` to change installation prefix
+    * default: `/usr/local`
+* `LIBDIR` to set the library installation directory
+    * default: `$(PREFIX)/lib`
+    * setting `LIBDIR` directly ignores `DESTDIR` and `PREFIX`
+* `INCDIR` to set the header installation directory
+    * default: `$(PREFIX)/include/nsfplay`
+    * setting `INCDIR` directly ignores `DESTDIR` and `PREFIX`
