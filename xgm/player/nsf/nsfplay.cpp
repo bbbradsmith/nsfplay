@@ -477,11 +477,14 @@ void NSFPlayer::SetPlayFreq (double r)
 
   void NSFPlayer::CheckTerminal ()
   {
-    if (fader.IsFading ())
-      return;
+    if(!(*config)["INFINITE"])
+    {
+      if (fader.IsFading ())
+        return;
 
-    if (time_in_ms + nsf->GetFadeTime () >= nsf->GetLength ())
-      fader.FadeStart (rate, nsf->GetFadeTime ());
+      if (time_in_ms + nsf->GetFadeTime () >= nsf->GetLength ())
+        fader.FadeStart (rate, nsf->GetFadeTime ());
+    }
   }
 
   UINT32 NSFPlayer::Skip (UINT32 length)

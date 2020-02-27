@@ -115,6 +115,8 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("QUALITY", 10);
   CreateValue("MASTER_VOLUME", 128);
 
+  CreateValue("INFINITE",0); // never fade track out
+
   for (i = 0; i < NES_CHANNEL_MAX; ++i)
   {
       std::string str;
