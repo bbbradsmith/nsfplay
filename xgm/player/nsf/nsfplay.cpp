@@ -37,6 +37,7 @@ namespace xgm
     fader.Attach(&rconv);
 
     nch = 1;
+    infinite = false;
   }
 
   NSFPlayer::~NSFPlayer ()
@@ -477,11 +478,14 @@ void NSFPlayer::SetPlayFreq (double r)
 
   void NSFPlayer::CheckTerminal ()
   {
-    if (fader.IsFading ())
-      return;
+    if(!infinite)
+    {
+      if (fader.IsFading ())
+        return;
 
-    if (time_in_ms + nsf->GetFadeTime () >= nsf->GetLength ())
-      fader.FadeStart (rate, nsf->GetFadeTime ());
+      if (time_in_ms + nsf->GetFadeTime () >= nsf->GetLength ())
+        fader.FadeStart (rate, nsf->GetFadeTime ());
+    }
   }
 
   UINT32 NSFPlayer::Skip (UINT32 length)
@@ -586,6 +590,9 @@ void NSFPlayer::SetPlayFreq (double r)
         for(i=0; i<5; i++)
           infobuf[FME7_TRK0+i].AddInfo(total_render,fme7->GetTrackInfo(i));
       }
+
+      if(infinite)
+        total_render = 0; // ensure we never overflow
 
     }
   }
@@ -981,6 +988,16 @@ void NSFPlayer::SetPlayFreq (double r)
 
       // no valid regions? giving up
       return REGION_NTSC;
+  }
+
+  bool NSFPlayer::GetInfinite()
+  {
+      return infinite;
+  }
+
+  void NSFPlayer::SetInfinite(bool inf)
+  {
+      infinite = inf;
   }
 
 }

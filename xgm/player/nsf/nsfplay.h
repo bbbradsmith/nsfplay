@@ -50,6 +50,7 @@ namespace xgm
 
     int time_in_ms;             // ‰‰‘t‚µ‚½ŠÔ(ms)
     bool playtime_detected;     // ‰‰‘tŠÔ‚ªŒŸo‚³‚ê‚½‚çtrue
+    bool infinite;               // never fade out
 
     void Reload ();
     void DetectLoop ();
@@ -176,6 +177,9 @@ namespace xgm
 
     /** Whether to use PAL/NTSC/Dendy based on flags and REGION config */
     virtual int GetRegion(UINT8 flags, int pref);
+
+    virtual bool GetInfinite();
+    virtual void SetInfinite(bool inf);
     enum {
         REGION_NTSC = 0,
         REGION_PAL,
