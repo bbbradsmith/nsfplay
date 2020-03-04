@@ -169,7 +169,7 @@ namespace xgm
     /** コンフィグレーションの更新情報通知を受け取るコールバック */
     virtual void Notify (int id);
 
-    // Notify for panning
+    /** Notify for panning */
     virtual void NotifyPan (int id);
 
     /** time_in_ms時点でのデバイス情報を取得する */
@@ -178,13 +178,15 @@ namespace xgm
     /** Whether to use PAL/NTSC/Dendy based on flags and REGION config */
     virtual int GetRegion(UINT8 flags, int pref);
 
-    virtual bool GetInfinite();
-    virtual void SetInfinite(bool inf);
     enum {
         REGION_NTSC = 0,
         REGION_PAL,
         REGION_DENDY
     };
+
+    /** Infinite playback with no fadeout */
+    virtual bool GetInfinite();
+    virtual void SetInfinite(bool inf);
   };
 
 }// namespace
