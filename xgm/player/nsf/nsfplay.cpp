@@ -590,10 +590,6 @@ void NSFPlayer::SetPlayFreq (double r)
         for(i=0; i<5; i++)
           infobuf[FME7_TRK0+i].AddInfo(total_render,fme7->GetTrackInfo(i));
       }
-
-      if(infinite)
-        total_render = 0; // ensure we never overflow
-
     }
   }
   
