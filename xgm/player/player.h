@@ -34,11 +34,11 @@ namespace xgm {
 
     Player()
     {
-        config = nullptr;
+        config = NULL;
     }
 
     virtual ~Player(){ 
-        if(config != nullptr)
+        if(config != NULL)
             config->DetachObserver(this);
     }
 
