@@ -9,8 +9,6 @@ extern "C" {
 
 #define OPLL_DEBUG 0
 
-typedef enum __OPLL_EG_STATE { ATTACK, DECAY, SUSTAIN, RELEASE, DAMP, UNKNOWN } OPLL_EG_STATE;
-
 enum OPLL_TONE_ENUM {
     OPLL_VRC7_TONE = 0,
     OPLL_VRC7_RW_TONE,
@@ -25,7 +23,7 @@ enum OPLL_TONE_ENUM {
 
 /* voice data */
 typedef struct __OPLL_PATCH {
-  uint32_t TL, FB, EG, ML, AR, DR, SL, RR, KR, KL, AM, PM, WF;
+  uint32_t TL, FB, EG, ML, AR, DR, SL, RR, KR, KL, AM, PM, WS;
 } OPLL_PATCH;
 
 /* slot */
@@ -33,9 +31,9 @@ typedef struct __OPLL_SLOT {
   uint8_t number;
 
   /* type flags:
-   * 000000SM 
+   * 000000SM
    *       |+-- M: 0:modulator 1:carrier
-   *       +--- S: 0:normal 1:single slot mode (sd, tom, hh or cym) 
+   *       +--- S: 0:normal 1:single slot mode (sd, tom, hh or cym)
    */
   uint8_t type;
 
@@ -54,15 +52,16 @@ typedef struct __OPLL_SLOT {
   uint8_t blk;          /* block (3 bits) */
 
   /* envelope generator (eg) */
-  uint8_t eg_state;         /* current state */
-  int32_t volume;           /* current volume */
-  uint8_t sus_flag;         /* key-sus option 1:on 0:off */
-  uint16_t tll;             /* total level + key scale level*/
-  uint8_t rks;              /* key scale offset (rks) for eg speed */
-  uint8_t eg_rate_h;        /* eg speed rate high 4bits */
-  uint8_t eg_rate_l;        /* eg speed rate low 2bits */
-  uint32_t eg_shift;        /* shift for eg global counter, controls envelope speed */
-  uint32_t eg_out;          /* eg output */
+  uint8_t eg_state;  /* current state */
+  int32_t volume;    /* current volume */
+  uint8_t key_flag;  /* key-on flag 1:on 0:off */
+  uint8_t sus_flag;  /* key-sus option 1:on 0:off */
+  uint16_t tll;      /* total level + key scale level*/
+  uint8_t rks;       /* key scale offset (rks) for eg speed */
+  uint8_t eg_rate_h; /* eg speed rate high 4bits */
+  uint8_t eg_rate_l; /* eg speed rate low 2bits */
+  uint32_t eg_shift; /* shift for eg global counter, controls envelope speed */
+  uint32_t eg_out;   /* eg output */
 
   uint32_t update_requests; /* flags to debounce update */
 
@@ -99,7 +98,7 @@ typedef struct __OPLL {
   uint32_t clk;
   uint32_t rate;
 
-  uint8_t chip_mode;
+  uint8_t chip_type;
 
   uint32_t adr;
 
@@ -115,22 +114,20 @@ typedef struct __OPLL {
   uint32_t eg_counter;
 
   uint32_t pm_phase;
-  uint32_t pm_dphase;
-
   int32_t am_phase;
-  int32_t am_dphase;
+
   uint8_t lfo_am;
 
-  uint32_t noise_seed;
-  uint8_t noise;
+  uint32_t noise;
   uint8_t short_noise;
 
   int32_t patch_number[9];
   OPLL_SLOT slot[18];
   OPLL_PATCH patch[19 * 2];
-  int32_t patch_update[2];
 
   uint8_t pan[16];
+  float pan_fine[16][2];
+
   uint32_t mask;
 
   /* channel output */
@@ -146,24 +143,25 @@ OPLL *OPLL_new(uint32_t clk, uint32_t rate);
 void OPLL_delete(OPLL *);
 
 void OPLL_reset(OPLL *);
-void OPLL_resetPatch(OPLL *, int32_t);
+void OPLL_resetPatch(OPLL *, uint8_t);
 
-/** 
- * Set output wave sampling rate. 
- * @param rate sampling rate. If clock / 72 (typically 49716 or 49715 at 3.58MHz) is set, the internal rate converter is disabled.
+/**
+ * Set output wave sampling rate.
+ * @param rate sampling rate. If clock / 72 (typically 49716 or 49715 at 3.58MHz) is set, the internal rate converter is
+ * disabled.
  */
 void OPLL_setRate(OPLL *opll, uint32_t rate);
 
-/** 
+/**
  * Set internal calcuration quality. Currently no effects, just for compatibility.
  * >= v1.0.0 always synthesizes internal output at clock/72 Hz.
  */
 void OPLL_setQuality(OPLL *opll, uint8_t q);
 
-/** 
+/**
  * Set pan pot (extra function - not YM2413 chip feature)
- * @param ch 0..8:tone 9:bd 10:hh 11:sd 12:tom 13:cym
- * @param pan 0:mute 1:right 2:left 3:center 
+ * @param ch 0..8:tone 9:bd 10:hh 11:sd 12:tom 13:cym 14,15:reserved
+ * @param pan 0:mute 1:right 2:left 3:center
  * ```
  * pan: 76543210
  *            |+- bit 1: enable Left output
@@ -173,16 +171,26 @@ void OPLL_setQuality(OPLL *opll, uint8_t q);
 void OPLL_setPan(OPLL *opll, uint32_t ch, uint8_t pan);
 
 /**
- * Set chip mode. If vrc7 is selected, r#14 is ignored.
- * @param mode 0:ym2413 1:vrc7
+ * Set fine-grained panning
+ * @param ch 0..8:tone 9:bd 10:hh 11:sd 12:tom 13:cym 14,15:reserved
+ * @param pan output strength of left/right channel.
+ *            pan[0]: left, pan[1]: right. pan[0]=pan[1]=1.0f for center.
  */
-void OPLL_setChipMode(OPLL *opll, uint8_t mode); 
+void OPLL_setPanFine(OPLL *opll, uint32_t ch, float pan[2]);
+
+/**
+ * Set chip type. If vrc7 is selected, r#14 is ignored.
+ * This method not change the current ROM patch set.
+ * To change ROM patch set, use OPLL_resetPatch.
+ * @param type 0:YM2413 1:VRC7
+ */
+void OPLL_setChipType(OPLL *opll, uint8_t type);
 
 void OPLL_writeIO(OPLL *opll, uint32_t reg, uint8_t val);
 void OPLL_writeReg(OPLL *opll, uint32_t reg, uint8_t val);
 
 /**
- * Calculate sample
+ * Calculate one sample
  */
 int16_t OPLL_calc(OPLL *opll);
 
@@ -194,8 +202,8 @@ void OPLL_calcStereo(OPLL *opll, int32_t out[2]);
 void OPLL_setPatch(OPLL *, const uint8_t *dump);
 void OPLL_copyPatch(OPLL *, int32_t, OPLL_PATCH *);
 
-/** 
- * Force to refresh. 
+/**
+ * Force to refresh.
  * External program should call this function after updating patch parameters.
  */
 void OPLL_forceRefresh(OPLL *);
@@ -204,8 +212,8 @@ void OPLL_dumpToPatch(const uint8_t *dump, OPLL_PATCH *patch);
 void OPLL_patchToDump(const OPLL_PATCH *patch, uint8_t *dump);
 void OPLL_getDefaultPatch(int32_t type, int32_t num, OPLL_PATCH *);
 
-/** 
- *  Set channel mask 
+/**
+ *  Set channel mask
  *  @param mask mask flag: OPLL_MASK_* can be used.
  *  - bit 0..8: mask for ch 1 to 9 (OPLL_MASK_CH(i))
  *  - bit 9: mask for Hi-Hat (OPLL_MASK_HH)
@@ -225,10 +233,12 @@ uint32_t OPLL_toggleMask(OPLL *, uint32_t mask);
 #define OPLL_set_rate OPLL_setRate
 #define OPLL_set_quality OPLL_setQuality
 #define OPLL_set_pan OPLL_setPan
+#define OPLL_set_pan_fine OPLL_setPanFine
 #define OPLL_calc_stereo OPLL_calcStereo
 #define OPLL_reset_patch OPLL_resetPatch
 #define OPLL_dump2patch OPLL_dumpToPatch
 #define OPLL_patch2dump OPLL_patchToDump
+#define OPLL_setChipMode OPLL_setChipType
 
 #ifdef __cplusplus
 }
