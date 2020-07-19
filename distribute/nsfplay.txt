@@ -329,6 +329,36 @@ NSFPlay 2.0 - 2/22/2012
 NSFPlay - 12/09/2006
 - Written by Brezza > http://www.pokipoki.org/dsa/index.php?NSFplay
 
+Contributors
+============
+
+Brad Smith
+https://github.com/bbbradsmith
+- main developer and maintainer since 2.0 (2012)
+
+Mitsutaka Okazaki
+https://github.com/okaxaki
+- original developer
+- YM2143 emulation updates
+
+John Regan
+https://github.com/jprjr
+- clang/gcc compile preparation
+- infinite track playback
+- work on separated NSFPlay library (see contribs)
+
+Marat Fayzullin
+https://fms.komkon.org/
+- 6502 emulator core
+
+rwtodd
+https://github.com/rwtodd
+- VS2019 compilation fixes
+
+Admiral H. Curtiss
+https://github.com/AdmiralCurtiss
+- VS2015 compilation fixes
+
 
 ===============
 end of document
