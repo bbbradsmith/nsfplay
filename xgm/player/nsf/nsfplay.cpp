@@ -711,6 +711,7 @@ void NSFPlayer::SetPlayFreq (double r)
   bool NSFPlayer::SetSong (int s)
   {
     nsf->song = s % nsf->songs;
+    UpdateInfinite();
     return true;
   }
 
@@ -723,6 +724,7 @@ void NSFPlayer::SetPlayFreq (double r)
         nsf->song -=nsf->songs;
         result = false;
     }
+    UpdateInfinite();
     return result;
   }
 
@@ -735,6 +737,7 @@ void NSFPlayer::SetPlayFreq (double r)
         nsf->song +=nsf->songs;
         result = false;
     }
+    UpdateInfinite();
     return result;
   }
 
@@ -892,6 +895,7 @@ void NSFPlayer::SetPlayFreq (double r)
     }
 
     NotifyPan(id);
+    UpdateInfinite();
   }
 
   void NSFPlayer::NotifyPan (int id)
@@ -986,14 +990,9 @@ void NSFPlayer::SetPlayFreq (double r)
       return REGION_NTSC;
   }
 
-  bool NSFPlayer::GetInfinite()
+  void NSFPlayer::UpdateInfinite()
   {
-      return infinite;
-  }
-
-  void NSFPlayer::SetInfinite(bool inf)
-  {
-      infinite = inf;
+      infinite = 1 == (*config)["PLAY_ADVANCE"];
   }
 
 }

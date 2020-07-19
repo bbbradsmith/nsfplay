@@ -100,7 +100,11 @@ void WA2InputModuleMSP::PreAutoStop()
 {
   if(sdat->enable_multi_tracks)
   {
-    if(pl->NextSong(1))
+    if((*(pl->GetConfig()))["PLAY_ADVANCE"] == 2) // single track play, don't signal end
+    {
+        return;
+    }
+    else if(pl->NextSong(1))
     {
       keep_song = true;
       PostMessage(pMod->hMainWindow, WM_COMMAND, WINAMP_BUTTON2, 0); // 曲を一曲進めて，再生ボタンを押す．

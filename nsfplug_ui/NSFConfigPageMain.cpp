@@ -36,6 +36,7 @@ NSFConfigPageMain::NSFConfigPageMain() : CPropertyPage(NSFConfigPageMain::IDD)
 	m_nFadeTime = 0;
 	m_nPlayTime = 0;
 	m_nPlayFreq = -1;
+    m_nPlayAdvance = 0;
 	m_bAutoDetect = FALSE;
 	m_nDetectTime = 0;
 	m_bUpdatePlaylist = FALSE;
@@ -60,6 +61,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     int i;
     for(i = 0;rate[i]<CONFIG["RATE"];i++);
     m_nPlayFreq       = i;
+    m_nPlayAdvance    = CONFIG["PLAY_ADVANCE"];
     m_bAutoStop       = CONFIG["AUTO_STOP"];
     m_nStopSec        = CONFIG["STOP_SEC"];
     m_nFadeTime       = CONFIG["FADE_TIME"]/1000;
@@ -100,6 +102,7 @@ void NSFConfigPageMain::UpdateNSFPlayerConfig(bool b)
     CONFIG["LOOP_NUM"]        = m_nLoopNum;
     CONFIG["AUTO_DETECT"]     = m_bAutoDetect;
     CONFIG["DETECT_TIME"]     = m_nDetectTime * 1000;
+    CONFIG["PLAY_ADVANCE"]    = m_nPlayAdvance;
     CONFIG["UPDATE_PLAYLIST"] = m_bUpdatePlaylist;
     CONFIG["HPF"]             = 256 - m_nHpfValue;
     CONFIG["LPF"]             = m_nLpfValue;
@@ -148,6 +151,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
   DDV_MinMaxUInt(pDX, m_nDetectTime, 0, 32767);
   DDV_MinMaxUInt(pDX, m_nLoopNum, 0, 256);
   DDX_CBIndex(pDX, IDC_PLAYFREQ, m_nPlayFreq);
+  DDX_CBIndex(pDX, IDC_PLAYADVANCE, m_nPlayAdvance);
   DDX_CBIndex(pDX, IDC_REGION, m_nRegion);
   DDV_MaxChars(pDX, m_format, 128);
   //DDX_Control(pDX, IDC_LIMIT, m_limitCtrl);
@@ -168,6 +172,7 @@ void NSFConfigPageMain::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(NSFConfigPageMain, CPropertyPage)
 	//{{AFX_MSG_MAP(NSFConfigPageMain)
 	ON_CBN_SELCHANGE(IDC_PLAYFREQ, OnSelchangePlayfreq)
+    ON_CBN_SELCHANGE(IDC_PLAYADVANCE, OnSelchangePlayAdvance)
 	ON_CBN_SELCHANGE(IDC_REGION, OnRegion)
 	ON_EN_CHANGE(IDC_STOPSEC, OnChangeStopsec)
 	ON_EN_CHANGE(IDC_PLAYTIME, OnChangePlaytime)
@@ -196,6 +201,11 @@ BOOL NSFConfigPageMain::OnApply()
 void NSFConfigPageMain::OnSelchangePlayfreq() 
 {
 	//SetModified(true);
+}
+
+void NSFConfigPageMain::OnSelchangePlayAdvance()
+{
+    //SetModified(true);
 }
 
 void NSFConfigPageMain::OnRegion() 

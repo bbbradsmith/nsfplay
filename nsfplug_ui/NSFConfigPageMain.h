@@ -30,6 +30,7 @@ public:
 	UINT	m_nFadeTime;
 	UINT	m_nPlayTime;
 	int 	m_nPlayFreq;
+	int 	m_nPlayAdvance;
 	BOOL	m_bAutoDetect;
 	UINT	m_nDetectTime;
 	BOOL	m_bUpdatePlaylist;
@@ -69,6 +70,7 @@ protected:
 	// 生成されたメッセージ マップ関数
 	//{{AFX_MSG(NSFConfigPageMain)
 	afx_msg void OnSelchangePlayfreq();
+	afx_msg void OnSelchangePlayAdvance();
 	afx_msg void OnRegion();
 	afx_msg void OnChangeStopsec();
 	afx_msg void OnChangePlaytime();

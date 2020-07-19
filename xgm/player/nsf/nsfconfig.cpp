@@ -111,6 +111,7 @@ NSFPlayerConfig::NSFPlayerConfig () : PlayerConfig ()
   CreateValue("LOG_CPU", 0);
   CreateValue("LOG_CPU_FILE", "nsf_write.log");
 
+  CreateValue("PLAY_ADVANCE", 0);
   CreateValue("FAST_SEEK", 1);
   CreateValue("QUALITY", 10);
   CreateValue("MASTER_VOLUME", 128);
