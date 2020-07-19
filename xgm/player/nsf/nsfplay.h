@@ -184,9 +184,8 @@ namespace xgm
         REGION_DENDY
     };
 
-    /** Infinite playback with no fadeout */
-    virtual bool GetInfinite();
-    virtual void SetInfinite(bool inf);
+    /** Refresh infinite playback setting from PLAY_ADVANCE config */
+    virtual void UpdateInfinite();
   };
 
 }// namespace
