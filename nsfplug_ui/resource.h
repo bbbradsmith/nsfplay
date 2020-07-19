@@ -146,6 +146,7 @@
 #define IDC_UNMUTE                      2013
 #define IDC_TRI_MUTE                    2014
 #define IDC_VELOCITY                    2015
+#define IDC_DPCM_REVERSE                2015
 #define IDC_RANDOMIZE_TRI               2016
 #define ID_READTAG                      2018
 #define IDC_SAVE                        2021

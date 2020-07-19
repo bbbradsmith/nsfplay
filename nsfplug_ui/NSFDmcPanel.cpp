@@ -26,6 +26,7 @@ NSFDmcPanel::NSFDmcPanel(CWnd* pParent /*=NULL*/)
   , m_unmute(TRUE)
   , m_tri_mute(TRUE)
   , m_randomize_tri(TRUE)
+  , m_dpcm_reverse(TRUE)
 {
 }
 
@@ -40,6 +41,7 @@ void NSFDmcPanel::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX, IDC_UNMUTE, m_unmute);
   DDX_Check(pDX, IDC_TRI_MUTE, m_tri_mute);
   DDX_Check(pDX, IDC_RANDOMIZE_TRI, m_randomize_tri);
+  DDX_Check(pDX, IDC_DPCM_REVERSE, m_dpcm_reverse);
 }
 
 void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
@@ -58,6 +60,7 @@ void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
     m_unmute          = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_UNMUTE_ON_RESET).GetInt();
     m_tri_mute        = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_TRI_MUTE       ).GetInt();
     m_randomize_tri   = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_TRI  ).GetInt();
+    m_dpcm_reverse    = pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_DPCM_REVERSE   ).GetInt();
     UpdateData(FALSE);
   }
   else
@@ -71,6 +74,7 @@ void NSFDmcPanel::UpdateNSFPlayerConfig(bool b)
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_UNMUTE_ON_RESET) = m_unmute;
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_TRI_MUTE       ) = m_tri_mute;
     pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_RANDOMIZE_TRI  ) = m_randomize_tri;
+    pm->cf->GetDeviceOption(DMC,NES_DMC::OPT_DPCM_REVERSE   ) = m_dpcm_reverse;
     pm->cf->Notify(DMC);
   }
 }
@@ -84,6 +88,7 @@ BEGIN_MESSAGE_MAP(NSFDmcPanel, CDialog)
 	ON_BN_CLICKED(IDC_RANDOMIZE_NOISE, OnRandomizeNoise)
 	ON_BN_CLICKED(IDC_UNMUTE, OnUnmute)
 	ON_BN_CLICKED(IDC_TRI_MUTE, OnTriMute)
+    ON_BN_CLICKED(IDC_DPCM_REVERSE, OnDpcmReverse)
 	ON_WM_HSCROLL()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -122,6 +127,11 @@ void NSFDmcPanel::OnUnmute()
 }
 
 void NSFDmcPanel::OnTriMute() 
+{
+  //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(true);		
+}
+
+void NSFDmcPanel::OnDpcmReverse()
 {
   //dynamic_cast<CPropertyPage*>(GetParent())->SetModified(true);		
 }

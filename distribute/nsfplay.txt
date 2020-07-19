@@ -113,6 +113,7 @@ Device options:
   APU2_OPTION5: randomize noise on reset
   APU2_OPTION6: mute triangle on pitch 0 (prevents high frequency aliasing)
   APU2_OPTION7: randomize triangle on reset
+  APU2_OPTION8: reverse bits of DPCM sample bytes
   FDS_OPTION0: (Hz) lowpass filter cutoff frequency (0=off, 2000=default)
   FDS_OPTION1: reset "phase" on $4085 write (works around timing issue in Bio Miracle Bokutte Upa)
   FDS_OPTION2: write protect $8000-DFFF (for some multi-expansion NSFs)
@@ -163,6 +164,7 @@ Versions
 ========
 
 NSFPlay 2.5 beta - ???
+- DPCM bit-reverse option.
 - Playback advance options (auto, infinite play, single track).
 - Negate sweep init option (compatibility with old SuperNSF, etc. that relies on nonstandard sweep init).
 - Option to force VRC7 replacement with YM2413 (OPLL).
