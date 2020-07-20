@@ -80,6 +80,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     npm.cf->Load(IniPath,"NSFplug");
 
     if((*(npm.cf))["MASK_INIT"]) (*(npm.cf))["MASK"] = 0;
+	(*(npm.cf))["MULT_SPEED"] = 256; // reset speed to normal on startup
 
     // GUI initialized in Init()
     ui = NULL;
