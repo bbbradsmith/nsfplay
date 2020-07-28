@@ -7,6 +7,8 @@
 
 namespace xgm
 {
+  int debug_mark = 0;
+
   NSFPlayer::NSFPlayer () : PlayerMSP ()
   {
     nsf = NULL;
@@ -671,6 +673,14 @@ void NSFPlayer::SetPlayFreq (double r)
 
       if     (out[1]<-32767) out[1]=-32767;
       else if( 32767<out[1]) out[1]= 32767;
+
+      #if _DEBUG
+          if (debug_mark)
+          {
+              out[0] = debug_mark;
+              debug_mark = 0;
+          }
+      #endif
 
       if (nch == 2)
       {
