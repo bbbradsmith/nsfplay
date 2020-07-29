@@ -55,7 +55,7 @@ namespace xgm
     int mode;
     bool irq;
 
-    UINT32 counter[3]; // frequency dividers
+    INT32 counter[3];  // frequency dividers
     int tphase;        // triangle phase
     UINT32 nfreq;      // noise frequency
     UINT32 dfreq;      // DPCM frequency

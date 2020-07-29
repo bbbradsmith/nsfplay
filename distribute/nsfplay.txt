@@ -164,6 +164,7 @@ Versions
 ========
 
 NSFPlay 2.5 beta - ???
+- APU frequency dividers now count down (more accurate pitch change timing).
 - Keyboard view speed control setting should reset to normal when the program restarts.
 - DPCM bit-reverse option.
 - Playback advance options (auto, infinite play, single track).

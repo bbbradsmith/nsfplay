@@ -207,11 +207,11 @@ namespace xgm
     if (linear_counter > 0 && length_counter[0] > 0
         && (!option[OPT_TRI_MUTE] || tri_freq > 0))
     {
-      counter[0] += clocks;
-      while (counter[0] > tri_freq)
+      counter[0] -= clocks;
+      while (counter[0] < 0)
       {
         tphase = (tphase + 1) & 31;
-        counter[0] -= (tri_freq + 1);
+        counter[0] += (tri_freq + 1);
       }
     }
 
@@ -233,21 +233,30 @@ namespace xgm
 
     // simple anti-aliasing (noise requires it, even when oversampling is off)
     UINT32 count = 0;
-    UINT32 accum = 0;
+    UINT32 accum = counter[1] * last; // samples pending from previous calc
+    UINT32 accum_clocks = counter[1];
+    #ifdef _DEBUG
+        INT32 start_clocks = counter[1];
+    #endif
+    if (counter[1] < 0) // only happens on startup when using the randomize noise option
+    {
+        accum = 0;
+        accum_clocks = 0;
+    }
 
-    counter[1] += clocks;
+    counter[1] -= clocks;
     assert (nfreq > 0); // prevent infinite loop
-    while (counter[1] >= nfreq)
+    while (counter[1] < 0)
     {
         // tick the noise generator
         UINT32 feedback = (noise&1) ^ ((noise&noise_tap)?1:0);
         noise = (noise>>1) | (feedback<<14);
 
-        ++count;
-        accum += last;
         last = (noise & 0x4000) ? 0 : env;
-
-        counter[1] -= nfreq;
+        accum += (last * nfreq);
+        counter[1] += nfreq;
+        ++count;
+        accum_clocks += nfreq;
     }
 
     if (count < 1) // no change over interval, don't anti-alias
@@ -255,24 +264,25 @@ namespace xgm
        return last;
     }
 
-    UINT32 clocks_accum = clocks - counter[1];
-    // count = number of samples in accum
-    // counter[1] = number of clocks since last sample
+    accum -= (last * counter[1]); // remove these samples which belong in the next calc
+    accum_clocks -= counter[1];
+    #ifdef _DEBUG
+        if (start_clocks >= 0) assert(accum_clocks == clocks); // these should be equal
+    #endif
 
-    accum = (accum * clocks_accum) + (last * counter[1] * count);
-    // note accum as an average is already premultiplied by count
-
-    return accum / (clocks * count);
+    UINT32 average = accum / accum_clocks;
+    assert(average <= 15); // above this would indicate overflow
+    return average;
   }
 
 	// Tick the DMC for the number of clocks, and return output counter;
 	UINT32 NES_DMC::calc_dmc (UINT32 clocks)
 	{
-		counter[2] += clocks;
+		counter[2] -= clocks;
 		assert (dfreq > 0); // prevent infinite loop
-		while (counter[2] >= dfreq)
+		while (counter[2] < 0)
 		{
-			counter[2] -= dfreq;
+			counter[2] += dfreq;
 
 			if ( data > 0x100 ) // data = 0x100 when shift register is empty
 			{
@@ -520,10 +530,12 @@ namespace xgm
     if (option[OPT_RANDOMIZE_NOISE])
     {
         noise |= ::rand();
+        counter[1] = -(rand() & 511);
     }
     if (option[OPT_RANDOMIZE_TRI])
     {
         tphase = ::rand() & 31;
+        counter[0] = -(rand() & 2047);
     }
 
     SetRate(rate);
@@ -640,12 +652,10 @@ namespace xgm
 
     case 0x400a:
       tri_freq = val | (tri_freq & 0x700) ;
-      if (counter[0] > tri_freq) counter[0] = tri_freq;
       break;
 
     case 0x400b:
       tri_freq = (tri_freq & 0xff) | ((val & 0x7) << 8) ;
-      if (counter[0] > tri_freq) counter[0] = tri_freq;
       linear_counter_halt = true;
       if (enable[0])
       {
@@ -671,7 +681,6 @@ namespace xgm
       else
         noise_tap = (1<<1);
       nfreq = wavlen_table[pal][val&15];
-      if (counter[1] > nfreq) counter[1] = nfreq;
       break;
 
     case 0x400f:
@@ -692,7 +701,6 @@ namespace xgm
         cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
       }
       dfreq = freq_table[pal][val&15];
-      if (counter[2] > dfreq) counter[2] = dfreq;
       break;
 
     case 0x4011:

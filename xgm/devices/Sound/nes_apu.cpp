@@ -70,7 +70,6 @@ namespace xgm
                 if (freq[i] >= 8 && sfreq[i] < 0x800 && sweep_amount[i] > 0) // update frequency if appropriate
                 {
                     freq[i] = sfreq[i] < 0 ? 0 : sfreq[i];
-                    if (scounter[i] > freq[i]) scounter[i] = freq[i];
                 }
                 sweep_div[i] = sweep_div_period[i] + 1;
 
@@ -96,11 +95,11 @@ namespace xgm
       {1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
 
-    scounter[i] += clocks;
-    while (scounter[i] > freq[i])
+    scounter[i] -= clocks;
+    while (scounter[i] < 0)
     {
         sphase[i] = (sphase[i] + 1) & 15;
-        scounter[i] -= (freq[i] + 1);
+        scounter[i] += freq[i] + 1;
     }
 
     INT32 ret = 0;
@@ -346,7 +345,6 @@ namespace xgm
       case 0x6:
         freq[ch] = val | (freq[ch] & 0x700) ;
         sweep_sqr(ch);
-        if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
         break;
 
       case 0x3: 
@@ -360,7 +358,6 @@ namespace xgm
           length_counter[ch] = length_table[(val >> 3) & 0x1f];
         }
         sweep_sqr(ch);
-        if (scounter[ch] > freq[ch]) scounter[ch] = freq[ch];
         break;
 
       default:
