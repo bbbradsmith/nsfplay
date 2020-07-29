@@ -7,6 +7,7 @@ const int DIVIDER = 8; // TODO this is not optimal, rewrite PSG output
 NES_FME7::NES_FME7 ()
 {
   psg = PSG_new ((e_uint32)DEFAULT_CLOCK, DEFAULT_RATE);
+  divider = 0;
 
   for(int c=0;c<2;++c)
     for(int t=0;t<3;++t)

@@ -98,6 +98,9 @@ UINT32 Callback readByte (void *__THIS, UINT32 adr)
 
 void NES_CPU::run_from (UINT32 address)
 {
+	#if TRACE
+		DEBUG_OUT("run_from($%04X)\n",address);
+	#endif
 	breaked = false;
 	context.PC = PLAYER_RESERVED; // JSR, followed by infinite loop ("breaked")
 	breakpoint = context.PC+3;

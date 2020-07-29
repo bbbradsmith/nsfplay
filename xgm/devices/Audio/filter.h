@@ -163,6 +163,12 @@ namespace xgm
       in[0] = in[1] = 0;
       out[0] = out[1] = 0;
     }
+
+    void SetLevel(INT32 b[2])
+    {
+      in[0] = b[0];
+      in[1] = b[1];
+    }
   };
 
   class SimpleFIR

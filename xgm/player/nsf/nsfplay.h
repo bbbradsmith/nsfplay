@@ -35,9 +35,6 @@ namespace xgm
   protected:
     NSFPlayerConfig *config;
 
-    enum { PRE_CLICK, CLICKING, POST_CLICK };
-
-    int click_mode;
     double rate;
     int nch; // number of channels
     int song;

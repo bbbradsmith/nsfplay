@@ -356,10 +356,9 @@ void NSFPlayer::SetPlayFreq (double r)
   {
     ::srand((unsigned)::time(NULL)); // randomizing random generator
 
-    time_in_ms = 0;  
-    silent_length = 0; 
+    time_in_ms = 0;
+    silent_length = 0;
     playtime_detected = false;
-    click_mode = PRE_CLICK;
     total_render = 0;
     frame_render = (int)(rate)/60; // ‰‰‘tî•ñ‚ğXV‚·‚éüŠú
     apu_clock_rest = 0.0;
@@ -444,6 +443,14 @@ void NSFPlayer::SetPlayFreq (double r)
 
     for (int i=0;i<NES_DEVICE_MAX;++i)
       NotifyPan(i);
+
+    // suppress starting click by setting DC filter to balance the starting level at 0
+    int quality = config->GetValue("QUALITY").GetInt();
+    INT32 b[2];
+    for (int i=0; i < NES_DEVICE_MAX; ++i) sc[i]->Tick(0); // determine starting state for all sound units
+    fader.Tick(0);
+    for (int i=0; i < (quality+1); ++i) fader.Render(b); // warm up rconv/render with enough sample to reach a steady state
+    dcf.SetLevel(b); // DC filter will use the current DC level as its starting state
   }
 
   void NSFPlayer::DetectSilent ()

@@ -8,6 +8,7 @@ namespace xgm
     use_all_channels = false;
     patch_set = OPLL_VRC7_TONE;
     patch_custom = NULL;
+    divider = 0;
 
     opll = OPLL_new ( 3579545, DEFAULT_RATE);
     OPLL_reset_patch (opll, patch_set);
