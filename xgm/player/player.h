@@ -66,6 +66,10 @@ namespace xgm {
      */
     virtual void Notify(int param){};
 
+    virtual void Detach() {
+        config = NULL;
+    }
+
     /**
      * 演奏データをロードする
      * <P>

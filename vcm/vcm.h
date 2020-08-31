@@ -92,6 +92,7 @@ namespace vcm
   {
   public:
     virtual void Notify(int)=0;
+    virtual void Detach()=0;
   };
 
   class Observable
@@ -127,6 +128,12 @@ namespace vcm
       std::set<ObserverI *>::iterator it;
       for(it=oblist.begin();it!=oblist.end();it++)
         (*it)->Notify(id);
+    }
+
+    virtual ~Observable() {
+      std::set<ObserverI *>::iterator it;
+      for(it=oblist.begin();it!=oblist.end();it++)
+        (*it)->Detach();
     }
   }; 
 
