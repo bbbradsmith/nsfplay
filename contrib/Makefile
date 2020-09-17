@@ -13,7 +13,6 @@ LIBDIR=$(DESTDIR)$(PREFIX)/lib
 INCDIR=$(DESTDIR)$(PREFIX)/include/nsfplay
 
 OBJDIR := .objs
-DEPDIR := .deps
 
 LIB_STATIC=$(STATIC_PREFIX)nsfplay$(STATIC_EXT)
 LIB_DYNLIB=$(DYNLIB_PREFIX)nsfplay$(DYNLIB_EXT)
@@ -27,7 +26,13 @@ CFLAGS_RELEASE := -g0 -O2 -Wall -fPIC -DNDEBUG
 CXXFLAGS_RELEASE_DEBUG := -g -O2 -Wall -fPIC -std=c++11 -DNDEBUG
 CFLAGS_RELEASE_DEBUG := -g -O2 -Wall -fPIC -DNDEBUG
 
-DEPFLAGS = -MT $@ -MD -MP -MF $(DEPDIR)/$*.Td
+ifeq ($(CFLAGS),)
+CFLAGS := $(CFLAGS_DEBUG)
+endif
+
+ifeq ($(CXXFLAGS),)
+CXXFLAGS := $(CXXFLAGS_DEBUG)
+endif
 
 LIBXGM_CPP_SRCS = \
 	../xgm/devices/Audio/MedianFilter.cpp \
@@ -143,35 +148,24 @@ LIBVCM_HEADERS = \
 LIBXGM_OBJS = $(patsubst %,$(OBJDIR)/%.o,$(basename $(subst ../,,$(LIBXGM_CPP_SRCS)))) $(patsubst %,$(OBJDIR)/%.o,$(basename $(subst ../,,$(LIBXGM_C_SRCS))))
 LIBVCM_OBJS = $(patsubst %,$(OBJDIR)/%.o,$(basename $(subst ../,,$(LIBVCM_CPP_SRCS))))
 
-LIBXGM_DEPS = $(patsubst %,$(DEPDIR)/%.d,$(basename $(subst ../,,$(LIBXGM_CPP_SRCS)))) $(patsubst %,$(DEPDIR)/%.d,$(basename $(subst ../,,$(LIBXGM_C_SRCS))))
-LIBVCM_DEPS = $(patsubst %,$(DEPDIR)/%.d,$(basename $(subst ../,,$(LIBVCM_CPP_SRCS))))
-
 OBJS = $(LIBXGM_OBJS) $(LIBVCM_OBJS)
-DEPS = $(LIBXGM_DEPS) $(LIBVCM_DEPS)
 
 $(shell mkdir -p $(dir $(OBJS)) > /dev/null)
-$(shell mkdir -p $(dir $(DEPS)) > /dev/null)
 
-COMPILE.c = $(CC) -c -o $@ $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(CFLAGS_EXTRA)
-COMPILE.cc = $(CXX) -c -o $@ $(DEPFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS_EXTRA)
+COMPILE.c = $(CC) -c -o $@ $(CFLAGS) $(CPPFLAGS) $(CFLAGS_EXTRA)
+COMPILE.cc = $(CXX) -c -o $@ $(CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS_EXTRA)
 LINK.o = $(CXX) -shared -o $@ $(LDFLAGS) $(LDLIBS) $(LDFLAGS_EXTRA)
-POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 VPATH = ../
 
 all: debug
-
-show:
-	echo $(LIBXGM_DEPS)
 
 debug:
 	"$(MAKE)" "CC=$(CC)" "CXX=$(CXX)" "STATIC_PREFIX=$(STATIC_PREFIX)" "DYNLIB_PREFIX=$(DYNLIB_PREFIX)" "STATIC_EXT=$(STATIC_EXT)" "DYNLIB_EXT=$(DYNLIB_EXT)" "CFLAGS=$(CFLAGS_DEBUG)" "CXXFLAGS=$(CXXFLAGS_DEBUG)" "$(LIB_STATIC)" "$(LIB_DYNLIB)"
 
 release:
-	"$(MAKE)" clean
 	"$(MAKE)" "CC=$(CC)" "CXX=$(CXX)" "STATIC_PREFIX=$(STATIC_PREFIX)" "DYNLIB_PREFIX=$(DYNLIB_PREFIX)" "STATIC_EXT=$(STATIC_EXT)" "DYNLIB_EXT=$(DYNLIB_EXT)" "CFLAGS=$(CFLAGS_RELEASE)" "CXXFLAGS=$(CXXFLAGS_RELEASE)" "$(LIB_STATIC)" "$(LIB_DYNLIB)"
 
 release_debug:
-	"$(MAKE)" clean
 	"$(MAKE)" "CC=$(CC)" "CXX=$(CXX)" "STATIC_PREFIX=$(STATIC_PREFIX)" "DYNLIB_PREFIX=$(DYNLIB_PREFIX)" "STATIC_EXT=$(STATIC_EXT)" "DYNLIB_EXT=$(DYNLIB_EXT)" "CFLAGS=$(CFLAGS_RELEASE_DEBUG)" "CXXFLAGS=$(CXXFLAGS_RELEASE_DEBUG)" "$(LIB_STATIC)" "$(LIB_DYNLIB)"
 
 demo: nsf2wav$(EXE_EXT)
@@ -186,32 +180,21 @@ $(LIB_DYNLIB): $(OBJS)
 	$(LINK.o) $^
 
 $(OBJDIR)/%.o: %.c
-$(OBJDIR)/%.o: %.c $(DEPDIR)/%.d
+$(OBJDIR)/%.o: %.c
 	$(COMPILE.c) $<
-	$(POSTCOMPILE)
 
 $(OBJDIR)/%.o: %.cpp
-$(OBJDIR)/%.o: %.cpp $(DEPDIR)/%.d
+$(OBJDIR)/%.o: %.cpp
 	$(COMPILE.cc) $<
-	$(POSTCOMPILE)
-
-.PRECIOUS: $(DEPDIR)/%.d
-$(DEPDIR)/%.d: ;
-
--include $(DEPS)
 
 clean:
-	$(RM) $(DEPS)
 	$(RM) $(OBJS)
 	$(RM) $(LIB_STATIC) $(LIB_DYNLIB)
 
 # this rule winds up generating a huge command-line
 # for installing headers, need to find a way to break
 # it up
-install: $(LIB_STATIC) $(LIB_DYNLIB)
-	$(INSTALL) -d $(LIBDIR)
-	$(INSTALL) -m 644 $(LIB_STATIC) $(LIBDIR)/$(LIB_STATIC)
-	$(INSTALL) -m 755 $(LIB_DYNLIB) $(LIBDIR)/$(LIB_DYNLIB)
+install-headers: $(LIBXGM_HEADERS) $(LIBVCM_HEADERS) nsfplay.h
 	$(INSTALL) -d $(INCDIR)
 	$(foreach header,$(LIBXGM_HEADERS), \
 	  $(INSTALL) -d $(INCDIR)/$(dir $(subst ../,,$(header))) && \
@@ -223,3 +206,8 @@ install: $(LIB_STATIC) $(LIB_DYNLIB)
 	) true
 	$(INSTALL) -m 644 nsfplay.h $(INCDIR)/nsfplay.h
 
+
+install: install-headers $(LIB_STATIC) $(LIB_DYNLIB)
+	$(INSTALL) -d $(LIBDIR)
+	$(INSTALL) -m 644 $(LIB_STATIC) $(LIBDIR)/$(LIB_STATIC)
+	$(INSTALL) -m 755 $(LIB_DYNLIB) $(LIBDIR)/$(LIB_DYNLIB)
