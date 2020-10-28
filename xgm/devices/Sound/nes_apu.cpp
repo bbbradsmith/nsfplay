@@ -210,19 +210,29 @@ namespace xgm
     gclock = 0;
     mask = 0;
 
-    scounter[0] = 0;
-    scounter[1] = 0;
-    sphase[0] = 0;
-    sphase[0] = 0;
-
-    sweep_div[0] = 1;
-    sweep_div[1] = 1;
-    envelope_div[0] = 0;
-    envelope_div[1] = 0;
-    length_counter[0] = 0;
-    length_counter[1] = 0;
-    envelope_counter[0] = 0;
-    envelope_counter[1] = 0;
+    for (int i=0; i<2; ++i)
+    {
+        scounter[i] = 0;
+        sphase[i] = 0;
+        duty[i] = 0;
+        volume[i] = 0;
+        freq[i] = 0;
+        sfreq[i] = 0;
+        sweep_enable[i] = 0;
+        sweep_mode[i] = 0;
+        sweep_write[i] = 0;
+        sweep_div_period[i] = 0;
+        sweep_div[i] = 1;
+        sweep_amount[i] = 0;
+        envelope_disable[i] = 0;
+        envelope_loop[i] = 0;
+        envelope_write[i] = 0;
+        envelope_div_period[i] = 0;
+        envelope_div[0] = 0;
+        envelope_counter[i] = 0;
+        length_counter[i] = 0;
+        enable[i] = 0;
+    }
 
     for (i = 0x4000; i < 0x4008; i++)
       Write (i, 0);

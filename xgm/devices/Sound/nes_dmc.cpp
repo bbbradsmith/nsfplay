@@ -487,19 +487,30 @@ namespace xgm
     tphase = 0;
     nfreq = wavlen_table[0][0];
     dfreq = freq_table[0][0];
-
+    tri_freq = 0;
+    linear_counter = 0;
+    linear_counter_reload = 0;
+    linear_counter_halt = 0;
+    linear_counter_control = 0;
+    noise_volume = 0;
+    noise = 0;
+    noise_tap = 0;
+    envelope_loop = 0;
+    envelope_disable = 0;
+    envelope_write = 0;
+    envelope_div_period = 0;
     envelope_div = 0;
+    envelope_counter = 0;
+    enable[0] = 0;
+    enable[1] = 0;
     length_counter[0] = 0;
     length_counter[1] = 0;
-    envelope_counter = 0;
-
     frame_irq = false;
     frame_irq_enable = false;
     frame_sequence_count = 0;
     frame_sequence_steps = 4;
     frame_sequence_step = 0;
     cpu->UpdateIRQ(NES_CPU::IRQD_FRAME, false);
-
 
     for (i = 0; i < 0x0F; i++)
       Write (0x4008 + i, 0);
@@ -512,7 +523,6 @@ namespace xgm
     cpu->UpdateIRQ(NES_CPU::IRQD_DMC, false);
 
     out[0] = out[1] = out[2] = 0;
-    tri_freq = 0;
     damp = 0;
     dmc_pop = false;
     dmc_pop_offset = 0;
