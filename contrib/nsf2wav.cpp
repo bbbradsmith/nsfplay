@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     uint64_t frames; /* total pcm frames */
 
     xgm::NSF nsf;
-    xgm::NSFPlayer player;
     xgm::NSFPlayerConfig config;
+    xgm::NSFPlayer player;
 
     if(argc < 2) {
         fprintf(stderr,"Usage: %s (/path/to/nsf[e] | m3u entry) [tracknum] [out.wav]\n",argv[0]);
