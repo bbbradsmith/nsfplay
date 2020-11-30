@@ -1,6 +1,8 @@
 #ifndef _VCM_UI_H_
 #define _VCM_UI_H_
 
+#include <cstdlib>
+
 namespace vcm
 {
   class ValueCtrl;
@@ -321,7 +323,7 @@ namespace vcm
         {
           buf[j] = '\0';
           tmp *= 60;
-          tmp += atoi( buf );
+          tmp += ::atoi( buf );
           j=0;
         }
         else
@@ -334,7 +336,7 @@ namespace vcm
       {
         buf[j]='\0';
         tmp *= 60;
-        tmp += atoi( buf );
+        tmp += ::atoi( buf );
       }
 
       result = tmp * 1000;
