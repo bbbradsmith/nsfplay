@@ -171,7 +171,7 @@ release_debug:
 demo: nsf2wav$(EXE_EXT)
 
 nsfmeta$(EXE_EXT): $(OBJDIR)/nsfmeta.o $(LIB_STATIC)
-	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA)
+	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA) -liconv
 
 nsf2wav$(EXE_EXT): $(OBJDIR)/nsf2wav.o $(LIB_STATIC)
 	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA)
