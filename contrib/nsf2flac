@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Requires the jq and flac tools to be available.
+#set -x
+
+NSFMETA="$(dirname "$0")/nsfmeta"
+NSF2WAV="$(dirname "$0")/nsf2wav"
+
+function usage {
+    cat >&2 <<-EOF
+Usage: $0 file.nsf [track] [-- [flac flags] [-- nsf2wav flags]]"
+Convert an NSF[e] file to FLAC.
+
+Here's an example to convert foo.nsf to a 96khz mono flac called foo.flac
+with the highest available compression, verification, and replaygain:
+
+  ./nsf2flac foo.nsf \\
+      -- -o foo.flac --best --replay-gain --verify \\
+      -- --channels=1 --samplerate=96000
+EOF
+    exit 1
+}
+
+[[ $# -lt 1 ]] && usage
+
+nsf_file="$1"
+shift
+
+declare -i track=1
+if [[ -n "$1" && "$1" != "--" ]]; then
+  track="$1"
+  shift
+fi
+
+[[ -n "$1" && "$1" != "--" ]] && usage
+shift
+
+declare -a flacflags
+for flag in "$@"; do
+    shift
+    [[ "$flag" == "--" ]] && break
+    flacflags+=( "$flag" )
+done
+
+declare -a nsf2wavflags
+nsf2wavflags+=( "$@" )
+
+tagsjson="$("$NSFMETA" "$nsf_file")" || exit $?
+
+# Usage: jq_on_track filter [options]
+function jq_on_track {
+  local filter="$1"
+  shift
+  jq -r --argjson track "$(( track - 1 ))" "$@" ".[\$track] | $filter" <<< "$tagsjson"
+}
+
+declare -A tags
+keys="$(jq_on_track 'keys[]')" || exit $?
+while read -r key; do
+    tags["$key"]="$(jq_on_track '.[$key]' --arg key "$key")" || exit $?
+done <<< "$keys"
+
+for tag in "${!tags[@]}"; do
+    val="${tags[$tag]}"
+    case $tag in
+        ripper)
+          flacflags+=( "--tag=ORGANIZATION=${val}" )
+          ;;
+        text)
+          flacflags+=( "--tag=DESCRIPTION=${val}" )
+          ;;
+        title|artist|copyright)
+          flacflags+=( "--tag=${tag^^}=${val}" )
+          ;;
+        *) ;;
+    esac
+done
+
+coproc "$NSF2WAV" --track="$track" --quiet "${nsf2wavflags[@]}" "$nsf_file" /dev/stdout
+pid="$COPROC_PID"
+flac "${flacflags[@]}" /dev/stdin <&"${COPROC[0]}" || exit $?
+wait "$pid" || exit $?

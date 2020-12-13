@@ -39,10 +39,10 @@ struct Nsf2WavOptions {
 
     int32_t length_ms;
     int32_t fade_ms;
-    // TODO: Auto-detect if the NSF uses panning to choose mono or stereo.
-    int channels = 2;
+    int channels = 1;
     double samplerate = xgm::DEFAULT_RATE;
     int track = 1;
+    bool quiet = false;
 };
 
 void Usage(FILE *output, int exit_code, const xgm::NSF &nsf) {
@@ -60,19 +60,20 @@ If no output file is specified, nsf2wav will print information about the NSF
 to the screen and then exit without performing any conversion.
 
 Options:
+ -c, --channels=%-8d The number of audio channels to output.
+ -f, --fade_ms=%-9d The length of time in milliseconds to fade out at the
+                         end of the song.
  -h, --help              Show this help message.
- -t, --track=%-11d Track number, starting with 1.
  -l, --length_ms=%-7d The length in milliseconds to output. The final file
                          may be shorter than specified if the NSF program
                          terminates before outputting the specified amount of
                          audio.
- -f, --fade_ms=%-9d The length of time in milliseconds to fade out at the
-                         end of the song.
+ -q, --quiet             Suppress all non-error output.
  -s, --samplerate=%-6.0f The audio sample rate.
- -c, --channels=%-8d The number of audio channels to output.
+ -t, --track=%-11d Track number, starting with 1.
 )",
-        progname, defaults.track, defaults.length_ms, defaults.fade_ms,
-        defaults.samplerate, defaults.channels);
+        progname, defaults.channels, defaults.fade_ms, defaults.length_ms,
+        defaults.samplerate, defaults.track);
     exit(exit_code);
 }
 
@@ -84,12 +85,16 @@ Nsf2WavOptions ParseOptions(int *argc, char ***argv, const xgm::NSF &nsf) {
         { "track", required_argument, nullptr, 't' },
         { "samplerate", required_argument, nullptr, 's' },
         { "channels", required_argument, nullptr, 'c' },
+        { "quiet", no_argument, nullptr, 'q' },
         { nullptr, 0, nullptr, 0 }
     };
     Nsf2WavOptions options(nsf);
     int ch = 0;
     while ((ch = getopt_long(*argc, *argv, "hl:s:f:c:", longopts, NULL)) != -1) {
         switch (ch) {
+        case 'q':
+            options.quiet = true;
+            break;
         case 'l':
             options.length_ms = std::stoi(optarg);
             break;
@@ -223,6 +228,8 @@ int main(int argc, char *argv[]) {
         /* dump info */
         /* use playlist order, if available */
 
+        if (options.quiet) return EXIT_SUCCESS;
+
         printf("Title: %s\n",nsf.title);
         printf("Artist: %s\n",nsf.artist);
         printf("Copyright: %s\n",nsf.copyright);
@@ -230,7 +237,7 @@ int main(int argc, char *argv[]) {
 
         if(nsf.playlist_mode) {
             printf("Track %03d: %s\n",nsf.song+1,nsf.GetTitleString());
-            return 0;
+            return EXIT_SUCCESS;
         }
 
         if(nsf.nsfe_plst_size > 0) {
@@ -280,12 +287,14 @@ int main(int argc, char *argv[]) {
         options.fade_ms = nsf.fade_in_ms;
     }
 
-    printf("Track %03d: %s\n",i+1,
-      (!nsf.playlist_mode && nsf.nsfe_entry[nsfe_i].tlbl[0] != '\0') ?
-      nsf.nsfe_entry[nsfe_i].tlbl :
-      nsf.GetTitleString("%L",i));
-    printf("  length: %" PRId32 " ms\n", options.length_ms);
-    printf("    fade: %" PRId32 " ms\n", options.fade_ms);
+    if (!options.quiet) {
+        printf("Track %03d: %s\n",i+1,
+          (!nsf.playlist_mode && nsf.nsfe_entry[nsfe_i].tlbl[0] != '\0') ?
+          nsf.nsfe_entry[nsfe_i].tlbl :
+          nsf.GetTitleString("%L",i));
+        printf("  length: %" PRId32 " ms\n", options.length_ms);
+        printf("    fade: %" PRId32 " ms\n", options.fade_ms);
+    }
 
     config["MASTER_VOLUME"] = 256; /* default volume = 128 */
 
