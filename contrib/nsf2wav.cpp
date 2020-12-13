@@ -279,12 +279,24 @@ int main(int argc, char *argv[]) {
         options.length_ms = nsf.nsfe_entry[nsfe_i].time;
     } else if (nsf.time_in_ms >= 0) {
         options.length_ms = nsf.time_in_ms;
+    } else {
+      fprintf(
+          stderr,
+          "Warning: Could not detect track length, will use default of %" PRId32
+              " ms.\n",
+          options.length_ms);
     }
 
     if (!nsf.playlist_mode && nsf.nsfe_entry[nsfe_i].fade >= 0) {
         options.fade_ms = nsf.nsfe_entry[nsfe_i].fade;
     } else if (nsf.fade_in_ms >= 0) {
         options.fade_ms = nsf.fade_in_ms;
+    } else {
+      fprintf(
+          stderr,
+          "Warning: Could not detect fade time, will use default of %" PRId32
+              " ms.\n",
+          options.fade_ms);
     }
 
     if (!options.quiet) {
