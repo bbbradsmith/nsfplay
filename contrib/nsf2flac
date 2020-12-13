@@ -56,6 +56,7 @@ function jq_on_track {
 declare -A tags
 keys="$(jq_on_track 'keys[]')" || exit $?
 while read -r key; do
+    [[ -z "$key" ]] && continue
     tags["$key"]="$(jq_on_track '.[$key]' --arg key "$key")" || exit $?
 done <<< "$keys"
 

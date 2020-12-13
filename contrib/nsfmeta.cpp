@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
     json nsf_json = json::array();
 
     for (int track = 0; track < nsf.GetSongNum(); track++) {
-      json &track_json = nsf_json[track];
+      json &track_json = nsf_json[track] = json::object();
       nsf.SetSong(track);
 
       if (std::string_view title(nsf.title); !title.empty()) {
