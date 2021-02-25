@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysexits.h>
+#include <string.h>
 
 #include <algorithm>
 #include <memory>
