@@ -7,6 +7,8 @@ DYNLIB_EXT=.so
 EXE_EXT=
 INSTALL=install
 
+LIBS_ICONV = -liconv
+
 DESTDIR=
 PREFIX=/usr/local
 LIBDIR=$(DESTDIR)$(PREFIX)/lib
@@ -171,7 +173,7 @@ release_debug:
 demo: nsf2wav$(EXE_EXT)
 
 nsfmeta$(EXE_EXT): $(OBJDIR)/nsfmeta.o $(LIB_STATIC)
-	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA) -liconv
+	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA) $(LIBS_ICONV)
 
 nsf2wav$(EXE_EXT): $(OBJDIR)/nsf2wav.o $(LIB_STATIC)
 	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA)
