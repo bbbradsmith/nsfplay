@@ -40,6 +40,7 @@ namespace xgm
 
     nch = 1;
     infinite = false;
+    last_out = 0;
   }
 
   NSFPlayer::~NSFPlayer ()
