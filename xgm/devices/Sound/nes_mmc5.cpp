@@ -33,6 +33,7 @@ namespace xgm
     for(int c=0;c<2;++c)
         for(int t=0;t<3;++t)
             sm[c][t] = 128;
+    Reset();
   }
 
   NES_MMC5::~NES_MMC5 ()
@@ -55,6 +56,11 @@ namespace xgm
     envelope_counter[0] = 0;
     envelope_counter[1] = 0;
     frame_sequence_count = 0;
+
+    freq[0] = 0;
+    freq[1] = 0;
+    enable[0] = false;
+    enable[1] = false;
 
     for (i = 0; i < 8; i++)
       Write (0x5000 + i, 0);
