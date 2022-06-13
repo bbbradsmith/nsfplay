@@ -14,6 +14,7 @@ namespace xgm
     for(int c=0;c<2;++c)
         for(int t=0;t<3;++t)
             sm[c][t] = 128;
+    Reset();
   }
 
   NES_VRC6::~NES_VRC6 ()
@@ -74,6 +75,15 @@ namespace xgm
 
   void NES_VRC6::Reset ()
   {
+    freq[0] = 0;
+    freq[1] = 0;
+    freq[2] = 0;
+    counter[0] = 0;
+    counter[1] = 0;
+    counter[2] = 0;
+    enable[0] = 0;
+    enable[1] = 0;
+    enable[2] = 0;
     Write (0x9003, 0);
     for (int i = 0; i < 3; i++)
     {
@@ -83,9 +93,6 @@ namespace xgm
     }
     count14 = 0;
     mask = 0;
-    counter[0] = 0;
-    counter[1] = 0;
-    counter[2] = 0;
     phase[0] = 0;
     phase[0] = 1;
     phase[0] = 2;
