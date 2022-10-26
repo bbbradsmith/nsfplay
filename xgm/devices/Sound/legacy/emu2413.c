@@ -1,5 +1,5 @@
 /**
- * emu2413 v1.5.2
+ * emu2413 v1.5.9
  * https://github.com/digital-sound-antiques/emu2413
  * Copyright (C) 2020 Mitsutaka Okazaki
  *
@@ -68,7 +68,7 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {
 #define EG_STEP 0.375
 #define EG_BITS 7
 #define EG_MUTE ((1 << EG_BITS) - 1)
-#define EG_MAX (EG_MUTE - 3)
+#define EG_MAX (EG_MUTE - 4)
 
 /* dynamic range of total level */
 #define TL_STEP 0.75
@@ -188,8 +188,13 @@ static int32_t rks_table[8 * 2][2];
 static OPLL_PATCH null_patch = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static OPLL_PATCH default_patch[OPLL_TONE_NUM][(16 + 3) * 2];
 
-#define min(i, j) (((i) < (j)) ? (i) : (j))
-#define max(i, j) (((i) > (j)) ? (i) : (j))
+/* don't forget min/max is defined as a macro in stdlib.h of Visual C. */
+#ifndef min
+static INLINE int min(int i, int j) { return (i < j) ? i : j; }
+#endif
+#ifndef max
+static INLINE int max(int i, int j) { return (i > j) ? i : j; }
+#endif
 
 /***************************************************
 
@@ -354,7 +359,7 @@ static void makeRksTable(void) {
     }
 }
 
-static void makeDefaultPatch() {
+static void makeDefaultPatch(void) {
   int i, j;
   for (i = 0; i < OPLL_TONE_NUM; i++)
     for (j = 0; j < 19; j++)
@@ -363,7 +368,7 @@ static void makeDefaultPatch() {
 
 static uint8_t table_initialized = 0;
 
-static void initializeTables() {
+static void initializeTables(void) {
   makeTllTable();
   makeRksTable();
   makeSinTable();
@@ -770,7 +775,6 @@ static INLINE void start_envelope(OPLL_SLOT *slot) {
     slot->eg_out = 0;
   } else {
     slot->eg_state = ATTACK;
-    slot->eg_out = EG_MUTE;
   }
   request_update(slot, UPDATE_EG);
 }
@@ -795,7 +799,9 @@ static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *buddy, uint16_t eg_
 
   switch (slot->eg_state) {
   case DAMP:
-    if (slot->eg_out >= EG_MUTE) {
+    // DAMP to ATTACK transition is occured when the envelope reaches EG_MAX (max attenuation but it's not mute).
+    // Do not forget to check (eg_counter & mask) == 0 to synchronize it with the progress of the envelope.
+    if (slot->eg_out >= EG_MAX && (eg_counter & mask) == 0) {
       start_envelope(slot);
       if (slot->type & 1) {
         if (!slot->pg_keep) {
@@ -816,6 +822,8 @@ static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *buddy, uint16_t eg_
     break;
 
   case DECAY:
+    // DECAY to SUSTAIN transition must be checked at every cycle regardless of the conditions of the envelope rate and
+    // counter. i.e. the transition is not synchronized with the progress of the envelope.
     if ((slot->eg_out >> 3) == slot->patch->SL) {
       slot->eg_state = SUSTAIN;
       request_update(slot, UPDATE_EG);
@@ -856,7 +864,7 @@ static void update_slots(OPLL *opll) {
 
 /* output: -4095...4095 */
 static INLINE int16_t lookup_exp_table(uint16_t i) {
-  /* from andete's expressoin */
+  /* from andete's expression */
   int16_t t = (exp_table[(i & 0xff) ^ 0xff] + 1024);
   int16_t res = t >> ((i & 0x7f00) >> 8);
   return ((i & 0x8000) ? ~res : res) << 1;
@@ -864,10 +872,10 @@ static INLINE int16_t lookup_exp_table(uint16_t i) {
 
 static INLINE int16_t to_linear(uint16_t h, OPLL_SLOT *slot, int16_t am) {
   uint16_t att;
-  if (slot->eg_out >= EG_MAX)
+  if (slot->eg_out > EG_MAX)
     return 0;
 
-  att = min(EG_MAX, (slot->eg_out + slot->tll + am)) << 4;
+  att = min(EG_MUTE, (slot->eg_out + slot->tll + am)) << 4;
   return lookup_exp_table(h + att);
 }
 
@@ -1073,11 +1081,11 @@ void OPLL_delete(OPLL *opll) {
 
 static void reset_rate_conversion_params(OPLL *opll) {
   const double f_out = opll->rate;
-  const double f_inp = opll->clk / 72;
+  const double f_inp = opll->clk / 72.0;
 
   opll->out_time = 0;
-  opll->out_step = ((uint32_t)f_inp) << 8;
-  opll->inp_step = ((uint32_t)f_out) << 8;
+  opll->out_step = f_inp;
+  opll->inp_step = f_out;
 
   if (opll->conv) {
     OPLL_RateConv_delete(opll->conv);
@@ -1375,14 +1383,14 @@ void OPLL_dumpToPatch(const uint8_t *dump, OPLL_PATCH *patch) {
 }
 
 void OPLL_getDefaultPatch(int32_t type, int32_t num, OPLL_PATCH *patch) {
-  OPLL_dump2patch(default_inst[type] + num * 8, patch);
+  OPLL_dumpToPatch(default_inst[type] + num * 8, patch);
 }
 
 void OPLL_setPatch(OPLL *opll, const uint8_t *dump) {
   OPLL_PATCH patch[2];
   int i;
   for (i = 0; i < 19; i++) {
-    OPLL_dump2patch(dump + i * 8, patch);
+    OPLL_dumpToPatch(dump + i * 8, patch);
     memcpy(&opll->patch[i * 2 + 0], &patch[0], sizeof(OPLL_PATCH));
     memcpy(&opll->patch[i * 2 + 1], &patch[1], sizeof(OPLL_PATCH));
   }
