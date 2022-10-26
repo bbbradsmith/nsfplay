@@ -433,6 +433,7 @@ static int is_sjis_prefix(int c)
   void NSF::SetSong (int s)
   {
     song = s % songs;
+    title_unknown = true;
   }
 
   bool NSF::Load (UINT8 * image, UINT32 size)
