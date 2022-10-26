@@ -16,6 +16,7 @@
 namespace xgm
 {
 
+class NES_MEM; // forward declaration
 class NSF2_IRQ; // forward declaration
 
 class NES_CPU : public IDevice
@@ -38,6 +39,7 @@ protected:
   bool nmi_play;
   bool play_ready;
   IDevice *bus;
+  NES_MEM* nes_mem;
   UINT8 nsf2_bits;
   NSF2_IRQ* nsf2_irq;
   CPULogger *log_cpu;
@@ -60,6 +62,7 @@ public:
     NSF2_IRQ* nsf2_irq_);
   int Exec (int clock); // returns number of clocks executed
   void SetMemory (IDevice *);
+  void SetNESMemory (NES_MEM *);
   bool Read (UINT32 adr, UINT32 & val, UINT32 id=0);
   bool Write (UINT32 adr, UINT32 val, UINT32 id=0);
   void SetLogger (CPULogger *logger);

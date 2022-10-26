@@ -176,6 +176,8 @@ NSFPlay 2.5 beta - ???
 - Fixed error in track selector length when using NSFe playlists.
 - Integrated VRC7 (YM2143) emulation update from Mitsutaka Okazaki.
 - Linear square mix level now matches nonlinear at 1 full square.
+- Fix winamp playlist generator track titles.
+- Write protect internal player memory.
 
 NSFPlay 2.4 - 3/30/2019
 - Fixed incorrect bytes per second in stereo WAV output.

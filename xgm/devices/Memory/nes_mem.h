@@ -22,6 +22,7 @@ namespace xgm
     bool SetImage (UINT8 * data, UINT32 offset, UINT32 size);
     void SetFDSMode (bool); // enables writing to $6000-DFFF for FDS
     void SetReserved (const UINT8* data, UINT32 size);
+	bool WriteReserved (UINT32 adr, UINT32 val);
   };
 
 }                               // namespace

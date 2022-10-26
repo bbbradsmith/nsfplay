@@ -41,11 +41,6 @@ namespace xgm
       image[adr] = val;
       return true;
     }
-    if (PLAYER_RESERVED <= adr && adr < (PLAYER_RESERVED + PLAYER_RESERVED_SIZE))
-    {
-      image[adr] = val;
-      return true;
-    }
     if (fds_enable && 0x8000 <= adr && adr < 0xe000)
     {
       image[adr] = val;
@@ -83,6 +78,16 @@ namespace xgm
   {
     assert(size <= PLAYER_RESERVED_SIZE);
     ::memcpy(image + PLAYER_RESERVED, data, size);
+  }
+
+  bool NES_MEM::WriteReserved (UINT32 adr, UINT32 val)
+  {
+    if (PLAYER_RESERVED <= adr && adr < (PLAYER_RESERVED + PLAYER_RESERVED_SIZE))
+    {
+      image[adr] = val;
+      return true;
+    }
+    return false;
   }
 
 }                               // namespace

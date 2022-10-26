@@ -72,6 +72,7 @@ NES_CPU::NES_CPU (double clock)
 {
   nes_basecycles = clock;
   bus = NULL;
+  nes_mem = NULL;
   log_cpu = NULL;
   irqs = 0;
   enable_irq = true;
@@ -104,9 +105,9 @@ void NES_CPU::run_from (UINT32 address)
 	breaked = false;
 	context.PC = PLAYER_RESERVED; // JSR, followed by infinite loop ("breaked")
 	breakpoint = context.PC+3;
-	assert (bus);
-	bus->Write (PLAYER_RESERVED+1, address & 0xff);
-	bus->Write (PLAYER_RESERVED+2, address>>8);
+	assert (nes_mem);
+	nes_mem->WriteReserved (PLAYER_RESERVED+1, address & 0xff);
+	nes_mem->WriteReserved (PLAYER_RESERVED+2, address>>8);
 	// see PLAYER_PROGRAM in nsfplay.cpp
 }
 
@@ -205,6 +206,11 @@ int NES_CPU::Exec (int clocks)
 void NES_CPU::SetMemory (IDevice * b)
 {
   bus = b;
+}
+
+void NES_CPU::SetNESMemory (NES_MEM * b)
+{
+  nes_mem = b;
 }
 
 bool NES_CPU::Write (UINT32 adr, UINT32 val, UINT32 id)

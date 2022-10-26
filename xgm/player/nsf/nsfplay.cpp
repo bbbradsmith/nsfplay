@@ -187,8 +187,8 @@ namespace xgm
         nsf2_vectors.ForceVector(0,PLAYER_RESERVED+0x06); // NMI routine that calls PLAY
         nsf2_vectors.ForceVector(1,PLAYER_RESERVED+0x03); // Reset routine goes to "breaked" infinite loop (not used)
         nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x1D); // Default IRQ points to empty RTI.
-        mem.Write(PLAYER_RESERVED+0x11,nsf->play_address & 0xFF);
-        mem.Write(PLAYER_RESERVED+0x12,nsf->play_address >> 8);
+        mem.WriteReserved(PLAYER_RESERVED+0x11,nsf->play_address & 0xFF);
+        mem.WriteReserved(PLAYER_RESERVED+0x12,nsf->play_address >> 8);
     }
     if (nsf->nsf2_bits & 0x10) // uses IRQ
     {
@@ -297,6 +297,7 @@ namespace xgm
     // stack above.
 
     cpu.SetMemory (&stack);
+	cpu.SetNESMemory (&mem);
   }
 
 void NSFPlayer::SetPlayFreq (double r)
