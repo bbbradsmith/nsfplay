@@ -28,7 +28,7 @@
 
 #define _PI_ 3.14159265358979323846264338327950288
 
-#define OPLL_TONE_NUM 9
+#define OPLL_TONE_NUM 10
 static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {
   {
 #include "vrc7tone_nuke.h"
@@ -57,6 +57,9 @@ static unsigned char default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {
   {
 #include "281btone.h"
   },
+  {
+#include "281btone_plgdavid.h"
+  }
 };
 
 /* phase increment counter */
