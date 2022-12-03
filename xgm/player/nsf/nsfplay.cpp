@@ -186,9 +186,19 @@ namespace xgm
         nsf2_vectors.SetCPU(&cpu);
         nsf2_vectors.ForceVector(0,PLAYER_RESERVED+0x06); // NMI routine that calls PLAY
         nsf2_vectors.ForceVector(1,PLAYER_RESERVED+0x03); // Reset routine goes to "breaked" infinite loop (not used)
-        nsf2_vectors.ForceVector(2,PLAYER_RESERVED+0x1D); // Default IRQ points to empty RTI.
         mem.WriteReserved(PLAYER_RESERVED+0x11,nsf->play_address & 0xFF);
         mem.WriteReserved(PLAYER_RESERVED+0x12,nsf->play_address >> 8);
+        // Initialize IRQ vector with existing contents of $FFFE.
+        UINT32 iv[2];
+        mem.Read(0xFFFE,iv[0]);
+        mem.Read(0xFFFF,iv[1]);
+        if (bmax)
+        {
+            bank.Read(0xFFFE,iv[0]);
+            bank.Read(0xFFFF,iv[1]);
+        }
+        UINT32 iva = (iv[0] & 0xFF) | ((iv[1] & 0xFF) << 8);
+        nsf2_vectors.ForceVector(2,iva);
     }
     if (nsf->nsf2_bits & 0x10) // uses IRQ
     {
