@@ -310,6 +310,8 @@ int main(int argc, char *argv[]) {
     }
 
     config["MASTER_VOLUME"] = 256; /* default volume = 128 */
+    config["APU2_OPTION5"] = 0; /* disable randomized noise phase at reset */
+    config["APU2_OPTION7"] = 0; /* disable randomized tri phase at reset */
 
     player.SetConfig(&config);
     if(!player.Load(&nsf)) {
