@@ -139,7 +139,7 @@ BOOL CnsfplayDlg::OnInitDialog()
     ((CButton *)GetDlgItem(IDC_CONFIG))->SetIcon((HICON)::LoadImage(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_CONFIG),IMAGE_ICON,16,16,LR_DEFAULTCOLOR));
     ((CButton *)GetDlgItem(IDC_WAVEOUT))->SetIcon((HICON)::LoadImage(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_WAVEOUT),IMAGE_ICON,16,16,LR_DEFAULTCOLOR));
 
-	m_timerID = SetTimer(1,100,NULL);
+    m_timerID = SetTimer(1,100,NULL);
     m_slider.SetRange(0,60*5,TRUE);
     m_slider.SetTicFreq(10);
     m_sb_dragging = false;
