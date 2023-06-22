@@ -342,6 +342,7 @@ NSFPlay 2.0 - 2/22/2012
 NSFPlay - 12/09/2006
 - Written by Brezza > http://www.pokipoki.org/dsa/index.php?NSFplay
 
+
 Contributors
 ============
 
@@ -358,7 +359,9 @@ John Regan
 https://github.com/jprjr
 - clang/gcc compile preparation
 - infinite track playback
-- work on separated NSFPlay library (see contribs)
+- separated NSFPlay library (contribs)
+- nsf2wav tool (contribs)
+- MMC5/VRC6 initialization fixes
 
 Marat Fayzullin
 https://fms.komkon.org/
@@ -376,6 +379,15 @@ Gumball2415
 https://github.com/Gumball2415
 - YM2413 emulation update
 - YMF281B plgDavid patch set option
+
+Russell Harmon
+https://github.com/eatnumber1
+- nsf2flac (contribs)
+- nsfmeta converts NSFe data to json (contribs)
+
+Valtteri Heikkilä 
+https://github.com/tsone
+- nsf2wav fix triangle/noise randomiazation (contribs)
 
 
 ===============
