@@ -169,6 +169,9 @@ BOOL CnsfplayDlg::OnInitDialog()
     ::OutputDebugString(cWndName);
     ::OutputDebugString("\n");
 
+    // begin with Open button selected
+    GotoDlgCtrl(GetDlgItem(IDC_OPEN));
+
     return TRUE;
 }
 
