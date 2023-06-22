@@ -79,7 +79,6 @@ void CnsfplayDlg::DoDataExchange(CDataExchange* pDX)
   CDialog::DoDataExchange(pDX);
   DDX_Control(pDX, IDC_PLAYTIME, m_timebox);
   DDX_Control(pDX, IDC_SLIDER, m_slider);
-  DDX_Control(pDX, IDC_TITLE, m_title);
   DDX_Control(pDX, IDC_TIME_MAX, m_time_max);
   DDX_Control(pDX, IDC_OPEN, m_open_btn);
   DDX_Control(pDX, IDC_INFO, m_prop_btn);
@@ -383,10 +382,13 @@ void CnsfplayDlg::UpdateInfo()
     m_last_len = len;
   }
   if(strcmp(m_last_title,title)!=0) {
-    m_title.SetWindowText(title);
     strcpy(m_last_title,title);
+    // convert utf8 to unicode
+    CArray<wchar_t,int> w;
+    w.SetSize(utf8_file(title,NULL,0));
+    utf8_file(title,w.GetData(),w.GetSize());
+    SetWindowTextW(GetDlgItem(IDC_TITLE)->GetSafeHwnd(),w.GetData());
   }
-
 }
 
 void CnsfplayDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)

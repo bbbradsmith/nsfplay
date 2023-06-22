@@ -15,4 +15,4 @@ extern FILE* fopen_utf8(const char* filename, const char* mode);
 
 // convert a utf8 filename to wchar_t, returns length
 // use wfile=NULL, wfile_len=0 to query length without writing the conversion to wfile
-#define utf8_file(utf8,wfile,wfile_len) MultiByteToWideChar(CP_UTF8,0,(utf8),-1,(wfile),(wfile_len));
+#define utf8_file(utf8,wfile,wfile_len) MultiByteToWideChar(CP_UTF8,0,(utf8),-1,(wfile),(wfile_len))

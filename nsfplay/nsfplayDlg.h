@@ -67,7 +67,6 @@ public:
   afx_msg void OnBnClickedPlay();
   CSliderCtrl m_slider;
   afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-  CStatic m_title;
   CStatic m_time_max;
   afx_msg void OnBnClickedKbwin();
   afx_msg void OnBnClickedPause();
