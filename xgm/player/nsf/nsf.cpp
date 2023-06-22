@@ -602,7 +602,8 @@ void sjis_legacy(char* s, const unsigned int length)
       if (n >= chunk_size) break; \
       p = reinterpret_cast<char*>(chunk+n); \
       while (n < chunk_size && chunk[n] != 0) ++n; \
-      if(chunk[n] == 0) ++n;
+      if(chunk[n] == 0) ++n; \
+      else p = "<invalid>";
 
     // store entire file for string references, etc.
     delete[] nsfe_image;

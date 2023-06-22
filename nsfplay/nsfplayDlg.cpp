@@ -226,9 +226,9 @@ void CnsfplayDlg::OnDropFiles(HDROP hDropInfo)
     w_aryFile.SetSize(wSize+1);
     DragQueryFileW(hDropInfo, 0, w_aryFile.GetData(), wSize+1);
     nSize = file_utf8(w_aryFile.GetData(),NULL,0);
-    if (nSize < 0) nSize = 0;
-	aryFile.SetSize(nSize);
-	file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
+    if (nSize < 0) nSize = 1;
+    aryFile.SetSize(nSize);
+    file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
     if (m_emu->Play(aryFile.GetData()))
     {
       MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
@@ -371,7 +371,7 @@ void CnsfplayDlg::OnBnClickedPlay()
 void CnsfplayDlg::UpdateInfo()
 {
   CString str;
-  char title[1024];
+  char title[GETFILEINFO_TITLE_LENGTH];
   int len;
   m_emu->GetFileInfo(NULL,title,&len);
   len/=1000;

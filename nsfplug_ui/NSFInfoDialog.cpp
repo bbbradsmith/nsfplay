@@ -78,12 +78,12 @@ ON_COMMAND(ID_NEWPLS, OnNewpls)
 ON_COMMAND(ID_PRESET, OnLoadpreset)
 END_MESSAGE_MAP()
 
-
-// sets unicode text on a dialog item
+// sets UTF8 text on a dialog item
 void SetTextW(CWnd* cw, int item, CString& s)
 {
   CArray<wchar_t,int> w;
   w.SetSize(utf8_file(s.GetBuffer(),NULL,0));
+  if (w.GetSize() == 0) w.SetSize(1);
   utf8_file(s.GetBuffer(),w.GetData(),w.GetSize());
   SetWindowTextW(cw->GetDlgItem(item)->GetSafeHwnd(),w.GetData());
 }
@@ -540,17 +540,24 @@ void NSFInfoDialog::OnStnClickedArtist()
 
 void NSFInfoDialog::OnDropFiles(HDROP hDropInfo)
 {
-  CArray<char,int> aryFile;
-  UINT nSize, nCount = DragQueryFile(hDropInfo, -1, NULL, 0);
+  UINT nCount, wSize;
+  int nSize;
+  CArray <char,int> aryFile;
+  CArray <wchar_t, int> w_aryFile;
 
   if(parent->wa2mod)
   {
     parent->wa2mod->ClearList();
+    nCount = DragQueryFileW(hDropInfo, -1, NULL, 0);
     for(UINT i=0;i<nCount;i++)
     {
-      nSize = DragQueryFile(hDropInfo, i, NULL, 0);
-      aryFile.SetSize(nSize+1);
-      DragQueryFile(hDropInfo, i, aryFile.GetData(), nSize+1);
+      wSize = DragQueryFileW(hDropInfo, i, NULL, 0);
+      w_aryFile.SetSize(wSize+1);
+      DragQueryFileW(hDropInfo, i, w_aryFile.GetData(), wSize+1);
+      nSize = file_utf8(w_aryFile.GetData(),NULL,0);
+      if (nSize < 0) nSize = 1;
+      aryFile.SetSize(nSize);
+      file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
       parent->wa2mod->QueueFile(aryFile.GetData());
     }
     parent->wa2mod->PlayStart();
