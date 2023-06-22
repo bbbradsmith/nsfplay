@@ -2,6 +2,7 @@
 #include "log_cpu.h"
 #include "../CPU/nes_cpu.h"
 #include "../../player/nsf/nsf.h"
+#include "../../fileutil.h"
 
 namespace xgm
 {
@@ -145,7 +146,7 @@ void CPULogger::Begin (const char* title)
         file = NULL;
     }
     if (filename)
-        file = ::fopen(filename, "at");
+        file = fopen_utf8(filename, "at");
 
     if (file)
         ::fprintf(file, "BEGIN(\"%s\")\n", title);\

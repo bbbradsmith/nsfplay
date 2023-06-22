@@ -3,6 +3,7 @@
  */
 
 #include "emu_outdisk.h"
+#include "../xgm/fileutil.h" // utf8_file
 
 Out_Module EmuOutDisk::m_out_mod;
 unsigned int EmuOutDisk::m_sec_size;
@@ -63,7 +64,9 @@ int EmuOutDisk::Open(int rate, int nch, int bps, int buflen, int prebuf) {
   pwf.wf.nAvgBytesPerSec = nch * rate * (bps / 8);
   pwf.wBitsPerSample = bps;
 
-  m_file = mmioOpen((LPSTR)m_filename, NULL, MMIO_ALLOCBUF | MMIO_READWRITE | MMIO_CREATE);
+  wchar_t wfile[2048];
+  utf8_file(m_filename,wfile,2048);
+  m_file = mmioOpenW(wfile, NULL, MMIO_ALLOCBUF | MMIO_READWRITE | MMIO_CREATE);
   if (m_file == NULL)
   {
     return -1;

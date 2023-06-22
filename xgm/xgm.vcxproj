@@ -162,6 +162,7 @@
     <ClInclude Include="devices\Sound\nes_n106.h" />
     <ClInclude Include="devices\Sound\nes_vrc6.h" />
     <ClInclude Include="devices\Sound\nes_vrc7.h" />
+    <ClInclude Include="fileutil.h" />
     <ClInclude Include="player\all.h" />
     <ClInclude Include="player\midi_interface.h" />
     <ClInclude Include="player\nsf\nsf.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="devices\Sound\nes_n106.cpp" />
     <ClCompile Include="devices\Sound\nes_vrc6.cpp" />
     <ClCompile Include="devices\Sound\nes_vrc7.cpp" />
+    <ClCompile Include="fileutil.cpp" />
     <ClCompile Include="player\nsf\nsf.cpp" />
     <ClCompile Include="player\nsf\nsfconfig.cpp" />
     <ClCompile Include="player\nsf\nsfplay.cpp" />

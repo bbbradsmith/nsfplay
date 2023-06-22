@@ -163,6 +163,11 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
+NSFPlay 2.6 - (Unofficial)
+- NSF2 IRQ vector filled with existing content at $FFFE by default.
+- Unicode filename support, UTF8 metadata support.
+- Legacy Shift-JIS support for NSF title/author/copyright fields.
+
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).
 - Keyboard view speed control setting should reset to normal when the program restarts.

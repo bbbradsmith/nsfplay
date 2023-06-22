@@ -39,10 +39,6 @@ void NSFInfoDialog::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(NSFInfoDialog)
 	DDX_Control(pDX, IDC_SONGSLIDER, m_songslider);
 	DDX_Text(pDX, IDC_SONG, m_song);
-	DDX_Text(pDX, IDC_ARTIST, m_artist);
-	DDX_Text(pDX, IDC_COPYRIGHT, m_copyright);
-	DDX_Text(pDX, IDC_TITLE, m_title);
-	DDX_Text(pDX, IDC_INFO, m_info);
 	DDX_Text(pDX, IDC_FDS, m_fds);
 	DDX_Text(pDX, IDC_FME7, m_fme7);
 	DDX_Text(pDX, IDC_MMC5, m_mmc5);
@@ -82,6 +78,15 @@ ON_COMMAND(ID_NEWPLS, OnNewpls)
 ON_COMMAND(ID_PRESET, OnLoadpreset)
 END_MESSAGE_MAP()
 
+// sets UTF8 text on a dialog item
+void SetTextW(CWnd* cw, int item, CString& s)
+{
+  CArray<wchar_t,int> w;
+  w.SetSize(utf8_file(s.GetBuffer(),NULL,0));
+  if (w.GetSize() == 0) w.SetSize(1);
+  utf8_file(s.GetBuffer(),w.GetData(),w.GetSize());
+  SetWindowTextW(cw->GetDlgItem(item)->GetSafeHwnd(),w.GetData());
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // NSFInfoDialog ‚Ì‹@”
@@ -251,13 +256,20 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
     local_tag = true;
     ss.LoadString(IDS_LOCALTAG);
     m_info += ss + "\r\n";
-  }  
+  }
 
   GetDlgItem(IDC_SONGSLIDER)->EnableWindow(nsf->enable_multi_tracks?TRUE:FALSE);
   GetDlgItem(IDC_PREV)->EnableWindow(nsf->enable_multi_tracks?TRUE:FALSE);
   GetDlgItem(IDC_NEXT)->EnableWindow(nsf->enable_multi_tracks?TRUE:FALSE);
 
   UpdateData(false);
+  //GetDlgItem(IDC_INFO)->SetWindowTextA(m_winfo.GetBuffer());
+
+  // convert UTF8 to unicode
+  SetTextW(this,IDC_INFO,m_info);
+  SetTextW(this,IDC_ARTIST,m_artist);
+  SetTextW(this,IDC_COPYRIGHT,m_copyright);
+  SetTextW(this,IDC_TITLE,m_title);
 }
 
 void NSFInfoDialog::SetInfo(char *fn)
@@ -265,6 +277,9 @@ void NSFInfoDialog::SetInfo(char *fn)
   if(nsf.LoadFile(fn)==false)
   {
     GetDlgItem(IDC_INFO)->SetWindowText("Not a NSF file");
+    GetDlgItem(IDC_ARTIST)->SetWindowText("");
+    GetDlgItem(IDC_COPYRIGHT)->SetWindowText("");
+    GetDlgItem(IDC_TITLE)->SetWindowText("");
     return;
   }
   if(CONFIG["NSFE_PLAYLIST"] && nsf.nsfe_plst)
@@ -300,7 +315,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
     return;
   }
 
-  fp = fopen(path_buffer,"r");
+  fp = fopen_utf8(path_buffer,"r");
   if(fp)
   {
     fclose(fp);
@@ -308,7 +323,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
       return;
   }
 
-  fp = fopen(path_buffer, "w");
+  fp = fopen_utf8(path_buffer, "w");
   if(fp==NULL)
   {
     MessageBox("Playlist Write Error!", "Error", MB_OK|MB_ICONEXCLAMATION );
@@ -525,17 +540,24 @@ void NSFInfoDialog::OnStnClickedArtist()
 
 void NSFInfoDialog::OnDropFiles(HDROP hDropInfo)
 {
-  CArray<char,int> aryFile;
-  UINT nSize, nCount = DragQueryFile(hDropInfo, -1, NULL, 0);
+  UINT nCount, wSize;
+  int nSize;
+  CArray <char,int> aryFile;
+  CArray <wchar_t, int> w_aryFile;
 
   if(parent->wa2mod)
   {
     parent->wa2mod->ClearList();
+    nCount = DragQueryFileW(hDropInfo, -1, NULL, 0);
     for(UINT i=0;i<nCount;i++)
     {
-      nSize = DragQueryFile(hDropInfo, i, NULL, 0);
-      aryFile.SetSize(nSize+1);
-      DragQueryFile(hDropInfo, i, aryFile.GetData(), nSize+1);
+      wSize = DragQueryFileW(hDropInfo, i, NULL, 0);
+      w_aryFile.SetSize(wSize+1);
+      DragQueryFileW(hDropInfo, i, w_aryFile.GetData(), wSize+1);
+      nSize = file_utf8(w_aryFile.GetData(),NULL,0);
+      if (nSize < 0) nSize = 1;
+      aryFile.SetSize(nSize);
+      file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
       parent->wa2mod->QueueFile(aryFile.GetData());
     }
     parent->wa2mod->PlayStart();

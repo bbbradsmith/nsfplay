@@ -23,6 +23,7 @@
 #include "nsfplayDlg.h"
 
 #include "../xgm/version.h"
+#include "../xgm/fileutil.h" // file_utf8
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,6 +52,9 @@ BOOL CnsfplayApp::InitInstance()
 
     CWinApp::InitInstance();
 
+    int wargc;
+    wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(),&wargc);
+
     CMutex mutex(FALSE, m_pszExeName);
     if( mutex.Lock(0) == TRUE ) {
 
@@ -59,27 +63,30 @@ BOOL CnsfplayApp::InitInstance()
       m_pMainWnd = &dlg;
       m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
 
-      if(5==__argc) // command line wave out
+      if(5==wargc) // command line wave out
       {
-        char* nsf_file = __argv[1];
-        char* wav_file = __argv[2];
-        char* track = __argv[3];
-        char* time = __argv[4];
+        char nsf_file[2048]; file_utf8(wargv[1],nsf_file,2048);
+        char wav_file[2048]; file_utf8(wargv[2],wav_file,2048);
+        char track[32]; file_utf8(wargv[3],track,32);
+        char time[32]; file_utf8(wargv[4],time,32);
         dlg.WriteSingleWave(nsf_file, wav_file, track, time);
         dlg.m_cancel_open = true;
       }
-      else if(2<=__argc) 
+      else if(2<=wargc) 
       {
-        dlg.m_init_file = CString(__argv[1]);
+        const int INIT_FILE_MAX = 2048;
+        char init_file[INIT_FILE_MAX];
+        file_utf8(wargv[1],init_file,INIT_FILE_MAX);
+        dlg.m_init_file = CString(init_file);
       }
 
-	  INT_PTR nResponse = dlg.DoModal();
-	  if (nResponse == IDOK)
-	  {
-	  }
-	  else if (nResponse == IDCANCEL)
-	  {
-	  }
+      INT_PTR nResponse = dlg.DoModal();
+      if (nResponse == IDOK) // what is this for?
+      {
+      }
+      else if (nResponse == IDCANCEL)
+      {
+      }
       mutex.Unlock();
 
     } else {
@@ -89,17 +96,16 @@ BOOL CnsfplayApp::InitInstance()
         if( pWnd ) {
           pWnd->SetForegroundWindow();
 
-        if(2<=__argc) {
-          size_t size = strlen(__argv[1])+1;
-          HANDLE hMem = GlobalAlloc(GMEM_ZEROINIT,sizeof(DROPFILES)+size+1);
+        if(2<=wargc) {
+          size_t size = wcslen(wargv[1])+1;
+          HANDLE hMem = GlobalAlloc(GMEM_ZEROINIT,sizeof(DROPFILES)+(size*sizeof(wchar_t))+1);
           DROPFILES *DropFiles = (DROPFILES *)GlobalLock(hMem);
           DropFiles->pFiles=sizeof(DROPFILES);
           DropFiles->pt.x=10;
           DropFiles->pt.y=10;
           DropFiles->fNC=1;
-          DropFiles->fWide=0;
-          strcpy(((char *)DropFiles)+sizeof(DROPFILES),__argv[1]);
-          *(((char *)DropFiles)+sizeof(DROPFILES)+size)='\0';
+          DropFiles->fWide=1;
+          wcscpy((wchar_t*)(((char*)DropFiles)+sizeof(DROPFILES)),wargv[1]);
           GlobalUnlock(hMem);
           pWnd->PostMessage(WM_DROPFILES,(WPARAM)hMem,0);
         }

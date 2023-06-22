@@ -94,8 +94,8 @@ namespace xgm
     count14 = 0;
     mask = 0;
     phase[0] = 0;
-    phase[0] = 1;
-    phase[0] = 2;
+    phase[1] = 0;
+    phase[2] = 0;
   }
 
   INT16 NES_VRC6::calc_sqr (int i, UINT32 clocks)

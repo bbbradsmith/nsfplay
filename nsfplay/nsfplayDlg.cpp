@@ -21,11 +21,11 @@
 #include "stdafx.h"
 #include "nsfplay.h"
 #include "nsfplayDlg.h"
+#include "../xgm/fileutil.h" // file_utf8
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
 
 class CAboutDlg : public CDialog
 {
@@ -79,7 +79,6 @@ void CnsfplayDlg::DoDataExchange(CDataExchange* pDX)
   CDialog::DoDataExchange(pDX);
   DDX_Control(pDX, IDC_PLAYTIME, m_timebox);
   DDX_Control(pDX, IDC_SLIDER, m_slider);
-  DDX_Control(pDX, IDC_TITLE, m_title);
   DDX_Control(pDX, IDC_TIME_MAX, m_time_max);
   DDX_Control(pDX, IDC_OPEN, m_open_btn);
   DDX_Control(pDX, IDC_INFO, m_prop_btn);
@@ -216,15 +215,20 @@ HCURSOR CnsfplayDlg::OnQueryDragIcon()
 
 void CnsfplayDlg::OnDropFiles(HDROP hDropInfo)
 {
-  UINT nCount, nSize;
-  CArray <char, int> aryFile;
-  CSize size;
+  UINT nCount, wSize;
+  int nSize;
+  CArray <char,int> aryFile;
+  CArray <wchar_t, int> w_aryFile;
 
-  nCount = DragQueryFile(hDropInfo, -1, NULL, 0);
+  nCount = DragQueryFileW(hDropInfo, -1, NULL, 0);
   if(nCount==1) {
-    nSize = DragQueryFile(hDropInfo, 0, NULL, 0);
-    aryFile.SetSize(nSize+1);
-    DragQueryFile(hDropInfo, 0, aryFile.GetData(), nSize+1);
+    wSize = DragQueryFileW(hDropInfo, 0, NULL, 0);
+    w_aryFile.SetSize(wSize+1);
+    DragQueryFileW(hDropInfo, 0, w_aryFile.GetData(), wSize+1);
+    nSize = file_utf8(w_aryFile.GetData(),NULL,0);
+    if (nSize < 0) nSize = 1;
+    aryFile.SetSize(nSize);
+    file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
     if (m_emu->Play(aryFile.GetData()))
     {
       MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
@@ -275,10 +279,29 @@ void CnsfplayDlg::OnBnClickedWaveout()
           *t = '.';
       }
   }
+  wchar_t wtitle[1024];
+  utf8_file(title,wtitle,1024);
 
-  CFileDialog fd(FALSE,".wav",title,OFN_HIDEREADONLY,"WAV files (*.wav)|*.wav|All files (*.*)|*.*||",this);
-  if(fd.DoModal()==IDOK) {
-    m_emu->Waveout(fd.GetPathName().GetBuffer());
+  const int MAX_FN = 2048;
+  wchar_t wfn[MAX_FN];
+  utf8_file(title,wfn,2048); // default filename
+
+  OPENFILENAMEW ofn;
+  ZeroMemory(&ofn,sizeof(ofn));
+  ofn.lStructSize = sizeof(ofn);
+  ofn.hwndOwner = GetSafeHwnd();
+  ofn.lpstrDefExt = L".wav";
+  ofn.Flags = OFN_HIDEREADONLY;
+  ofn.lpstrFilter = L"WAV files (*.wav)\0*.wav\0All files (*.*)\0*.*\0\0";
+  ofn.lpstrFile = wfn;
+  ofn.nMaxFile = MAX_FN;
+  ofn.lpstrTitle = wtitle;
+  ofn.nMaxFileTitle = 1024;
+  if(GetOpenFileNameW(&ofn))
+  {
+    char fn[MAX_FN];
+    file_utf8(wfn,fn,MAX_FN);
+	m_emu->Waveout(fn);
     OnBnClickedPlay();
   }
 }
@@ -348,7 +371,7 @@ void CnsfplayDlg::OnBnClickedPlay()
 void CnsfplayDlg::UpdateInfo()
 {
   CString str;
-  char title[1024];
+  char title[GETFILEINFO_TITLE_LENGTH];
   int len;
   m_emu->GetFileInfo(NULL,title,&len);
   len/=1000;
@@ -359,10 +382,13 @@ void CnsfplayDlg::UpdateInfo()
     m_last_len = len;
   }
   if(strcmp(m_last_title,title)!=0) {
-    m_title.SetWindowText(title);
     strcpy(m_last_title,title);
+    // convert utf8 to unicode
+    CArray<wchar_t,int> w;
+    w.SetSize(utf8_file(title,NULL,0));
+    utf8_file(title,w.GetData(),w.GetSize());
+    SetWindowTextW(GetDlgItem(IDC_TITLE)->GetSafeHwnd(),w.GetData());
   }
-
 }
 
 void CnsfplayDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
@@ -392,9 +418,22 @@ void CnsfplayDlg::OnBnClickedPause()
 
 void CnsfplayDlg::OnBnClickedOpen()
 {
-  CFileDialog fd(TRUE,".nsf;.nsfe",0,OFN_FILEMUSTEXIST|OFN_HIDEREADONLY,"NSF files (*.nsf;*.nsfe)|*.nsf;*.nsfe|All files (*.*)|*.*||",this);
-  if(fd.DoModal()==IDOK) {
-    if (m_emu->Play(fd.GetPathName().GetBuffer()))
+  const int MAX_FN = 2048;
+  wchar_t wfn[MAX_FN];
+  OPENFILENAMEW ofn;
+  ZeroMemory(&ofn,sizeof(ofn));
+  ofn.lStructSize = sizeof(ofn);
+  ofn.hwndOwner = GetSafeHwnd();
+  ofn.lpstrDefExt = L".nsf;.nsfe";
+  ofn.Flags = OFN_FILEMUSTEXIST;
+  ofn.lpstrFilter = L"NSF files (*.nsf;*.nsfe)\0*.nsf;*.nsfe\0All files (*.*)\0*.*\0\0";
+  ofn.lpstrFile = wfn; wfn[0] = 0;
+  ofn.nMaxFile = MAX_FN;
+  if(GetOpenFileNameW(&ofn))
+  {
+    char fn[MAX_FN];
+    file_utf8(wfn,fn,MAX_FN);
+    if (m_emu->Play(fn))
     {
       MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
     }
