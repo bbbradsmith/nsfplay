@@ -48,6 +48,7 @@ public:
   int IsPaused();
   void GetFileInfo(char *file, char *title, int *length_in_ms);
   void Info(HWND hWnd);
+  void TrackInfo(HWND hWnd);
   void Config(HWND hWnd);
   void About(HWND hWnd);
   void Next();

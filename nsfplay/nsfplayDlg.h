@@ -76,6 +76,7 @@ public:
   CSliderCtrl m_volume;
   afx_msg void OnBnClickedConfig();
   afx_msg void OnBnClickedWaveout();
+  afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 
   int WriteSingleWave(char* nsf_file, char* wave_file, char* track, char* ms);
 };

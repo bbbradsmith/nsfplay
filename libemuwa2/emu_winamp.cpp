@@ -240,6 +240,13 @@ void EmuWinamp::Info(HWND hWnd) {
     m_in_mod->InfoBox(m_fn,m_in_mod->hMainWindow);
 }
 
+void EmuWinamp::TrackInfo(HWND hWnd) {
+  if(hWnd)
+    m_in_mod->InfoBox(NULL,hWnd); // null filename select track info instead
+  else
+    m_in_mod->InfoBox(NULL,m_in_mod->hMainWindow);
+}
+
 void EmuWinamp::Next() {
   SendMessage(m_in_mod->hMainWindow,WM_COMMAND,WINAMP_BUTTON5,0);
 }

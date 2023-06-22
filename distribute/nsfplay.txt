@@ -170,6 +170,7 @@ NSFPlay 2.6 - (Unofficial)
 - YM2413 emulation update to emu2413 1.5.9. (Gumball2415, okaxaki)
 - YMF281B plgDavid patch set option. (Gumball2415m plgDavid)
 - Resizable info window.
+- Right click info button to open the keyboard track-info window.
 
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).

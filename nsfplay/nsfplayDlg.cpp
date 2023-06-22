@@ -102,8 +102,8 @@ BEGIN_MESSAGE_MAP(CnsfplayDlg, CDialog)
     ON_BN_CLICKED(IDC_OPEN, OnBnClickedOpen)
     ON_BN_CLICKED(IDC_CONFIG, OnBnClickedConfig)
     ON_BN_CLICKED(IDC_WAVEOUT, OnBnClickedWaveout)
+    ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
-
 
 BOOL CnsfplayDlg::OnInitDialog()
 {
@@ -312,6 +312,12 @@ void CnsfplayDlg::OnBnClickedWaveout()
 void CnsfplayDlg::OnBnClickedInfo()
 {
   m_emu->Info(m_hWnd);
+}
+
+void CnsfplayDlg::OnContextMenu(CWnd* pWnd, CPoint point)
+{
+  if (pWnd == GetDlgItem(IDC_INFO)) // right click on info button
+    m_emu->TrackInfo(m_hWnd);
 }
 
 void CnsfplayDlg::OnTimer(UINT nIDEvent)

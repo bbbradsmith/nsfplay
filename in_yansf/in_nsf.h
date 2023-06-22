@@ -91,12 +91,16 @@ public:
     }
   }
 
-  virtual int InfoBox(char *fn, HWND hParent)
+  virtual int InfoBox(char *fn, HWND hParent) // fn==NULL used to open track info instead
   {
     if(ui) {
       ui->SetPlayerWindow(pMod->hMainWindow);
-      ui->SetInfoData(fn);
-      ui->OpenDialog(NSFplug_UI::DLG_INFO);
+      if (fn)
+      {
+        ui->SetInfoData(fn);
+        ui->OpenDialog(NSFplug_UI::DLG_INFO);
+      }
+      else ui->OpenDialog(NSFplug_UI::DLG_TRACK);
     }
     return 1;
   }
