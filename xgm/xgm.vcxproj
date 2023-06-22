@@ -143,6 +143,7 @@
     <ClInclude Include="devices\Misc\nsf2_irq.h" />
     <ClInclude Include="devices\Sound\legacy\2413tone.h" />
     <ClInclude Include="devices\Sound\legacy\281btone.h" />
+    <ClInclude Include="devices\Sound\legacy\281btone_plgdavid.h" />
     <ClInclude Include="devices\Sound\legacy\emu2149.h" />
     <ClInclude Include="devices\Sound\legacy\emu2212.h" />
     <ClInclude Include="devices\Sound\legacy\emu2413.h" />

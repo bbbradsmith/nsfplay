@@ -141,6 +141,7 @@ VRC7 patch sets: (VRC7_PATCH)
   6 - VRC7 set by kevtris 11/14/1999 (first set in vrcvii.txt)
   7 - YM2413 set by Mitsutaka Okazaki 4/10/2004
   8 - YMF281B set by Chabin 4/10/2004
+  9 - YMF281B set by plgDavid 2/28/2021
 
 
 Playlists
