@@ -10,6 +10,7 @@
 #include <memory.h>
 #include <string.h>
 #include "nsf.h"
+#include "../../fileutil.h"
 extern "C"
 {
 #include "pls/ppls.h"
@@ -297,7 +298,7 @@ static int is_sjis_prefix(int c)
     }
 
     filename[NSF_MAX_PATH - 1] = '\0';
-    fp = fopen (filename, "rb");
+    fp = fopen_utf8(filename, "rb");
     if (fp == NULL)
     {
       nsf_error = "Could not open file.";

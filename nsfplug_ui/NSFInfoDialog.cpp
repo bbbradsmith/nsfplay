@@ -300,7 +300,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
     return;
   }
 
-  fp = fopen(path_buffer,"r");
+  fp = fopen_utf8(path_buffer,"r");
   if(fp)
   {
     fclose(fp);
@@ -308,7 +308,7 @@ void NSFInfoDialog::GeneratePlaylist(bool clear)
       return;
   }
 
-  fp = fopen(path_buffer, "w");
+  fp = fopen_utf8(path_buffer, "w");
   if(fp==NULL)
   {
     MessageBox("Playlist Write Error!", "Error", MB_OK|MB_ICONEXCLAMATION );

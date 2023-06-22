@@ -1,4 +1,5 @@
 #include "nsf_tag.h"
+#include "../xgm/fileutil.h"
 using namespace xgm;
 
 NSF_TAG::NSF_TAG() : sdat(NULL)
@@ -75,7 +76,7 @@ int NSF_TAG::InitTagItem(int song, const char *title_format)
 
 static bool IsFileExist(char *file)
 {
-  FILE *fp = fopen(file, "r");
+  FILE *fp = fopen_utf8(file, "r");
   if(fp==NULL)
   {
     DEBUG_OUT("NOT EXIST\n");
