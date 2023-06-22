@@ -179,13 +179,21 @@
     <None Include="hlp\nsfplug.hhc" />
     <CustomBuild Include="hlp\nsfplug.hhp">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">start /wait hhc "hlp\nsfplug.hhp"
+
 if not exist "hlp\nsfplug.chm" goto :HelpError
+
 copy "hlp\nsfplug.chm" "$(OutDir)nsfplug.chm"
+
 goto :HelpDone
+
 :HelpError
+
 echo hlp\nsfplug.hhp(1) : error:ヘルプ ファイルを作成中に問題が発生しました。
+
 echo.
+
 :HelpDone
+
 echo.
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)nsfplug.chm;%(Outputs)</Outputs>
