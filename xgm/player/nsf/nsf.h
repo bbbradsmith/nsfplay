@@ -34,9 +34,9 @@ namespace xgm
     UINT16 play_address;
     char filename[NSF_MAX_PATH];
     char print_title[256+64]; // margin 64 chars.
-    char title_nsf[32];
-    char artist_nsf[32];
-    char copyright_nsf[32];
+    char title_nsf[128];
+    char artist_nsf[128];
+    char copyright_nsf[128];
     const char* title;
     const char* artist;
     const char* copyright;

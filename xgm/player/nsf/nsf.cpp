@@ -28,11 +28,46 @@ static char nsfe_error_[NSFE_ERROR_SIZE];
 static const char* nsfe_error = "(no NSFe loaded)";
 static const char* nsf_error = "(no NSF loaded)";
 
-static int is_sjis_prefix(int c)
+void sjis_legacy(char* s, const unsigned int length)
 {
-  if((0x81<=c&&c<=0x9F)||(0xE0<=c&&c<=0xFC)) return 1 ;
-  else return 0 ;
+	bool utf8 = true;
+	unsigned int multibyte = 0;
+	for (unsigned int i=0; i<length; ++i)
+	{
+		unsigned char c = s[i];
+		if (multibyte)
+		{
+			if ((c & 0xC0) != 0x80) // multibyte continuations always have 10xxxxxx
+			{
+				utf8 = false;
+				break;
+			}
+			--multibyte;
+		}
+		else
+		{
+			if ((c & 0x80) != 0x00) // high bit marks start of multibyte
+			{
+				if      ((c & 0xE0) == 0xC0) multibyte = 1; // 110xxxxx
+				else if ((c & 0xF0) == 0xE0) multibyte = 2; // 1110xxxx
+				else if ((c & 0xF8) == 0xF0) multibyte = 3; // 11110xxx
+				else
+				{
+					utf8 = false;
+					break;
+				}
+			}
+		}
+	}
+	if (utf8) return; // valid UTF8, don't convert
+
+	// if not valid UTF8 assume legacy shift-JIS
+	// (convenient conversion back and forth using windows wide character)
+	wchar_t w[1024];
+	MultiByteToWideChar(932,0,s,-1,w,1024);
+	WideCharToMultiByte(CP_UTF8,0,w,-1,s,length,NULL,NULL);
 }
+
 
   NSF::NSF ():SoundDataMSP ()
   {
@@ -41,6 +76,9 @@ static int is_sjis_prefix(int c)
     default_fadetime = 5 * 1000;
     default_loopnum = 0;
 
+    title_nsf[0] = 0;
+    artist_nsf[0] = 0;
+    copyright_nsf[0] = 0;
     title = title_nsf;
     artist = artist_nsf;
     copyright = copyright_nsf;
@@ -148,13 +186,7 @@ static int is_sjis_prefix(int c)
 
     while(wp<256&&*format)
     {
-      if(is_sjis_prefix(*format))
-      {
-        print_title[wp++] = *format++;
-        print_title[wp++] = *format++;
-        continue;
-      }
-      else if(*format=='%')
+      if(*format=='%')
       {
         switch(*(++format))
         {
@@ -496,13 +528,16 @@ static int is_sjis_prefix(int c)
     init_address = image[0x0a] | (image[0x0B] << 8);
     play_address = image[0x0c] | (image[0x0D] << 8);
     memcpy (title_nsf, image + 0x0e, 32);
-    title_nsf[31] = '\0';
-    title = title_nsf;
     memcpy (artist_nsf, image + 0x2e, 32);
-    artist_nsf[31] = '\0';
-    artist = artist_nsf;
     memcpy (copyright_nsf, image + 0x4e, 32);
-    copyright_nsf[31] = '\0';
+    title_nsf[32] = '\0';
+    artist_nsf[32] = '\0';
+    copyright_nsf[32] = '\0';
+    sjis_legacy(title_nsf,sizeof(title_nsf)); // these 3 fields use SJIS in some old Japanese NSFs
+    sjis_legacy(artist_nsf,sizeof(artist_nsf));
+    sjis_legacy(copyright_nsf,sizeof(copyright_nsf));
+    title = title_nsf;
+    artist = artist_nsf;
     copyright = copyright_nsf;
     ripper = ""; // NSFe only
     text = NULL; // NSFe only
