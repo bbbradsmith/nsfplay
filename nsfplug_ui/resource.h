@@ -120,6 +120,10 @@
 #define IDC_N106_7                      1163
 #define IDC_N106_8                      1164
 #define IDC_FDS                         1166
+#define IDC_MISC                        1167
+#define IDC_SONGBOX                     1168
+#define IDC_SONGSTATIC                  1169
+#define IDC_HEADER                      1170
 #define IDC_TRACKINFO                   2000
 #define IDC_FREQ                        2001
 #define IDC_DELAY                       2002

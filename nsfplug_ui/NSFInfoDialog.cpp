@@ -65,6 +65,8 @@ BEGIN_MESSAGE_MAP(NSFInfoDialog, CDialog)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_NEXT, OnNext)
 	ON_BN_CLICKED(IDC_PREV, OnPrev)
+    ON_WM_GETMINMAXINFO()
+    ON_WM_SIZE()
 	//}}AFX_MSG_MAP
   ON_COMMAND(ID_DELALL, OnDelall)
   ON_COMMAND(ID_DELONE, OnDelone)
@@ -276,7 +278,7 @@ void NSFInfoDialog::SetInfo(char *fn)
 {
   if(nsf.LoadFile(fn)==false)
   {
-    GetDlgItem(IDC_INFO)->SetWindowText("Not a NSF file");
+    GetDlgItem(IDC_INFO)->SetWindowText("Not an NSF file");
     GetDlgItem(IDC_ARTIST)->SetWindowText("");
     GetDlgItem(IDC_COPYRIGHT)->SetWindowText("");
     GetDlgItem(IDC_TITLE)->SetWindowText("");
@@ -401,7 +403,17 @@ void NSFInfoDialog::OnPanBox()
 BOOL NSFInfoDialog::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	
+
+	// store initial positions
+	CRect rect;
+	GetClientRect(rect); m_base_size = rect.Size(); // OnSize uses ClientRect size
+	GetWindowRect(rect); m_base_min  = rect.Size(); // OnGetMinMaxInfo uses WindowRect size
+	for (int i=0; i<CHILDREN; ++i)
+	{
+		GetDlgItem(m_child[i])->GetWindowRect(m_child_rect[i]);
+		ScreenToClient(m_child_rect[i]); // MoveWindow uses WindowRect relative to Client
+	}
+
   HICON hIcon = AfxGetApp()->LoadIcon(IDI_NSF);
   SetIcon(hIcon, TRUE);
   CMenu *menu = GetMenu();
@@ -493,6 +505,64 @@ void NSFInfoDialog::OnNext()
   if(max < (int)m_song ) m_song = max;
   if(UpdateData(false))
     ::SendMessage(parent->hWinamp, WM_USER+2413, (WPARAM)0xdeadbeef, (LPARAM)m_song-1);
+}
+
+//
+// dynamic resizing
+//
+
+const int NSFInfoDialog::m_child[CHILDREN] = {
+	IDC_HEADER,
+	IDC_MISC,
+	IDC_INFO,
+	IDC_SONGBOX,
+	IDC_SONGSTATIC,
+	IDC_SONG,
+	IDC_SONGSLIDER,
+	IDC_PREV,
+	IDC_NEXT,
+};
+
+// whether they move and/or resize with the window
+#define RESIZE_MX 0x01
+#define RESIZE_MY 0x02
+#define RESIZE_SX 0x04
+#define RESIZE_SY 0x08
+const int NSFInfoDialog::m_child_resize[CHILDREN] = {
+	RESIZE_SX,
+	RESIZE_SX | RESIZE_SY,
+	RESIZE_SX | RESIZE_SY,
+	RESIZE_SX | RESIZE_MY,
+	RESIZE_MY,
+	RESIZE_MY,
+	RESIZE_SX | RESIZE_MY,
+	RESIZE_MX | RESIZE_MY,
+	RESIZE_MX | RESIZE_MY,
+};
+
+void NSFInfoDialog::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
+{
+	CDialog::OnGetMinMaxInfo(lpMMI);
+	if (lpMMI->ptMinTrackSize.x < m_base_min.cx) lpMMI->ptMinTrackSize.x = m_base_min.cx;
+	if (lpMMI->ptMinTrackSize.y < m_base_min.cy) lpMMI->ptMinTrackSize.y = m_base_min.cy;
+}
+
+void NSFInfoDialog::OnSize(UINT nType, int cx, int cy)
+{
+	int dx = cx - m_base_size.cx;
+	int dy = cy - m_base_size.cy;
+	for (int i=0; i<CHILDREN; ++i)
+	{
+		CWnd* w = GetDlgItem(m_child[i]);
+		CRect r = m_child_rect[i];
+		int z = m_child_resize[i];
+		if (z & RESIZE_MX) r.OffsetRect(dx,0);
+		if (z & RESIZE_MY) r.OffsetRect(0,dy);
+		if (z & RESIZE_SX) r.right += dx;
+		if (z & RESIZE_SY) r.bottom += dy;
+		w->MoveWindow(r,0);
+	}
+	RedrawWindow();
 }
 
 void NSFInfoDialog::OnDelall()

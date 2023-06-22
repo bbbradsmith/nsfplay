@@ -65,11 +65,20 @@ protected:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnNext();
 	afx_msg void OnPrev();
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
 // ÉÜÅ[ÉUÅ[í«â¡
 protected:
+  static const int CHILDREN = 9;
+  static const int m_child[CHILDREN];
+  static const int m_child_resize[CHILDREN];
+  CRect m_child_rect[CHILDREN];
+  CSize m_base_size;
+  CSize m_base_min;
+
   NSF nsf, nsf_copy;
   NSF_TAG ntag;
   bool local_tag;

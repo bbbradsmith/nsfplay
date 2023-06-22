@@ -167,8 +167,9 @@ NSFPlay 2.6 - (Unofficial)
 - NSF2 IRQ vector filled with existing content at $FFFE by default.
 - Unicode filename support, UTF8 metadata support.
 - Legacy Shift-JIS support for NSF title/author/copyright fields.
-- YM2413 emulation update to emu2413 1.5.9 (Gumball2415, okaxaki)
-- YMF281B plgDavid patch set option (Gumball2415m plgDavid)
+- YM2413 emulation update to emu2413 1.5.9. (Gumball2415, okaxaki)
+- YMF281B plgDavid patch set option. (Gumball2415m plgDavid)
+- Resizable info window.
 
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).
