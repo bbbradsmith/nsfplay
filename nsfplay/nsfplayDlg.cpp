@@ -480,11 +480,39 @@ void CnsfplayDlg::OnBnClickedOpen()
   }
 }
 
-// command line wave output
-int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, char* ms)
+int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv)
 {
-    int it = ::atoi(track);
-    int ims = ::atoi(ms);
+	if (!in_yansf) return 0; // can't parse arguments without direct plugin access
+	int result = 0;
+	for (int i=1; i<wargc; ++i)
+	{
+		if (wargv[i][0] != L'-') continue;
+		char arg[1024];
+		file_utf8(wargv[i],arg,1024);
+		char* split = strstr(arg,"=");
+		if (split == NULL)
+		{
+			printf("Argument = expected but not found: %s\n",arg);
+			++result;
+			continue;
+		}
+		std::string val(arg+1,split-(arg+1));
+		if (!in_yansf->npm->cf->HasValue(val))
+		{
+			printf("Unknown configuration argument: %s\n",val.c_str());
+			++result;
+			continue;
+		}
+		(*(in_yansf->npm->cf))[val] = split+1;
+		in_yansf->npm->no_save_config = true; // changes are temporary unless explicitly saved by user
+	}
+	return result;
+}
+
+// command line wave output
+int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, int track, int ms)
+{
+    if (track < 1) track = 1;
 
     int last_pos = 0;
     int hang_count = 0;
@@ -494,28 +522,41 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, c
     if (in_yansf) // direct connection allows to set play time exactly
     {
         in_yansf->npm->no_save_config = true;
-        (*(in_yansf->npm->cf))["PLAY_TIME"] = ms;
+        if (ms >= 0) (*(in_yansf->npm->cf))["PLAY_TIME"] = ms;
+        else  ms = (*(in_yansf->npm->cf))["PLAY_TIME"];
         (*(in_yansf->npm->cf))["AUTO_DETECT"] = 0;
-        ims += (*(in_yansf->npm->cf))["FADE_TIME"];
-        ims += 10000; // buffer against early cutoff
+        ms += (*(in_yansf->npm->cf))["FADE_TIME"];
+        ms += 10000; // buffer against early cutoff
     }
-    else sleep_time = 5; // no plugin: kludge a cutoff length with 5ms accuracy
+    else
+    {
+        if (ms < 0) ms = 3 * 60000; // 3 minute default?
+        sleep_time = 5; // no plugin: kludge a cutoff length with 5ms accuracy
+    }
 
-    m_emu->Play(nsf_file);
+    if (m_emu->Play(nsf_file))
+    {
+        printf("Error opening file: %s\n",nsf_file);
+        if (in_yansf) printf("Error: %s\n",in_yansf->npm->sdat->LoadError());
+        m_emu->Stop();
+        return 1;
+    }
+    printf("Opened: %s\n",nsf_file);
     m_emu->Stop();
-    for (int t=1; t < it; ++t)
+    for (int t=1; t < track; ++t)
     {
         m_emu->Next();
         m_emu->Stop();
     }
     m_emu->Waveout(wave_file);
+    printf("Wave Output: %s\n",wave_file);
     m_emu->Play(NULL);
     do
     {
         ::Sleep(sleep_time);
         if (!m_emu->IsPlaying()) break;
         int iot = m_emu->GetOutputTime();
-        if (iot >= ims) break;
+        if (iot >= ms) break;
 
         if (last_pos != iot)
         {
@@ -530,6 +571,7 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, c
     }
     while (true);
     m_emu->Stop();
+    printf("Play time: %d ms\n",m_emu->GetOutputTime());
 
     return 0;
 }

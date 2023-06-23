@@ -30,10 +30,30 @@ Command line arguments
 ======================
 
   NSFPlay [filename]
-    > Open and begin playing NSF file.
+    Open and begin playing NSF file.
+    > [filename] NSF or NSFE input file
 
-  NFSPlay [nsf_filename] [wav_filename] [track] [milliseconds]
-    > Create WAV file from command line (cuts off after milliseconds are reached, or loop detection).
+  NFSPlay [nsf_filename] [wav_filename] (track) (milliseconds) >error.log
+    Create WAV file from command line
+    > [nsf_filename] NSF or NSFE input file
+    > [wav_filename] WAV output file
+    > (track) - optional, 1 if omitted
+    > (milliseconds) - optional, sets PLAY_TIME
+
+  Because it is a GUI application, errors cannot be reported to the command line
+  console, but you can redirect errors to a log file with >.
+  (>error.log in the example)
+
+  Optionally any value from the configuration file can be temporarily set with
+  an  argument beginning -. If this is done, the configuration will not be
+  automatically saved on close, but can still be saved if you manually save
+  the new configuration from the menu.
+
+  NSFPlay -AUTO_DETECT=0
+    > Disables automatic track length detection.
+
+  NSFPlay -REGION=4
+    > Force PAL region.
 
 
 Configuration files
@@ -171,6 +191,10 @@ NSFPlay 2.6 - (Unofficial)
 - YMF281B plgDavid patch set option. (Gumball2415m plgDavid)
 - Resizable info window.
 - Right click info button to open the keyboard track-info window.
+- Fix random variation in command line WAV export times.
+- Allow multiple instances of command line WAV export.
+- Add redirectable diagnostic log to stdout for command line usage. (Use > to send it to a file.)
+- Allow command-line configuration overrides.
 
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).

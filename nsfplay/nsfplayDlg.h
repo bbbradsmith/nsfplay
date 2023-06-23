@@ -81,5 +81,6 @@ public:
   afx_msg void OnBnClickedWaveout();
   afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 
-  int WriteSingleWave(char* nsf_file, char* wave_file, char* track, char* ms);
+  int ParseArgs(int wargc, const wchar_t* const * wargv); // apply config override arguments starting with -
+  int WriteSingleWave(char* nsf_file, char* wave_file, int track, int ms);
 };

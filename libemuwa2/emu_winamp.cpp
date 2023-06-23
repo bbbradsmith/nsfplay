@@ -108,7 +108,7 @@ EmuWinamp::EmuWinamp(char *dll_name) {
   m_in_mod->hMainWindow = CreateWindow(
     "WinampEmu","Winamp Emulation",WS_POPUP,0,0,32,32,NULL,NULL,GetModuleHandle(NULL),this);
   SetProp(m_in_mod->hMainWindow,"WinampEmu",(HANDLE)this);
-  printf("hMainWindow :%p\n",m_in_mod->hMainWindow);
+  //printf("hMainWindow :%p\n",m_in_mod->hMainWindow);
   m_in_mod->hDllInstance = m_dll;
 
   m_plugin_direct = (PLUGIN_DIRECT)GetProcAddress(m_dll, "pluginDirect");
@@ -158,7 +158,7 @@ int EmuWinamp::Play(char *fn) {
   
   int retcode = m_in_mod->Play(m_fn);
 
-  m_wo[0] = 0; // 
+  m_wo[0] = 0;
 
   if(!retcode) 
     m_playing = true;

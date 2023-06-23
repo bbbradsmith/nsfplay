@@ -45,53 +45,79 @@ CnsfplayApp::CnsfplayApp() :
 
 CnsfplayApp theApp;
 
-
 BOOL CnsfplayApp::InitInstance()
 {
-	InitCommonControls();
-
+    InitCommonControls();
     CWinApp::InitInstance();
 
     int wargc;
     wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(),&wargc);
 
-    CMutex mutex(FALSE, m_pszExeName);
-    if( mutex.Lock(0) == TRUE ) {
+    // find positional arguments
+    const int MAX_PARGS = 4;
+    int pargc = 0;
+    wchar_t* pargv[4];
+    for (int i=1; i<wargc; ++i) {
+        if(wargv[i][0] != L'-') {
+            if (pargc < MAX_PARGS)
+                pargv[pargc] = wargv[i];
+            ++pargc;
+        }
+    }
+    if (pargc > MAX_PARGS)
+        printf("Too many positional arguments. Maximum %d, got: %d\n",MAX_PARGS,pargc);
+
+    if (pargc >= 2) { // WAV export
+      CnsfplayDlg dlg;
+      m_pDlg = &dlg;
+      m_pMainWnd = &dlg;
+      m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
+      char nsf_file[2048]; file_utf8(pargv[0],nsf_file,2048);
+      char wav_file[2048]; file_utf8(pargv[1],wav_file,2048);
+      int track = -1;
+      int time = -1;
+      if (pargc >= 3) {
+          char temp[32]; file_utf8(pargv[2],temp,32);
+          track = ::atoi(temp);
+      }
+      if (pargc >= 4) {
+          char temp[32]; file_utf8(pargv[3],temp,32);
+          time = ::atoi(temp);
+      }
+      dlg.ParseArgs(wargc,wargv);
+      dlg.WriteSingleWave(nsf_file, wav_file, track, time);
+      dlg.m_cancel_open = true;
+      dlg.DoModal();
+      return FALSE;
+    }
+
+    // GUI open
+    CMutex mutex(FALSE, m_pszExeName); // see if program is already open
+    if( mutex.Lock(0) == TRUE ) { // new instance
 
       CnsfplayDlg dlg;
       m_pDlg = &dlg;
       m_pMainWnd = &dlg;
       m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
 
-      if(5==wargc) // command line wave out
-      {
-        char nsf_file[2048]; file_utf8(wargv[1],nsf_file,2048);
-        char wav_file[2048]; file_utf8(wargv[2],wav_file,2048);
-        char track[32]; file_utf8(wargv[3],track,32);
-        char time[32]; file_utf8(wargv[4],time,32);
-        dlg.WriteSingleWave(nsf_file, wav_file, track, time);
-        dlg.m_cancel_open = true;
-      }
-      else if(2<=wargc) 
-      {
+      if(pargc > 0) {
         const int INIT_FILE_MAX = 2048;
         char init_file[INIT_FILE_MAX];
-        file_utf8(wargv[1],init_file,INIT_FILE_MAX);
+        file_utf8(pargv[0],init_file,INIT_FILE_MAX);
         dlg.m_init_file = CString(init_file);
       }
 
-      INT_PTR nResponse = dlg.DoModal();
+      dlg.ParseArgs(wargc,wargv);
+      dlg.DoModal();
       mutex.Unlock();
 
-    } else {
-
-        // NOTE this string must match CAPTION in IDD_NSFPLAY_DIALOG in nsfplay.rc
-        CWnd* pWnd = CWnd::FindWindow(NULL, NSFPLAY_TITLE);
-        if( pWnd ) {
-          pWnd->SetForegroundWindow();
-
-        if(2<=wargc) {
-          size_t size = wcslen(wargv[1])+1;
+    } else { // otherwise send the new file to already open NSFPlay
+      // NOTE this string must match CAPTION in IDD_NSFPLAY_DIALOG in nsfplay.rc
+      CWnd* pWnd = CWnd::FindWindow(NULL, NSFPLAY_TITLE);
+      if( pWnd ) {
+        pWnd->SetForegroundWindow();
+        if(pargc > 0) {
+          size_t size = wcslen(pargv[0])+1;
           HANDLE hMem = GlobalAlloc(GMEM_ZEROINIT,sizeof(DROPFILES)+(size*sizeof(wchar_t))+1);
           DROPFILES *DropFiles = (DROPFILES *)GlobalLock(hMem);
           DropFiles->pFiles=sizeof(DROPFILES);
@@ -99,13 +125,13 @@ BOOL CnsfplayApp::InitInstance()
           DropFiles->pt.y=10;
           DropFiles->fNC=1;
           DropFiles->fWide=1;
-          wcscpy((wchar_t*)(((char*)DropFiles)+sizeof(DROPFILES)),wargv[1]);
+          wcscpy((wchar_t*)(((char*)DropFiles)+sizeof(DROPFILES)),pargv[0]);
           GlobalUnlock(hMem);
           pWnd->PostMessage(WM_DROPFILES,(WPARAM)hMem,0);
         }
       }
     }
-	return FALSE;
+    return FALSE;
 }
 
 BOOL CnsfplayApp::ProcessMessageFilter(int code, LPMSG lpMsg)

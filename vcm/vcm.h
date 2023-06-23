@@ -192,6 +192,11 @@ namespace vcm
       MutexGuard mg_(this);
       return data[id];
     }
+    inline bool HasValue( const std::string id )
+    {
+      MutexGuard mg_(this);
+      return data.find( id ) != data.end();
+    }
     inline void Clear()
     { 
       MutexGuard mg_(this);

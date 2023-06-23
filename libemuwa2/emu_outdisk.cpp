@@ -69,6 +69,7 @@ int EmuOutDisk::Open(int rate, int nch, int bps, int buflen, int prebuf) {
   m_file = mmioOpenW(wfile, NULL, MMIO_ALLOCBUF | MMIO_READWRITE | MMIO_CREATE);
   if (m_file == NULL)
   {
+    printf("Failed to open WAV: %s\n",m_filename);
     return -1;
   }
 
