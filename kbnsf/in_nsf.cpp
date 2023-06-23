@@ -20,7 +20,7 @@ std::set<KMP_NSF *>kmp_set;
 CRITICAL_SECTION cso;
 
 static NSFplug_UI_DLL *ui;
-static NSFplug_Model npm;
+static NSFplug_Model npm = {0};
 
 static void WINAPI Init()
 { 
@@ -164,7 +164,8 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
   case DLL_PROCESS_DETACH:
     // コンフィグレーション破棄
     if(ui&&ui->GetModule()) kmp_unhack();
-    npm.cf->Save(IniPath,"NSFplug");
+    if (!npm.no_save_config)
+      npm.cf->Save(IniPath,"NSFplug");
     delete npm.cf;
     delete ui;
     break;

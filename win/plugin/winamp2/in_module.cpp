@@ -92,7 +92,7 @@ DWORD WINAPI __stdcall WA2InputModule::PlayThread(WA2InputModule *_t)
 
       if(_t->pMod->dsp_isactive())
         wsize = _t->pMod->dsp_dosamples((short *)packet_buf,packet_samples,_t->bps,_t->nch,_t->rate) * (_t->nch*_t->bps/8);
-      else 
+      else
         wsize = packet_size;
 
       _t->pMod->outMod->Write((char *)packet_buf, wsize);

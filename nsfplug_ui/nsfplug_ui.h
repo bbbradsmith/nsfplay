@@ -10,6 +10,7 @@ public:
   xgm::NSF *sdat;           // データラッパへのポインタ
   xgm::NSFPlayer *pl;       // プレイヤーへのポインタ
   xgm::NSFPlayerConfigIni *cf; // プレイヤーのコンフィグ情報
+  bool no_save_config;
 };
 
 class NSFplug_UI

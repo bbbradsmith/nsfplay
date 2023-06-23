@@ -12,7 +12,7 @@ static WA2NSF *pPlugin;
 static HINSTANCE hPlugin;
 
 static NSFplug_UI_DLL *ui;
-static NSFplug_Model npm;
+static NSFplug_Model npm = {0};
 
 static InYansfDirect direct = {
 	NSFPLUG_TITLE,
@@ -96,7 +96,8 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     break;
 
   case DLL_PROCESS_DETACH:
-    npm.cf->Save(IniPath,"NSFplug");
+    if (!npm.no_save_config)
+      npm.cf->Save(IniPath,"NSFplug");
 
     delete pPlugin;
     delete npm.pl;

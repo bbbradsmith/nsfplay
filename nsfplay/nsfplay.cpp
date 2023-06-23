@@ -81,12 +81,6 @@ BOOL CnsfplayApp::InitInstance()
       }
 
       INT_PTR nResponse = dlg.DoModal();
-      if (nResponse == IDOK) // what is this for?
-      {
-      }
-      else if (nResponse == IDCANCEL)
-      {
-      }
       mutex.Unlock();
 
     } else {

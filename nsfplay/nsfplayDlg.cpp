@@ -489,8 +489,17 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, c
     int last_pos = 0;
     int hang_count = 0;
 
-    const int SLEEP_TIME = 5;
-    const int HANG_TIME = 3000;
+    int sleep_time = 100;
+    const int HANG_TIME = 5000; // timeout if unresponsive
+    if (in_yansf) // direct connection allows to set play time exactly
+    {
+        in_yansf->npm->no_save_config = true;
+        (*(in_yansf->npm->cf))["PLAY_TIME"] = ms;
+        (*(in_yansf->npm->cf))["AUTO_DETECT"] = 0;
+        ims += (*(in_yansf->npm->cf))["FADE_TIME"];
+        ims += 10000; // buffer against early cutoff
+    }
+    else sleep_time = 5; // no plugin: kludge a cutoff length with 5ms accuracy
 
     m_emu->Play(nsf_file);
     m_emu->Stop();
@@ -503,7 +512,7 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, c
     m_emu->Play(NULL);
     do
     {
-        ::Sleep(SLEEP_TIME);
+        ::Sleep(sleep_time);
         if (!m_emu->IsPlaying()) break;
         int iot = m_emu->GetOutputTime();
         if (iot >= ims) break;
@@ -515,7 +524,7 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, char* track, c
         else
         {
             ++hang_count;
-            if (hang_count > (HANG_TIME/SLEEP_TIME)) break;
+            if (hang_count > (HANG_TIME/sleep_time)) break;
         }
         last_pos = iot;
     }
