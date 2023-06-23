@@ -162,6 +162,11 @@ VRC7 patch sets: (VRC7_PATCH)
   8 - YMF281B set by Chabin 4/10/2004
   9 - YMF281B set by plgDavid 2/28/2021
 
+The NSFPlay application has its own nsfplay,ini file, found next to the .exe.
+It has a few options to control the loading of the plugin. The last used volume is saved at exit.
+NSFPlay could be used with other Winamp plugins, but it will not has as many features.
+  VOLUME: 0-255 starting volume. Default: 255
+  PLUGIN: Path to player plugin. Default: plugins/in_yansf.dll
 
 Playlists
 =========

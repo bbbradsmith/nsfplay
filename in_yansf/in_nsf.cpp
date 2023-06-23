@@ -5,6 +5,7 @@
 
 using namespace xgm;
 
+static bool firstinit = false;
 static In_Module mod = {0};
 
 /** プラグイン本体 */
@@ -40,6 +41,27 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 #endif
 #endif
     hPlugin = (HINSTANCE)hModule;
+    firstinit = false;
+    break;
+
+  case DLL_PROCESS_DETACH:
+    if (!firstinit) break;
+    if (!npm.no_save_config)
+      npm.cf->Save(IniPath,"NSFplug");
+
+    delete pPlugin;
+    delete npm.pl;
+    delete npm.cf;
+    delete npm.sdat;
+    //delete ui;
+    break;
+  }
+  return TRUE;
+}
+
+static void FirstInit()
+{
+    firstinit = true;
 
     // DLLパスの取得
     GetModuleFileName(hPlugin, DllPath, MAX_PATH);
@@ -86,27 +108,12 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     npm.cf->Load(IniPath,"NSFplug");
 
     if((*(npm.cf))["MASK_INIT"]) (*(npm.cf))["MASK"] = 0;
-	(*(npm.cf))["MULT_SPEED"] = 256; // reset speed to normal on startup
+    (*(npm.cf))["MULT_SPEED"] = 256; // reset speed to normal on startup
 
     // GUI initialized in Init()
     ui = NULL;
-
     pPlugin = new WA2NSF(npm.pl,npm.cf,npm.sdat);
     pPlugin->SetUserInterface(ui);
-    break;
-
-  case DLL_PROCESS_DETACH:
-    if (!npm.no_save_config)
-      npm.cf->Save(IniPath,"NSFplug");
-
-    delete pPlugin;
-    delete npm.pl;
-    delete npm.cf;
-    delete npm.sdat;
-    //delete ui;
-    break;
-  }
-  return TRUE;
 }
 
 static void Config(HWND hParent)
@@ -199,6 +206,7 @@ static void EQSet(int on, char data[], int preamp)
 
 extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
 {
+  if (!firstinit) FirstInit();
   mod.version = IN_VER;
   mod.is_seekable = 1;
   mod.UsesOutputPlug = 1;
@@ -228,5 +236,6 @@ extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
 
 extern "C" __declspec( dllexport ) void * pluginDirect() // direct access, bypassing winamp plugin interface
 {
+  if (!firstinit) FirstInit();
   return &direct;
 }

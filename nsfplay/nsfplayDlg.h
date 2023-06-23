@@ -49,6 +49,7 @@ protected:
     int m_last_len;
     char m_last_title[1024];
     char m_IniPath[MAX_PATH+16];
+    std::string m_plugin_path;
 
     void LoadError(const char* filename);
     virtual BOOL OnInitDialog();

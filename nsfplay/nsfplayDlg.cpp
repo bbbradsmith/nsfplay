@@ -68,7 +68,17 @@ CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
   strrchr(m_IniPath,'\\')[1] = '\0';
   strcat(m_IniPath,"nsfplay.ini");
   GetPrivateProfileString("NSFPLAY","PLUGIN","plugins\\in_yansf.dll",buf,MAX_PATH,m_IniPath);
-  m_emu = new EmuWinamp(buf);
+  m_plugin_path = buf;
+  try { m_emu = new EmuWinamp(buf); }
+  catch (int e) {
+     char msg[MAX_PATH+256];
+     strcpy(msg,"Unable to open plugin:\n");
+     if (e == 2) strcpy(msg,"Not a Winamp plugin:\n");
+     strcat(msg,buf);
+     printf(msg,buf); printf("\n");
+     ::MessageBox(NULL,msg,"FATAL ERROR",MB_OK);
+     exit(-1);
+  }
   // direct plugin access (only safe if matches current version)
   in_yansf = (InYansfDirect*)m_emu->PluginDirect();
   if (in_yansf == NULL ||
@@ -385,6 +395,7 @@ void CnsfplayDlg::OnDestroy()
   CString str;
   str.Format("%d",m_volume.GetPos());
   WritePrivateProfileString("NSFPLAY","VOLUME",str,m_IniPath);
+  WritePrivateProfileString("NSFPLAY","PLUGIN",m_plugin_path.c_str(),m_IniPath);
 }
 
 void CnsfplayDlg::OnBnClickedStop()

@@ -76,14 +76,12 @@ EmuWinamp::EmuWinamp(char *dll_name) {
   m_dll = LoadLibrary(dll_name);
   if(m_dll==NULL)
   {
-      MessageBox(NULL,"Can't load the plugin!","ERROR",MB_OK);
-      throw 1;
+    throw 1;
   }
 
   WINAMP_GET_IN_MODULE f = (WINAMP_GET_IN_MODULE)GetProcAddress(m_dll,"winampGetInModule2"); 
   if(f==NULL) {
-    MessageBox(NULL,"Can't load winampGetInModule2!","ERROR",MB_OK);
-    throw 1;
+    throw 2;
   }
   m_in_mod = f();
   m_in_mod->SAAdd = SAAdd;
