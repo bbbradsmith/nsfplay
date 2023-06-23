@@ -1,9 +1,29 @@
+
+#ifndef NULLSOFT_WINAMP_IN2H
+#define NULLSOFT_WINAMP_IN2H
 #include "out.h"
 
 // note: exported symbol is now winampGetInModule2.
 
-#define IN_VER 0x100
+#define IN_UNICODE 0x0F000000
 
+#ifdef UNICODE_INPUT_PLUGIN
+#define in_char wchar_t
+#define IN_VER (IN_UNICODE | 0x100)
+#else
+#define in_char char
+#define IN_VER 0x100
+#endif
+
+#define IN_MODULE_FLAG_USES_OUTPUT_PLUGIN 1
+// By default, Winamp assumes that your input plugin wants to use Winamp's EQ, and doesn't do replay gain
+// if you handle any of these yourself (EQ, Replay Gain adjustments), then set these flags accordingly
+#define IN_MODULE_FLAG_EQ 2 // set this if you do your own EQ
+#define IN_MODULE_FLAG_REPLAYGAIN 8 // set this if you adjusted volume for replay gain
+																		// for tracks with no replay gain metadata, you should clear this flag 
+																		// UNLESS you handle "non_replaygain" gain adjustment yourself
+#define IN_MODULE_FLAG_REPLAYGAIN_PREAMP 16 // use this if you queried for the replay gain preamp parameter and used it 
+																						// this parameter is new to 5.54
 typedef struct 
 {
 	int version;				// module type (IN_VER)
@@ -17,6 +37,8 @@ typedef struct
 	
 	int is_seekable;			// is this stream seekable? 
 	int UsesOutputPlug;			// does this plug-in use the output plug-ins? (musn't ever change, ever :)
+													// note that this has turned into a "flags" field
+													// see IN_MODULE_FLAG_*
 
 	void (*Config)(HWND hwndParent); // configuration dialog
 	void (*About)(HWND hwndParent);  // about dialog
@@ -24,12 +46,16 @@ typedef struct
 	void (*Init)();				// called at program init
 	void (*Quit)();				// called at program quit
 
-	void (*GetFileInfo)(char *file, char *title, int *length_in_ms); // if file == NULL, current playing is used
-	int (*InfoBox)(char *file, HWND hwndParent);
+#define GETFILEINFO_TITLE_LENGTH 2048 
+	void (*GetFileInfo)(const in_char *file, in_char *title, int *length_in_ms); // if file == NULL, current playing is used
+
+#define INFOBOX_EDITED 0
+#define INFOBOX_UNCHANGED 1
+	int (*InfoBox)(const in_char *file, HWND hwndParent);
 	
-	int (*IsOurFile)(char *fn);	// called before extension checks, to allow detection of mms://, etc
+	int (*IsOurFile)(const in_char *fn);	// called before extension checks, to allow detection of mms://, etc
 	// playback stuff
-	int (*Play)(char *fn);		// return zero on success, -1 on file-not-found, some other value on other (stopping winamp) error
+	int (*Play)(const in_char *fn);		// return zero on success, -1 on file-not-found, some other value on other (stopping winamp) error
 	void (*Pause)();			// pause stream
 	void (*UnPause)();			// unpause stream
 	int (*IsPaused)();			// ispaused? return 1 if paused, 0 if not
@@ -38,7 +64,7 @@ typedef struct
 	// time stuff
 	int (*GetLength)();			// get length in ms
 	int (*GetOutputTime)();		// returns current output time in ms. (usually returns outMod->GetOutputTime()
-	void (*SetOutputTime)(int time_in_ms);	// seeks to point in stream (in ms). Usually you signal yoru thread to seek, which seeks and calls outMod->Flush()..
+	void (*SetOutputTime)(int time_in_ms);	// seeks to point in stream (in ms). Usually you signal your thread to seek, which seeks and calls outMod->Flush()..
 
 	// volume stuff
 	void (*SetVolume)(int volume);	// from 0 to 255.. usually just call outMod->SetVolume
@@ -60,7 +86,7 @@ typedef struct
 	// advanced vis supplying mode, only use if you're cool. Use SAAddPCMData for most stuff.
 	int (*SAGetMode)();		// gets csa (the current type (4=ws,2=osc,1=spec))
 							// use when calling SAAdd()
-	void (*SAAdd)(void *data, int timestamp, int csa); // sets the spec data, filled in by winamp
+	int (*SAAdd)(void *data, int timestamp, int csa); // sets the spec data, filled in by winamp
 
 
 	// vis stuff (plug-in)
@@ -71,15 +97,15 @@ typedef struct
 
 	// advanced vis supplying mode, only use if you're cool. Use VSAAddPCMData for most stuff.
 	int (*VSAGetMode)(int *specNch, int *waveNch); // use to figure out what to give to VSAAdd
-	void (*VSAAdd)(void *data, int timestamp); // filled in by winamp, called by plug-in
+	int (*VSAAdd)(void *data, int timestamp); // filled in by winamp, called by plug-in
 
 
 	// call this in Play() to tell the vis plug-ins the current output params. 
-	void (*VSASetInfo)(int nch, int srate);
+	void (*VSASetInfo)(int srate, int nch); // <-- Correct (benski, dec 2005).. old declaration had the params backwards
 
 
 	// dsp plug-in processing: 
-	// (filled in by winamp, called by input plug)
+	// (filled in by winamp, calld by input plug)
 
 	// returns 1 if active (which means that the number of samples returned by dsp_dosamples
 	// could be greater than went in.. Use it to estimate if you'll have enough room in the
@@ -100,4 +126,13 @@ typedef struct
 	Out_Module *outMod; // filled in by winamp, optionally used :)
 } In_Module;
 
+// return values from the winampUninstallPlugin(HINSTANCE hdll, HWND parent, int param)
+// which determine if we can uninstall the plugin immediately or on winamp restart
+//
+// uninstall support was added from 5.0+ and uninstall now support from 5.5+
+// it is down to you to ensure that if uninstall now is returned that it will not cause a crash
+// (ie don't use if you've been subclassing the main window)
+#define IN_PLUGIN_UNINSTALL_NOW    0x1
+#define IN_PLUGIN_UNINSTALL_REBOOT 0x0
 
+#endif

@@ -163,27 +163,27 @@ void WA2InputModule::Quit()
 {
 }
 
-void WA2InputModule::GetFileInfo(char *file, char *title, int *length_in_ms)
+void WA2InputModule::GetFileInfo(const char *file, char *title, int *length_in_ms)
 {
 }
 
-int WA2InputModule::InfoBox(char *file, HWND hParent)
+int WA2InputModule::InfoBox(const char *file, HWND hParent)
 {
   MessageBox(hParent, "No info box", "Info", MB_OK);
   return 0;
 }
 
-int WA2InputModule::IsOurFile(char *fn)
+int WA2InputModule::IsOurFile(const char *fn)
 {
   return 0;
 }
 
-bool WA2InputModule::LoadFile(char *fn)
+bool WA2InputModule::LoadFile(const char *fn)
 {
   return sdat->LoadFile(fn)&&pl->Load(sdat);
 }
 
-int WA2InputModule::Play(char *fn)
+int WA2InputModule::Play(const char *fn)
 {
   int maxlatency;
 

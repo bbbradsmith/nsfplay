@@ -131,7 +131,7 @@ void WA2InputModuleMSP::Quit()
   WA2InputModule::Quit();
 }
 
-bool WA2InputModuleMSP::LoadFile(char *fn)
+bool WA2InputModuleMSP::LoadFile(const char *fn)
 {
   int song=-1;
 
@@ -155,7 +155,7 @@ bool WA2InputModuleMSP::LoadFile(char *fn)
   return true;
 }
 
-int WA2InputModuleMSP::Play(char *fn)
+int WA2InputModuleMSP::Play(const char *fn)
 {
   if(!grabbed) GrabWinamp();
   return WA2InputModule::Play(fn);

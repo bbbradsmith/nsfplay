@@ -22,6 +22,7 @@
 #include "nsfplay.h"
 #include "nsfplayDlg.h"
 #include "../xgm/fileutil.h" // file_utf8
+#include "../in_yansf/direct.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,6 +59,7 @@ END_MESSAGE_MAP()
 CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
     : CDialog(CnsfplayDlg::IDD, pParent)
     , m_cancel_open(false)
+	, in_yansf(NULL)
 {
   m_hIcon = AfxGetApp()->LoadIcon(IDI_MAINFRAME);
 
@@ -67,6 +69,12 @@ CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
   strcat(m_IniPath,"nsfplay.ini");
   GetPrivateProfileString("NSFPLAY","PLUGIN","plugins\\in_yansf.dll",buf,MAX_PATH,m_IniPath);
   m_emu = new EmuWinamp(buf);
+  // direct plugin access (only safe if matches current version)
+  in_yansf = (InYansfDirect*)m_emu->PluginDirect();
+  if (in_yansf == NULL ||
+      strcmp(m_emu->GetDescription(), NSFPLUG_TITLE) ||
+      strcmp(in_yansf->version, NSFPLUG_TITLE))
+      in_yansf = NULL;
 }
 
 CnsfplayDlg::~CnsfplayDlg()
@@ -104,6 +112,23 @@ BEGIN_MESSAGE_MAP(CnsfplayDlg, CDialog)
     ON_BN_CLICKED(IDC_WAVEOUT, OnBnClickedWaveout)
     ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
+
+void CnsfplayDlg::LoadError(const char* filename)
+{
+    const char* err = "Unknown plugin file load error.";
+    if (in_yansf) err = in_yansf->npm->sdat->LoadError();
+    if (!filename) filename = "<unknown filename>";
+
+    // create alert message
+    CArray<wchar_t,int> wmsg;
+    int msgsize = utf8_file(err,NULL,0); if (msgsize<1) msgsize = 1;
+    int fnsize = utf8_file(filename,NULL,0); if (fnsize<1) fnsize = 1;
+    wmsg.SetSize(msgsize+fnsize);
+    utf8_file(err,wmsg.GetData(),msgsize);
+    wmsg[msgsize-1] = L'\n'; // replace end of error message with newline
+    utf8_file(filename,wmsg.GetData()+msgsize,fnsize);
+    MessageBoxW(GetSafeHwnd(),wmsg.GetData(),L"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
+}
 
 BOOL CnsfplayDlg::OnInitDialog()
 {
@@ -151,9 +176,7 @@ BOOL CnsfplayDlg::OnInitDialog()
     
     if(m_init_file.GetLength()) {
       if(m_emu->Play(m_init_file.GetBuffer()))
-      {
-        MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
-      }
+          LoadError(m_init_file.GetBuffer());
       m_update_wait = 0;
     }
 
@@ -233,9 +256,7 @@ void CnsfplayDlg::OnDropFiles(HDROP hDropInfo)
     aryFile.SetSize(nSize);
     file_utf8(w_aryFile.GetData(),aryFile.GetData(),nSize);
     if (m_emu->Play(aryFile.GetData()))
-    {
-      MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
-    }
+      LoadError(aryFile.GetData());
     m_last_len = -1;
     m_update_wait = 0;
   }
@@ -282,6 +303,8 @@ void CnsfplayDlg::OnBnClickedWaveout()
           *t = '.';
       }
   }
+  title[1024-5]=0; // truncate if too long for .wav
+  strcat(title,".wav");
   wchar_t wtitle[1024];
   utf8_file(title,wtitle,1024);
 
@@ -293,14 +316,15 @@ void CnsfplayDlg::OnBnClickedWaveout()
   ZeroMemory(&ofn,sizeof(ofn));
   ofn.lStructSize = sizeof(ofn);
   ofn.hwndOwner = GetSafeHwnd();
+  ofn.lpstrTitle = L"Export WAV";
   ofn.lpstrDefExt = L".wav";
   ofn.Flags = OFN_HIDEREADONLY;
   ofn.lpstrFilter = L"WAV files (*.wav)\0*.wav\0All files (*.*)\0*.*\0\0";
   ofn.lpstrFile = wfn;
   ofn.nMaxFile = MAX_FN;
-  ofn.lpstrTitle = wtitle;
+  ofn.lpstrFileTitle = wtitle; wtitle[0] = 0;
   ofn.nMaxFileTitle = 1024;
-  if(GetOpenFileNameW(&ofn))
+  if(GetSaveFileNameW(&ofn))
   {
     char fn[MAX_FN];
     file_utf8(wfn,fn,MAX_FN);
@@ -317,7 +341,13 @@ void CnsfplayDlg::OnBnClickedInfo()
 void CnsfplayDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 {
   if (pWnd == GetDlgItem(IDC_INFO)) // right click on info button
-    m_emu->TrackInfo(m_hWnd);
+  {
+    if (in_yansf && *(in_yansf->ui))
+    {
+       (*(in_yansf->ui))->SetPlayerWindow(m_emu->GetMainWindow());
+	   (*(in_yansf->ui))->OpenDialog(NSFplug_UI::DLG_TRACK);
+    }
+  }
 }
 
 void CnsfplayDlg::OnTimer(UINT nIDEvent)
@@ -433,6 +463,7 @@ void CnsfplayDlg::OnBnClickedOpen()
   ZeroMemory(&ofn,sizeof(ofn));
   ofn.lStructSize = sizeof(ofn);
   ofn.hwndOwner = GetSafeHwnd();
+  ofn.lpstrTitle = L"Open NSF";
   ofn.lpstrDefExt = L".nsf;.nsfe";
   ofn.Flags = OFN_FILEMUSTEXIST;
   ofn.lpstrFilter = L"NSF files (*.nsf;*.nsfe)\0*.nsf;*.nsfe\0All files (*.*)\0*.*\0\0";
@@ -443,9 +474,7 @@ void CnsfplayDlg::OnBnClickedOpen()
     char fn[MAX_FN];
     file_utf8(wfn,fn,MAX_FN);
     if (m_emu->Play(fn))
-    {
-      MessageBox(m_emu->LoadError(),"Error reading file!",MB_ICONEXCLAMATION | MB_OK);
-    }
+      LoadError(fn);
     m_last_len = -1;
     m_update_wait = 0;
   }

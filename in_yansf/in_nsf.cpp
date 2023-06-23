@@ -1,18 +1,24 @@
 #include <shlobj.h>
 #include <shlwapi.h>
 #include "in_nsf.h"
+#include "direct.h"
 
 using namespace xgm;
 
-static In_Module mod;
+static In_Module mod = {0};
 
 /** プラグイン本体 */
 static WA2NSF *pPlugin;
 static HINSTANCE hPlugin;
 
-static NSF *sdat;
 static NSFplug_UI_DLL *ui;
 static NSFplug_Model npm;
+
+static InYansfDirect direct = {
+	NSFPLUG_TITLE,
+	&ui,
+	&npm,
+};
 
 static char DllPath[MAX_PATH];
 static char IniPath[MAX_PATH+32];
@@ -130,19 +136,19 @@ static void Quit()
   delete ui;
   ui = NULL;
 }
-static void GetFileInfo(char *file, char *title, int *length_in_ms)
+static void GetFileInfo(const char *file, char *title, int *length_in_ms)
 { 
   pPlugin->GetFileInfo(file, title, length_in_ms);
 }
-static int InfoBox(char *fn, HWND hParent)
+static int InfoBox(const char *fn, HWND hParent)
 {
   return pPlugin->InfoBox(fn, hParent);
 }
-static int IsOurFile(char *fn)
+static int IsOurFile(const char *fn)
 {
   return pPlugin->IsOurFile(fn);
 }
-static int Play(char *fn)
+static int Play(const char *fn)
 {
   int ret = pPlugin->Play(fn);
   if(!ret && ui) ui->StartUpdate();
@@ -195,8 +201,8 @@ extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
   mod.version = IN_VER;
   mod.is_seekable = 1;
   mod.UsesOutputPlug = 1;
-  mod.description = "NSFplug " "(" __DATE__ " " __TIME__ ")";
-  mod.FileExtensions = "nsf\0NES Sound Format\0nsfe\0NES Sound Format Extended\0";
+  mod.description = NSFPLUG_TITLE;
+  mod.FileExtensions = "nsf\0NES Sound Format\0nsfe\0NES Sound Format Extended\0\0";
   mod.Config = Config;
   mod.About = About;
   mod.Init = Init;
@@ -219,7 +225,7 @@ extern "C" __declspec( dllexport ) In_Module *winampGetInModule2()
   return &mod;
 }
 
-extern "C" __declspec( dllexport ) const char * nsfLoadError()
+extern "C" __declspec( dllexport ) void * pluginDirect() // direct access, bypassing winamp plugin interface
 {
-  return sdat->LoadError();
+  return &direct;
 }

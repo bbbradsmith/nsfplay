@@ -22,6 +22,7 @@
 #include "../libemuwa2/emu_winamp.h"
 #include "afxwin.h"
 #include "afxcmn.h"
+#include "../in_yansf/direct.h"
 
 class CnsfplayDlg : public CDialog
 {
@@ -36,9 +37,10 @@ public:
 
 
 protected:
-	HICON m_hIcon;
+    HICON m_hIcon;
     HICON m_hIcon_btn[2];
     EmuWinamp *m_emu;
+    InYansfDirect* in_yansf;
     UINT_PTR m_timerID;
     bool m_sb_dragging;
     void UpdateInfo();
@@ -48,6 +50,7 @@ protected:
     char m_last_title[1024];
     char m_IniPath[MAX_PATH+16];
 
+    void LoadError(const char* filename);
     virtual BOOL OnInitDialog();
     afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
     afx_msg void OnPaint();

@@ -31,6 +31,11 @@ namespace xgm
     virtual bool LoadFile(const char *fn){ return false; }
 
     /**
+     * Error from last Load.
+     */
+    virtual const char* LoadError() { return "<no error message>"; }
+
+    /**
      * タイトルの取得
      * @return タイトル情報
      */

@@ -48,7 +48,7 @@ public:
   virtual void SetWA2InputModule(WA2InputModule *p){ wa2mod = p; }
   virtual void OpenDialog(int id);
   virtual void SetInfoData(xgm::NSF *nsf){ info->SetInfo(nsf); }
-  virtual void SetInfoData(char *fn){ info->SetInfo(fn); }
+  virtual void SetInfoData(const char *fn){ info->SetInfo(fn); }
   // 演奏情報へのアクセスを許可
   virtual void StartUpdate();
   // 演奏情報へのアクセスを禁止

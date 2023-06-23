@@ -29,7 +29,7 @@ class EmuWinamp {
   EmuOutMod m_eom;
   EmuOutDisk m_eod;
   In_Module *m_in_mod;
-  const char * (*m_load_error)();
+  void * (*m_plugin_direct)();
   char m_fn[2048];
   char m_wo[2048]; // waveout filename
   bool m_playing;
@@ -38,6 +38,7 @@ public:
   static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
   EmuWinamp(char *dll_name);
   ~EmuWinamp();
+  const char* GetDescription();
   int Play(char *fn);
   void Stop();
   void Pause();
@@ -48,7 +49,6 @@ public:
   int IsPaused();
   void GetFileInfo(char *file, char *title, int *length_in_ms);
   void Info(HWND hWnd);
-  void TrackInfo(HWND hWnd);
   void Config(HWND hWnd);
   void About(HWND hWnd);
   void Next();
@@ -56,7 +56,8 @@ public:
   int GetBufferUsage();
   void SetVolume(int volume);
   void Waveout(const char* wavefile);
-  const char* LoadError();
+  // extra access not part of Winamp interace
+  void* PluginDirect();
+  HWND GetMainWindow();
 };
-
 

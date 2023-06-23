@@ -155,6 +155,7 @@
     <ClCompile Include="in_nsf.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="direct.h" />
     <ClInclude Include="in_nsf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

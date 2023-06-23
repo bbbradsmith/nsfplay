@@ -33,13 +33,13 @@ public:
     if (ui) ui->SetWA2InputModule(this);
   }
 
-  virtual int IsOurFile(char *fn)
+  virtual int IsOurFile(const char *fn)
   {
     xgm::NSF nsf;
     return nsf.LoadFile(fn);
   }
 
-  virtual void GetFileInfo(char *file, char *title, int *length_in_ms)
+  virtual void GetFileInfo(const char *file, char *title, int *length_in_ms)
   {
     if(file==NULL||file[0]=='\0')
     {
@@ -62,7 +62,7 @@ public:
     }
   }
 
-  virtual int Play(char *fn)
+  virtual int Play(const char *fn)
   {
     sdat->SetDefaults((*cf)["PLAY_TIME"], (*cf)["FADE_TIME"], (*cf)["LOOP_NUM"]);
 
@@ -91,16 +91,12 @@ public:
     }
   }
 
-  virtual int InfoBox(char *fn, HWND hParent) // fn==NULL used to open track info instead
+  virtual int InfoBox(const char *fn, HWND hParent)
   {
     if(ui) {
       ui->SetPlayerWindow(pMod->hMainWindow);
-      if (fn)
-      {
-        ui->SetInfoData(fn);
-        ui->OpenDialog(NSFplug_UI::DLG_INFO);
-      }
-      else ui->OpenDialog(NSFplug_UI::DLG_TRACK);
+      ui->SetInfoData(fn);
+      ui->OpenDialog(NSFplug_UI::DLG_INFO);
     }
     return 1;
   }

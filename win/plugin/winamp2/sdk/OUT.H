@@ -1,10 +1,27 @@
+#ifndef NULLSOFT_OUTH
+#define NULLSOFT_OUTH
+#include <windows.h>
+#include <stddef.h>
+// ids:
+// waveout: 32
+// gapless: 64
+// xfade: 63
+// disk: 33
+// dsound: 38
+// NULL: 65
+// mm2: 69
+
+#if (_MSC_VER <= 1200)
+typedef int intptr_t;
+#endif
+
 #define OUT_VER 0x10
 
 typedef struct 
 {
 	int version;				// module version (OUT_VER)
 	char *description;			// description of module, with version string
-	int id;						// module id. each input module gets its own. non-nullsoft modules should
+	intptr_t id;						// module id. each input module gets its own. non-nullsoft modules should
 								// be >= 65536. 
 
 	HWND hMainWindow;			// winamp's main window (filled in by winamp)
@@ -18,11 +35,14 @@ typedef struct
 
 	int (*Open)(int samplerate, int numchannels, int bitspersamp, int bufferlenms, int prebufferms); 
 					// returns >=0 on success, <0 on failure
+
 					// NOTENOTENOTE: bufferlenms and prebufferms are ignored in most if not all output plug-ins. 
 					//    ... so don't expect the max latency returned to be what you asked for.
 					// returns max latency in ms (0 for diskwriters, etc)
 					// bufferlenms and prebufferms must be in ms. 0 to use defaults. 
 					// prebufferms must be <= bufferlenms
+					// pass bufferlenms==-666 to tell the output plugin that it's clock is going to be used to sync video
+					//   out_ds turns off silence-eating when -666 is passed
 
 	void (*Close)();	// close the ol' output device.
 
@@ -50,3 +70,4 @@ typedef struct
 } Out_Module;
 
 
+#endif

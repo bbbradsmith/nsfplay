@@ -85,7 +85,7 @@ protected:
   void GeneratePlaylist(bool clear);
 
 public:
-  void SetInfo(char *fn);
+  void SetInfo(const char *fn);
   void SetInfo(NSF *n);
 
   afx_msg void OnDelall();

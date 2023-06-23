@@ -53,11 +53,11 @@ public:
   virtual void About(HWND hParent);
   virtual void Init();
   virtual void Quit();
-  virtual void GetFileInfo(char *file, char *title, int *length_in_ms);
-  virtual int InfoBox(char *file, HWND hParent);
-  virtual int IsOurFile(char *fn);
-  virtual bool LoadFile(char *fn);
-  virtual int Play(char *fn);
+  virtual void GetFileInfo(const char *file, char *title, int *length_in_ms);
+  virtual int InfoBox(const char *file, HWND hParent);
+  virtual int IsOurFile(const char *fn);
+  virtual bool LoadFile(const char *fn);
+  virtual int Play(const char *fn);
   virtual void Pause();
   virtual void UnPause();
   virtual int IsPaused();
@@ -116,8 +116,8 @@ public:
   virtual void PreAutoStop();
   virtual void Init();
   virtual void Quit();
-  virtual bool LoadFile(char *fn);
-  virtual int Play(char *fn);
+  virtual bool LoadFile(const char *fn);
+  virtual int Play(const char *fn);
   virtual void Keep_Song(bool b);
   WA2InputModuleMSP(xgm::PlayerMSP *p, xgm::PlayerConfig *c, xgm::SoundDataMSP *s);
   virtual ~WA2InputModuleMSP();

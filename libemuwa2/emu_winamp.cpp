@@ -38,7 +38,7 @@ static int dsp_dosamples(short int *samples, int numsamples, int bps, int nch, i
 static void SetInfo(int bitrate, int srate, int stereo, int synched){}
 
 typedef In_Module *(*WINAMP_GET_IN_MODULE)() ;
-typedef const char *(*LOAD_ERROR)();
+typedef void *(*PLUGIN_DIRECT)();
 
 LRESULT CALLBACK EmuWinamp::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
@@ -111,7 +111,7 @@ EmuWinamp::EmuWinamp(char *dll_name) {
   printf("hMainWindow :%p\n",m_in_mod->hMainWindow);
   m_in_mod->hDllInstance = m_dll;
 
-  m_load_error = (LOAD_ERROR)GetProcAddress(m_dll, "nsfLoadError");
+  m_plugin_direct = (PLUGIN_DIRECT)GetProcAddress(m_dll, "pluginDirect");
 
   m_in_mod->Init();
   m_in_mod->outMod->Init();
@@ -131,6 +131,11 @@ EmuWinamp::~EmuWinamp() {
   DestroyWindow(m_in_mod->hMainWindow);
   UnregisterClass("WinampEmu",GetModuleHandle(NULL));
   FreeLibrary(m_dll);
+}
+
+const char* EmuWinamp::GetDescription()
+{
+  return m_in_mod->description;
 }
 
 int EmuWinamp::Play(char *fn) {
@@ -240,13 +245,6 @@ void EmuWinamp::Info(HWND hWnd) {
     m_in_mod->InfoBox(m_fn,m_in_mod->hMainWindow);
 }
 
-void EmuWinamp::TrackInfo(HWND hWnd) {
-  if(hWnd)
-    m_in_mod->InfoBox(NULL,hWnd); // null filename select track info instead
-  else
-    m_in_mod->InfoBox(NULL,m_in_mod->hMainWindow);
-}
-
 void EmuWinamp::Next() {
   SendMessage(m_in_mod->hMainWindow,WM_COMMAND,WINAMP_BUTTON5,0);
 }
@@ -259,8 +257,13 @@ void EmuWinamp::Waveout(const char* filename) {
   ::strcpy_s(m_wo, sizeof(m_wo), filename);
 }
 
-const char* EmuWinamp::LoadError()
+void* EmuWinamp::PluginDirect()
 {
-  if (m_load_error) return m_load_error();
-  return "Unknown file load error.";
+  if (m_plugin_direct) return m_plugin_direct();
+  return NULL;
+}
+
+HWND EmuWinamp::GetMainWindow()
+{
+  return m_in_mod->hMainWindow;
 }

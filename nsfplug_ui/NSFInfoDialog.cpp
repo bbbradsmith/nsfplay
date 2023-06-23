@@ -274,7 +274,7 @@ void NSFInfoDialog::SetInfo(NSF *nsf)
   SetTextW(this,IDC_TITLE,m_title);
 }
 
-void NSFInfoDialog::SetInfo(char *fn)
+void NSFInfoDialog::SetInfo(const char *fn)
 {
   if(nsf.LoadFile(fn)==false)
   {

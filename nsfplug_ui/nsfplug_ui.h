@@ -1,8 +1,8 @@
 #ifndef _NSFPLUG_UI_
 #define _NSFPLUG_UI_
-#include "xgm.h"
-#include "plugin/winamp2/in_module.h"
-#include "nsfconfig_ini.h"
+#include "../xgm/xgm.h"
+#include "../win/plugin/winamp2/in_module.h"
+#include "../win/nsfconfig_ini.h"
 
 class NSFplug_Model
 {
@@ -27,7 +27,7 @@ public:
   virtual void SetWA2InputModule(WA2InputModule *p)=0;
   virtual void OpenDialog(int id)=0;
   virtual void SetInfoData(xgm::NSF *)=0;
-  virtual void SetInfoData(char *)=0;
+  virtual void SetInfoData(const char *)=0;
   // リアルタイム更新を中断
   virtual void StopUpdate()=0;
   // リアルタイム更新を開始
@@ -122,7 +122,7 @@ public:
   {
     if(pUI) pUI->SetInfoData(nsf);
   }
-  virtual void SetInfoData(char *fn)
+  virtual void SetInfoData(const char *fn)
   {
     if(pUI) pUI->SetInfoData(fn);
   }
