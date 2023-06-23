@@ -55,9 +55,11 @@ Command line arguments
   NSFPlay -REGION=4
     > Force PAL region.
 
-  There are two special options to override the INI files directly. These should
-  have an absolute path, or one relative to the current directory. If the file
-  does not exist, NSFPlay will attempt to create it.
+  The default INI configuration files can both be overridden from the command line.
+  These will take effect before any other command-line parameters are applied,
+  and only one INI/NSFPLAY substitute can be used. They can use an absolute path,
+  or one relative to the current directory. If the file does not exist, NSFPlay
+  will attempt to create it.
 
   NSFPlay -INI=override.ini
     > Override default in_yansf.ini file.
@@ -69,9 +71,16 @@ Configuration files
 ===================
 
 The default configuration file is in_yansf.ini, found in the plugins folder.
-If it does not exist, NSFPlay will attempt to create it next to the plugin DLL.
-If access is denied, it will instead attempt to create it in APPDATA under
-an NSFPlay folder. This file location can be overridden with -INI.
+This will be automatically created when the program is run. If it can't be created
+at its default location (e.g. access denied to C:\Program Files\Winamp\Plugins)
+it will instead try to use your %APPDATA% directory under an NSFPlay folder.
+(You can type %APPDATA%\NSFPlay into the Explorer address bar to find it.)
+
+It will always check the folder next to in_yansf.dll first, so if this file is
+present but not writeable, you may not be able to save settings unless it is
+deleted to allow the %APPDATA% fallback.
+
+The INI file location can be overridden with -INI.
 
 Global options:
   RATE: samplerate
@@ -174,16 +183,19 @@ VRC7 patch sets: (VRC7_PATCH)
   8 - YMF281B set by Chabin 4/10/2004
   9 - YMF281B set by plgDavid 2/28/2021
 
-The NSFPlay application has its own nsfplay,ini file, found next to the .exe.
-It has a few options to control the loading of the plugin. The last used volume is saved at exit.
-NSFPlay could be used with other Winamp plugins, but it will not has as many features.
-If its location not overridden by the command line, this will be saved next to the
-application if possible, or otherwise in APPDATA under an NSFPlay folder.
+The NSFPlay application has its own nsfplay,ini file, found next to the .exe,
+or in %APPDATA%\NSFPlay if it could not be created there. (Use -NSFPLAYINI to
+specify a different location.)
+
+This has a few options to control the loading of the plugin. The last used
+volume is saved at exit. NSFPlay could be used with other Winamp plugins, but
+only with more basic features.
 
 nsfplay.ini settings:
-  VOLUME: 0-255 starting volume. Default: 255
-  SAVEVOLUME: 0 = don't save, 1 = save. Default: 1
   PLUGIN: Path to player plugin. Default: plugins\in_yansf.dll
+  VOLUME: 0-255 starting volume. Default: 255 (Does not affect WAV export.)
+  SAVEVOLUME: 0 = don't save, 1 = save. Default: 1
+
 
 Playlists
 =========
@@ -218,6 +230,7 @@ NSFPlay 2.6 - (Unofficial)
 - Add redirectable diagnostic log to stdout for command line usage. (Use > to send it to a file.)
 - Allow command-line configuration overrides.
 - Allow command-line INI file overrides.
+- Use VS2019 for official builds (still using VS2017 v141_xp toolset).
 
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).

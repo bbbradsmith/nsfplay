@@ -459,6 +459,8 @@ void CnsfplayDlg::OnDestroy()
 
   if (m_ini_save)
   {
+    WritePrivateProfileString("NSFPLAY","PLUGIN",m_plugin_path.c_str(),m_nsfplay_ini_path.c_str());
+
     if (m_volume_save < 0) m_volume_save = 1;
     m_volume_save = GetPrivateProfileInt("NSFPLAY","SAVEVOLUME",m_volume_save,m_nsfplay_ini_path.c_str());
 
@@ -467,7 +469,6 @@ void CnsfplayDlg::OnDestroy()
     char str[16]; ::itoa(v,str,10);
     WritePrivateProfileString("NSFPLAY","VOLUME",str,m_nsfplay_ini_path.c_str());
     WritePrivateProfileString("NSFPLAY","SAVEVOLUME",m_volume_save?"1":"0",m_nsfplay_ini_path.c_str());
-    WritePrivateProfileString("NSFPLAY","PLUGIN",m_plugin_path.c_str(),m_nsfplay_ini_path.c_str());
   }
 }
 
