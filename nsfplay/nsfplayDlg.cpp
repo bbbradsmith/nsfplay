@@ -582,12 +582,12 @@ int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv, bool prepass
 		std::string key(arg+1,split-(arg+1));
 		const char* val = split+1;
 		// special values
-		if      (key == "INI")        if (prepass) { m_yansf_ini_path = val; }
-		else if (key == "NSFPLAYINI") if (prepass) { m_nsfplay_ini_path = val; }
+		if      (key == "INI")        { if (prepass) { m_yansf_ini_path = val; } }
+		else if (key == "NSFPLAYINI") { if (prepass) { m_nsfplay_ini_path = val; } }
 		// check NSFPlay ini values
-		else if (key == "VOLUME")     if (prepass) { m_volume_init = atoi(val); m_ini_save = false; }
-		else if (key == "SAVEVOLUME") if (prepass) { m_volume_save = (atoi(val) != 0); m_ini_save = false; }
-		else if (key == "PLUGIN")     if (prepass) { m_plugin_path = val; m_ini_save = false; }
+		else if (key == "VOLUME")     { if (prepass) { m_volume_init = atoi(val); m_ini_save = false; } }
+		else if (key == "SAVEVOLUME") { if (prepass) { m_volume_save = (atoi(val) != 0); m_ini_save = false; } }
+		else if (key == "PLUGIN")     { if (prepass) { m_plugin_path = val; m_ini_save = false; } }
 		else if (!prepass) // after prepass, only affects plugin, warn if invalid arguments
 		{
 			if((in_yansf && in_yansf->npm->cf->HasValue(key)))
