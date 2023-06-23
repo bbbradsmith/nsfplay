@@ -581,19 +581,16 @@ int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv, bool prepass
 		}
 		std::string key(arg+1,split-(arg+1));
 		const char* val = split+1;
-		if (prepass)
+		// special values
+		if      (key == "INI")        if (prepass) { m_yansf_ini_path = val; }
+		else if (key == "NSFPLAYINI") if (prepass) { m_nsfplay_ini_path = val; }
+		// check NSFPlay ini values
+		else if (key == "VOLUME")     if (prepass) { m_volume_init = atoi(val); m_ini_save = false; }
+		else if (key == "SAVEVOLUME") if (prepass) { m_volume_save = (atoi(val) != 0); m_ini_save = false; }
+		else if (key == "PLUGIN")     if (prepass) { m_plugin_path = val; m_ini_save = false; }
+		else if (!prepass) // after prepass, only affects plugin, warn if invalid arguments
 		{
-			// special values
-			if      (key == "INI")        { m_yansf_ini_path = val; }
-			else if (key == "NSFPLAYINI") { m_nsfplay_ini_path = val; }
-			// check NSFPlay ini values
-			else if (key == "VOLUME")     { m_volume_init = atoi(val); m_ini_save = false; }
-			else if (key == "SAVEVOLUME") { m_volume_save = (atoi(val) != 0); m_ini_save = false; }
-			else if (key == "PLUGIN")     { m_plugin_path = val; m_ini_save = false; }
-		}
-		else // after prepass, only affects plugin, warn if invalid arguments
-		{
-			if((in_yansf && in_yansf->npm->cf->HasValue(val)))
+			if((in_yansf && in_yansf->npm->cf->HasValue(key)))
 			{
 				(*(in_yansf->npm->cf))[key] = val;
 				in_yansf->npm->no_save_config = true; // changes are temporary unless explicitly saved by user
@@ -669,8 +666,8 @@ int CnsfplayDlg::WriteSingleWave(char* nsf_file, char* wave_file, int track, int
         last_pos = iot;
     }
     while (true);
-    m_emu->Stop();
     printf("Play time: %d ms\n",m_emu->GetOutputTime());
+    m_emu->Stop();
 
     return 0;
 }
