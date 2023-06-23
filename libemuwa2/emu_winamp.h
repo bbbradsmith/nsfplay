@@ -36,7 +36,7 @@ class EmuWinamp {
   int m_volume;
 public:
   static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-  EmuWinamp(char *dll_name);
+  EmuWinamp(const char *dll_name, const char *ini_override);
   ~EmuWinamp();
   const char* GetDescription();
   int Play(char *fn);

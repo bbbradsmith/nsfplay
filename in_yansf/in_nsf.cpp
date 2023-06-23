@@ -21,9 +21,10 @@ static InYansfDirect direct = {
 	&npm,
 };
 
-static char DllPath[MAX_PATH];
-static char IniPath[MAX_PATH+32];
+static char DllPath[1024];
+static char IniPath[1024+32];
 const char* INI_FILENAME = "in_yansf.ini";
+const char* ini_override = NULL;
 
 static HANDLE hDbgfile;
 
@@ -41,6 +42,7 @@ BOOL APIENTRY DllMain (HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 #endif
 #endif
     hPlugin = (HINSTANCE)hModule;
+    ini_override = NULL;
     firstinit = false;
     break;
 
@@ -64,7 +66,7 @@ static void FirstInit()
     firstinit = true;
 
     // DLLパスの取得
-    GetModuleFileName(hPlugin, DllPath, MAX_PATH);
+    GetModuleFileName(hPlugin, DllPath, 1024);
     strrchr(DllPath,'\\')[1] = '\0';
 
     // プレイヤー作成
@@ -84,24 +86,34 @@ static void FirstInit()
     npm.cf->CreateValue("LAST_PRESET", "Default");
     
     // configuration
-    strcpy(IniPath,DllPath);
-    strcat(IniPath,INI_FILENAME);
-    if (FALSE == PathFileExists(IniPath)) // if an INI file does not exists next to the plugin already...
+    if (ini_override)
     {
-      // first try to see if we have permission to create a new one in that location...
-      HANDLE f = CreateFile(IniPath,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
-      if (f != INVALID_HANDLE_VALUE)
+      GetFullPathName(ini_override,sizeof(IniPath),IniPath,NULL);
+      if (FALSE == PathFileExists(IniPath)) // try to create if needed
       {
-        CloseHandle(f);
+        HANDLE f = CreateFile(IniPath,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+        if (f != INVALID_HANDLE_VALUE) CloseHandle(f);
       }
-      else  // Otherwise, attempt to use AppData instead.
+    }
+    else // use default or try to create it
+    {
+      strcpy(IniPath,DllPath);
+      strcat(IniPath,INI_FILENAME);
+      if (FALSE == PathFileExists(IniPath)) // if an INI file does not exists next to the plugin already...
       {
-        if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, IniPath)))
+        // first try to see if we have permission to create a new one in that location...
+        HANDLE f = CreateFile(IniPath,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+        if (f != INVALID_HANDLE_VALUE) {
+          CloseHandle(f);
+        }
+        else  // Otherwise, attempt to use AppData instead.
         {
-          strcat(IniPath,"\\NSFPlay");
-          CreateDirectory(IniPath,NULL);
-          strcat(IniPath,"\\");
-          strcat(IniPath,INI_FILENAME);
+          if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, IniPath))) {
+            strcat(IniPath,"\\NSFPlay");
+            CreateDirectory(IniPath,NULL);
+            strcat(IniPath,"\\");
+            strcat(IniPath,INI_FILENAME);
+          }
         }
       }
     }
@@ -128,7 +140,7 @@ static void Init()
 { 
   if (ui == NULL)
   {
-    char path[MAX_PATH+16];
+    char path[1024+16];
     strcpy(path,DllPath);
     strcat(path,"nsfplug_ui.dll");
     ui = new NSFplug_UI_DLL(path,&npm,0);
@@ -238,4 +250,9 @@ extern "C" __declspec( dllexport ) void * pluginDirect() // direct access, bypas
 {
   if (!firstinit) FirstInit();
   return &direct;
+}
+
+extern "C" __declspec( dllexport ) void iniOverride(const char* ini) // call before winampGetInModule2/pluginDirect to redirect the INI file
+{
+  ini_override = ini;
 }

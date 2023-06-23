@@ -39,6 +39,7 @@ static void SetInfo(int bitrate, int srate, int stereo, int synched){}
 
 typedef In_Module *(*WINAMP_GET_IN_MODULE)() ;
 typedef void *(*PLUGIN_DIRECT)();
+typedef void *(*INI_OVERRIDE)(const char*);
 
 LRESULT CALLBACK EmuWinamp::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
@@ -71,12 +72,17 @@ LRESULT CALLBACK EmuWinamp::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
   return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-EmuWinamp::EmuWinamp(char *dll_name) {
+EmuWinamp::EmuWinamp(const char *dll_name, const char* ini_override) {
 
   m_dll = LoadLibrary(dll_name);
   if(m_dll==NULL)
   {
     throw 1;
+  }
+
+  if (ini_override) {
+    INI_OVERRIDE fp_ini_override = (INI_OVERRIDE)GetProcAddress(m_dll, "iniOverride");
+    if (fp_ini_override) fp_ini_override(ini_override);
   }
 
   WINAMP_GET_IN_MODULE f = (WINAMP_GET_IN_MODULE)GetProcAddress(m_dll,"winampGetInModule2"); 

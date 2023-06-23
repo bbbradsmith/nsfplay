@@ -44,10 +44,10 @@ Command line arguments
   console, but you can redirect errors to a log file with >.
   (>error.log in the example)
 
-  Optionally any value from the configuration file can be temporarily set with
-  an  argument beginning -. If this is done, the configuration will not be
+  Optionally any value from the configuration files can be temporarily set with
+  an argument beginning with -. If this is done, the configuration will not be
   automatically saved on close, but can still be saved if you manually save
-  the new configuration from the menu.
+  the new configuration from the info page menu.
 
   NSFPlay -AUTO_DETECT=0
     > Disables automatic track length detection.
@@ -55,11 +55,23 @@ Command line arguments
   NSFPlay -REGION=4
     > Force PAL region.
 
+  There are two special options to override the INI files directly. These should
+  have an absolute path, or one relative to the current directory. If the file
+  does not exist, NSFPlay will attempt to create it.
+
+  NSFPlay -INI=override.ini
+    > Override default in_yansf.ini file.
+
+  NSFPlay -NSFPLAYINI=override.ini
+    > Override default nsfplay.ini file.
 
 Configuration files
 ===================
 
 The default configuration file is in_yansf.ini, found in the plugins folder.
+If it does not exist, NSFPlay will attempt to create it next to the plugin DLL.
+If access is denied, it will instead attempt to create it in APPDATA under
+an NSFPlay folder. This file location can be overridden with -INI.
 
 Global options:
   RATE: samplerate
@@ -165,8 +177,13 @@ VRC7 patch sets: (VRC7_PATCH)
 The NSFPlay application has its own nsfplay,ini file, found next to the .exe.
 It has a few options to control the loading of the plugin. The last used volume is saved at exit.
 NSFPlay could be used with other Winamp plugins, but it will not has as many features.
+If its location not overridden by the command line, this will be saved next to the
+application if possible, or otherwise in APPDATA under an NSFPlay folder.
+
+nsfplay.ini settings:
   VOLUME: 0-255 starting volume. Default: 255
-  PLUGIN: Path to player plugin. Default: plugins/in_yansf.dll
+  SAVEVOLUME: 0 = don't save, 1 = save. Default: 1
+  PLUGIN: Path to player plugin. Default: plugins\in_yansf.dll
 
 Playlists
 =========
@@ -200,6 +217,7 @@ NSFPlay 2.6 - (Unofficial)
 - Allow multiple instances of command line WAV export.
 - Add redirectable diagnostic log to stdout for command line usage. (Use > to send it to a file.)
 - Allow command-line configuration overrides.
+- Allow command-line INI file overrides.
 
 NSFPlay 2.5 - 10/25/2022
 - APU frequency dividers now count down (more accurate pitch change timing).

@@ -68,7 +68,7 @@ BOOL CnsfplayApp::InitInstance()
         printf("Too many positional arguments. Maximum %d, got: %d\n",MAX_PARGS,pargc);
 
     if (pargc >= 2) { // WAV export
-      CnsfplayDlg dlg;
+      CnsfplayDlg dlg(NULL,wargc,wargv);
       m_pDlg = &dlg;
       m_pMainWnd = &dlg;
       m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
@@ -84,7 +84,7 @@ BOOL CnsfplayApp::InitInstance()
           char temp[32]; file_utf8(pargv[3],temp,32);
           time = ::atoi(temp);
       }
-      dlg.ParseArgs(wargc,wargv);
+
       dlg.WriteSingleWave(nsf_file, wav_file, track, time);
       dlg.m_cancel_open = true;
       dlg.DoModal();
@@ -95,7 +95,7 @@ BOOL CnsfplayApp::InitInstance()
     CMutex mutex(FALSE, m_pszExeName); // see if program is already open
     if( mutex.Lock(0) == TRUE ) { // new instance
 
-      CnsfplayDlg dlg;
+      CnsfplayDlg dlg(NULL,wargc,wargv);
       m_pDlg = &dlg;
       m_pMainWnd = &dlg;
       m_hAccel = ::LoadAccelerators(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDR_ACCELERATOR)); 
@@ -107,7 +107,6 @@ BOOL CnsfplayApp::InitInstance()
         dlg.m_init_file = CString(init_file);
       }
 
-      dlg.ParseArgs(wargc,wargv);
       dlg.DoModal();
       mutex.Unlock();
 

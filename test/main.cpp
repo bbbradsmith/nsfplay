@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   
   if(argc<2) return 0;
 
-  EmuWinamp emu("in_yansf.dll");
+  EmuWinamp emu("in_yansf.dll",NULL);
   emu.Play(argv[1]);
   MSG msg;
   while(GetMessage(&msg,NULL,0,0)) {

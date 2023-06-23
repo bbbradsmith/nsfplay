@@ -56,22 +56,79 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
+CnsfplayDlg::CnsfplayDlg(CWnd* pParent, int wargc, const wchar_t* const * wargv)
     : CDialog(CnsfplayDlg::IDD, pParent)
     , m_cancel_open(false)
-	, in_yansf(NULL)
+    , in_yansf(NULL)
+    , m_volume_init(-1)
+    , m_volume_save(-1)
+    , m_ini_save(true)
+    , m_plugin_path("")
+    , m_yansf_ini_path("")
+    , m_nsfplay_ini_path("")
 {
   m_hIcon = AfxGetApp()->LoadIcon(IDI_MAINFRAME);
 
-  char buf[MAX_PATH];
-  GetModuleFileName(AfxGetApp()->m_hInstance, m_IniPath, MAX_PATH);
-  strrchr(m_IniPath,'\\')[1] = '\0';
-  strcat(m_IniPath,"nsfplay.ini");
-  GetPrivateProfileString("NSFPLAY","PLUGIN","plugins\\in_yansf.dll",buf,MAX_PATH,m_IniPath);
-  m_plugin_path = buf;
-  try { m_emu = new EmuWinamp(buf); }
-  catch (int e) {
-     char msg[MAX_PATH+256];
+  ParseArgs(wargc,wargv,true); // prepass to get nsfplay.ini overrides
+
+  // find nsfplay.ini (or override)
+  char buf[1024+16];
+  if (m_nsfplay_ini_path.length() == 0)
+  {
+    const char* INI_FILENAME = "nsfplay.ini";
+    
+    GetModuleFileName(AfxGetApp()->m_hInstance, buf, 1024);
+    strrchr(buf,'\\')[1] = '\0';
+    strcat(buf,INI_FILENAME);
+    if (FALSE == PathFileExists(buf))
+    {
+      // first try to see if we have permission to create a new one in that location...
+      HANDLE f = CreateFile(buf,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+      if (f != INVALID_HANDLE_VALUE)
+      {
+        CloseHandle(f);
+      }
+      else  // Otherwise, attempt to use AppData instead.
+      {
+        if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, buf)))
+        {
+          strcat(buf,"\\NSFPlay");
+          CreateDirectory(buf,NULL);
+          strcat(buf,"\\");
+          strcat(buf,INI_FILENAME);
+        }
+      }
+    }
+    m_nsfplay_ini_path = buf;
+  }
+  else
+  {
+    GetFullPathName(m_nsfplay_ini_path.c_str(),1024+16,buf,NULL);
+    m_nsfplay_ini_path = buf;
+    if (FALSE == PathFileExists(buf)) // try to create if needed
+    {
+      HANDLE f = CreateFile(buf,GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+      if (f != INVALID_HANDLE_VALUE) CloseHandle(f);
+    }
+  }
+
+  // find plugin (or override)
+  if (m_plugin_path.length() == 0)
+  {
+    GetPrivateProfileString("NSFPLAY","PLUGIN","plugins\\in_yansf.dll",buf,1024,m_nsfplay_ini_path.c_str());
+    m_plugin_path = buf;
+  }
+
+  // open plugin, override in_yansf.ini
+  try
+  {
+      strcpy(buf,m_plugin_path.c_str());
+      m_emu = new EmuWinamp(buf,
+         (m_yansf_ini_path.length()==0) ? NULL : m_yansf_ini_path.c_str());
+  }
+  catch (int e)
+  {
+     char msg[1024+256];
      strcpy(msg,"Unable to open plugin:\n");
      if (e == 2) strcpy(msg,"Not a Winamp plugin:\n");
      strcat(msg,buf);
@@ -79,12 +136,16 @@ CnsfplayDlg::CnsfplayDlg(CWnd* pParent /*=NULL*/)
      ::MessageBox(NULL,msg,"FATAL ERROR",MB_OK);
      exit(-1);
   }
+
   // direct plugin access (only safe if matches current version)
   in_yansf = (InYansfDirect*)m_emu->PluginDirect();
   if (in_yansf == NULL ||
       strcmp(m_emu->GetDescription(), NSFPLUG_TITLE) ||
       strcmp(in_yansf->version, NSFPLUG_TITLE))
       in_yansf = NULL;
+
+  // finish unpacking options
+  ParseArgs(wargc,wargv,false);
 }
 
 CnsfplayDlg::~CnsfplayDlg()
@@ -179,9 +240,13 @@ BOOL CnsfplayDlg::OnInitDialog()
     m_slider.SetTicFreq(10);
     m_sb_dragging = false;
     m_volume.SetRange(0,255,TRUE);
-    int v = GetPrivateProfileInt("NSFPLAY","VOLUME",255,m_IniPath);
-    m_volume.SetPos(v);
     m_volume.SetTicFreq(32);
+
+    int v = 255;
+    if (m_volume_init >= 0) v = m_volume_init;
+    else v = GetPrivateProfileInt("NSFPLAY","VOLUME",255,m_nsfplay_ini_path.c_str());
+    m_volume_init = v;
+    m_volume.SetPos(v);
     m_emu->SetVolume(v);
     
     if(m_init_file.GetLength()) {
@@ -392,10 +457,18 @@ void CnsfplayDlg::OnDestroy()
     m_timerID = 0;
   }
 
-  CString str;
-  str.Format("%d",m_volume.GetPos());
-  WritePrivateProfileString("NSFPLAY","VOLUME",str,m_IniPath);
-  WritePrivateProfileString("NSFPLAY","PLUGIN",m_plugin_path.c_str(),m_IniPath);
+  if (m_ini_save)
+  {
+    if (m_volume_save < 0) m_volume_save = 1;
+    m_volume_save = GetPrivateProfileInt("NSFPLAY","SAVEVOLUME",m_volume_save,m_nsfplay_ini_path.c_str());
+
+    int v = m_volume.GetPos();
+    if (!m_volume_save) v = m_volume_init;
+    char str[16]; ::itoa(v,str,10);
+    WritePrivateProfileString("NSFPLAY","VOLUME",str,m_nsfplay_ini_path.c_str());
+    WritePrivateProfileString("NSFPLAY","SAVEVOLUME",m_volume_save?"1":"0",m_nsfplay_ini_path.c_str());
+    WritePrivateProfileString("NSFPLAY","PLUGIN",m_plugin_path.c_str(),m_nsfplay_ini_path.c_str());
+  }
 }
 
 void CnsfplayDlg::OnBnClickedStop()
@@ -491,9 +564,8 @@ void CnsfplayDlg::OnBnClickedOpen()
   }
 }
 
-int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv)
+int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv, bool prepass)
 {
-	if (!in_yansf) return 0; // can't parse arguments without direct plugin access
 	int result = 0;
 	for (int i=1; i<wargc; ++i)
 	{
@@ -507,15 +579,31 @@ int CnsfplayDlg::ParseArgs(int wargc, const wchar_t* const * wargv)
 			++result;
 			continue;
 		}
-		std::string val(arg+1,split-(arg+1));
-		if (!in_yansf->npm->cf->HasValue(val))
+		std::string key(arg+1,split-(arg+1));
+		const char* val = split+1;
+		if (prepass)
 		{
-			printf("Unknown configuration argument: %s\n",val.c_str());
-			++result;
-			continue;
+			// special values
+			if      (key == "INI")        { m_yansf_ini_path = val; }
+			else if (key == "NSFPLAYINI") { m_nsfplay_ini_path = val; }
+			// check NSFPlay ini values
+			else if (key == "VOLUME")     { m_volume_init = atoi(val); m_ini_save = false; }
+			else if (key == "SAVEVOLUME") { m_volume_save = (atoi(val) != 0); m_ini_save = false; }
+			else if (key == "PLUGIN")     { m_plugin_path = val; m_ini_save = false; }
 		}
-		(*(in_yansf->npm->cf))[val] = split+1;
-		in_yansf->npm->no_save_config = true; // changes are temporary unless explicitly saved by user
+		else // after prepass, only affects plugin, warn if invalid arguments
+		{
+			if((in_yansf && in_yansf->npm->cf->HasValue(val)))
+			{
+				(*(in_yansf->npm->cf))[key] = val;
+				in_yansf->npm->no_save_config = true; // changes are temporary unless explicitly saved by user
+			}
+			else
+			{
+				printf("Unknown configuration argument: %s\n",key.c_str());
+				++result;
+			}
+		}
 	}
 	return result;
 }
