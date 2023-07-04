@@ -217,7 +217,7 @@ loopcount - number of times to loop, 0 default
 Versions
 ========
 
-NSFPlay 2.6 - (Unofficial)
+NSFPlay 2.6 - 7/03/2023
 - NSF2 IRQ vector filled with existing content at $FFFE by default.
 - Unicode filename support, UTF8 metadata support.
 - Legacy Shift-JIS support for NSF title/author/copyright fields.
