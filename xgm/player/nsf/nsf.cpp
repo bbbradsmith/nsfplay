@@ -589,6 +589,7 @@ void sjis_legacy(char* s, const unsigned int length)
             nsf_error = nsfe_error;
             return false; // NSF2 bit 7 indicates metadata parsing is mandatory
         }
+        bodysize = suffix - 0x80;
     }
 
     nsf_error = "";
