@@ -52,8 +52,7 @@ namespace xgm
     int total_size = ((offset & 0xfff) + size);
     bankmax = (total_size >> 12); // count of full banks
     if (total_size & 0xfff) bankmax += 1; // include last partial bank
-    if (bankmax > 256)
-      return false;
+    if (bankmax > 256) bankmax = 256;
 
     if (image)
       delete[]image;
