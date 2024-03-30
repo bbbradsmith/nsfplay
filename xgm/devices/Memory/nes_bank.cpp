@@ -53,11 +53,16 @@ namespace xgm
     bankmax = (total_size >> 12); // count of full banks
     if (total_size & 0xfff) bankmax += 1; // include last partial bank
     if (bankmax > 256) bankmax = 256;
+    UINT32 image_size = 0x1000 * bankmax;
 
     if (image)
       delete[]image;
-    image = new UINT8[0x1000 * bankmax];
-    memset (image, 0, 0x1000 * bankmax);
+    image = new UINT8[image_size];
+    memset (image, 0, image_size);
+
+    UINT32 start = offset & 0xfff;
+    if ((start + size) > image_size)
+      size = image_size;
     memcpy (image + (offset & 0xfff), data, size);
 
     #if FDS_MEMCPY
