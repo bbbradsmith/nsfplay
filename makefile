@@ -1,20 +1,26 @@
 include makefile.common
 
-.PHONY: default core cmd gui winamp clean
+.PHONY: default core cmd gui winamp install uninstall clean
 
 default: core cmd gui
 
 core:
-	make -C core
+	$(MAKE) -C core
 
 cmd: core
-	make -C cmd
+	$(MAKE) -C cmd
 
 gui: core
-	make -C gui
+	$(MAKE) -C gui
 
 winamp: core
-	make -C winamp
+	$(MAKE) -C winamp
+
+install: cmd
+	$(MAKE) -C cmd install
+
+uninstall:
+	$(MAKE) -C cmd uninstall
 
 clean:
 	rm -rf $(INTDIR)

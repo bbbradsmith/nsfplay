@@ -1,4 +1,5 @@
 intermediate
 output
+secrets
 *.user
 .vs

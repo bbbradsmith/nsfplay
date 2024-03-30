@@ -1,2 +1,13 @@
 OUTDIR ?= output/make
 INTDIR ?= intermediate/make
+
+MAKE ?= make
+CXX ?= g++
+AR ?= ar
+MKDIR ?= mkdir -p
+
+CXXFLAGS += -I../include -O3 -Wall -Werror -g
+LDFLAGS += -g
+
+EXE_SUFFIX ?= .exe
+LIB_SUFFIX ?= .a

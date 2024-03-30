@@ -1,9 +1,10 @@
 // stub
 
 #include <cstdio>
+#include <nsfplaycore.h>
 
 int main()
 {
 	printf("nsfplaycmd stub\n");
-	return 0;
+	return nsfplaycore::test();
 }
