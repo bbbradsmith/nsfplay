@@ -1,0 +1,91 @@
+name: NSFPlay 3 Builds
+on:
+  push:
+    branches: [ "nsfplay3" ]
+  pull_request:
+    branches: [ "nsfplay3" ]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build-win64-msvc:
+    name: Windows 64-bit MSVC
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Build MSVC
+        run: |
+          msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
+      - name: Prepare Artifact
+        shell: pwsh
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          cp output/x64/Release/nsfplay.exe artifact
+          cp output/x64/Release/nsfplaycmd.exe artifact
+          cp output/x64/Release/nsfplug.dll artifact
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nsfplay3-win64-msvc--${{ env.BUILD_TAG }}
+          path: artifact/
+
+
+  build-win32-msvc:
+    name: Windows 32-bit MSVC
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Build MSVC
+        run: |
+          msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x86
+      - name: Prepare Artifact
+        shell: pwsh
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          cp output/x86/Release/nsfplay.exe artifact
+          cp output/x86/Release/nsfplaycmd.exe artifact
+          cp output/x86/Release/nsfplug.dll artifact
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nsfplay3-win32-msvc--${{ env.BUILD_TAG }}
+          path: artifact/
+
+  build-win64-msys2:
+    name: Windows 64-bit MSVC
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          install: make mingw-w64-ucrt-x86_64-gcc
+      - name: Build Make
+        shell: msys2 {0}
+        run: |
+          make
+      - name: Prepare Artifact
+        shell: pwsh
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          cp output/make/nsfplay.exe artifact
+          cp output/make/nsfplaycmd.exe artifact
+          cp output/make/nsfplug.dll artifact
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nsfplay3-win64-msys2--${{ env.BUILD_TAG }}
+          path: artifact/
