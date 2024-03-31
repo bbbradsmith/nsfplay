@@ -1,5 +1,6 @@
 OUTDIR ?= output/make
 INTDIR ?= intermediate/make
+prefix ?= /usr/local/bin
 
 MAKE ?= make
 CXX ?= g++
@@ -8,6 +9,23 @@ MKDIR ?= mkdir -p
 
 CXXFLAGS += -I../include -O3 -Wall -Werror -g
 LDFLAGS += -g
+LDFLAGS_CMD += 
+LDFLAGS_GUI += 
+LDFLAGS_DLL += 
 
-EXE_SUFFIX ?= .exe
 LIB_SUFFIX ?= .a
+EXE_SUFFIX ?= .exe
+DLL_SUFFIX ?= .dll
+
+LIB_NAME ?= nsfplaycore
+CMD_NAME ?= nsfplaycmd
+GUI_NAME ?= nsfplay
+WINAMP_NAME ?= winamp/nsfplay
+
+ifeq ($(OS),Windows_NT)
+CXXFLAGS += -municode
+LDFLAGS += 
+LDFLAGS_CMD += -mconsole
+LDFLAGS_GUI += -municode -mwindows
+LDFLAGS_DLL += -municode -mdll
+endif

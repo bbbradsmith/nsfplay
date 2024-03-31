@@ -1,10 +1,8 @@
 include ../makefile.common
 
+TARGETFILE ?= $(CMD_NAME)$(EXE_SUFFIX)
+TARGET ?= ../$(OUTDIR)/$(TARGETFILE)
 CMD_INTDIR ?= ../$(INTDIR)/cmd
-CMD_OUTDIR ?= ../$(OUTDIR)
-prefix ?= /usr/local/bin
-TARGETFILE ?= nsfplaycmd$(EXE_SUFFIX)
-TARGET ?= $(CMD_OUTDIR)/$(TARGETFILE)
 CMD_INSTALL = $(prefix)/$(TARGETFILE)
 
 .PHONY: default install uninstall clean
@@ -14,10 +12,10 @@ default: $(TARGET)
 SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.d))
-CORE = $(CMD_OUTDIR)/nsfplaycore$(LIB_SUFFIX)
+CORE = ../$(OUTDIR)/$(LIB_NAME)$(LIB_SUFFIX)
 
-$(TARGET): $(OBJS) $(CORE) | $(CMD_OUTDIR)/
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(OBJS) $(CORE)
+$(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
+	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_CMD) $(OBJS) $(CORE)
 
 $(CMD_INTDIR)/%.d: %.cpp | $(CMD_INTDIR)/
 	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(basename $<).o $(CXXFLAGS) -c $<
@@ -28,7 +26,7 @@ $(CMD_INTDIR)/%.o: %.cpp $(CMD_INTDIR)/%.d | $(CMD_INTDIR)/
 $(CMD_INTDIR)/:
 	$(MKDIR) $@
 
-$(CMD_OUTDIR)/:
+$(dir $(TARGET)):
 	$(MKDIR) $@
 
 $(CORE):
@@ -43,6 +41,6 @@ uninstall:
 
 clean:
 	rm -rf $(CMD_INTDIR)
-	rm -rf $(CMD_OUTDIR)
+	rm -rf $(dir $(TARGET))
 
 include $(DEPS)

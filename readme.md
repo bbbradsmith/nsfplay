@@ -9,12 +9,14 @@ This is a work in progress total rewrite of NSFPlay. Goals include:
 * Rewrite to change the emulation architecture, hopefully more efficient and easier to maintain.
 
 Make targets:
-* `make` - same as make `core` 
-* `make core` - build core library `nsfplaycore` to `output/make`
-* `make cmd` - build `nsfplaycmd` to `output/make`
-* `make gui` - build `nsfplay` to `output/make`
-* `make winamp` - build `nsfplay.dll` winamp plugin to `output/make`
-* `make install` - copy `nsfplaycmd` to `/usr/local/bin`
-* `make uninstall` - delete `nsfplaycmd` from `/usr/local/bin`
-* `make install prefix=/my/directory` - copy `nsfplaycmd` to custom directory.
-* `make uninstall prefix=/my/directory` - delete `nsfplaycmd` from custom directory.
+* `make` - builds `cmd`, `gui`, and on windows `winamp` .
+* `make clean` - deletes `intermediate` and `output` directories.
+* `make core` - build core library `nsfplaycore` to `output/make`.
+* `make cmd` - build `nsfplaycmd` to `output/make`.
+* `make gui` - build `nsfplay` to `output/make`.
+* `make winamp` - (windows only) build `nsfplay.dll` winamp plugin to `output/make/winamp`.
+* `make install` - copy `nsfplay`/`nsfplaycmd` to `/usr/local/bin`.
+* `make uninstall` - delete install from `/usr/local/bin`.
+* `make install prefix=~/my/directory` - install to custom directory.
+* `make uninstall prefix=~/my/directory` - uninstall from custom directory.
+See `makefile.common` for various potential environment overrides.

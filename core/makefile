@@ -1,8 +1,8 @@
 include ../makefile.common
 
+TARGETFILE ?= $(LIB_NAME)$(LIB_SUFFIX)
+TARGET ?= ../$(OUTDIR)/$(TARGETFILE)
 CORE_INTDIR ?= ../$(INTDIR)/core
-CORE_OUTDIR ?= ../$(OUTDIR)
-TARGET ?= $(CORE_OUTDIR)/nsfplaycore$(LIB_SUFFIX)
 
 .PHONY: default clean
 
@@ -12,7 +12,7 @@ SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.d))
 
-$(TARGET): $(OBJS) | $(CORE_OUTDIR)/
+$(TARGET): $(OBJS) | $(dir $(TARGET))
 	rm -f $(TARGET)
 	$(AR) rcs $(TARGET) $(OBJS)
 
@@ -25,11 +25,11 @@ $(CORE_INTDIR)/%.o: %.cpp $(CORE_INTDIR)/%.d | $(CORE_INTDIR)/
 $(CORE_INTDIR)/:
 	$(MKDIR) $@
 
-$(CORE_OUTDIR)/:
+$(dir $(TARGET)):
 	$(MKDIR) $@
 
 clean:
 	rm -rf $(CORE_INTDIR)
-	rm -rf $(CORE_OUTDIR)
+	rm -rf $(dir $(TARGET))
 
 include $(DEPS)

@@ -4,6 +4,10 @@ include makefile.common
 
 default: core cmd gui
 
+ifeq ($(OS),Windows_NT)
+default: winamp
+endif
+
 core:
 	$(MAKE) -C core
 
@@ -18,9 +22,11 @@ winamp: core
 
 install: cmd
 	$(MAKE) -C cmd install
+	$(MAKE) -C gui install
 
 uninstall:
 	$(MAKE) -C cmd uninstall
+	$(MAKE) -C gui uninstall
 
 clean:
 	rm -rf $(INTDIR)
