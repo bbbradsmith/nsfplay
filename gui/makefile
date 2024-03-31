@@ -20,6 +20,7 @@ endif
 
 $(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_GUI) $(OBJS) $(CORE)
+	$(STRIP_DEBUG)
 
 $(GUI_INTDIR)/%.d: %.cpp | $(GUI_INTDIR)/
 	$(CXX) -M -MM -MF $@ -MT $(GUI_INTDIR)/$(basename $<).o $(CXXFLAGS) -c $<

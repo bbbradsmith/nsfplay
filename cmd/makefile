@@ -16,6 +16,7 @@ CORE = ../$(OUTDIR)/$(LIB_NAME)$(LIB_SUFFIX)
 
 $(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_CMD) $(OBJS) $(CORE)
+	$(STRIP_DEBUG)
 
 $(CMD_INTDIR)/%.d: %.cpp | $(CMD_INTDIR)/
 	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(basename $<).o $(CXXFLAGS) -c $<

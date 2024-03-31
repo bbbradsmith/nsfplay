@@ -20,7 +20,12 @@ DLL_SUFFIX ?= .dll
 LIB_NAME ?= nsfplaycore
 CMD_NAME ?= nsfplaycmd
 GUI_NAME ?= nsfplay
-WINAMP_NAME ?= winamp/nsfplay
+WINAMP_NAME ?= nsfplug
+
+STRIP_DEBUG = \
+  objcopy --only-keep-debug $@ $@.debug ; \
+  strip --strip-debug --strip-unneeded $@ ; \
+  objcopy --add-gnu-debuglink=$@.debug $@
 
 ifeq ($(OS),Windows_NT)
 CXXFLAGS += -municode
