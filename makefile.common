@@ -17,10 +17,10 @@ LIB_SUFFIX ?= .a
 EXE_SUFFIX ?= .exe
 DLL_SUFFIX ?= .dll
 
-LIB_NAME ?= nsfplaycore
-CMD_NAME ?= nsfplaycmd
+LIB_NAME ?= nsfcore
+CMD_NAME ?= nsfplac
 GUI_NAME ?= nsfplay
-WINAMP_NAME ?= nsfplug
+WINAMP_NAME ?= nsfplay
 
 STRIP_DEBUG = \
   objcopy --only-keep-debug $@ $@.debug ; \
