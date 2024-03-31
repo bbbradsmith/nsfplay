@@ -11,59 +11,45 @@ concurrency:
 
 jobs:
 
-  build-win64-msvc:
-    name: Windows 64-bit MSVC
+  build-msvc:
+    name: Windows MSVC
     runs-on: windows-latest
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
       - name: Setup MSVC
         uses: microsoft/setup-msbuild@v2
-      - name: Build MSVC
+      - name: Build 64-bit
         run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
-      - name: Prepare Artifact
-        shell: pwsh
-        run: |
-          mkdir artifact
-          cp nsfplay.txt artifact
-          cp output/x64/Release/nsfplay.exe artifact
-          cp output/x64/Release/nsfplaycmd.exe artifact
-          cp output/x64/Release/nsfplug.dll artifact
-          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nsfplay3-win64-msvc--${{ env.BUILD_TAG }}
-          path: artifact/
-
-
-  build-win32-msvc:
-    name: Windows 32-bit MSVC
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Files
-        uses: actions/checkout@v4
-      - name: Setup MSVC
-        uses: microsoft/setup-msbuild@v2
-      - name: Build MSVC
+      - name: Build 32-bit
         run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x86
-      - name: Prepare Artifact
+      - name: Prepare Artifacts
         shell: pwsh
         run: |
-          mkdir artifact
-          cp nsfplay.txt artifact
-          cp output/Win32/Release/nsfplay.exe artifact
-          cp output/Win32/Release/nsfplaycmd.exe artifact
-          cp output/Win32/Release/nsfplug.dll artifact
+          mkdir artifact64
+          cp nsfplay.txt artifact64
+          cp output/x64/Release/nsfplay.exe artifact64
+          cp output/x64/Release/nsfplaycmd.exe artifact64
+          cp output/Win32/Release/nsfplug.dll artifact64
+          mkdir artifact32
+          cp nsfplay.txt artifact32
+          cp output/Win32/Release/nsfplay.exe artifact32
+          cp output/Win32/Release/nsfplaycmd.exe artifact32
+          cp output/Win32/Release/nsfplug.dll artifact32
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
-      - name: Upload Artifact
+      - name: Upload 64-bit Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nsfplay3-win32-msvc--${{ env.BUILD_TAG }}
-          path: artifact/
+          name: nsfplay3-win64--${{ env.BUILD_TAG }}
+          path: artifact64/
+      - name: Upload 32-bit Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay3-win32--${{ env.BUILD_TAG }}
+          path: artifact32/
 
-  build-win64-msys2:
-    name: Windows 64-bit MSYS2
+  build-msys2:
+    name: Windows MSYS2
     runs-on: windows-latest
     steps:
       - name: Checkout Files
@@ -72,22 +58,34 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          install: make mingw-w64-ucrt-x86_64-gcc
-      - name: Build Make
+          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-toolchain
+      - name: Make 64-bit
         shell: msys2 {0}
-        run: |
-          make
-      - name: Prepare Artifact
+        run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd gui
+      - name: Make 32-bit
+        shell: msys2 {0}
+        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 ; make
+      - name: Prepare Artifacts
         shell: pwsh
         run: |
-          mkdir artifact
-          cp nsfplay.txt artifact
-          cp output/make/nsfplay.exe artifact
-          cp output/make/nsfplaycmd.exe artifact
-          cp output/make/nsfplug.dll artifact
+          mkdir artifact64
+          cp nsfplay.txt artifact64
+          cp output/make64/nsfplay.exe artifact64
+          cp output/make64/nsfplaycmd.exe artifact64
+          cp output/make32/nsfplug.dll artifact64
+          mkdir artifact32
+          cp nsfplay.txt artifact32
+          cp output/make32/nsfplay.exe artifact32
+          cp output/make32/nsfplaycmd.exe artifact32
+          cp output/make32/nsfplug.dll artifact32
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
-      - name: Upload Artifact
+      - name: Upload 64-bit Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nsfplay3-win64-msys2--${{ env.BUILD_TAG }}
-          path: artifact/
+          name: nsfplay3-win64-ucrt--${{ env.BUILD_TAG }}
+          path: artifact64/
+      - name: Upload 32-bit Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay3-win32-mingw--${{ env.BUILD_TAG }}
+          path: artifact32/
