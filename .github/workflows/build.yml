@@ -58,7 +58,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-toolchain
+          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc
       - name: Make 64-bit
         shell: msys2 {0}
         run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd gui
