@@ -29,7 +29,7 @@ STRIP_DEBUG = \
 
 ifeq ($(OS),Windows_NT)
 CXXFLAGS += -municode
-LDFLAGS += 
+LDFLAGS += -static-libgcc
 LDFLAGS_CMD += -mconsole
 LDFLAGS_GUI += -municode -mwindows
 LDFLAGS_DLL += -municode -mdll
