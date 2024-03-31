@@ -218,7 +218,7 @@ Versions
 ========
 
 NSFPlay 2.7 - Unreleased
-- No changes yet.
+- Crash fix for NSF larger than 1MB. (Gumball2415)
 
 NSFPlay 2.6 - 7/03/2023
 - NSF2 IRQ vector filled with existing content at $FFFE by default.
