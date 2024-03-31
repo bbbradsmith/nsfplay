@@ -31,7 +31,7 @@ jobs:
           cp output/x64/Release/nsfplug.dll artifact
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nsfplay3-win64-msvc--${{ env.BUILD_TAG }}
           path: artifact/
@@ -52,12 +52,12 @@ jobs:
         run: |
           mkdir artifact
           cp nsfplay.txt artifact
-          cp output/x86/Release/nsfplay.exe artifact
-          cp output/x86/Release/nsfplaycmd.exe artifact
-          cp output/x86/Release/nsfplug.dll artifact
+          cp output/Win32/Release/nsfplay.exe artifact
+          cp output/Win32/Release/nsfplaycmd.exe artifact
+          cp output/Win32/Release/nsfplug.dll artifact
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nsfplay3-win32-msvc--${{ env.BUILD_TAG }}
           path: artifact/
@@ -87,7 +87,7 @@ jobs:
           cp output/make/nsfplug.dll artifact
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nsfplay3-win64-msys2--${{ env.BUILD_TAG }}
           path: artifact/
