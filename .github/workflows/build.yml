@@ -29,13 +29,13 @@ jobs:
           mkdir artifact64
           cp nsfplay.txt artifact64
           cp output/x64/Release/nsfplay.exe artifact64
-          cp output/x64/Release/nsfplaycmd.exe artifact64
-          cp output/Win32/Release/nsfplug.dll artifact64
+          cp output/x64/Release/nsfplac.exe artifact64
+          cp output/Win32/Release/nsfplay.dll artifact64
           mkdir artifact32
           cp nsfplay.txt artifact32
           cp output/Win32/Release/nsfplay.exe artifact32
-          cp output/Win32/Release/nsfplaycmd.exe artifact32
-          cp output/Win32/Release/nsfplug.dll artifact32
+          cp output/Win32/Release/nsfplac.exe artifact32
+          cp output/Win32/Release/nsfplay.dll artifact32
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
       - name: Upload 64-bit Artifact
         uses: actions/upload-artifact@v4
@@ -71,13 +71,13 @@ jobs:
           mkdir artifact64
           cp nsfplay.txt artifact64
           cp output/make64/nsfplay.exe artifact64
-          cp output/make64/nsfplaycmd.exe artifact64
-          cp output/make32/nsfplug.dll artifact64
+          cp output/make64/nsfplac.exe artifact64
+          cp output/make32/nsfplay.dll artifact64
           mkdir artifact32
           cp nsfplay.txt artifact32
           cp output/make32/nsfplay.exe artifact32
-          cp output/make32/nsfplaycmd.exe artifact32
-          cp output/make32/nsfplug.dll artifact32
+          cp output/make32/nsfplac.exe artifact32
+          cp output/make32/nsfplay.dll artifact32
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
       - name: Upload 64-bit Artifact
         uses: actions/upload-artifact@v4
