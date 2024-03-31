@@ -17,9 +17,10 @@ jobs:
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
       - name: Build MSVC
-        run: |
-          msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
+        run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
       - name: Prepare Artifact
         shell: pwsh
         run: |
@@ -42,9 +43,10 @@ jobs:
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
       - name: Build MSVC
-        run: |
-          msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x86
+        run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x86
       - name: Prepare Artifact
         shell: pwsh
         run: |
@@ -61,7 +63,7 @@ jobs:
           path: artifact/
 
   build-win64-msys2:
-    name: Windows 64-bit MSVC
+    name: Windows 64-bit MSYS2
     runs-on: windows-latest
     steps:
       - name: Checkout Files
