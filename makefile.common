@@ -8,7 +8,7 @@ AR ?= ar
 MKDIR ?= mkdir -p
 
 CXXFLAGS += -I../include -O3 -Wall -Werror -g
-LDFLAGS += -g
+LDFLAGS += -Wl,--fatal-warnings -g
 LDFLAGS_CMD += 
 LDFLAGS_GUI += 
 LDFLAGS_DLL += 
