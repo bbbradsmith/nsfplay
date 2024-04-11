@@ -17,10 +17,10 @@ cmd: core
 gui: core
 	$(MAKE) -C gui
 
-nsfplay: core
+nsfplay: core gui
 	$(MAKE) -C nsfplay
 
-winamp: core
+winamp: core gui
 	$(MAKE) -C winamp
 
 install: cmd

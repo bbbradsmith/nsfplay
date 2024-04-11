@@ -11,10 +11,11 @@ default: $(TARGET)
 SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(WINAMP_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(WINAMP_INTDIR)/,$(SRCS:.cpp=.d))
-CORE = ../$(OUTDIR)/$(LIB_NAME)$(LIB_SUFFIX)
+CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
+GUI = ../$(OUTDIR)/$(GUI_NAME)$(LIB_SUFFIX)
 
-$(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_DLL) $(OBJS) $(CORE)
+$(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
+	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_DLL) $(OBJS) $(CORE) $(GUI)
 	$(STRIP_DEBUG)
 
 $(WINAMP_INTDIR)/%.d: %.cpp | $(WINAMP_INTDIR)/

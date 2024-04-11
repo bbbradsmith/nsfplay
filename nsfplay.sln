@@ -13,12 +13,16 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winamp", "winamp\winamp.vcxproj", "{4564B30C-656E-4897-8036-42E4A3E88FBE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E492BA81-E2F5-439C-B42E-A3E26C82DDFB} = {E492BA81-E2F5-439C-B42E-A3E26C82DDFB}
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5} = {62FFE7E8-A311-4603-A4C0-8D438230EBA5}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nsfplay", "nsfplay\nsfplay.vcxproj", "{D3EC4B41-9124-4C7E-B2B8-01E85EEC750D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E492BA81-E2F5-439C-B42E-A3E26C82DDFB} = {E492BA81-E2F5-439C-B42E-A3E26C82DDFB}
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5} = {62FFE7E8-A311-4603-A4C0-8D438230EBA5}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gui", "gui\gui.vcxproj", "{62FFE7E8-A311-4603-A4C0-8D438230EBA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +62,14 @@ Global
 		{D3EC4B41-9124-4C7E-B2B8-01E85EEC750D}.Release|x64.Build.0 = Release|x64
 		{D3EC4B41-9124-4C7E-B2B8-01E85EEC750D}.Release|x86.ActiveCfg = Release|Win32
 		{D3EC4B41-9124-4C7E-B2B8-01E85EEC750D}.Release|x86.Build.0 = Release|Win32
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Debug|x64.ActiveCfg = Debug|x64
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Debug|x64.Build.0 = Debug|x64
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Debug|x86.ActiveCfg = Debug|Win32
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Debug|x86.Build.0 = Debug|Win32
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Release|x64.ActiveCfg = Release|x64
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Release|x64.Build.0 = Release|x64
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Release|x86.ActiveCfg = Release|Win32
+		{62FFE7E8-A311-4603-A4C0-8D438230EBA5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

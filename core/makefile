@@ -1,6 +1,6 @@
 include ../makefile.common
 
-TARGETFILE ?= $(LIB_NAME)$(LIB_SUFFIX)
+TARGETFILE ?= $(CORE_NAME)$(LIB_SUFFIX)
 TARGET ?= ../$(OUTDIR)/$(TARGETFILE)
 CORE_INTDIR ?= ../$(INTDIR)/core
 

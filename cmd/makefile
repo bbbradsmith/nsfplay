@@ -12,7 +12,7 @@ default: $(TARGET)
 SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.d))
-CORE = ../$(OUTDIR)/$(LIB_NAME)$(LIB_SUFFIX)
+CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
 
 $(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_CMD) $(OBJS) $(CORE)

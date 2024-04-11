@@ -12,14 +12,15 @@ default: $(TARGET)
 SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.d))
-CORE = ../$(OUTDIR)/$(LIB_NAME)$(LIB_SUFFIX)
+CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
+GUI = ../$(OUTDIR)/$(GUI_NAME)$(LIB_SUFFIX)
 
 ifeq ($(OS),Windows_NT)
 OBJS += $(NSFPLAY_INTDIR)/nsfplay_rc.o
 endif
 
-$(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_NSFPLAY) $(OBJS) $(CORE)
+$(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
+	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_NSFPLAY) $(OBJS) $(CORE) $(GUI)
 	$(STRIP_DEBUG)
 
 $(NSFPLAY_INTDIR)/%.d: %.cpp | $(NSFPLAY_INTDIR)/
@@ -39,6 +40,9 @@ $(dir $(TARGET)):
 
 $(CORE):
 	$(MAKE) -C ../core
+
+$(GUI):
+	$(MAKE) -C ../gui
 
 install: $(TARGET)
 	$(MKDIR) $(dir $(NSFPLAY_INSTALL))

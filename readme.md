@@ -8,6 +8,13 @@ This is a work in progress total rewrite of NSFPlay. Goals include:
 * Winamp plugin.
 * Rewrite to change the emulation architecture, hopefully more efficient and easier to maintain.
 
+Components:
+* `core` - A platform-agnostic NSF player library suitable for integration into other programs.
+* `gui` - A cross platform GUI library that works with the core, allowing plugins to share the same UI as the stand alone player.
+* `cmd` - A stand-alone command line player.
+* `nsfplay` - A stand-alone GUI player.
+* `winamp` - A winamp plugin.
+
 Make targets:
 * `make` - builds `cmd`, `gui`, and on windows: `winamp` .
 * `make clean` - deletes `intermediate` and `output` directories.
