@@ -33,6 +33,9 @@ $(dir $(TARGET)):
 $(CORE):
 	$(MAKE) -C ../core
 
+$(GUI):
+	$(MAKE) -C ../gui
+
 clean:
 	rm -rf $(WINAMP_INTDIR)
 	rm -rf $(dir $(TARGET))
