@@ -13,7 +13,8 @@ Make targets:
 * `make clean` - deletes `intermediate` and `output` directories.
 * `make core` - build core library `nsfcore` to `output/make`.
 * `make cmd` - build `nsfplac` to `output/make`.
-* `make gui` - build `nsfplay` to `output/make`.
+* `make gui` - build gui library `nsfgui` to `output/make`.
+* `make nsfplay` - build `nsfplay` to `output/make`.
 * `make winamp` - (windows only) build `nsfplay.dll` winamp plugin to `output/make`.
 * `make install` - copy `nsfplay`/`nsfplaycmd` to `/usr/local/bin`.
 * `make uninstall` - delete install from `/usr/local/bin`.

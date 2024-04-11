@@ -20,12 +20,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="gui.cpp">
+    <ClCompile Include="nsfplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="gui.rc">
+    <ResourceCompile Include="nsfplay.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

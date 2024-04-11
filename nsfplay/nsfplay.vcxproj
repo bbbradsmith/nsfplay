@@ -22,8 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{d3ec4b41-9124-4c7e-b2b8-01e85eec750d}</ProjectGuid>
-    <RootNamespace>gui</RootNamespace>
+    <RootNamespace>nsfplay</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>nsfplay</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -170,10 +171,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="gui.cpp" />
+    <ClCompile Include="nsfplay.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="gui.rc" />
+    <ResourceCompile Include="nsfplay.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="nsfplay.ico" />

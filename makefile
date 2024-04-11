@@ -1,8 +1,8 @@
 include makefile.common
 
-.PHONY: default core cmd gui winamp install uninstall clean
+.PHONY: default core cmd gui nsfplay winamp install uninstall clean
 
-default: core cmd gui
+default: core cmd nsfplay
 
 ifeq ($(OS),Windows_NT)
 default: winamp
@@ -17,16 +17,19 @@ cmd: core
 gui: core
 	$(MAKE) -C gui
 
+nsfplay: core
+	$(MAKE) -C nsfplay
+
 winamp: core
 	$(MAKE) -C winamp
 
 install: cmd
 	$(MAKE) -C cmd install
-	$(MAKE) -C gui install
+	$(MAKE) -C nsfplay install
 
 uninstall:
 	$(MAKE) -C cmd uninstall
-	$(MAKE) -C gui uninstall
+	$(MAKE) -C nsfplay uninstall
 
 clean:
 	rm -rf $(INTDIR)

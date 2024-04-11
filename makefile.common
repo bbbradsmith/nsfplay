@@ -11,6 +11,7 @@ CXXFLAGS += -I../include -O3 -Wall -Werror -g
 LDFLAGS += -Wl,--fatal-warnings -g
 LDFLAGS_CMD += 
 LDFLAGS_GUI += 
+LDFLAGS_NSFPLAY += 
 LDFLAGS_DLL += 
 
 LIB_SUFFIX ?= .a
@@ -19,7 +20,8 @@ DLL_SUFFIX ?= .dll
 
 LIB_NAME ?= nsfcore
 CMD_NAME ?= nsfplac
-GUI_NAME ?= nsfplay
+GUI_NAME ?= nsfgui
+NSFPLAY_NAME ?= nsfplay
 WINAMP_NAME ?= nsfplay
 
 STRIP_DEBUG = \
@@ -31,6 +33,6 @@ ifeq ($(OS),Windows_NT)
 CXXFLAGS += -municode
 LDFLAGS += -static-libgcc
 LDFLAGS_CMD += -mconsole
-LDFLAGS_GUI += -municode -mwindows
+LDFLAGS_NSFPLAY += -municode -mwindows
 LDFLAGS_DLL += -municode -mdll
 endif
