@@ -1,6 +1,6 @@
 include makefile.common
 
-.PHONY: default core cmd gui nsfplay winamp install uninstall clean
+.PHONY: default core cmd gui wx nsfplay winamp install uninstall clean
 
 default: core cmd nsfplay
 
@@ -16,6 +16,9 @@ cmd: core
 
 gui: core
 	$(MAKE) -C gui
+
+wx:
+	$(MAKE) -f makefile.wx
 
 nsfplay: core gui
 	$(MAKE) -C nsfplay

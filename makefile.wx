@@ -1,0 +1,47 @@
+include makefile.common
+
+WXDIR ?= wx 
+WXOUT ?= output_wx/make
+WXREL ?= ../../wx
+
+WXCONF ?= \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DwxBUILD_SHARED=OFF \
+	-DwxUSE_AUI=OFF \
+	-DwxUSE_HTML=OFF \
+	-DwxUSE_MEDIACTRL=OFF \
+	-DwxUSE_OPENGL=OFF \
+	-DwxUSE_DEBUGREPORT=OFF \
+	-DwxUSE_RIBBON=OFF \
+	-DwxUSE_RICHTEXT=OFF \
+	-DwxUSE_STC=OFF \
+	-DwxUSE_WEBVIEW=OFF \
+	-DwxUSE_XRC=OFF \
+	-DwxUSE_STL=OFF \
+	-DwxUSE_REGEX=OFF \
+	-DwxUSE_ZLIB=builtin \
+	-DwxUSE_EXPAT=OFF \
+	-DwxUSE_LIBJPEG=OFF \
+	-DwxUSE_LIBPNG=builtin \
+	-DwxUSE_LIBTIFF=OFF \
+	-DwxUSE_NANOSVG=OFF \
+	-DwxUSE_LIBLZMA=OFF \
+	-DwxUSE_WXHTML_HELP=OFF
+
+.PHONY: default test
+
+default: wx
+
+submodules:
+	git submodule init
+	git submodule update --depth 1
+	(cd $(WXDIR) && git submodule init)
+	(cd $(WXDIR) && git submodule update --depth 1)
+
+wx: submodules
+	mkdir -p $(WXOUT)
+	(cd $(WXOUT) && cmake $(WXREL) $(WXCONF))
+	(cd $(WXOUT) && cmake --build .)
+
+clean:
+	rm -f -r $(WXOUT)

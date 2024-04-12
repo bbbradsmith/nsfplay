@@ -13,6 +13,8 @@ OBJS = $(addprefix $(WINAMP_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(WINAMP_INTDIR)/,$(SRCS:.cpp=.d))
 CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
 GUI = ../$(OUTDIR)/$(GUI_NAME)$(LIB_SUFFIX)
+INCS = -I$(WX_INCLUDE) -I$(WX_LIB_INCLUDE)
+LIBS = -L$(WX_LIB_PATH) $(WX_LIBS)
 
 $(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_DLL) $(OBJS) $(CORE) $(GUI)

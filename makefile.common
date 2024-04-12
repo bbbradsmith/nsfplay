@@ -30,9 +30,18 @@ STRIP_DEBUG = \
   objcopy --add-gnu-debuglink=$@.debug $@
 
 ifeq ($(OS),Windows_NT)
+
 CXXFLAGS += -municode
 LDFLAGS += -static-libgcc
 LDFLAGS_CMD += -mconsole
 LDFLAGS_NSFPLAY += -municode -mwindows
 LDFLAGS_DLL += -municode -mdll
+
+WX_INCLUDE ?= ../wx/include
+WX_LIB_PATH ?= ../output_wx/make/lib/gcc_x64_lib
+WX_LIB_INCLUDE ?= ../output_wx/make/lib/gcc_x64_lib/mswu
+WX_LIBS ?= -lwxmsw32u_propgrid -lwxmsw32u_core -lwxbase32u -lwxpng -lwxzlib -lcomctl32 -lrpcrt4
+
+else
+
 endif
