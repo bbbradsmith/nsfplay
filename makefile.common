@@ -53,7 +53,7 @@ ifeq ($(OS),Windows_NT)
 	WXL_PREFIX ?= wx
 	WXL_SUFFIX ?= 32u$(WXL_DEBUG_SUFFIX)
 	WXL_LIBSUFFIX ?= 
-	WXL_LIBS ?= \
+	WXL_WXLIBS ?= \
 		-lwxmsw32u$(WXL_DEBUG_SUFFIX)_propgrid \
 		-lwxmsw32u$(WXL_DEBUG_SUFFIX)_core \
 		-lwxbase32u$(WXL_DEBUG_SUFFIX) \
@@ -77,7 +77,7 @@ else
 	WXL_INCDIR ?= include/wx-3.2
 	WXL_LIBDIR ?= .
 	WXL_LIBINCDIR ?= wx/include/gtk3-unicode-static-3.2
-	WXL_LIBS ?= \
+	WXL_WXLIBS ?= \
 		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_propgrid-3.2 \
 		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_core-3.2 \
 		-lwx_baseu$(WXL_DEBUG_SUFFIX)-3.2 \
@@ -109,4 +109,4 @@ WXL_CXXFLAGS ?= \
 	$(WXL_DEFINE) \
 	-I$(WXL_DIR)/$(WXL_INCDIR) \
 	-I$(WXL_DIR)/lib/$(WXL_LIBINCDIR)
-WXL_LIBS ?= -L$(WXL_DIR)/lib/$(WXL_LIBDIR) $(WXL_LIBS) $(WXL_DEPS)
+WXL_LIBS ?= -L$(WXL_DIR)/lib/$(WXL_LIBDIR) $(WXL_WXLIBS) $(WXL_DEPS)
