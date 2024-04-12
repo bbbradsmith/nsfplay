@@ -14,11 +14,11 @@ Components:
 * `cmd` - A stand-alone command line player.
 * `nsfplay` - A stand-alone GUI player.
 * `winamp` - A winamp plugin.
-* `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4)
+* `wxlib` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4)
 
 Build Setup:
 * Windows: run `wxlib.bat` to prepare libraries, then use `nsfplay.sln` to build.
-* Other: run `make wx` to prepare libraries, then use `make` to build.
+* Other: run `make wxlib` to prepare libraries, then use `make` to build.
 
 Make targets:
 * `make` - builds `cmd`, `gui`
@@ -32,6 +32,6 @@ Make targets:
 * `make uninstall` - delete install from `/usr/local/bin`.
 * `make install prefix=~/my/directory` - install to custom directory.
 * `make uninstall prefix=~/my/directory` - uninstall from custom directory.
-* `make wx` - fetches wxWidgets submodule in `wx/` and builds libraries to `wxlib/`.
+* `make wxlib` - fetches wxWidgets submodule in `wx/` and builds libraries to `wxlib/`.
 
 See `makefile.common` for various potential environment overrides.

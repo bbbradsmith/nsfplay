@@ -13,7 +13,7 @@ cmd: core
 gui: core
 	$(MAKE) -C gui
 
-wx:
+wxlib:
 	$(MAKE) -f makefile.wx
 
 nsfplay: core gui

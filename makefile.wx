@@ -48,9 +48,9 @@ else
 endif
 
 
-.PHONY: default
+.PHONY: default wxlib
 
-default: wx
+default: wxlib
 
 submodules:
 	git submodule init
@@ -58,7 +58,7 @@ submodules:
 	(cd $(WXSRC) && git submodule init)
 	(cd $(WXSRC) && git submodule update --depth 1)
 
-wx: submodules
+wxlib: submodules
 	mkdir -p $(WXOUT)/$(WXCMAKE)
 	(cd $(WXOUT)/$(WXCMAKE) && cmake $(WXREL) $(WXCONF) $(WXCONF_EXTRA) $(WXBUILD_TYPE))
 	(cd $(WXOUT)/$(WXCMAKE) && cmake --build .)

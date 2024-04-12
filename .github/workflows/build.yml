@@ -13,7 +13,7 @@ jobs:
 
   build-msvc:
     name: Windows MSVC
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
@@ -39,7 +39,6 @@ jobs:
           git submodule init
           git submodule update --depth 1
           cd ..
-          set WXB_GENERATOR="Visual Studio 17 2022"
           set WXB_NODEBUG=1
           set WXB_NOPAUSE=1
           wxlib.bat
@@ -96,14 +95,14 @@ jobs:
         if: steps.cache-wx.outputs.cache-hit != 'true'
         shell: msys2 {0}
         run: |
-          make wx
-          export PATH="/mingw32/bin:$PATH" WXCMAKE=make32; make wx
+          make wxlib
+          export PATH="/mingw32/bin:$PATH" WXCMAKE=make32; make wxlib
       - name: Make 64-bit
         shell: msys2 {0}
-        run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd gui
+        run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd nsfplay
       - name: Make 32-bit
         shell: msys2 {0}
-        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 WXL_LIBTYPE=gcc_lib ; make cmd gui winamp
+        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 WXL_LIBTYPE=gcc_lib ; make cmd nsfplay winamp
       - name: Prepare Artifacts
         shell: pwsh
         run: |
