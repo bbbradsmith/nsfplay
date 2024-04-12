@@ -11,7 +11,7 @@
 @set WXCMAKE64=vc64
 @set WXCMAKE32=vc32
 
-@if "%WXB_GENERATOR%"=="" set WXB_GENERATOR="Visual Studio 16 2019"
+@if not defined WXB_GENERATOR set WXB_GENERATOR="Visual Studio 16 2019"
 
 @set WXCONF=%WXCONF% -G %WXB_GENERATOR%
 @set WXCONF=%WXCONF% -DwxBUILD_USE_STATIC_RUNTIME=ON
@@ -51,7 +51,7 @@ REM ensure wx exists
 @echo    git submodule update --depth 1
 @echo Alternative: manually place wxWidgets source in wx directory.
 @echo.
-@if "%WXB_NOPAUSE%"=="" pause
+@if not defined WXB_NOPAUSE pause
 exit /b 1
 )
 
@@ -65,38 +65,38 @@ REM locate visual studio vsdevcmd.bat to use cmake
 @echo.
 @echo Error: Unable to find Visual Studio installation: %ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 @echo.
-@if "%WXB_NOPAUSE%"=="" pause
+@if not defined WXB_NOPAUSE pause
 exit /b 1
 
 :build
 REM build wxWidgets libraries
 
-@if not "%WXB_NO64%"=="" goto :no64
+@if defined WXB_NO64 goto :no64
 mkdir %WXOUT%\%WXCMAKE64%
 @pushd .
 @cd %WXOUT%\%WXCMAKE64%
 cmake ..\%WXREL% %WXCONF% -DCMAKE_GENERATOR_PLATFORM=x64 || @goto error
-@if not "%WXB_NORELEASE%"=="" goto :norelease64
+@if defined WXB_NORELEASE goto :norelease64
 cmake --build .               --config Release --verbose || @goto error
 cmake --install . --prefix .. --config Release           || @goto error
 :norelease64
-@if not "%WXB_NODEBUG%"=="" goto :nodebug64
+@if defined WXB_NODEBUG goto :nodebug64
 cmake --build .               --config Debug   --verbose || @goto error
 cmake --install . --prefix .. --config Debug             || @goto error
 :nodebug64
 @popd
 :no64
 
-@if not "%WXB_NO32%"=="" goto :no32
+@if defined WXB_NO32 goto :no32
 mkdir %WXOUT%\%WXCMAKE32%
 @pushd .
 @cd %WXOUT%\%WXCMAKE32%
 cmake ..\%WXREL% %WXCONF% -DCMAKE_GENERATOR_PLATFORM=Win32 || @goto error
-@if not "%WXB_NORELEASE%"=="" goto :norelease32
+@if defined WXB_NORELEASE goto :norelease32
 cmake --build .               --config Release --verbose || @goto error
 cmake --install . --prefix .. --config Release           || @goto error
 :norelease32
-@if not "%WXB_NODEBUG%"=="" goto :nodebug32
+@if defined WXB_NODEBUG goto :nodebug32
 cmake --build .               --config Debug   --verbose || @goto error
 cmake --install . --prefix .. --config Debug             || @goto error
 :nodebug32
@@ -106,12 +106,12 @@ cmake --install . --prefix .. --config Debug             || @goto error
 @echo.
 @echo Success.
 @echo.
-@if "%WXB_NOPAUSE%"=="" pause
+@if not defined WXB_NOPAUSE pause
 exit /b 0
 
 :error
 @echo.
 @echo Unable to build wxWidgets libraries. See error above.
 @echo.
-@if "%WXB_NOPAUSE%"=="" pause
+@if not defined WXB_NOPAUSE pause
 exit /b 1
