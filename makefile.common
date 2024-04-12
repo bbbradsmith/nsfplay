@@ -76,7 +76,7 @@ else
 	WXL_DEFINE ?= -D__WXGTK__
 	WXL_INCDIR ?= include/wx-3.2
 	WXL_LIBDIR ?= .
-	WXL_LIBINCDIR ?= .
+	WXL_LIBINCDIR ?= wx/include/gtk3-unicode-static-3.2
 	WXL_LIBS ?= \
 		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_propgrid-3.2 \
 		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_core-3.2 \
