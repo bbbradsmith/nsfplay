@@ -80,7 +80,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc
+          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc
       - name: wxWidgets Cache Key
         shell: msys2 {0}
         run: echo WXHASH=$(git ls-tree HEAD wx) >> $env:GITHUB_ENV
