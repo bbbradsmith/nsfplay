@@ -19,6 +19,28 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup MSVC
         uses: microsoft/setup-msbuild@v2
+      - name: wxWidgets Cache Key
+        shell: pwsh
+        run: echo WXHASH=$(git ls-tree HEAD wx) >> $env:GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: wxlib
+          key: wx-msvc-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          git submodule init
+          git submodule update --depth 1
+          cd wx
+          git submodule init
+          git submodule update --depth 1
+          cd ..
+          set WXB_NODEBUG=1
+          set WXB_NOPAUSE=1
+          wxlib.bat
       - name: Build 64-bit
         run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
       - name: Build 32-bit
@@ -59,12 +81,27 @@ jobs:
         with:
           msystem: UCRT64
           install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc
+      - name: wxWidgets Cache Key
+        shell: msys2 {0}
+        run: echo WXHASH=$(git ls-tree HEAD wx) >> $env:GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: wxlib
+          key: wx-msys2-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        shell: msys2 {0}
+        run: |
+          make wx
+          export PATH="/mingw32/bin:$PATH" WXCMAKE=make32; make wx
       - name: Make 64-bit
         shell: msys2 {0}
         run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd gui
       - name: Make 32-bit
         shell: msys2 {0}
-        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 ; make
+        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 WXL_LIBTYPE=gcc_lib ; make cmd gui winamp
       - name: Prepare Artifacts
         shell: pwsh
         run: |

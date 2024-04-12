@@ -14,22 +14,23 @@ OBJS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.d))
 CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
 GUI = ../$(OUTDIR)/$(GUI_NAME)$(LIB_SUFFIX)
-INCS = -I$(WX_INCLUDE) -I$(WX_LIB_INCLUDE)
-LIBS = -L$(WX_LIB_PATH) $(WX_LIBS)
+CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON) $(WXL_CXXFLAGS)
+LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_NSFPLAY)
+LIBS = $(CORE) $(GUI) $(WXL_LIBS)
 
 ifeq ($(OS),Windows_NT)
 OBJS += $(NSFPLAY_INTDIR)/nsfplay_rc.o
 endif
 
 $(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_NSFPLAY) $(OBJS) $(CORE) $(GUI) $(LIBS)
+	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(LIBS)
 	$(STRIP_DEBUG)
 
 $(NSFPLAY_INTDIR)/%.d: %.cpp | $(NSFPLAY_INTDIR)/
-	$(CXX) -M -MM -MF $@ -MT $(NSFPLAY_INTDIR)/$(basename $<).o $(INCS) $(CXXFLAGS) -c $<
+	$(CXX) -M -MM -MF $@ -MT $(NSFPLAY_INTDIR)/$(basename $<).o $(CXXFLAGS_ALL) -c $<
 
 $(NSFPLAY_INTDIR)/%.o: %.cpp $(NSFPLAY_INTDIR)/%.d | $(NSFPLAY_INTDIR)/
-	$(CXX) -o $@ $(INCS) $(CXXFLAGS) -c $<
+	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<
 
 $(NSFPLAY_INTDIR)/nsfplay_rc.o: nsfplay.rc *.ico | $(NSFPLAY_INTDIR)/
 	windres -i $< -o $@

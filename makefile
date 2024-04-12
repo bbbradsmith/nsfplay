@@ -4,10 +4,6 @@ include makefile.common
 
 default: core cmd nsfplay
 
-ifeq ($(OS),Windows_NT)
-default: winamp
-endif
-
 core:
 	$(MAKE) -C core
 

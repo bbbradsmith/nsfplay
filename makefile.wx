@@ -1,12 +1,15 @@
 include makefile.common
 
-WXDIR ?= wx 
-WXOUT ?= output_wx/make
+WXSRC ?= wx
+WXOUT ?= wxlib
+WXCMAKE ?= make64
 WXREL ?= ../../wx
 
+# default cmake configuration
+
 WXCONF ?= \
-	-DCMAKE_BUILD_TYPE=Release \
 	-DwxBUILD_SHARED=OFF \
+	-DwxUSE_UNICODE=ON \
 	-DwxUSE_AUI=OFF \
 	-DwxUSE_HTML=OFF \
 	-DwxUSE_MEDIACTRL=OFF \
@@ -28,20 +31,38 @@ WXCONF ?= \
 	-DwxUSE_LIBLZMA=OFF \
 	-DwxUSE_WXHTML_HELP=OFF
 
-.PHONY: default test
+# WXCONF_EXTRA can be be used to provide extra configuration
+
+ifeq ($(OS),Windows_NT)
+	WXCONF_EXTRA ?= -DwxBUILD_USE_STATIC_RUNTIME=ON
+else
+	WXCONF_EXTRA ?=
+endif
+
+# WXL_DEBUG=1 will build debug libraries instead
+
+ifeq ($(WXL_DEBUG),0)
+	WXBUILD_TYPE ?= -DCMAKE_BUILD_TYPE=Release
+else
+	WXBUILD_TYPE ?= -DCMAKE_BUILD_TYPE=Debug
+endif
+
+
+.PHONY: default
 
 default: wx
 
 submodules:
 	git submodule init
 	git submodule update --depth 1
-	(cd $(WXDIR) && git submodule init)
-	(cd $(WXDIR) && git submodule update --depth 1)
+	(cd $(WXSRC) && git submodule init)
+	(cd $(WXSRC) && git submodule update --depth 1)
 
 wx: submodules
-	mkdir -p $(WXOUT)
-	(cd $(WXOUT) && cmake $(WXREL) $(WXCONF))
-	(cd $(WXOUT) && cmake --build .)
+	mkdir -p $(WXOUT)/$(WXCMAKE)
+	(cd $(WXOUT)/$(WXCMAKE) && cmake $(WXREL) $(WXCONF) $(WXCONF_EXTRA) $(WXBUILD_TYPE))
+	(cd $(WXOUT)/$(WXCMAKE) && cmake --build .)
+	(cd $(WXOUT)/$(WXCMAKE) && cmake --install . --prefix ..)
 
 clean:
-	rm -f -r $(WXOUT)
+	rm -f -r $(WXOUT)/$(WXCMAKE)

@@ -1,22 +1,10 @@
+# output directories
+
 OUTDIR ?= output/make
 INTDIR ?= intermediate/make
 prefix ?= /usr/local/bin
 
-MAKE ?= make
-CXX ?= g++
-AR ?= ar
-MKDIR ?= mkdir -p
-
-CXXFLAGS += -I../include -O3 -Wall -Werror -g
-LDFLAGS += -Wl,--fatal-warnings -g
-LDFLAGS_CMD += 
-LDFLAGS_GUI += 
-LDFLAGS_NSFPLAY += 
-LDFLAGS_DLL += 
-
-LIB_SUFFIX ?= .a
-EXE_SUFFIX ?= .exe
-DLL_SUFFIX ?= .dll
+# output binary names
 
 CORE_NAME ?= nsfcore
 CMD_NAME ?= nsfplac
@@ -24,24 +12,82 @@ GUI_NAME ?= nsfgui
 NSFPLAY_NAME ?= nsfplay
 WINAMP_NAME ?= nsfplay
 
+# tool names
+
+MAKE ?= make
+CXX ?= g++
+AR ?= ar
+MKDIR ?= mkdir -p
+
+# optimization, can be cleared for debugging purposes
+
+OPTIMIZE ?= -O3
+
+# wxWidgets
+
+WXL_DEBUG ?= 0
+WXL_DIR ?= ../wxlib
+
+# platform settings
+
+ifeq ($(OS),Windows_NT)
+	CXXFLAGS_EXTRA ?= -municode
+	LDFLAGS_EXTRA ?= -static -static-libgcc -static-libstdc++
+	LDFLAGS_CMD ?= -mconsole
+	LDFLAGS_GUI ?=
+	LDFLAGS_NSFPLAY ?= -mwindows
+	LDFLAGS_DLL ?= -mdll
+	LIB_SUFFIX ?= .a
+	EXE_SUFFIX ?= .exe
+	DLL_SUFFIX ?= .dll
+	WXL_DEFINE ?= -D__WXMSW__
+	WXL_LIBTYPE ?= gcc_x64_lib
+	WXL_PLATFORM ?= msw
+	WXL_DEPS ?= -lcomctl32 -luuid -lole32 -loleacc -loleaut32 -lversion -lshlwapi -luxtheme -lwinspool
+else
+	CXXFLAGS_EXTRA ?=
+	LDFLAGS_EXTRA ?=
+	LDFLAGS_CMD ?=
+	LDFLAGS_GUI ?=
+	LDFLAGS_NSFPLAY ?=
+	LDFLAGS_DLL ?= -shared
+	LIB_SUFFIX ?= .a
+	EXE_SUFFIX ?=
+	DLL_SUFFIX ?= .so
+	WXL_LIBTYPE ?= gcc_x64_lib
+	WXL_PLATFORM ?= gtk
+	WXL_DEFINE ?= -D__WXGTK__
+	WXL_DEPS ?=
+endif
+
+# common build flags
+
+CXXFLAGS ?= $(OPTIMIZE) -Wall -Werror -g
+LDFLAGS ?= -Wl,--fatal-warnings -g
+INC_COMMON ?= -I../include
+
+# utility to move GCC debug information outside of binaries
+
 STRIP_DEBUG = \
   objcopy --only-keep-debug $@ $@.debug ; \
   strip --strip-debug --strip-unneeded $@ ; \
   objcopy --add-gnu-debuglink=$@.debug $@
 
-ifeq ($(OS),Windows_NT)
-
-CXXFLAGS += -municode
-LDFLAGS += -static-libgcc
-LDFLAGS_CMD += -mconsole
-LDFLAGS_NSFPLAY += -municode -mwindows
-LDFLAGS_DLL += -municode -mdll
-
-WX_INCLUDE ?= ../wx/include
-WX_LIB_PATH ?= ../output_wx/make/lib/gcc_x64_lib
-WX_LIB_INCLUDE ?= ../output_wx/make/lib/gcc_x64_lib/mswu
-WX_LIBS ?= -lwxmsw32u_propgrid -lwxmsw32u_core -lwxbase32u -lwxpng -lwxzlib -lcomctl32 -lrpcrt4
-
+ifeq ($(WXL_DEBUG),0)
+	WXL_SUFFIX =
 else
-
+	WXL_SUFFIX = d
 endif
+
+WXL_CXXFLAGS ?= \
+	$(WXL_DEFINE) \
+	-I$(WXL_DIR)/include \
+	-I$(WXL_DIR)/lib/$(WXL_LIBTYPE)/$(WXL_PLATFORM)u$(WXL_SUFFIX)
+WXL_LIBS ?= \
+	-L$(WXL_DIR)/lib/$(WXL_LIBTYPE) \
+	-lwx$(WXL_PLATFORM)32u$(WXL_SUFFIX)_propgrid \
+	-lwx$(WXL_PLATFORM)32u$(WXL_SUFFIX)_core \
+	-lwxbase32u$(WXL_SUFFIX) \
+	-lwxpng$(WXL_SUFFIX) \
+	-lwxzlib$(WXL_SUFFIX) \
+	$(WXL_DEPS)

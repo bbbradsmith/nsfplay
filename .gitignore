@@ -1,6 +1,6 @@
 intermediate
 output
-output_wx
+wxlib
 secrets
 *.user
 .vs
