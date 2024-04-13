@@ -27,6 +27,7 @@ OPTIMIZE ?= -O3
 
 WXL_DEBUG ?= 0
 WXL_DIR ?= ../wxlib
+WXL_CMAKEDIR ?= make
 
 ifeq ($(WXL_DEBUG),0)
 	WXL_DEBUG_SUFFIX ?=
@@ -46,23 +47,25 @@ ifeq ($(OS),Windows_NT)
 	LIB_SUFFIX ?= .a
 	EXE_SUFFIX ?= .exe
 	DLL_SUFFIX ?= .dll
-	WXL_DEFINE ?= -D__WXMSW__
-	WXL_INCDIR ?= include
-	WXL_LIBDIR ?= gcc_x64_lib
-	WXL_LIBINCDIR ?= $(WXL_LIBDIR)/mswu$(WXL_DEBUG_SUFFIX)
-	WXL_PREFIX ?= wx
-	WXL_SUFFIX ?= 32u$(WXL_DEBUG_SUFFIX)
-	WXL_LIBSUFFIX ?= 
-	WXL_WXLIBS ?= \
-		-lwxmsw32u$(WXL_DEBUG_SUFFIX)_propgrid \
-		-lwxmsw32u$(WXL_DEBUG_SUFFIX)_core \
-		-lwxbase32u$(WXL_DEBUG_SUFFIX) \
-		-lwxpng$(WXL_DEBUG_SUFFIX) \
-		-lwxzlib$(WXL_DEBUG_SUFFIX)
-	WXL_DEPS ?= \
-		-lcomctl32 \
-		-luuid -lole32 -loleacc -loleaut32 \
-		-lversion -lshlwapi -luxtheme -lwinspool
+	WXL_LIBDIR ?=  gcc_x64_lib
+	# wx-config is invalid on MSYS2 if built with cmake
+	WXL_CONFIG ?=
+	ifeq ("$(WXL_CONFIG)","")
+		WXL_CXXFLAGS ?= \
+			-D__WXMSW__ \
+			-I$(WXL_DIR)/include \
+			-I$(WXL_DIR)/lib/$(WXL_LIBDIR)/mswu$(WXL_DEBUG_SUFFIX)
+		WXL_LIBS ?= \
+			-L$(WXL_DIR)/lib/$(WXL_LIBDIR) \
+			-lwxmsw32u$(WXL_DEBUG_SUFFIX)_propgrid \
+			-lwxmsw32u$(WXL_DEBUG_SUFFIX)_core \
+			-lwxbase32u$(WXL_DEBUG_SUFFIX) \
+			-lwxpng$(WXL_DEBUG_SUFFIX) \
+			-lwxzlib$(WXL_DEBUG_SUFFIX) \
+			-lcomctl32 \
+			-luuid -lole32 -loleacc -loleaut32 \
+			-lversion -lshlwapi -luxtheme -lwinspool
+	endif
 else
 	CXXFLAGS_EXTRA ?=
 	LDFLAGS_EXTRA ?=
@@ -73,17 +76,19 @@ else
 	LIB_SUFFIX ?= .a
 	EXE_SUFFIX ?=
 	DLL_SUFFIX ?= .so
-	WXL_DEFINE ?= -D__WXGTK__
-	WXL_INCDIR ?= include/wx-3.2
 	WXL_LIBDIR ?= .
-	WXL_LIBINCDIR ?= wx/include/gtk3-unicode-static-3.2
-	WXL_WXLIBS ?= \
-		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_propgrid-3.2 \
-		-lwx_gtk3u$(WXL_DEBUG_SUFFIX)_core-3.2 \
-		-lwx_baseu$(WXL_DEBUG_SUFFIX)-3.2 \
-		-lwxpng$(WXL_DEBUG_SUFFIX)-3.2 \
-		-lwxzlib$(WXL_DEBUG_SUFFIX)-3.2
-	WXL_DEPS ?=
+	# wx-config
+	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
+endif
+
+ifneq ("$(WXL_CONFIG)","")
+	ifneq ("$(wildcard $(WXL_CONFIG))","")
+		WXL_CXXFLAGS ?= $(shell $(WXL_CONFIG) --cxxflags)
+		WXL_LIBS ?= $(shell $(WXL_CONFIG) --libs base,core,propgrid)
+	else
+		WXL_CXXFLAGS ?= <$(WXL_CONFIG) missing>
+		WXL_LIBS ?= <$(WXL_CONFIG) missing>
+	endif
 endif
 
 # common build flags
@@ -98,15 +103,3 @@ STRIP_DEBUG = \
   objcopy --only-keep-debug $@ $@.debug ; \
   strip --strip-debug --strip-unneeded $@ ; \
   objcopy --add-gnu-debuglink=$@.debug $@
-
-ifeq ($(WXL_DEBUG),0)
-	WXL_SUFFIX =
-else
-	WXL_SUFFIX = d
-endif
-
-WXL_CXXFLAGS ?= \
-	$(WXL_DEFINE) \
-	-I$(WXL_DIR)/$(WXL_INCDIR) \
-	-I$(WXL_DIR)/lib/$(WXL_LIBINCDIR)
-WXL_LIBS ?= -L$(WXL_DIR)/lib/$(WXL_LIBDIR) $(WXL_WXLIBS) $(WXL_DEPS)

@@ -2,7 +2,7 @@ include makefile.common
 
 WXSRC ?= wx
 WXOUT ?= wxlib
-WXCMAKE ?= make
+WXCMAKE ?= $(WXL_CMAKEDIR)
 WXREL ?= ../../wx
 
 # default cmake configuration

@@ -5,6 +5,6 @@
 
 int main()
 {
-	printf("nsfplaycmd stub\n");
+	printf("nsfplac stub\n");
 	return nsfplaycore::test();
 }
