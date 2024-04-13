@@ -29,7 +29,8 @@ WXCONF ?= \
 	-DwxUSE_LIBTIFF=OFF \
 	-DwxUSE_NANOSVG=OFF \
 	-DwxUSE_LIBLZMA=OFF \
-	-DwxUSE_WXHTML_HELP=OFF
+	-DwxUSE_WXHTML_HELP=OFF \
+	-DwxUSE_LIBSDL=OFF
 
 # WXCONF_EXTRA can be be used to provide extra configuration
 

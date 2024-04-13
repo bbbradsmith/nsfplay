@@ -69,7 +69,7 @@ Otherwise on other platforms there is probably some wxWidgets library package yo
   * `export WXL_CONFIG=/path/to/wx-config`
   * `make`
 
-On Windows (including MSYS2), you don't need to keep the cmake generated directories in wxlib once you've built the libraries. Everything needed will be in `wxlib\include` and `wxlib\lib`, and the other folders can be deleted, if you'd like to recover some space (wxWidgets is unfortunately large). On other platforms, the `wx-config` utility will be contained there, so you should at least keep that and whatever other files it uses to determine its build configuration.
+On Windows (including MSYS2), you don't need to keep the cmake generated directories in wxlib once you've built the libraries. Everything needed will be in `wxlib\include` and `wxlib\lib`, and the other folders can be deleted, if you'd like to recover some space (wxWidgets is unfortunately large). On other platforms, the `wx-config` utility will be contained there, so you should at least keep that and whatever other files it uses to determine its build configuration. (`wx-config` does not appear to be aware of `cmake --install` and will reference the source includes, and uninstalled library binaries.)
 
 ### Make Targets
 

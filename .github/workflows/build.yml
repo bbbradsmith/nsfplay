@@ -153,8 +153,12 @@ jobs:
         id: cache-wx
         uses: actions/cache@v4
         with:
-          path: wxlib
+          path: |
+            wxlib
+            wx/include
           key: wx-ubuntu-${{ env.WXHASH }}
+        # Cache needs the source include because wx-config does not reference the cmake --install
+        # directories, only the source build, for some reason?
       - name: Build wxWidgets
         if: steps.cache-wx.outputs.cache-hit != 'true'
         run: make wxlib
