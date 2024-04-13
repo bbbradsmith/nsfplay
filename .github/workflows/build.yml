@@ -13,6 +13,7 @@ jobs:
 
   build-msvc:
     name: Windows MSVC
+    if: false
     runs-on: windows-2019
     steps:
       - name: Checkout Files
@@ -75,6 +76,7 @@ jobs:
 
   build-msys2:
     name: Windows MSYS2
+    if: false
     runs-on: windows-latest
     steps:
       - name: Checkout Files
@@ -143,6 +145,7 @@ jobs:
 
   build-ubuntu:
     name: Ubuntu
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Files
@@ -182,4 +185,45 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nsfplay3-ubuntu--${{ env.BUILD_TAG }}
+          path: artifact/
+
+  build-macos:
+   name: MacOS
+   runs-on: mac-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup MacOS
+        run: brew install make cmake imagemagick
+      - name: Build wxWidgets
+        run: |
+          export CC=clang
+          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+          make wxlib
+      - name: Make
+        run: |
+          export CC=clang
+          export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -Wno-c++11-extension:
+          export LDFLAGS_EXTRA="-target arm64-apple-macos11"
+          export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
+          make cmd nsfplay
+          export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -Wno-c++11-extension:
+          export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
+          export OUTDIR=output/make64 INTDIR=intermediate/make64
+          make cmd nsfplay
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          lipo -create -output artifact/nsfplayBoth output/makeArm/nsfplay output/make64/nsfplay
+          lipo -create -output artifact/nsfplacBoth output/makeArm/nsfplac output/make64/nsfplac
+          cp output/makeArm/nsfplay artifact/nsfplayArm
+          cp output/makeArm/nsfplac artifact/nsfplacArm
+          cp output/make64/nsfplay artifact/nsfplay64
+          cp output/make64/nsfplac artifact/nsfplac64
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay3-macos--${{ env.BUILD_TAG }}
           path: artifact/
