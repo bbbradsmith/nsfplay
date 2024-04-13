@@ -67,8 +67,7 @@ ifeq ($(OS),Windows_NT)
 			-luuid -lole32 -loleacc -loleaut32 \
 			-lversion -lshlwapi -luxtheme -lwinspool
 	endif
-else
-ifeq ($(shell uname),Darwin)
+else ifeq ($(shell uname),Darwin)
 	# MacOS (clang)
 	CXXFLAGS_EXTRA ?= -Wno-c++11-extension
 	LDFLAGS_EXTRA ?=
@@ -94,7 +93,6 @@ else
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
-endif
 endif
 
 ifneq ("$(WXL_CONFIG)","")
@@ -122,5 +120,5 @@ ifneq ($(shell uname),Darwin)
 		strip --strip-debug --strip-unneeded $@ ; \
 		objcopy --add-gnu-debuglink=$@.debug $@
 else
-	STRIP_DEBUG ?= strip $@
+	STRIP_DEBUG ?= strip -s $@.debug $@
 endif

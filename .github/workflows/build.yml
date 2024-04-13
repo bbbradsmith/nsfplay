@@ -189,7 +189,7 @@ jobs:
 
   build-macos:
     name: MacOS
-    runs-on: mac-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
