@@ -188,8 +188,8 @@ jobs:
           path: artifact/
 
   build-macos:
-   name: MacOS
-   runs-on: mac-latest
+    name: MacOS
+    runs-on: mac-latest
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
