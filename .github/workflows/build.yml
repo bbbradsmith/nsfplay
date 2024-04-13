@@ -195,20 +195,40 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup MacOS
         run: brew install make cmake imagemagick
+      - name: wxWidgets Cache Key
+        run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
+      - name: Cache wxWidgets
+        if: false # TODO re-enable when ready
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: |
+            wxlibArm/make
+            wxlibIntel/make
+            wx/include
+          key: wx-macos-${{ env.WXHASH }}
       - name: Build wxWidgets
         run: |
           export CC=clang
-          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+          export WXL_DIR=wxlibArm
+          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64"
           make wxlib
+          export WXL_DIR=wxlibIntel
+          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+          make wxlib
+          #rm -rf wxlibArm/make/libs
+          #rm -rf wxlibIntel/make/libs
       - name: Make
         run: |
           export CC=clang
           export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -Wno-c++11-extension:
           export LDFLAGS_EXTRA="-target arm64-apple-macos11"
+          export WXL_DIR=wxlibArm
           export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make cmd nsfplay
           export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -Wno-c++11-extension:
           export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
+          export WXL_DIR=wxlibIntel
           export OUTDIR=output/make64 INTDIR=intermediate/make64
           make cmd nsfplay
       - name: Prepare Artifacts
