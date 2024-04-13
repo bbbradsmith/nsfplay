@@ -1,5 +1,6 @@
 intermediate
 output
+wxlib
 secrets
 *.user
 .vs

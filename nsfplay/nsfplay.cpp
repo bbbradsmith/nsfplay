@@ -1,16 +1,17 @@
 // stub
 
-#include <windows.h>
+#include <wx/wx.h>
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+class MainApp : public wxApp
 {
-	UNREFERENCED_PARAMETER(hInstance);
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
-	MessageBox(NULL,L"NSFPlay 3 stub",L"NSFPlay 3",MB_OK);
-	return 0;
+public:
+	bool OnInit() override;
+};
+
+wxIMPLEMENT_APP(MainApp);
+
+bool MainApp::OnInit()
+{
+	wxMessageBox("NSFPlay 3 stub","NSFPlay 3",wxOK | wxICON_INFORMATION);
+	return false;
 }

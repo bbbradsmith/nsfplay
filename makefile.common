@@ -1,22 +1,10 @@
+# output directories
+
 OUTDIR ?= output/make
 INTDIR ?= intermediate/make
 prefix ?= /usr/local/bin
 
-MAKE ?= make
-CXX ?= g++
-AR ?= ar
-MKDIR ?= mkdir -p
-
-CXXFLAGS += -I../include -O3 -Wall -Werror -g
-LDFLAGS += -Wl,--fatal-warnings -g
-LDFLAGS_CMD += 
-LDFLAGS_GUI += 
-LDFLAGS_NSFPLAY += 
-LDFLAGS_DLL += 
-
-LIB_SUFFIX ?= .a
-EXE_SUFFIX ?= .exe
-DLL_SUFFIX ?= .dll
+# output binary names
 
 CORE_NAME ?= nsfcore
 CMD_NAME ?= nsfplac
@@ -24,15 +12,94 @@ GUI_NAME ?= nsfgui
 NSFPLAY_NAME ?= nsfplay
 WINAMP_NAME ?= nsfplay
 
+# tool names
+
+MAKE ?= make
+CXX ?= g++
+AR ?= ar
+MKDIR ?= mkdir -p
+
+# optimization, can be cleared for debugging purposes
+
+OPTIMIZE ?= -O3
+
+# wxWidgets
+
+WXL_DEBUG ?= 0
+WXL_DIR ?= ../wxlib
+WXL_CMAKEDIR ?= make
+
+ifeq ($(WXL_DEBUG),0)
+	WXL_DEBUG_SUFFIX ?=
+else
+	WXL_DEBUG_SUFFIX ?= d
+endif
+
+# platform settings
+
+ifeq ($(OS),Windows_NT)
+	CXXFLAGS_EXTRA ?= -municode
+	LDFLAGS_EXTRA ?= -static -static-libgcc -static-libstdc++
+	LDFLAGS_CMD ?= -mconsole
+	LDFLAGS_GUI ?=
+	LDFLAGS_NSFPLAY ?= -mwindows
+	LDFLAGS_DLL ?= -mdll
+	LIB_SUFFIX ?= .a
+	EXE_SUFFIX ?= .exe
+	DLL_SUFFIX ?= .dll
+	WXL_LIBDIR ?=  gcc_x64_lib
+	# wx-config is invalid on MSYS2 if built with cmake
+	WXL_CONFIG ?=
+	ifeq ("$(WXL_CONFIG)","")
+		WXL_CXXFLAGS ?= \
+			-D__WXMSW__ \
+			-I$(WXL_DIR)/include \
+			-I$(WXL_DIR)/lib/$(WXL_LIBDIR)/mswu$(WXL_DEBUG_SUFFIX)
+		WXL_LIBS ?= \
+			-L$(WXL_DIR)/lib/$(WXL_LIBDIR) \
+			-lwxmsw32u$(WXL_DEBUG_SUFFIX)_propgrid \
+			-lwxmsw32u$(WXL_DEBUG_SUFFIX)_core \
+			-lwxbase32u$(WXL_DEBUG_SUFFIX) \
+			-lwxpng$(WXL_DEBUG_SUFFIX) \
+			-lwxzlib$(WXL_DEBUG_SUFFIX) \
+			-lcomctl32 \
+			-luuid -lole32 -loleacc -loleaut32 \
+			-lversion -lshlwapi -luxtheme -lwinspool
+	endif
+else
+	CXXFLAGS_EXTRA ?=
+	LDFLAGS_EXTRA ?=
+	LDFLAGS_CMD ?=
+	LDFLAGS_GUI ?=
+	LDFLAGS_NSFPLAY ?=
+	LDFLAGS_DLL ?= -shared
+	LIB_SUFFIX ?= .a
+	EXE_SUFFIX ?=
+	DLL_SUFFIX ?= .so
+	WXL_LIBDIR ?= .
+	# wx-config
+	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
+endif
+
+ifneq ("$(WXL_CONFIG)","")
+	ifneq ("$(wildcard $(WXL_CONFIG))","")
+		WXL_CXXFLAGS ?= $(shell $(WXL_CONFIG) --cxxflags)
+		WXL_LIBS ?= $(shell $(WXL_CONFIG) --libs base,core,propgrid)
+	else
+		WXL_CXXFLAGS ?= <$(WXL_CONFIG) missing>
+		WXL_LIBS ?= <$(WXL_CONFIG) missing>
+	endif
+endif
+
+# common build flags
+
+CXXFLAGS ?= $(OPTIMIZE) -Wall -Werror -g
+LDFLAGS ?= -Wl,--fatal-warnings -g
+INC_COMMON ?= -I../include
+
+# utility to move GCC debug information outside of binaries
+
 STRIP_DEBUG = \
   objcopy --only-keep-debug $@ $@.debug ; \
   strip --strip-debug --strip-unneeded $@ ; \
   objcopy --add-gnu-debuglink=$@.debug $@
-
-ifeq ($(OS),Windows_NT)
-CXXFLAGS += -municode
-LDFLAGS += -static-libgcc
-LDFLAGS_CMD += -mconsole
-LDFLAGS_NSFPLAY += -municode -mwindows
-LDFLAGS_DLL += -municode -mdll
-endif

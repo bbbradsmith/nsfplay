@@ -13,12 +13,35 @@ jobs:
 
   build-msvc:
     name: Windows MSVC
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
       - name: Setup MSVC
         uses: microsoft/setup-msbuild@v2
+      - name: wxWidgets Cache Key
+        shell: pwsh
+        run: echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: wxlib
+          key: wx-msvc-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        shell: cmd
+        run: |
+          echo on
+          git submodule init
+          git submodule update --depth 1
+          cd wx
+          git submodule init
+          git submodule update --depth 1
+          cd ..
+          set WXB_NODEBUG=1
+          set WXB_NOPAUSE=1
+          wxlib.bat
       - name: Build 64-bit
         run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
       - name: Build 32-bit
@@ -58,13 +81,37 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc
+          install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-i686-cmake
+      - name: wxWidgets Cache Key
+        shell: pwsh
+        run: echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: wxlib
+          key: wx-msys2-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        shell: msys2 {0}
+        run: |
+          export WXL_CMAKEDIR=make64
+          make wxlib
+          export PATH="/mingw32/bin:$PATH"
+          export WXL_CMAKEDIR=make32
+          make wxlib
       - name: Make 64-bit
         shell: msys2 {0}
-        run: export OUTDIR=output/make64 INTDIR=intermediate/make64 ; make cmd gui
+        run: |
+          export OUTDIR=output/make64 INTDIR=intermediate/make64
+          make cmd nsfplay
       - name: Make 32-bit
         shell: msys2 {0}
-        run: export PATH="/mingw32/bin:$PATH" OUTDIR=output/make32 INTDIR=intermediate/make32 ; make
+        run: |
+          export PATH="/mingw32/bin:$PATH"
+          export WXL_LIBDIR=gcc_lib
+          export OUTDIR=output/make32 INTDIR=intermediate/make32
+          make cmd nsfplay winamp
       - name: Prepare Artifacts
         shell: pwsh
         run: |
@@ -89,3 +136,39 @@ jobs:
         with:
           name: nsfplay3-win32-mingw--${{ env.BUILD_TAG }}
           path: artifact32/
+
+  build-ubuntu:
+    name: Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install git make gcc cmake libgtk-3-dev
+      - name: wxWidgets Cache Key
+        run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: wxlib
+          key: wx-ubuntu-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        run: make wxlib
+      - name: Make
+        run: make cmd nsfplay
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          cp output/make/nsfplay artifact
+          cp output/make/nsfplac artifact
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay3-ubuntu--${{ env.BUILD_TAG }}
+          path: artifact/

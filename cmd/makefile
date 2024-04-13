@@ -13,16 +13,18 @@ SRCS = $(wildcard *.cpp)
 OBJS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.d))
 CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
+CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON)
+LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_CMD)
 
 $(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS) $(LDFLAGS_CMD) $(OBJS) $(CORE)
+	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(CORE)
 	$(STRIP_DEBUG)
 
 $(CMD_INTDIR)/%.d: %.cpp | $(CMD_INTDIR)/
-	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(basename $<).o $(CXXFLAGS) -c $<
+	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(basename $<).o $(CXXFLAGS_ALL) -c $<
 
 $(CMD_INTDIR)/%.o: %.cpp $(CMD_INTDIR)/%.d | $(CMD_INTDIR)/
-	$(CXX) -o $@ $(CXXFLAGS) -c $<
+	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<
 
 $(CMD_INTDIR)/:
 	$(MKDIR) $@

@@ -1,0 +1,68 @@
+include makefile.common
+
+WXSRC ?= wx
+WXOUT ?= wxlib
+WXCMAKE ?= $(WXL_CMAKEDIR)
+WXREL ?= ../../wx
+
+# default cmake configuration
+
+WXCONF ?= \
+	-DwxBUILD_SHARED=OFF \
+	-DwxUSE_UNICODE=ON \
+	-DwxUSE_AUI=OFF \
+	-DwxUSE_HTML=OFF \
+	-DwxUSE_MEDIACTRL=OFF \
+	-DwxUSE_OPENGL=OFF \
+	-DwxUSE_DEBUGREPORT=OFF \
+	-DwxUSE_RIBBON=OFF \
+	-DwxUSE_RICHTEXT=OFF \
+	-DwxUSE_STC=OFF \
+	-DwxUSE_WEBVIEW=OFF \
+	-DwxUSE_XRC=OFF \
+	-DwxUSE_STL=OFF \
+	-DwxUSE_REGEX=OFF \
+	-DwxUSE_ZLIB=builtin \
+	-DwxUSE_EXPAT=OFF \
+	-DwxUSE_LIBJPEG=OFF \
+	-DwxUSE_LIBPNG=builtin \
+	-DwxUSE_LIBTIFF=OFF \
+	-DwxUSE_NANOSVG=OFF \
+	-DwxUSE_LIBLZMA=OFF \
+	-DwxUSE_WXHTML_HELP=OFF
+
+# WXCONF_EXTRA can be be used to provide extra configuration
+
+ifeq ($(OS),Windows_NT)
+	WXCONF_EXTRA ?= -DwxBUILD_USE_STATIC_RUNTIME=ON
+else
+	WXCONF_EXTRA ?=
+endif
+
+# WXL_DEBUG=1 will build debug libraries instead
+
+ifeq ($(WXL_DEBUG),0)
+	WXBUILD_TYPE ?= -DCMAKE_BUILD_TYPE=Release
+else
+	WXBUILD_TYPE ?= -DCMAKE_BUILD_TYPE=Debug
+endif
+
+
+.PHONY: default wxlib
+
+default: wxlib
+
+submodules:
+	git submodule init
+	git submodule update --depth 1
+	(cd $(WXSRC) && git submodule init)
+	(cd $(WXSRC) && git submodule update --depth 1)
+
+wxlib: submodules
+	mkdir -p $(WXOUT)/$(WXCMAKE)
+	(cd $(WXOUT)/$(WXCMAKE) && cmake $(WXREL) $(WXCONF) $(WXCONF_EXTRA) $(WXBUILD_TYPE))
+	(cd $(WXOUT)/$(WXCMAKE) && cmake --build .)
+	(cd $(WXOUT)/$(WXCMAKE) && cmake --install . --prefix ..)
+
+clean:
+	rm -f -r $(WXOUT)/$(WXCMAKE)
