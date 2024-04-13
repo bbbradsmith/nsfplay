@@ -26,7 +26,9 @@ jobs:
         id: cache-wx
         uses: actions/cache@v4
         with:
-          path: wxlib
+          path: |
+            wxlib/lib
+            wxlib/include
           key: wx-msvc-${{ env.WXHASH }}
       - name: Build wxWidgets
         if: steps.cache-wx.outputs.cache-hit != 'true'
@@ -89,7 +91,9 @@ jobs:
         id: cache-wx
         uses: actions/cache@v4
         with:
-          path: wxlib
+          path: |
+            wxlib/lib
+            wxlib/include
           key: wx-msys2-${{ env.WXHASH }}
       - name: Build wxWidgets
         if: steps.cache-wx.outputs.cache-hit != 'true'
@@ -154,14 +158,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            wxlib
+            wxlib/make
             wx/include
           key: wx-ubuntu-${{ env.WXHASH }}
         # Cache needs the source include because wx-config does not reference the cmake --install
-        # directories, only the source build, for some reason?
+        # directories, only the source build for some reason?
       - name: Build wxWidgets
         if: steps.cache-wx.outputs.cache-hit != 'true'
-        run: make wxlib
+        run: |
+          make wxlib
+          rm -rf wxlib/make/libs
+        # Remove libs folder to keep cache smaller. It's just temporary build data.
       - name: Make
         run: make cmd nsfplay
       - name: Prepare Artifacts
