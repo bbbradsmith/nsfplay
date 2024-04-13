@@ -22,6 +22,8 @@ This is a work in progress total rewrite of NSFPlay. Goals include:
 
 ## Build
 
+Building the GUI components `nsfplay`/`winamp` requires first setting up the wxWidgets libraries. If you only need to use the command-line `nsfplac`, then you can skip this step.
+
 ### Visual Studio 2019
   * Initialize the git submodules if it wasn't done when cloning:
     * `git submodule init`
