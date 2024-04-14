@@ -245,7 +245,6 @@ jobs:
           mkdir artifact
           cp nsfplay.txt artifact
           cp output/makeArm/nsfplac artifact
-          cp output/makeArm/nsfplay artifact
           cp -r output/makeArm/nsfplay.app artifact/nsfplay.app
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $GITHUB_ENV
       - name: Upload Artifact
