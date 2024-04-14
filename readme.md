@@ -66,9 +66,7 @@ but there is some additional setup required:
 * Put the `lib\vc14x_x64_dll` folder from the 64-bit downloaded libraries in `wxlib\lib\vc_x64_lib`.
 * Put the `lib\vc14x_dll` folder from the 32-bit downloaded libraries in `wxlib\lib\vc_lib`.
 
-It's probably easier, however, to just use the `wxlib.bat` file to build it from the submodule source code in `wx`. If you want to try with Visual Studio 2022, you can edit the batch file or set an environment variable:
-  * `set WXB_GENERATOR="Visual Studio 17 2022"`
-  * `wxlib.bat`
+It's probably easier, however, to just use the `wxlib.bat` file to build it from the submodule source code in `wx`.
 
 Otherwise on other platforms there is probably some wxWidgets library package you can install and use. In theory could could use the `WXL_CONFIG` environment variable to tell the make build how to use it instead.
   * `export WXL_CONFIG=/path/to/wx-config`
