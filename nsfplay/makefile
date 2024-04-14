@@ -59,8 +59,12 @@ clean:
 	rm -rf $(NSFPLAY_INTDIR)
 	rm -rf $(dir $(TARGET))
 
+# mac app build
 # intentionally does not depend on $(TARGET) to allow modifying it for fat builds before creating the app
-mac: ../$(INTDIR)/icon/nsfplay.icns Info.plist ../version.txt
+
+ICON_INTDIR ?= ../$(INTDIR)/icon
+
+mac: $(ICON_INTDIR)/icon/nsfplay.icns Info.plist ../version.txt
 	make -C ../icons mac
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
@@ -71,5 +75,9 @@ mac: ../$(INTDIR)/icon/nsfplay.icns Info.plist ../version.txt
 	cp Info.plist $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
 	plutil -insert CFBundleShortVersionString -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
 	plutil -insert CFBundleVersion -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
+
+$(ICON_INTDIR)/nsfplay.icns:
+	make -C ../icons mac
+
 
 include $(DEPS)
