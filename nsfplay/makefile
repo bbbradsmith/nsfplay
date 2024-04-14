@@ -1,11 +1,12 @@
 include ../makefile.common
 
 TARGETFILE ?= $(NSFPLAY_NAME)$(EXE_SUFFIX)
-TARGET ?= ../$(OUTDIR)/$(TARGETFILE)
+TARGET_DIR ?= ../$(OUTDIR)
+TARGET ?= $(TARGET_DIR)/$(TARGETFILE)
 NSFPLAY_INTDIR ?= ../$(INTDIR)/nsfplay
 NSFPLAY_INSTALL = $(prefix)/$(TARGETFILE)
 
-.PHONY: default install uninstall clean
+.PHONY: default mac install uninstall clean
 
 default: $(TARGET)
 
@@ -57,5 +58,18 @@ uninstall:
 clean:
 	rm -rf $(NSFPLAY_INTDIR)
 	rm -rf $(dir $(TARGET))
+
+# intentionally does not depend on $(TARGET) to allow modifying it for fat builds before creating the app
+mac: ../$(INTDIR)/icon/nsfplay.icns Info.plist ../version.txt
+	make -C ../icons mac
+	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app
+	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
+	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/MacOS
+	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
+	cp ../$(INTDIR)/icon/nsfplay.icns $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
+	cp $(TARGET) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/MacOS
+	cp Info.plist $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
+	plutil -insert CFBundleShortVersionString -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
+	plutil -insert CFBundleVersion -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
 
 include $(DEPS)
