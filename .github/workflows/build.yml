@@ -233,17 +233,20 @@ jobs:
           make cmd nsfplay
       - name: Make Fat App
         run: |
-          mkdir output/make
-          lipo -create -output output/make/nsfplac output/makeArm/nsfplac output/makeIntel/nsfplay
-          lipo -create -output output/make/nsfplay output/makeArm/nsfplay output/makeIntel/nsfplay
+          lipo -create -output output/makeArm/nsfplac2 output/makeArm/nsfplac output/makeIntel/nsfplay
+          lipo -create -output output/makeArm/nsfplay2 output/makeArm/nsfplay output/makeIntel/nsfplay
+          mv output/makeArm/nsfplac2 output/makeArm/nsfplac
+          mv output/makeArm/nsfplay2 output/makeArm/nsfplay
+          export WXL_DIR=../wxlibArm
+          export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make mac
       - name: Prepare Artifacts
         run: |
           mkdir artifact
           cp nsfplay.txt artifact
-          cp output/make/nsfplac artifact
-          cp output/make/nsfplay artifact
-          cp -r output/make/nsfplay.app artifact/nsfplay.app
+          cp output/makeArm/nsfplac artifact
+          cp output/makeArm/nsfplay artifact
+          cp -r output/makeArm/nsfplay.app artifact/nsfplay.app
           echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $GITHUB_ENV
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
