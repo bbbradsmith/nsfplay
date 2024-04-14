@@ -120,5 +120,7 @@ ifneq ($(shell uname),Darwin)
 		strip --strip-debug --strip-unneeded $@ ; \
 		objcopy --add-gnu-debuglink=$@.debug $@
 else
-	STRIP_DEBUG ?= strip -s $@.debug $@
+	STRIP_DEBUG ?= \
+		nm -a $@ > $@.nm ; \
+		strip $@
 endif

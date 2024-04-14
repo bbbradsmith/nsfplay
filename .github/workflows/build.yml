@@ -198,7 +198,6 @@ jobs:
       - name: wxWidgets Cache Key
         run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
       - name: Cache wxWidgets
-        if: false # TODO re-enable when ready
         id: cache-wx
         uses: actions/cache@v4
         with:
