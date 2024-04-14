@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-msvc:
-    name: Windows MSVC
+  build-win32:
+    name: NSFPlay Windows 32-bit
     runs-on: windows-2019
     steps:
       - name: Checkout Files
