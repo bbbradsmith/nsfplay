@@ -16,7 +16,7 @@ gui: core
 nsfplay: core gui
 	$(MAKE) -C nsfplay
 
-mac: nsfplay
+mac:
 	$(MAKE) -C nsfplay mac
 
 winamp: core gui
