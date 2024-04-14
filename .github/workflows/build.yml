@@ -191,7 +191,7 @@ jobs:
       - name: Checkout Files
         uses: actions/checkout@v4
       - name: Setup MacOS
-        run: brew install make cmake imagemagick
+        run: brew install imagemagick
       - name: wxWidgets Cache Key
         run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
       - name: Cache wxWidgets
