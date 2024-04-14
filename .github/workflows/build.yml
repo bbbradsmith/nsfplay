@@ -1,0 +1,32 @@
+name: NSFPlay Builds
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-win32:
+    name: NSFPlay Windows 32-bit
+    runs-on: windows-2019
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup MSVC
+        uses: microsoft/setup-msbuild@v2
+      - name: Build
+        run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=Win32
+      - name: Prepare Artifacts
+        shell: pwsh
+        run: |
+          ./artifact.bat
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $env:GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay-unstable--${{ env.BUILD_TAG }}
+          path: artifact/
