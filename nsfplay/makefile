@@ -73,8 +73,8 @@ mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 	cp ../$(INTDIR)/icon/nsfplay.icns $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
 	cp $(TARGET) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/MacOS
 	cp Info.plist $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
-	plutil -insert CFBundleShortVersionString -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
-	plutil -insert CFBundleVersion -string "$(cat ../version.txt)" $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
+	plutil -insert CFBundleShortVersionString -string $(shell cat ../version.txt) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
+	plutil -insert CFBundleVersion -string $(shell cat ../version.txt) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
 
 $(ICON_INTDIR)/nsfplay.icns:
 	make -C ../icons mac
