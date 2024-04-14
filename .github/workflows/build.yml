@@ -13,7 +13,6 @@ jobs:
 
   build-msvc:
     name: Windows MSVC
-    if: false
     runs-on: windows-2019
     steps:
       - name: Checkout Files
@@ -76,7 +75,6 @@ jobs:
 
   build-msys2:
     name: Windows MSYS2
-    if: false
     runs-on: windows-latest
     steps:
       - name: Checkout Files
@@ -145,7 +143,6 @@ jobs:
 
   build-ubuntu:
     name: Ubuntu
-    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Files
