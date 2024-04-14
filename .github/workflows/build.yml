@@ -209,10 +209,10 @@ jobs:
       - name: Build wxWidgets
         run: |
           export CC=clang
-          export WXL_DIR=wxlibArm
+          export WXOUT=wxlibArm
           export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64"
           make wxlib
-          export WXL_DIR=wxlibIntel
+          export WXOUT=wxlibIntel
           export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
           make wxlib
           #rm -rf wxlibArm/make/libs
@@ -222,12 +222,12 @@ jobs:
           export CC=clang
           export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -Wno-c++11-extensions"
           export LDFLAGS_EXTRA="-target arm64-apple-macos11"
-          export WXL_DIR=wxlibArm
+          export WXL_DIR=../wxlibArm
           export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make cmd nsfplay
           export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -Wno-c++11-extensions"
           export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
-          export WXL_DIR=wxlibIntel
+          export WXL_DIR=../wxlibIntel
           export OUTDIR=output/make64 INTDIR=intermediate/make64
           make cmd nsfplay
       - name: Prepare Artifacts
