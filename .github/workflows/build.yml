@@ -237,6 +237,25 @@ jobs:
           export WXL_DIR=../wxlibArm
           export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make mac
+      - name: Prepare Signature
+        if: github.event_name != 'pull_request'
+        env:
+          CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        run: echo $CERTIFICATE | base64 --decode -o certificate.p12
+      - name: Sign Command Line Tool
+        if: github.event_name != 'pull_request'
+        uses: indygreg/apple-code-sign-action@v1.0
+        with:
+          input_path: output/makeArm/nsfplac
+          p12_file: certificate.p12
+          p12_password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      - name: Sign Application Bundle
+        if: github.event_name != 'pull_request'
+        uses: indygreg/apple-code-sign-action@v1.0
+        with:
+          input_path: output/makeArm/nsfplay.app
+          p12_file: certificate.p12
+          p12_password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
       - name: Prepare Artifacts
         run: |
           mkdir artifact
