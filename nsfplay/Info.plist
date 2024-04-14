@@ -2,12 +2,43 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>nsf</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>NSF sound file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>nsfplay.nsf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>nsfe</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>NSFE sound file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>nsfplay.nsfe</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>nsfplay</string>
 	<key>CFBundleIconFile</key>
-	<string>nfsplay</string>
+	<string>nsfplay.icns</string>
 	<key>CFBundleIconName</key>
 	<string>nsfplay</string>
 	<key>CFBundleIdentifier</key>
@@ -18,5 +49,7 @@
 	<string>nsfplay</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>NSFP</string>
 </dict>
 </plist>
