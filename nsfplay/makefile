@@ -64,7 +64,7 @@ clean:
 
 ICON_INTDIR ?= ../$(INTDIR)/icon
 
-mac: $(ICON_INTDIR)/icon/nsfplay.icns Info.plist ../version.txt
+mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 	make -C ../icons mac
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
