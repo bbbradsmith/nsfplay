@@ -13,11 +13,16 @@ This is a work in progress total rewrite of NSFPlay. Goals include:
 
 ## Components
 
-* `core` - A platform-agnostic NSF player library suitable for integration into other programs.
-* `gui` - A cross platform GUI library that works with the core, allowing plugins to share the same UI as the stand alone player.
-* `cmd` - A stand-alone command line player.
+Products:
+* `core` - A platform-agnostic NSF player library `nsfcore` suitable for integration into other programs.
+* `cmd` - A stand-alone command line player `nsfplac`.
 * `nsfplay` - A stand-alone GUI player.
 * `winamp` - A winamp plugin (Windows 32-bit only).
+
+Support:
+* `gui` - A library that provides a common user interface, allowing a plugin to share the same UI as the stand alone player.
+* `include` - Public interfaces for the `core` and `gui` libraries.
+* `icons` - Icons used for the GUI, edit the PNG files, and rebuild the ICO copies using the makefile (imagemagick required).
 * `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4) cross platform GUI library.
 
 ## Build
@@ -84,6 +89,8 @@ On Windows (including MSYS2), you don't need to keep the cmake generated directo
 * `make uninstall` - delete install from `/usr/local/bin/`.
 * `make install prefix=~/my/directory` - install to custom directory.
 * `make uninstall prefix=~/my/directory` - uninstall from custom directory.
+* `make icons` - rebuild windows icons from PNG source.
+* `make mac` - packages `nsfplay` into `nsfplay.app` (build nsfplay first).
 * `make wxlib` - fetches wxWidgets submodule in `wx/` and builds libraries to `wxlib/`.
 
 See `makefile.common` for various potential environment overrides.

@@ -1,6 +1,6 @@
 include makefile.common
 
-.PHONY: default core cmd gui wxlib nsfplay winamp install uninstall clean
+.PHONY: default core cmd gui nsfplay mac winamp icons wxlib install uninstall clean
 
 default: core cmd nsfplay
 
@@ -13,14 +13,20 @@ cmd: core
 gui: core
 	$(MAKE) -C gui
 
-wxlib:
-	$(MAKE) -f makefile.wx
-
 nsfplay: core gui
 	$(MAKE) -C nsfplay
 
+mac:
+	$(MAKE) -C nsfplay mac
+
 winamp: core gui
 	$(MAKE) -C winamp
+
+icons:
+	$(MAKE) -C icons
+
+wxlib:
+	$(MAKE) -f makefile.wx
 
 install: cmd
 	$(MAKE) -C cmd install

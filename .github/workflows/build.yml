@@ -183,3 +183,69 @@ jobs:
         with:
           name: nsfplay3-ubuntu--${{ env.BUILD_TAG }}
           path: artifact/
+
+  build-macos:
+    name: MacOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup MacOS
+        run: brew install make cmake imagemagick
+      - name: wxWidgets Cache Key
+        run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: |
+            wxlibArm/make
+            wxlibIntel/make
+            wx/include
+          key: wx-macos-${{ env.WXHASH }}
+      - name: Build wxWidgets
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        run: |
+          export CC=clang
+          export WXOUT=wxlibArm
+          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64"
+          make wxlib
+          export WXOUT=wxlibIntel
+          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+          make wxlib
+          #rm -rf wxlibArm/make/libs
+          #rm -rf wxlibIntel/make/libs
+      - name: Make
+        run: |
+          export CC=clang
+          export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -Wno-c++11-extensions"
+          export LDFLAGS_EXTRA="-target arm64-apple-macos11"
+          export WXL_DIR=../wxlibArm
+          export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
+          make cmd nsfplay
+          export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -Wno-c++11-extensions"
+          export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
+          export WXL_DIR=../wxlibIntel
+          export OUTDIR=output/makeIntel INTDIR=intermediate/makeIntel
+          make cmd nsfplay
+      - name: Make Fat App
+        run: |
+          lipo -create -output output/makeArm/nsfplac2 output/makeArm/nsfplac output/makeIntel/nsfplay
+          lipo -create -output output/makeArm/nsfplay2 output/makeArm/nsfplay output/makeIntel/nsfplay
+          mv output/makeArm/nsfplac2 output/makeArm/nsfplac
+          mv output/makeArm/nsfplay2 output/makeArm/nsfplay
+          export WXL_DIR=../wxlibArm
+          export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
+          make mac
+      - name: Prepare Artifacts
+        run: |
+          mkdir artifact
+          cp nsfplay.txt artifact
+          cp output/makeArm/nsfplac artifact
+          cp -r output/makeArm/nsfplay.app artifact/nsfplay.app
+          echo "BUILD_TAG=$(git log -1 --format="%ad--%h" --date=format-local:"%Y-%m-%d-%H%M%S")" >> $GITHUB_ENV
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfplay3-macos--${{ env.BUILD_TAG }}
+          path: artifact/
