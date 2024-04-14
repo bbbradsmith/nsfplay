@@ -33,7 +33,7 @@ $(NSFPLAY_INTDIR)/%.d: %.cpp | $(NSFPLAY_INTDIR)/
 $(NSFPLAY_INTDIR)/%.o: %.cpp $(NSFPLAY_INTDIR)/%.d | $(NSFPLAY_INTDIR)/
 	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<
 
-$(NSFPLAY_INTDIR)/nsfplay_rc.o: nsfplay.rc *.ico | $(NSFPLAY_INTDIR)/
+$(NSFPLAY_INTDIR)/nsfplay_rc.o: nsfplay.rc $(wildcard ../icons/*.ico) | $(NSFPLAY_INTDIR)/
 	windres -i $< -o $@
 
 $(NSFPLAY_INTDIR)/:
@@ -61,8 +61,6 @@ clean:
 
 # mac app build
 # intentionally does not depend on $(TARGET) to allow modifying it for fat builds before creating the app
-
-ICON_INTDIR ?= ../$(INTDIR)/icon
 
 mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app

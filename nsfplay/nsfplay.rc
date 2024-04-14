@@ -1,3 +1,4 @@
 #include "resource.h"
 
 IDI_NSFPLAY_ICO                 ICON            "../icons/nsfplay.ico"
+IDI_FAMICOM_ICO                 ICON            "../icons/famicom.ico"
