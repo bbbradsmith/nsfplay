@@ -23,6 +23,7 @@ Support:
 * `gui` - A library that provides a common user interface, allowing a plugin to share the same UI as the stand alone player.
 * `include` - Public interfaces for the `core` and `gui` libraries.
 * `icons` - Icons used for the GUI, edit the PNG files, and rebuild the ICO copies using the makefile (imagemagick required).
+* `enum` - Definitions of all settings and text used by NSFPlay, allowing localized text in multiple languages.
 * `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4) cross platform GUI library.
 
 ## Build
@@ -88,6 +89,8 @@ On Windows (including MSYS2), you don't need to keep the cmake generated directo
 * `make install prefix=~/my/directory` - install to custom directory.
 * `make uninstall prefix=~/my/directory` - uninstall from custom directory.
 * `make icons` - rebuild windows icons from PNG source.
+* `make enums` - generate enums and text data.
+* `make enums_verify` - verify that current generated enums/text data match their source.
 * `make mac` - packages `nsfplay` into `nsfplay.app` (build nsfplay first).
 * `make wxlib` - fetches wxWidgets submodule in `wx/` and builds libraries to `wxlib/`.
 

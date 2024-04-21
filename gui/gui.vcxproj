@@ -178,6 +178,8 @@
     <ClCompile Include="gui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\nsfplaycore.h" />
+    <ClInclude Include="..\include\nsfplayenums.h" />
     <ClInclude Include="..\include\nsfplaygui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

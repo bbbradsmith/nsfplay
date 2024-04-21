@@ -1,6 +1,6 @@
 include makefile.common
 
-.PHONY: default core cmd gui nsfplay mac winamp icons wxlib install uninstall clean
+.PHONY: default core cmd gui nsfplay mac winamp icons enums enums_verify wxlib install uninstall clean
 
 default: core cmd nsfplay
 
@@ -24,6 +24,12 @@ winamp: core gui
 
 icons:
 	$(MAKE) -C icons
+
+enums:
+	$(MAKE) -C enums
+
+enums_verify:
+	$(MAKE) -C enums verify
 
 wxlib:
 	$(MAKE) -f makefile.wx

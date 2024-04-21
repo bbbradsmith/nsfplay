@@ -1,8 +1,4 @@
 // stub
 
 #include <nsfplaycore.h>
-
-int nsfplaycore::test()
-{
-	return 3;
-}
+#include "enums_data.h"

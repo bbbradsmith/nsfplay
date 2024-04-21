@@ -6,5 +6,5 @@
 int main()
 {
 	printf("nsfplac stub\n");
-	return nsfplaycore::test();
+	return 0;
 }

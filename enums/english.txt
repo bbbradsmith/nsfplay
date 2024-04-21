@@ -1,0 +1,26 @@
+LOCAL ENGLISH "English"
+LOCALDEFAULT
+
+LOCALLIST ENABLE OFF "Off"
+LOCALLIST ENABLE ON "On"
+
+LOCALSETGROUP MAIN "Main" "Main Settings"
+LOCALSET MAIN VOLUME "Volume" "Total output loudness."
+LOCALSET MAIN SAMPLERATE "Samplerate" "Audio output samplerate."
+LOCALSET MAIN STEREO "Stereo" "Disable to output 1-channel mono sound."
+LOCALSET MAIN TITLE_FORMAT "NSF song title format" "See documentation for details."
+
+LOCALPROP SONGCOUNT "Song count"
+LOCALSONGPROP TITLE "Song title"
+LOCALSONGPROP SONGTEST "Song test"
+
+LOCALUNIT APU0 "APU0" "Built-in square channels."
+LOCALUNIT APU1 "APU1" "Built-in triangle, noise, and DPCM."
+LOCALCHANNEL APU0 SQU0 "Square 0"
+LOCALCHANNEL APU0 SQU1 "Square 1"
+LOCALCHANNEL APU1 TRI  "Triangle"
+LOCALCHANNEL APU1 NSE  "Noise"
+LOCALCHANNEL APU1 DPCM "DPCM"
+
+LOCALTEXT TEXT "Test Text"
+LOCALERROR ERROR "Test Error"

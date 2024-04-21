@@ -18,6 +18,12 @@
     <ClInclude Include="..\include\nsfplaygui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\nsfplaycore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\nsfplayenums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gui.cpp">
