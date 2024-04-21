@@ -126,12 +126,12 @@ def print_error(message):
 def warn(message):
     global warnings
     if not NOWARN:
-        print_error("Warning:" + message);
+        print_error("Warning: " + message);
         warnings += 1
 
 def error(message):
     global errors
-    print_error("Error:" + message);
+    print_error("Error: " + message);
     errors += 1
 
 def terminate():
@@ -926,7 +926,7 @@ def verify_lines(lines0,file):
             parse_line = i1 + 1
             parse_error("Verify failed (generated:%d)" % (i0+1))
             parse_path = None
-            return
+            return False
         i0 += 1
         i1 += 1
     while i1 < len(lines1):
@@ -934,19 +934,23 @@ def verify_lines(lines0,file):
             parse_line = i1 + 1
             parse_error("Verify failed, extra line")
             parse_path = None
-            return
+            return False
         i1 += 1
     parse_path = None
     while i0 < len(lines0):
         if not ignore_line(lines0[i0]):
             error("Verify failed, extra line at generated:%d" % (i0+1))
-            return
+            return False
         i0 += 1
-    return
+    return True
 
 def verify_enums(file_enum,file_data):
-    verify_lines(gen_enum_lines,file_enum)
-    verify_lines(gen_data_lines,file_data)
+    result = True
+    result &= verify_lines(gen_enum_lines,file_enum)
+    result &= verify_lines(gen_data_lines,file_data)
+    if not result:
+        print_error("Verification failed, try running "+os.path.basename(__file__)+" without parameters (make enums) to rebuild first?")
+    return result
 
 #
 # main
@@ -970,7 +974,7 @@ if NOWARN: print("Option: -nowarn")
 if VERBOSE: print("Option: -verbose")
 
 input_files = [os.path.join(INPUT_FOLDER,INPUT_FIRST)]
-for p in sorted(os.listdir(INPUT_FOLDER)):
+for p in sorted(os.listdir(INPUT_FOLDER)): # sort alphabetically for stable locale order
     if (p.lower().endswith(".txt") and p != INPUT_FIRST):
         input_files.append(os.path.join(INPUT_FOLDER,p))
 
