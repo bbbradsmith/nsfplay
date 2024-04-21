@@ -14,12 +14,21 @@
     <ClCompile Include="core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nsfplaycore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\nsfplaycore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\nsfplayenums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
