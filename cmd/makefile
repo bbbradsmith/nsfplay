@@ -46,4 +46,4 @@ clean:
 	rm -rf $(CMD_INTDIR)
 	rm -rf $(dir $(TARGET))
 
-include $(DEPS)
+-include $(DEPS)

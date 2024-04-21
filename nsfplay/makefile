@@ -76,5 +76,4 @@ mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 $(ICON_INTDIR)/nsfplay.icns:
 	make -C ../icons mac
 
-
-include $(DEPS)
+-include $(DEPS)

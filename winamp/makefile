@@ -43,4 +43,4 @@ clean:
 	rm -rf $(WINAMP_INTDIR)
 	rm -rf $(dir $(TARGET))
 
-include $(DEPS)
+-include $(DEPS)

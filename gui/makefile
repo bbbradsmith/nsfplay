@@ -33,4 +33,4 @@ clean:
 	rm -rf $(GUI_INTDIR)
 	rm -rf $(dir $(TARGET))
 
-include $(DEPS)
+-include $(DEPS)

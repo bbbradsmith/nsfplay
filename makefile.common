@@ -45,6 +45,10 @@ ifeq ($(OS),Windows_NT)
 	LDFLAGS_GUI ?=
 	LDFLAGS_NSFPLAY ?= -mwindows
 	LDFLAGS_DLL ?= -mdll
+	PCH_COMPILE ?= -x c++-header
+	PCH_USE ?= -Winvalid-pch --include
+	PCH_USE_SUFFIX ?=
+	PCH_SUFFIX ?= .gch
 	LIB_SUFFIX ?= .a
 	EXE_SUFFIX ?= .exe
 	DLL_SUFFIX ?= .dll
@@ -67,7 +71,7 @@ ifeq ($(OS),Windows_NT)
 			-luuid -lole32 -loleacc -loleaut32 \
 			-lversion -lshlwapi -luxtheme -lwinspool
 	endif
-	# wxWidgets props files include:
+	# wxWidgets props files included:
 	#   kernel32.lib, user32.lib, gdi32.lib, comdlg32.lib, winspool.lib, shell32.lib
 	#   shlwapi.lib, ole32.lib, oleaut32.lib, uuid.lib, advapi32.lib, version.lib
 	#   comctl32.lib, rpcrt4.lib, ws2_32.lib, wininet.lib, winmm.lib
@@ -79,6 +83,10 @@ else ifeq ($(shell uname),Darwin)
 	LDFLAGS_GUI ?=
 	LDFLAGS_NSFPLAY ?=
 	LDFLAGS_DLL ?= -shared
+	PCH_COMPILE ?= -x c++-header
+	PCH_USE ?= -include-pch
+	PCH_USE_SUFFIX ?= .pch
+	PCH_SUFFIX ?= .pch
 	LIB_SUFFIX ?= .a
 	EXE_SUFFIC ?=
 	DLL_SUFFIX ?= .so
@@ -92,6 +100,10 @@ else
 	LDFLAGS_GUI ?=
 	LDFLAGS_NSFPLAY ?=
 	LDFLAGS_DLL ?= -shared
+	PCH_COMPILE ?= -x c++-header
+	PCH_USE ?= -Winvalid-pch --include
+	PCH_USE_SUFFIX ?=
+	PCH_SUFFIX ?= .gch
 	LIB_SUFFIX ?= .a
 	EXE_SUFFIX ?=
 	DLL_SUFFIX ?= .so
