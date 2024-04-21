@@ -726,6 +726,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("\tconst char* default_str;",1)
     gen_line("} NSFSetData;",1)
     gen_line("const NSFSetData NSFPD_SET[NSFP_SET_COUNT] = {",1)
+    setstr_count = 0
     for si in range(len(defs_set)):
         gi = defs_set[si][0]
         group_key = defs_setgroup[gi][0]
@@ -734,6 +735,8 @@ def generate_enums(file_enum,file_data,do_write):
         default_str = "NULL"
         if defs_set[si][6]:
             default_str = "\""+defs_set[si][2]+"\""
+            default_int = setstr_count # default_int for string settings reused internally as as a lookup index to a string array
+            setstr_count += 1
         else:
             default_int = defs_set[si][2]
             if (default_int < defs_set[si][3]) or (default_int > defs_set[si][4]):
@@ -765,6 +768,7 @@ def generate_enums(file_enum,file_data,do_write):
                     descs[j] = descs[0]
             table_locale[i].append(gen_text(names[i]))
             table_locale[i].append(gen_text(descs[i]))
+    gen_enum("NSFP_SETSTR_COUNT",setstr_count)
     gen_break(0)
     gen_line("};",1)
     gen_break(1)

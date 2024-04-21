@@ -10,8 +10,8 @@
 // - The song index begins at 0 for the interface, but when presented to the user a +1 should be used,
 //   so that the first song in the NSF is song 1.
 
-#include <stdint.h>
-#include <stddef.h>
+#include <stdint.h> // explicit size integer types
+#include <stddef.h> // NULL
 
 // auto-generated enumerations for settings and properties
 #include "nsfplayenums.h"
@@ -20,7 +20,8 @@ extern "C"
 {
 
 // hidden implementation
-struct NSFCore;
+struct NSFCore_;
+typedef struct NSFCore_ NSFCore;
 
 
 typedef struct
@@ -30,6 +31,7 @@ typedef struct
 	const char* val_str; // NULL if not string
 } NSFSetInit;
 
+
 // create or destroy an core instance
 // - ini_data is a null terminated string, containing ini file settings
 // - a NULL ini_data will use the default settings
@@ -38,13 +40,40 @@ NSFCore* nsfplay_create(const char* ini_data);
 NSFCore* nsfplay_create_init(const NSFSetInit* init);
 void nsfplay_destroy(NSFCore* core);
 
-// reset all settings to default values
-void nsfplay_set_default(NSFCore* core);
-
 // returns a localized string describing the last error
 //  - NULL if there has been no logged error since the last call to nsfplay_test_error
 //  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
 const char* nsfplay_last_error(NSFCore* core);
+
+// for debug builds, sets a custom debug output function for diagnostics
+// - default will print to stdout.
+// - debug msg will not end with newline.
+void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
+
+// set a callback to handle a fatal error
+// - May be called if out of memory or some other irrecoverable error.
+// - Allows you to report the error message in some other way before exiting, luck willing.
+// - If no callback is provided, or if it returns, it will print msg to stderr,
+//   then std::exit(-1) to close the application.
+// - fatal msg will not end with newline.
+void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
+
+
+// reset all settings to default values
+void nsfplay_set_default(NSFCore* core);
+// apply ini file or init array
+bool nsfplay_set_ini(NSFCore* core, const char* ini_data);
+bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init);
+
+// ini file
+// - returns false if any lines could not be parsed
+// - settings are separated by line endings, any combination of cr and/or lf is accepted
+// - blank lines are ignored, anything after # will be ignored until the next line
+// read a current setting as an ini line
+// - does not include newline
+// - iterate from 0 to NSFP_SET_COUNT-1 to generate a complete ini file
+const char* nsfplay_ini_line(const NSFCore* core, int32_t index);
+
 
 // settings by index
 // - use the provided NSFP_SET_x enumerations, because index values are subject to change
@@ -61,16 +90,6 @@ bool nsfplay_set_key_int(NSFCore* core, const char* key, int32_t value);
 bool nsfplay_set_key_str(NSFCore* core, const char* key, const char* value);
 int32_t nsfplay_get_key_int(const NSFCore* core, const char* key);
 const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
-
-// ini file
-// - returns false if any lines could not be parsed
-// - settings are separated by line endings, any combination of cr and/or lf is accepted
-// - blank lines are ignored, anything after # will be ignored until the next line
-bool nsfplay_ini(NSFCore* core, const char* ini_data);
-// read a current setting as an ini line
-// - does not include newline
-// - iterate from 0 to NSFP_SET_COUNT-1 to generate a complete ini file
-const char* nsfplay_ini_line(const NSFCore* core, int32_t index);
 
 // information about settings, useful for UI display
 
@@ -111,10 +130,6 @@ int32_t nsfplay_set_group_index(const char* key); // -1 if not found
 bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size);
 bool nsfplay_assume(NSFCore* core, const void* nsf_data, uint32_t nsf_size);
 
-
-// convenience function for time conversion
-uint64_t nsfplay_time_to_samples(const NSFCore* core, int32_t hours, int32_t minutes, int32_t seconds, int32_t milliseconds);
-void nsfplay_samples_to_time(const NSFCore* core, uint64_t samples, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds);
 
 // song control
 uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF
@@ -223,7 +238,14 @@ NSFChannelState nsfplay_channel_state(const NSFCore* core, int32_t active_channe
 uint32_t nsfplay_channel_state_ex(const NSFCore* core, int32_t active_channel, void* data, uint32_t data_size);
 
 
+// convenience functions for time conversion
+uint64_t nsfplay_time_to_samples(const NSFCore* core, int32_t hours, int32_t minutes, int32_t seconds, int32_t milliseconds);
+uint64_t nsfplay_time_to_cycles(const NSFCore* core, int32_t hours, int32_t minutes, int32_t seconds, int32_t milliseconds);
+void nsfplay_samples_to_time(const NSFCore* core, uint64_t samples, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds);
+void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds);
+
 // other text strings adapted for the current locale, see: NSFP_TEXT_key
+// - the returned string pointer is static and has permanent lifetime
 const char* nsfplay_local_text(int32_t key);
 
 
