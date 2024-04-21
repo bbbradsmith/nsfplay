@@ -2,3 +2,5 @@ LOCAL JAPANESE "日本語"
 
 # LOCALPROP NOTFOUND "Not found"
 # LOCALTEXT BAD "Not in English"
+# LOCALTEXT TEXT "hellote"
+LOCALTEXT TEXT "goodbye"

@@ -114,7 +114,7 @@ VERBOSE = False
 warnings = 0
 errors = 0
 
-now_string = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
+now_string = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 #
 # warnings and errors
@@ -347,6 +347,15 @@ def check_channel(unit_key,key):
     parse_error("UNIT not found: "+unit_key)
     return (None,None)   
 
+def add_unique_entry(defs,id_elements,error_name,entry):
+    ide = entry[0:id_elements]
+    for i in range(len(defs)):
+        idi = defs[i][0:id_elements]
+        if idi == ide:
+            parse_error(error_name + " is not unique")
+            return
+    defs.append(entry)
+
 # parse enums file
 
 def parse_enums(path):
@@ -403,7 +412,8 @@ def parse_enums(path):
                 else:
                     defs_channelonlist = li
         elif command == "LOCAL":
-            defs_local.append([p[0],p[1],[],[],[],[],[],[],[],None,[]]) # local: key, name, list, group, set, prop, songprop, unit, channel, channelset,text
+            add_unique_entry(defs_local,1,command+" "+p[0],
+                [p[0],p[1],[],[],[],[],[],[],[],None,[]]) # local: key, name, list, group, set, prop, songprop, unit, channel, channelset,text
             localcurrent = len(defs_local)-1
         elif command == "LOCALDEFAULT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
@@ -416,43 +426,43 @@ def parse_enums(path):
             else:
                 (li,lk,lcount) = check_list(p[0],p[1])
                 if li != None:
-                    defs_local[localcurrent][2].append((li,lk,p[2])) # list, key, name
+                    add_unique_entry(defs_local[localcurrent][2],2,command+" "+p[1],(li,lk,p[2])) # list, key, name
         elif command == "LOCALSETGROUP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 gi = check_setgroup(p[0])
                 if gi != None:
-                    defs_local[localcurrent][3].append((gi,p[1],p[2])) # group, name, desc
+                    add_unique_entry(defs_local[localcurrent][3],1,command+" "+p[0],(gi,p[1],p[2])) # group, name, desc
         elif command == "LOCALSET":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 (gi,si) = check_set(p[0],p[1])
                 if gi != None:
-                    defs_local[localcurrent][4].append((gi,si,p[1],p[2])) # group, set, name, desc
+                    add_unique_entry(defs_local[localcurrent][4],2,command+" "+p[1],(gi,si,p[1],p[2])) # group, set, name, desc
         elif command == "LOCALPROP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 pi = check_prop(p[0])
                 if pi != None:
-                    defs_local[localcurrent][5].append((pi,p[1])) # prop, name
+                    add_unique_entry(defs_local[localcurrent][5],1,command+" "+p[0],(pi,p[1])) # prop, name
         elif command == "LOCALSONGPROP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 pi = check_songprop(p[0])
                 if pi != None:
-                    defs_local[localcurrent][6].append((pi,p[1])) # songprop, name
+                    add_unique_entry(defs_local[localcurrent][6],1,command+" "+p[0],(pi,p[1])) # songprop, name
         elif command == "LOCALUNIT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 ui = check_unit(p[0])
                 if ui != None:
-                    defs_local[localcurrent][7].append((ui,p[1],p[2])) # unit, name, desc
+                    add_unique_entry(defs_local[localcurrent][7],1,command+" "+p[0],(ui,p[1],p[2])) # unit, name, desc
         elif command == "LOCALCHANNEL":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 (ui,ci) = check_channel(p[0],p[1])
                 if ui != None:
-                    defs_local[localcurrent][8].append((ci,p[2])) # channel, name
+                    add_unique_entry(defs_local[localcurrent][8],1,command+" "+p[1],(ci,p[2])) # channel, name
         elif command == "LOCALCHANNELSET":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -463,11 +473,11 @@ def parse_enums(path):
         elif command == "LOCALTEXT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                defs_local[localcurrent][10].append(p)
+                add_unique_entry(defs_local[localcurrent][10],1,command+" "+p[0],p)
         elif command == "LOCALERROR":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                defs_local[localcurrent][10].append(("ERROR_"+p[0],p[1]))
+                add_unique_entry(defs_local[localcurrent][10],1,command+" "+p[0],("ERROR_"+p[0],p[1]))
     parse_path = None
 
 def parse_enum_files(files):
@@ -551,7 +561,7 @@ def generate_enums(file_enum,file_data,do_write):
     # locale tables contain a byte index to every generated string in gen_data_blob
     # defs_local: key, name, list, group, set, prop, songprop, unit, channel, channelset,text
     #
-    table_locale = [[]] * locs
+    table_locale = [[] for i in range(locs)]
     #
     # generate list data
     #
@@ -835,8 +845,8 @@ def generate_enums(file_enum,file_data,do_write):
         for i in range(locs):
             name = None
             mapped = False
-            for (lti,lname) in defs_local[i][10]:
-                if lti == ti:
+            for (lkey,lname) in defs_local[i][10]:
+                if lkey == text_key:
                     mapped = True
                     name = lname
                     break
