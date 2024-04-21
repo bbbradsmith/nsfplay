@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
-      - name: Verify Enums match Generated Files
+      - name: Verify Enums
         run: make enums_verify
 
   build-msvc:

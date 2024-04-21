@@ -22,8 +22,8 @@ Products:
 Support:
 * `gui` - A library that provides a common user interface, allowing a plugin to share the same UI as the stand alone player.
 * `include` - Public interfaces for the `core` and `gui` libraries.
-* `icons` - Icons used for the GUI, edit the PNG files, and rebuild the ICO copies using the makefile (imagemagick required).
-* `enum` - Definitions of all settings and text used by NSFPlay, allowing localized text in multiple languages.
+* `icons` - Icons used for the GUI, edit the PNG files, and rebuild the ICO copies using the makefile ([imagemagick](https://imagemagick.org) required).
+* `enum` - Definitions of all settings and text used by NSFPlay, allowing localized text in multiple languages ([python](https://www.python.org/) required).
 * `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4) cross platform GUI library.
 
 ## Build
