@@ -11,6 +11,7 @@
 //   so that the first song in the NSF is song 1.
 
 #include <stdint.h>
+#include <stddef.h>
 
 // auto-generated enumerations for settings and properties
 #include "nsfplayenums.h"
