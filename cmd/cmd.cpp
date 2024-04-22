@@ -1,19 +1,42 @@
 // stub
 
 #include <nsfplaycore.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <cstdio> // std::fprintf
+#include <cstdlib> // std::exit
+#include <cstring> // std::strlen
 
-void error_log(const char* msg) { std::fprintf(stderr,"Error: %s\n",msg); }
-void debug_print(const char* msg) { std::fprintf(stdout,"Debug: %s\n",msg); }
-void fatal_log(const char* msg) { std::fprintf(stderr,"Fatal: %s\n",msg); std::exit(-1); }
+// platform.cpp
+void platform_setup(int argc, char** argv);
+void platform_shutdown();
+int platform_argc();
+const char* platform_argv(int index);
 
-int main()
+void error_log(const char* msg)
 {
+	std::fprintf(stderr,"Error: %s\n",msg);
+}
+
+void debug_print(const char* msg)
+{
+	std::fprintf(stdout,"Debug: %s\n",msg);
+}
+
+void fatal_log(const char* msg)
+{
+	std::fprintf(stderr,"Fatal: %s\n",msg);
+	platform_shutdown();
+	std::exit(-1);
+}
+
+int main(int argc, char** argv)
+{
+	platform_setup(argc,argv);
 	nsfplay_set_error_log(error_log);
 	nsfplay_set_debug_print(debug_print);
 	nsfplay_set_fatal(fatal_log);
+
+	for (int i=0; i<platform_argc(); ++i)
+		printf("arg(%d)=[%s]\n",i,platform_argv(i));
 	
 	const char* TEST_INI =
 		"# test comment\n"
@@ -77,5 +100,6 @@ int main()
 
 	nsfplay_destroy(core);
 
+	platform_shutdown();
 	return 0;
 }
