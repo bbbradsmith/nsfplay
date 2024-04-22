@@ -197,6 +197,9 @@ void NSFCore::set_default()
 bool NSFCore::set_ini(const char* ini)
 {
 	if (ini == NULL) return true;
+	// skip UTF-8 BOM if it exists
+	if (ini[0] == 0xEF && ini[1] == 0xBB && ini[2] == 0xBF) ini += 3;
+	// parse line by line
 	int linenum = 1;
 	bool result = true;
 	while (*ini) // ini is the start of a line
@@ -206,8 +209,8 @@ bool NSFCore::set_ini(const char* ini)
 			++eol;
 		result &= parse_ini_line(ini,eol,linenum);
 		if (ini[eol] == 0) break;
-		if ((ini[eol] == 10 && ini[eol+1] == 13) ||
-		    (ini[eol] == 13 && ini[eol+1] == 10))
+		if ((ini[eol] == 10 && ini[eol+1] == 13) || // LF CR (obscure)
+		    (ini[eol] == 13 && ini[eol+1] == 10)) // CR LF (windows)
 			++eol;
 		linenum += 1;
 		ini += (eol+1);
@@ -373,6 +376,24 @@ const char* NSFCore::ini_line(sint32 setenum) const
 		std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,get_str(setenum));
 	temp_text[sizeof(temp_text)-1] = 0;
 	return temp_text;
+}
+
+void NSFCore::ini_write(FILE* f) const
+{
+	sint32 last_group = -1;
+	std::fprintf(f,"# NSFPlay INI settings file\n");
+	for (sint32 i=0; i<NSFP_SET_COUNT; ++i)
+	{
+		// print a group comment each time it changes
+		sint32 group = NSFPD_SET[i].group;
+		if (group != last_group)
+		{
+			last_group = group;
+			std::fprintf(f,"# [%s]\n",NSFPD_GROUP[last_group].key);
+		}
+		std::fprintf(f,"%s\n",ini_line(i));
+	}
+	std::fprintf(f,"# end of settings\n");
 }
 
 bool NSFCore::parse_ini_line(const char* line, int len, int linenum)

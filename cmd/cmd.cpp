@@ -104,6 +104,9 @@ int main(int argc, char** argv)
 	for (int i=0;i<NSFP_SET_COUNT;++i)
 		printf("%s\\n\n",nsfplay_ini_line(core,i));
 
+	// test ini write
+	nsfplay_ini_write(core,stdout);
+
 	nsfplay_destroy(core);
 
 	platform_shutdown();

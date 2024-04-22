@@ -69,6 +69,11 @@ const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum)
 	return core->ini_line(setenum);
 }
 
+void nsfplay_ini_write(const NSFCore* core, FILE* f)
+{
+	return core->ini_write(f);
+}
+
 bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value)
 {
 	bool result = core->set_int(setenum,value);
@@ -195,6 +200,15 @@ uint64_t nsfplay_samples_played(const NSFCore* core)
 }
 
 uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
+{
+	(void)core;
+	(void)samples;
+	(void)stereo_output;
+	// TODO
+	return 0;
+}
+
+uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output)
 {
 	(void)core;
 	(void)samples;

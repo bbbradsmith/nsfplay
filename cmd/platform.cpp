@@ -46,7 +46,7 @@ void platform_setup(int argc, char** argv)
 	(void)argv;
 	store_argv = CommandLineToArgvW(GetCommandLineW(), &store_argc);
 
-	// Windows needs its console set to a UTF8 code page
+	// Windows needs its console set to a UTF-8 code page
 	store_cp = set_code_page(CP_UTF8);
 	std::atexit(platform_atexit);
 }
@@ -79,7 +79,7 @@ const char* platform_argv(int index)
 
 FILE* platform_fopen(const char* path, const char* mode)
 {
-	// Windows filesystem is wchar native, convert UTF8 paths and use native wide fopen
+	// Windows filesystem is wchar native, convert UTF-8 paths and use native wide fopen
 	#ifdef DEBUG
 		printf("fopen(\"%s\",\"%s\")\n",path,mode);
 	#endif

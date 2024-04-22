@@ -12,6 +12,7 @@
 
 #include <stdint.h> // explicit size integer types
 #include <stddef.h> // NULL
+#include <stdio.h> // FILE
 
 // auto-generated enumerations for settings and properties
 #include "nsfplayenums.h"
@@ -95,6 +96,10 @@ bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init);
 // - does not include newline
 // - iterate from 0 to NSFP_SET_COUNT-1 to generate a complete ini file
 const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum);
+// write a complete ini to an open file
+// - uses fprintf and \n, and assumes the file is in "wt" mode for platform-appropriate line endings
+// - does not close the file
+void nsfplay_ini_write(const NSFCore* core, FILE* f);
 
 
 // settings by setenum
@@ -127,6 +132,8 @@ typedef struct
 	int32_t max_int;
 	const char* list; // if not NULL, contains a series of (1+max_int) localized null terminated strings naming each option
 	const char* default_str; // NULL only if !is_string
+	// TODO: slider min/max 
+	// TODO: display hint: int, hex16, hex32, color, hotkey
 } NSFSetInfo;
 
 typedef struct
@@ -164,6 +171,9 @@ uint64_t nsfplay_samples_played(const NSFCore* core); // samples since song_play
 // - stereo_output can be NULL if the output isn't needed
 // - returns number of samples rendered, may be less than samples if song is finished (will zero fill unused output samples)
 uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output);
+// internal mixing is done at 32-bits, this can be delivered if desired
+// - ensure the output volume is low enough to prevent overflow (32-bit render is not able to clip out of range samples)
+uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output);
 
 
 // direct emulation access
@@ -200,6 +210,7 @@ typedef struct
 	const char* key; // permanent string ID
 	const char* name; // localized name
 	int32_t type;
+	// TODO: display hint (shared with NSFSetInfo)
 } NSFPropInfo;
 
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop);
@@ -214,6 +225,7 @@ int32_t nsfplay_prop_lines(const NSFCore* core, int32_t prop); // returns line c
 const char* nsfplay_prop_line(const NSFCore* core); // returns next line  (NULL if no more lines)
 const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size); // blob_size written if not NULL
 
+// song -1 will use the current song
 int32_t nsfplay_songprop_type(const NSFCore* core, int32_t song, int32_t prop);
 int32_t nsfplay_songprop_int(const NSFCore* core, int32_t song, int32_t prop);
 int64_t nsfplay_songprop_long(const NSFCore* core, int32_t song, int32_t prop);
