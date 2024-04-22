@@ -1,15 +1,19 @@
-// stub
+// cmd.cpp
+//   Main entry point for nsfplac.
 
 #include <nsfplaycore.h>
 #include <cstdio> // std::fprintf
 #include <cstdlib> // std::exit
 #include <cstring> // std::strlen
 
-// platform.cpp
+// platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
 void platform_shutdown();
 int platform_argc();
 const char* platform_argv(int index);
+FILE* platform_fopen(const char* path, const char* mode);
+
+// logging functions
 
 void error_log(const char* msg)
 {
@@ -27,6 +31,8 @@ void fatal_log(const char* msg)
 	platform_shutdown();
 	std::exit(-1);
 }
+
+// main
 
 int main(int argc, char** argv)
 {
