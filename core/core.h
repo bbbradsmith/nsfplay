@@ -33,18 +33,38 @@ typedef uint64_t  uint64;
 
 typedef struct NSFCore_
 {
-	sint32 set[NSFP_SET_COUNT]; // all integer settings (values for string settings will index set_str)
-	const char* set_str[NSFP_SETSTR_COUNT];
-	bool set_str_free[NSFP_SETSTR_COUNT]; // true if string setting
+	mutable const char* error_last;
+	char error_last_buffer[256]; // error_last may point to this for formatted errors
+	char temp_text[1024]; // used for returned text information
+
+	sint32 setting[NSFP_SET_COUNT]; // integer settings (can read directly, write with set_int)
+	const char* setting_str[NSFP_SETSTR_COUNT]; // string settings, indexed by value in setting[], (use set/get_str to access)
+	bool setting_str_free[NSFP_SETSTR_COUNT]; // true if string setting (managed by set_str/destroy)
 
 	static NSFCore* create(); // After create: ->set_... then ->finalize.
 	static void destroy(NSFCore* core); // Calls ->release before freeing the core.
 	void finalize(); // finishes creation after create and initial settings
 	void release(); // called by destroy, releases all owned allocations
 
-	void set_default();
+	const char* last_error() const; // returns last error message, NULL if none since last check
+	void set_last_error(sint32 textenum,...);
+
+	void set_default(); // restore default settings
+	bool parse_ini_line(const char* line, int len, int linenum); // used by set_ini
 	bool set_ini(const char* ini);
 	bool set_init(const NSFSetInit* init);
+	bool set_int(sint32 setenum, sint32 value); // integer setting (sets error if false)
+	bool set_str(sint32 setenum, const char* value, sint32 len=-1); // string setting, len truncates, len<0 will strlen (sets error if false)
+	sint32 get_int(sint32 setenum) const;
+	const char* get_str(sint32 setenum) const; // use this instead of manually de-indexing setting_str
+
+	static sint32 set_enum(const char* key, int len=-1); // len truncates, len<0 uses strlen
+	static sint32 group_enum(const char* key, int len=-1);
+
+	// TODO after changing settings, they need to be applied at some point, some might be immediate
+
+	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale
+	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
 
 } NSFCore;
 

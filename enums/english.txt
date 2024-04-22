@@ -23,4 +23,12 @@ LOCALCHANNEL APU1 NSE  "Noise"
 LOCALCHANNEL APU1 DPCM "DPCM"
 
 LOCALTEXT TEXT "Test Text"
-LOCALERROR ERROR "Test Error"
+
+# errors for set checking
+LOCALERROR SET_INVALID "Invalid setting"
+LOCALERROR SET_TYPE "Wrong setting type"
+LOCALERROR SETINT_RANGE "Setting out of range: %d (%d-%d)"
+LOCALERROR INI_NO_EQUALS "INI line %d missing '='"
+LOCALERROR INI_BAD_KEY "INI line %d unknown setting"
+LOCALERROR INI_BAD_INT "INI line %d bad integer value"
+LOCALERROR INI_BAD_RANGE "INI line %d setting out of range: %d (%d-%d)"

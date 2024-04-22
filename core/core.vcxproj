@@ -192,6 +192,7 @@
     <ClInclude Include="..\include\nsfplaycore.h" />
     <ClInclude Include="..\include\nsfplayenums.h" />
     <ClInclude Include="core.h" />
+    <ClInclude Include="enums_data.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

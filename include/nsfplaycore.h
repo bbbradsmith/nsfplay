@@ -26,16 +26,15 @@ typedef struct NSFCore_ NSFCore;
 
 typedef struct
 {
-	int32_t index;
+	int32_t setenum; // -1 to terminate an init array
 	int32_t val_int;
 	const char* val_str; // NULL if not string
 } NSFSetInit;
 
 
 // create or destroy an core instance
-// - ini_data is a null terminated string, containing ini file settings
-// - a NULL ini_data will use the default settings
-// - and init array can be used instead of ini, terminated with an entry with index -1.
+// - see set_init/set_init below for an explanation of the create parameters
+// - a null ini_data/init will just use the default settings
 NSFCore* nsfplay_create(const char* ini_data);
 NSFCore* nsfplay_create_init(const NSFSetInit* init);
 void nsfplay_destroy(NSFCore* core);
@@ -43,7 +42,7 @@ void nsfplay_destroy(NSFCore* core);
 // returns a localized string describing the last error
 //  - NULL if there has been no logged error since the last call to nsfplay_test_error
 //  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
-const char* nsfplay_last_error(NSFCore* core);
+const char* nsfplay_last_error(const NSFCore* core);
 
 // for debug builds, sets a custom debug output function for diagnostics
 // - default will print to stdout.
@@ -61,31 +60,40 @@ void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
 
 // reset all settings to default values
 void nsfplay_set_default(NSFCore* core);
-// apply ini file or init array
+// apply ini file
+// - returns false and reports error if any lines could not be parsed
+// - ini_data is a null terminated string
+// - settings are separated by a line ending, any combination of cr and/or lf is accepted
+// - blank lines are ignored, anything after # will be ignored until the next line
+// - each line has a setting key, an =, and the value
+// - whitespace can be used before/after/around the key = and value
+// - string values will have their left and right whitespace trimmed,
+//   quotes are not treated as special, so a string cannot start or end with a space
 bool nsfplay_set_ini(NSFCore* core, const char* ini_data);
+// apply init array
+// - easier way to apply many settings from code
+// - an init array can be used instead of ini to initialize from code, terminated by an entry with setenum -1.
+// - returns false and reports error if any entries could not be set
 bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init);
 
-// ini file
-// - returns false if any lines could not be parsed
-// - settings are separated by line endings, any combination of cr and/or lf is accepted
-// - blank lines are ignored, anything after # will be ignored until the next line
-// read a current setting as an ini line
+// generate ini file
+
+// generate an ini line for a current settings
 // - does not include newline
 // - iterate from 0 to NSFP_SET_COUNT-1 to generate a complete ini file
-const char* nsfplay_ini_line(const NSFCore* core, int32_t index);
+const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum);
 
 
-// settings by index
-// - use the provided NSFP_SET_x enumerations, because index values are subject to change
-// - set returns false if index is out of bounds, or the wrong value type was used
+// settings by setenum
+// - use the provided NSFP_SET_x enumerations, because setenum values are subject to change
+// - set returns false if setenum is out of bounds, or the wrong value type was used
 // - get returns 0 or NULL if out of bounds, or wrong type
-bool nsfplay_set_int(NSFCore* core, int32_t index, int32_t value);
-bool nsfplay_set_str(NSFCore* core, int32_t index, const char* value);
-int32_t nsfplay_get_int(const NSFCore* core, int32_t index);
-const char* nsfplay_get_str(const NSFCore* core, int32_t index);
+bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value);
+bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value);
+int32_t nsfplay_get_int(const NSFCore* core, int32_t setenum);
+const char* nsfplay_get_str(const NSFCore* core, int32_t setenum);
 
 // settings by string key
-// - use nsfplay_setting_index
 bool nsfplay_set_key_int(NSFCore* core, const char* key, int32_t value);
 bool nsfplay_set_key_str(NSFCore* core, const char* key, const char* value);
 int32_t nsfplay_get_key_int(const NSFCore* core, const char* key);
@@ -115,10 +123,10 @@ typedef struct
 	const char* description; // localized description
 } NSFSetGroupInfo;
 
-NSFSetInfo nsfplay_set_info(int32_t index);
+NSFSetInfo nsfplay_set_info(int32_t setenum);
 NSFSetGroupInfo nsfplay_set_group_info(int32_t group);
-int32_t nsfplay_set_key_index(const char* key); // -1 if not found
-int32_t nsfplay_set_group_index(const char* key); // -1 if not found
+int32_t nsfplay_set_enum(const char* key); // -1 if not found
+int32_t nsfplay_group_enum(const char* key); // -1 if not found
 
 
 // load/change the current NSF file
@@ -152,6 +160,9 @@ void nsfplay_emu_poke(NSFCore* core, uint16_t address, uint8_t value); // write 
 void nsfplay_emu_reg_set(NSFCore* core, char reg, uint16_t value); // reg is one of A, X, Y, S, P (flags), * (PC)
 uint16_t nsfplay_emu_reg_get(const NSFCore* core, char reg);
 void nsfplay_emu_run(NSFCore* core, uint32_t cycles);
+uint32_t nsfplay_emu_run_instruction(NSFCore* core); // runs to end of current instruction, returns cycles elapsed
+const char* nsfplay_emu_trace(const NSFCore* core); // trace prints register state and next instruction
+
 uint32_t nsfplay_emu_samples_pending(const NSFCore* core); // number of sound samples due to emu_run that have not been rendered out yet
 void nsfplay_emu_cancel_pending(NSFCore* core);
 uint64_t nsfplay_emu_cycles(const NSFCore* core); // cycles since song_play
@@ -246,7 +257,7 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 
 // other text strings adapted for the current locale, see: NSFP_TEXT_key
 // - the returned string pointer is static and has permanent lifetime
-const char* nsfplay_local_text(int32_t key);
+const char* nsfplay_local_text(const NSFCore* core, int32_t key);
 
 
 } // extern "C"

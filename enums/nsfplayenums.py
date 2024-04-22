@@ -75,7 +75,7 @@
 #   If LOCALDEFAULT is missing strings, it will use the corresponding key if possible.
 #   The LOCALCHANNELSET command should be used once per locale to name the ON/VOL/PAN settings.
 #   The LOCALTEXT definition creates an enumerated string, more miscellaneous purposes if needed by the code.
-#   LOCALERROR is just LOCALTEXT with "ERROR_" automatically prefixed to the key.
+#   LOCALERROR is just LOCALTEXT but the enum will have "ERROR" instead of "TEXT".
 #   In place of a text value, * can be used to defer to the LOCALDEFAULT without creating a warning.
 #     LOCAL key "name"
 #     LOCALDEFAULT
@@ -473,7 +473,7 @@ def parse_enums(path):
         elif command == "LOCALTEXT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                add_unique_entry(defs_local[localcurrent][10],1,command+" "+p[0],p)
+                add_unique_entry(defs_local[localcurrent][10],1,command+" "+p[0],("TEXT_"+p[0],p[1]))
         elif command == "LOCALERROR":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -839,13 +839,12 @@ def generate_enums(file_enum,file_data,do_write):
     #
     # generate extra text
     #
-    table_text = []
     gen_enum("NSFP_TEXT_COUNT",len(defs_local[0][10]))
+    gen_enum("NSFP_TEXT_INDEX",len(table_locale[0]))
     for ti in range(len(defs_local[0][10])):
         text_key = defs_local[0][10][ti][0]
-        gen_enum("NSFP_TEXT_"+text_key,ti)
+        gen_enum("NSFP_"+text_key,ti)
         names = [text_key for i in range(locs)]
-        table_text.append(len(table_locale[0]))
         for i in range(locs):
             name = None
             mapped = False
@@ -859,10 +858,6 @@ def generate_enums(file_enum,file_data,do_write):
             if name != None: names[i] = name
             table_locale[i].append(gen_text(names[i]))
     gen_break(0)
-    gen_line("const int32_t NSFPD_TEXT[NSFP_LIST_COUNT] = {",1)
-    gen_data(table_text,mode=2)
-    gen_line("};",1)
-    gen_break(1)
     # verify there aren't stray TEXT definitions outside the default locale
     for i in range(1,locs):
         for (text_key,text_name) in defs_local[i][10]:

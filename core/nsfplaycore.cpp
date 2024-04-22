@@ -24,12 +24,9 @@ void nsfplay_destroy(NSFCore* core)
 	NSFCore::destroy(core);
 }
 
-// TODO: everything below this line
-
-const char* nsfplay_last_error(NSFCore* core)
+const char* nsfplay_last_error(const NSFCore* core)
 {
-	(void)core;
-	return NULL;
+	return core->last_error();
 }
 
 void nsfplay_set_debug_print(void (*debug_print_callback_)(const char* msg))
@@ -41,6 +38,8 @@ void nsfplay_set_fatal(void (*fatal_callback_)(const char* msg))
 {
 	nsfp::fatal_callback = fatal_callback_;
 }
+
+// TODO: everything below this line
 
 void nsfplay_set_default(NSFCore* core)
 {
@@ -61,40 +60,40 @@ bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init)
 	return false;
 }
 
-const char* nsfplay_ini_line(const NSFCore* core, int32_t index)
+const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum)
 {
 	(void)core;
-	(void)index;
+	(void)setenum;
 	return NULL;
 }
 
-bool nsfplay_set_int(NSFCore* core, int32_t index, int32_t value)
+bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value)
 {
 	(void)core;
-	(void)index;
+	(void)setenum;
 	(void)value;
 	return false;
 }
 
-bool nsfplay_set_str(NSFCore* core, int32_t index, const char* value)
+bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value)
 {
 	(void)core;
-	(void)index;
+	(void)setenum;
 	(void)value;
 	return false;
 }
 
-int32_t nsfplay_get_int(const NSFCore* core, int32_t index)
+int32_t nsfplay_get_int(const NSFCore* core, int32_t setenum)
 {
 	(void)core;
-	(void)index;
+	(void)setenum;
 	return 0;
 }
 
-const char* nsfplay_get_str(const NSFCore* core, int32_t index)
+const char* nsfplay_get_str(const NSFCore* core, int32_t setenum)
 {
 	(void)core;
-	(void)index;
+	(void)setenum;
 	return NULL;
 }
 
@@ -128,9 +127,9 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key)
 	return NULL;
 }
 
-NSFSetInfo nsfplay_set_info(int32_t index)
+NSFSetInfo nsfplay_set_info(int32_t setenum)
 {
-	(void)index;
+	(void)setenum;
 	return {};
 }
 
@@ -140,16 +139,14 @@ NSFSetGroupInfo nsfplay_set_group_info(int32_t group)
 	return {};
 }
 
-int32_t nsfplay_set_key_index(const char* key)
+int32_t nsfplay_set_enum(const char* key)
 {
-	(void)key;
-	return 0;
+	return NSFCore::set_enum(key);
 }
 
-int32_t nsfplay_set_group_index(const char* key)
+int32_t nsfplay_group_enum(const char* key)
 {
-	(void)key;
-	return 0;
+	return NSFCore::group_enum(key);
 }
 
 bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size)
@@ -245,6 +242,18 @@ void nsfplay_emu_run(NSFCore* core, uint32_t cycles)
 {
 	(void)core;
 	(void)cycles;
+}
+
+uint32_t nsfplay_emu_run_instruction(NSFCore* core)
+{
+	(void)core;
+	return 0;
+}
+
+const char* nsfplay_emu_trace(const NSFCore* core)
+{
+	(void)core;
+	return NULL;
 }
 
 uint32_t nsfplay_emu_samples_pending(const NSFCore* core)
