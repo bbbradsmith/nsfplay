@@ -74,11 +74,13 @@ int main(int argc, char** argv)
 	nsfplay_set_key_str(core,"TITLE_FORMAT","keyed");
 
 	// test info
+	printf("GROUPS:\n");
 	for (int i=0;i<NSFP_GROUP_COUNT;++i)
 	{
 		NSFSetGroupInfo info = nsfplay_set_group_info(core,i);
 		printf("%s %s - %s\n",info.key,info.name,info.desc);
 	}
+	printf("SETS:\n");
 	for (int i=0;i<NSFP_SET_COUNT;++i)
 	{
 		NSFSetInfo info = nsfplay_set_info(core,i);
@@ -98,6 +100,19 @@ int main(int argc, char** argv)
 			}
 			printf("\n");
 		}
+	}
+	// test props
+	printf("PROPS:\n");
+	for (int i=0;i<NSFP_PROP_COUNT;++i)
+	{
+		NSFPropInfo info = nsfplay_prop_info(core,i);
+		printf("%s %s %d\n",info.key,info.name,info.type);
+	}
+	printf("SONGPROPS:\n");
+	for (int i=0;i<NSFP_SONGPROP_COUNT;++i)
+	{
+		NSFPropInfo info = nsfplay_songprop_info(core,i);
+		printf("%s %s %d\n",info.key,info.name,info.type);
 	}
 
 	// test ini generation

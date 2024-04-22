@@ -1,6 +1,6 @@
 // core.cpp
 //   High level central operation of core functions.
-//   Implementation of NSFCore members.
+//   Implementation of most NSFCore members.
 //   Global utilities.
 
 #include "core.h"
@@ -117,6 +117,11 @@ void NSFCore::destroy(NSFCore* core)
 
 void NSFCore::finalize()
 {
+	ram8000 = memory_master;
+	ram0000 = ram8000 + 0x8000;
+	pad0    = ram0000 + 0x800;
+	pad1    = pad0    + 0x1000;
+
 	// TODO make any allocations needed based on the settings
 	// resample kernel, etc.
 	set_apply();
@@ -125,6 +130,8 @@ void NSFCore::finalize()
 void NSFCore::release()
 {
 	// release any allocations held
+	if (nsf_free)
+		nsfp::free(const_cast<uint8*>(nsf));
 	for (int si=0; si<NSFP_SETSTR_COUNT; ++si)
 		if (setting_str_free[si])
 			nsfp::free(const_cast<char*>(setting_str[si]));
@@ -288,7 +295,7 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 	// allocate and copy
 	if (setting_str_free[si])
 		nsfp::free(const_cast<char*>(setting_str[si]));
-	char* new_str = (char*)nsfp::alloc(size_t(len)+1);
+	char* new_str = (char*)(nsfp::alloc(size_t(len)+1));
 	std::memcpy(new_str,value,len);
 	new_str[len] = 0;
 	setting_str[si] = new_str;
@@ -458,6 +465,51 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
 	}
 	return true;
+}
+
+bool NSFCore::load(const uint8* data, uint32 size, bool assume)
+{
+	if (nsf_free)
+		nsfp::free(const_cast<uint8*>(nsf));
+	nsf = NULL;
+	nsf_free = false;
+
+	if (data != NULL)
+	{
+		if (assume)
+			nsf = data;
+		else
+		{
+			nsf = (uint8*)(nsfp::alloc(size));
+			std::memcpy(const_cast<uint8*>(nsf),data,size);
+			nsf_free = true;
+		}
+	}
+
+	bool result = nsf_parse();
+	// TODO play song (reset/rebuilds audio stacks) which may & with result
+	return result;
+}
+
+NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
+{
+	NSFPropInfo info = {0};
+	info.type = NSFP_PROP_TYPE_INVALID;
+	const NSFPropData* PD;
+	if (!song)
+	{
+		if (prop < 0 || prop > NSFP_PROP_COUNT) return info;
+		PD = &NSFPD_PROP[prop];
+	}
+	else
+	{
+		if (prop < 0 || prop > NSFP_SONGPROP_COUNT) return info;
+		PD = &NSFPD_SONGPROP[prop];
+	}
+	info.key = PD->key;
+	info.name = local_text(PD->text);
+	info.type = PD->type;
+	return info;
 }
 
 const char* NSFCore::local_text(sint32 textenum) const

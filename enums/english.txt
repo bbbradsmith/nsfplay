@@ -13,7 +13,7 @@ LOCALSET SAMPLERATE "Samplerate" "Audio output samplerate."
 LOCALSET STEREO "Stereo" "Disable to output 1-channel mono sound."
 LOCALSET TITLE_FORMAT "NSF song title format" "See documentation for details."
 
-LOCALPROP SONGCOUNT "Song count"
+LOCALPROP SONG_COUNT "Song count"
 LOCALSONGPROP TITLE "Song title"
 LOCALSONGPROP SONGTEST "Song test"
 

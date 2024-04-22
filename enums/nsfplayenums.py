@@ -793,7 +793,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("};",1)
     gen_break(1)
     #
-    # generate prop data
+    # generate prop data, songprop data
     #
     gen_enum("NSFP_PROP_COUNT",len(defs_prop))
     gen_line("typedef struct {",1)
@@ -823,16 +823,8 @@ def generate_enums(file_enum,file_data,do_write):
             table_locale[i].append(gen_text(names[i]))
     gen_break(0)
     gen_line("};",1)
-    gen_break(1)
-    #
-    # generate songprop data
-    #
     gen_enum("NSFP_SONGPROP_COUNT",len(defs_songprop))
-    gen_line("typedef struct {",1)
-    gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t type, text;",1)
-    gen_line("} NSFSongPropData;",1)
-    gen_line("const NSFSongPropData NSFPD_SONGPROP[NSFP_SONGPROP_COUNT] = {",1)
+    gen_line("const NSFPropData NSFPD_SONGPROP[NSFP_SONGPROP_COUNT] = {",1)
     for pi in range(len(defs_songprop)):
         prop_key = defs_songprop[pi][0]
         gen_line("\t{ %30s,%1d,%4d }," % ('"'+prop_key+'"',defs_songprop[pi][1],len(table_locale[0])),1)

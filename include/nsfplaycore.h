@@ -187,6 +187,7 @@ void nsfplay_emu_run(NSFCore* core, uint32_t cycles);
 uint32_t nsfplay_emu_run_frame(NSFCore* core); // runs until start of next frame, or end of INIT if just started, returns cycles elapsed
 uint32_t nsfplay_emu_run_instruction(NSFCore* core); // runs to end of current instruction, returns cycles elapsed
 const char* nsfplay_emu_trace(const NSFCore* core); // trace prints register state and next instruction
+void nsfplay_emu_gamepad(const NSFCore* core, int32_t pad, uint32_t report); // send a gamepad report for debugging (LSB is read first), reset to 0 on init
 
 uint32_t nsfplay_emu_samples_pending(const NSFCore* core); // number of sound samples due to emu_run that have not been rendered out yet
 void nsfplay_emu_cancel_pending(NSFCore* core);
@@ -216,22 +217,21 @@ typedef struct
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop);
 bool nsfplay_songprop_exists(const NSFCore* core, int32_t song, int32_t prop);
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop); // type will be INVALID if not present
-NSFPropInfo nsfplay_songprop_info(const NSFCore* core, int32_t song, int32_t prop);
+NSFPropInfo nsfplay_songprop_info(const NSFCore* core, int32_t songprop);
 
 int32_t nsfplay_prop_int(const NSFCore* core, int32_t prop);
 int64_t nsfplay_prop_long(const NSFCore* core, int32_t prop);
 const char* nsfplay_prop_str(const NSFCore* core, int32_t prop); // NULL if not found or wrong type
 int32_t nsfplay_prop_lines(const NSFCore* core, int32_t prop); // returns line count (-1 if not found), prepares for first prop_line
 const char* nsfplay_prop_line(const NSFCore* core); // returns next line  (NULL if no more lines)
-const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size); // blob_size written if not NULL
+const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size, int32_t prop); // blob_size written if not NULL
 
 // song -1 will use the current song
-int32_t nsfplay_songprop_type(const NSFCore* core, int32_t song, int32_t prop);
-int32_t nsfplay_songprop_int(const NSFCore* core, int32_t song, int32_t prop);
-int64_t nsfplay_songprop_long(const NSFCore* core, int32_t song, int32_t prop);
-const char* nsfplay_songprop_str(const NSFCore* core, int32_t song, int32_t prop);
-int32_t nsfplay_songprop_lines(const NSFCore* core, int32_t song, int32_t prop); // prepares nsfplay_prop_line
-const void* nsfplay_songprop_blob(const NSFCore* core, int32_t song, uint32_t* blob_size);
+int32_t nsfplay_songprop_int(const NSFCore* core, int32_t prop, int32_t song=-1);
+int64_t nsfplay_songprop_long(const NSFCore* core, int32_t prop, int32_t song=-1);
+const char* nsfplay_songprop_str(const NSFCore* core, int32_t prop, int32_t song=-1);
+int32_t nsfplay_songprop_lines(const NSFCore* core, int32_t prop, int32_t song=-1); // prepares nsfplay_prop_line
+const void* nsfplay_songprop_blob(const NSFCore* core, uint32_t* blob_size, int32_t prop, int32_t song=-1);
 
 // NSFe or NSF2 chunks can be fetched for manual inspection
 // - fourcc does not need a terminating 0, only the first 4 characters will be used
