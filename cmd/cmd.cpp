@@ -3,7 +3,7 @@
 
 #include <nsfplaycore.h>
 #include <cstdio> // std::fprintf
-#include <cstdlib> // std::exit
+#include <cstdlib> // std::exit, std::atexit
 #include <cstring> // std::strlen
 
 // platform specific abstractions (platform.cpp)

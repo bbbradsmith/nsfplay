@@ -3,9 +3,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 
-#define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h> // GetConsoleOutputCP, SetConsoleOutputCP, WireCharToMultiByte, MultiByteToWideChar
+#include <Windows.h> // GetConsoleOutputCP, SetConsoleOutputCP, WireCharToMultiByte, MultiByteToWideChar
 #include <shellapi.h> // GetCommandLineW, CommandLineToArgW
 #include <cstdlib> // std::malloc, std::free
 #include <cstdio> // std::_wfopen
@@ -14,7 +13,7 @@
 #pragma warning(disable:6387) // MSVC thinks store_wconvert could be NULL and warns about _wfopen_s
 #endif
 
-static UINT startup_cp = 0;
+static UINT store_cp = 0;
 static LPWSTR* store_argv;
 static int store_argc;
 static char* store_convert = NULL;
@@ -22,6 +21,23 @@ static int store_convert_size = 0;
 static wchar_t* store_wconvert = NULL;
 static int store_wconvert_size = 0;
 
+UINT set_code_page(UINT cp)
+{
+	UINT old_cp = GetConsoleOutputCP();
+	SetConsoleOutputCP(cp);
+	#ifdef DEBUG
+		UINT new_cp = GetConsoleOutputCP();
+		printf("Console code page: %5d -> %5d\n",old_cp,new_cp);
+	#endif
+	return old_cp;
+}
+
+extern "C" {
+void platform_atexit()
+{
+	set_code_page(store_cp);
+}
+}
 
 void platform_setup(int argc, char** argv)
 {
@@ -31,15 +47,14 @@ void platform_setup(int argc, char** argv)
 	store_argv = CommandLineToArgvW(GetCommandLineW(), &store_argc);
 
 	// Windows needs its console set to a UTF8 code page
-	startup_cp = GetConsoleOutputCP();
-	SetConsoleOutputCP(CP_UTF8);
+	store_cp = set_code_page(CP_UTF8);
+	std::atexit(platform_atexit);
 }
 
 void platform_shutdown()
 {
 	std::free(store_wconvert);
 	std::free(store_convert);
-	SetConsoleOutputCP(startup_cp);
 	LocalFree(store_argv);
 }
 
@@ -64,6 +79,10 @@ const char* platform_argv(int index)
 
 FILE* platform_fopen(const char* path, const char* mode)
 {
+	// Windows filesystem is wchar native, convert UTF8 paths and use native wide fopen
+	#ifdef DEBUG
+		printf("fopen(\"%s\",\"%s\")\n",path,mode);
+	#endif
 	static wchar_t wmode[16];
 	MultiByteToWideChar(CP_UTF8,0,mode,-1,wmode,sizeof(wmode)/sizeof(wmode[0]));
 
@@ -112,6 +131,9 @@ const char* platform_argv(int index)
 
 FILE* platform_fopen(const char* path, const char* mode)
 {
+	#ifdef DEBUG
+		printf("fopen(\"%s\",\"%s\")\n",path,mode);
+	#endif
 	return std::fopen(path,mode);
 }
 

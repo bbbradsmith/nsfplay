@@ -24,9 +24,11 @@ typedef uint32_t  uint32;
 typedef uint64_t  uint64;
 
 #ifdef DEBUG
-#define NSFP_DEBUG(...) { nsfp::debug_printf(__VA_ARGS__); }
+	#define NSFP_DEBUG(...) { nsfp::debug_printf(__VA_ARGS__); }
+	#define DEBUG_ALLOC 1
 #else
-#define NSFP_DEBUG(...) {}
+	#define NSFP_DEBUG(...) {}
+	#define DEBUG_ALLOC 0
 #endif
 
 // NSFCore structure, code members defined in core.cpp

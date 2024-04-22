@@ -24,11 +24,6 @@ void nsfplay_destroy(NSFCore* core)
 	NSFCore::destroy(core);
 }
 
-const char* nsfplay_last_error(const NSFCore* core)
-{
-	return core->last_error();
-}
-
 void nsfplay_set_error_log(void (*error_callback_)(const char* msg))
 {
 	nsfp::error_callback = error_callback_;
@@ -42,6 +37,11 @@ void nsfplay_set_debug_print(void (*debug_print_callback_)(const char* msg))
 void nsfplay_set_fatal(void (*fatal_callback_)(const char* msg))
 {
 	nsfp::fatal_callback = fatal_callback_;
+}
+
+const char* nsfplay_last_error(const NSFCore* core)
+{
+	return core->last_error();
 }
 
 void nsfplay_set_default(NSFCore* core)

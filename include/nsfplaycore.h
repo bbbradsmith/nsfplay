@@ -39,15 +39,12 @@ NSFCore* nsfplay_create(const char* ini_data);
 NSFCore* nsfplay_create_init(const NSFSetInit* init);
 void nsfplay_destroy(NSFCore* core);
 
-// returns a localized string describing the last error
-//  - NULL if there has been no logged error since the last call to nsfplay_test_error
-//  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
-const char* nsfplay_last_error(const NSFCore* core);
+
+// logging and error handling
 
 // set a callback to log errors
 // - errors are silently sent to last_error by default,
-//   but multiple errors could happen in one call,
-//   this provides a way to catch all of them.
+//   but this provides a way to catch all of them as they happen.
 // - error msg will not end with newline.
 // - global, can be set before creating a core.
 void nsfplay_set_error_log(void (*error_callback)(const char* msg));
@@ -66,6 +63,12 @@ void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
 // - fatal msg will not end with newline.
 // - global, can be set before creating a core.
 void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
+
+// returns a localized string describing the last error for this core
+//  - NULL if there has been no logged error since the last call to nsfplay_test_error
+//  - only remembers the latest error, use set_error_log if you need to catch them all
+//  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
+const char* nsfplay_last_error(const NSFCore* core);
 
 
 // reset all settings to default values

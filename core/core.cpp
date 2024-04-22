@@ -12,6 +12,12 @@
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // errno
 
+#if DEBUG_ALLOC
+#include <map> // std::map
+std::map<void*,size_t> debug_alloc;
+size_t debug_alloc_total = 0;
+#endif
+
 // key_compare
 // - key_test can be any case, len can truncate it (len<0 will use the whole string)
 // - key_reference is uppercase only
@@ -41,14 +47,27 @@ void* alloc(size_t size)
 {
 	void* a = std::malloc(size);
 	if (a == NULL) nsfp::fatal("Out of memory.");
-	NSFP_DEBUG("alloc(%zu)=%p",size,a);
+	#if DEBUG_ALLOC
+		debug_alloc[a] = size;
+		debug_alloc_total += size;
+		NSFP_DEBUG("alloc(%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+	#else
+		NSFP_DEBUG("alloc(%7zu)",size);
+	#endif
 	return a;
 }
 
 void free(void* ptr)
 {
-	NSFP_DEBUG("free(%p)",ptr);
 	std::free(ptr);
+	#if DEBUG_ALLOC
+		size_t size = debug_alloc[ptr];
+		debug_alloc_total -= size;
+		debug_alloc.erase(ptr);
+		NSFP_DEBUG("free(-%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+	#else
+		NSFP_DEBUG("free()");
+	#endif
 }
 
 void debug(const char* msg)
@@ -83,7 +102,7 @@ void fatal(const char* msg)
 NSFCore* NSFCore::create()
 {
 	NSFCore* core = (NSFCore*)nsfp::alloc(sizeof(NSFCore));
-	NSFP_DEBUG("create()=%p",core);
+	NSFP_DEBUG("create()");
 	std::memset(core,0,sizeof(NSFCore));
 	core->set_default();
 	return core;
@@ -91,7 +110,7 @@ NSFCore* NSFCore::create()
 
 void NSFCore::destroy(NSFCore* core)
 {
-	NSFP_DEBUG("destroy(%p)",core);
+	NSFP_DEBUG("destroy()");
 	core->release();
 	nsfp::free(core);
 }
