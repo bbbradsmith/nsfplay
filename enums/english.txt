@@ -1,14 +1,17 @@
 LOCAL ENGLISH "English"
 LOCALDEFAULT
+LOCALSETLOCALE "Language" "Display language."
 
 LOCALLIST ENABLE OFF "Off"
 LOCALLIST ENABLE ON "On"
 
+LOCALCHANNELSET " On" " Volume" " Pan" " enabled." " volume." " panning."
+
 LOCALSETGROUP MAIN "Main" "Main Settings"
-LOCALSET MAIN VOLUME "Volume" "Total output loudness."
-LOCALSET MAIN SAMPLERATE "Samplerate" "Audio output samplerate."
-LOCALSET MAIN STEREO "Stereo" "Disable to output 1-channel mono sound."
-LOCALSET MAIN TITLE_FORMAT "NSF song title format" "See documentation for details."
+LOCALSET VOLUME "Volume" "Total output loudness."
+LOCALSET SAMPLERATE "Samplerate" "Audio output samplerate."
+LOCALSET STEREO "Stereo" "Disable to output 1-channel mono sound."
+LOCALSET TITLE_FORMAT "NSF song title format" "See documentation for details."
 
 LOCALPROP SONGCOUNT "Song count"
 LOCALSONGPROP TITLE "Song title"

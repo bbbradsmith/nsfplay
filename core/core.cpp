@@ -40,7 +40,7 @@ void* alloc(size_t size)
 {
 	void* a = std::malloc(size);
 	if (a == NULL) nsfp::fatal("Out of memory.");
-	NSFP_DEBUG("alloc(%z)=%p",size,a);
+	NSFP_DEBUG("alloc(%zu)=%p",size,a);
 	return a;
 }
 
@@ -62,8 +62,9 @@ void debug_printf(const char* fmt,...)
 	static char msg[2048];
 	va_list args;
 	va_start(args,fmt);
-	std::vsnprintf(msg,sizeof(msg),msg,args);
+	std::vsnprintf(msg,sizeof(msg),fmt,args);
 	msg[sizeof(msg)-1] = 0;
+	debug(msg);
 #else
 	(void)fmt;
 #endif
@@ -132,8 +133,8 @@ void NSFCore::set_error(sint32 textenum,...)
 	if (direct)
 	{
 		error_last = fmt;
-		NSFP_DEBUG("ERROR: %s\n",error_last);
 		if (nsfp::error_callback) nsfp::error_callback(error_last);
+		else { NSFP_DEBUG("ERROR: %s",error_last); } // send errors to debug if not logged
 		return;
 	}
 	// format
@@ -142,8 +143,8 @@ void NSFCore::set_error(sint32 textenum,...)
 	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
-	NSFP_DEBUG("ERROR: %s\n",error_last);
 	if (nsfp::error_callback) nsfp::error_callback(error_last);
+	else { NSFP_DEBUG("ERROR: %s",error_last); }
 }
 
 void NSFCore::set_error_raw(const char* fmt,...)
@@ -153,8 +154,8 @@ void NSFCore::set_error_raw(const char* fmt,...)
 	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
-	NSFP_DEBUG("ERROR: %s\n",error_last);
 	if (nsfp::error_callback) nsfp::error_callback(error_last);
+	else { NSFP_DEBUG("ERROR: %s",error_last); }
 }
 
 void NSFCore::set_default()
@@ -391,7 +392,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	const NSFSetData& SD = NSFPD_SET[se];
 	if (SD.default_str != NULL)
 	{
-		if (set_str(se,line,len) && error_last != NULL)
+		if (!set_str(se,line,len) && error_last != NULL)
 		{
 			NSFP_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
 		}
@@ -411,7 +412,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 		set_error(NSFP_ERROR_INI_BAD_RANGE,linenum,value,SD.min_int,SD.max_int);
 		return false;
 	}
-	if (set_int(se,value) && error_last != NULL)
+	if (!set_int(se,value) && error_last != NULL)
 	{
 		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
 	}

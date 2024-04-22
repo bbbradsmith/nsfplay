@@ -49,11 +49,13 @@ const char* nsfplay_last_error(const NSFCore* core);
 //   but multiple errors could happen in one call,
 //   this provides a way to catch all of them.
 // - error msg will not end with newline.
+// - global, can be set before creating a core.
 void nsfplay_set_error_log(void (*error_callback)(const char* msg));
 
 // for debug builds, sets a custom debug output function for diagnostics
 // - default will print to stdout.
 // - debug msg will not end with newline.
+// - global, can be set before creating a core.
 void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
 
 // set a callback to handle a fatal error
@@ -62,6 +64,7 @@ void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
 // - If no callback is provided, or if it returns, it will print msg to stderr,
 //   then std::exit(-1) to close the application.
 // - fatal msg will not end with newline.
+// - global, can be set before creating a core.
 void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
 
 
