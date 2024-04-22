@@ -87,7 +87,7 @@ ifeq ($(OS),Windows_NT)
 	#   comctl32.lib, rpcrt4.lib, ws2_32.lib, wininet.lib, winmm.lib
 else ifeq ($(shell uname),Darwin)
 	# MacOS (clang)
-	CXXFLAGS_EXTRA ?= -Wno-c++11-extension $(CXXFLAGS_DEBUG)
+	CXXFLAGS_EXTRA ?= -Wno-c++11-extensions $(CXXFLAGS_DEBUG)
 	LDFLAGS_EXTRA ?=
 	LDFLAGS_CMD ?=
 	LDFLAGS_GUI ?=
