@@ -61,10 +61,10 @@ typedef struct NSFCore_
 
 	static sint32 set_enum(const char* key, int len=-1); // len truncates, len<0 uses strlen
 	static sint32 group_enum(const char* key, int len=-1);
+	NSFSetInfo set_info(sint32 setenum) const;
+	NSFSetGroupInfo group_info(sint32 group) const;
 	const char* ini_line(sint32 setenum) const;
 	bool parse_ini_line(const char* line, int len, int linenum); // used by set_ini
-
-	// TODO after changing settings, they need to be applied at some point, some might be immediate
 
 	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale
 	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale

@@ -313,6 +313,35 @@ sint32 NSFCore::group_enum(const char* key, int len)
 	return -1;
 }
 
+NSFSetInfo NSFCore::set_info(sint32 setenum) const
+{
+	NSFSetInfo info = {0}; info.group = -1;
+	if (setenum < 0 || setenum > NSFP_SET_COUNT) return info;
+	const NSFSetData& SD = NSFPD_SET[setenum];
+	info.group = SD.group;
+	info.key = SD.key;
+	info.name = local_text(SD.text+0);
+	info.desc = local_text(SD.text+1);
+	info.is_string = (SD.default_str != NULL);
+	info.default_int = SD.default_int;
+	info.min_int = SD.min_int;
+	info.max_int = SD.max_int;
+	info.list = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list])) : NULL; 
+	info.default_str = SD.default_str;
+	return info;
+}
+
+NSFSetGroupInfo NSFCore::group_info(sint32 group) const
+{
+	NSFSetGroupInfo info = {0};
+	if (group < 0 || group > NSFP_GROUP_COUNT) return info;
+	const NSFSetGroupData& GD = NSFPD_GROUP[group];
+	info.key = GD.key;
+	info.name = local_text(GD.text+0);
+	info.desc = local_text(GD.text+1);
+	return info;
+}
+
 const char* NSFCore::ini_line(sint32 setenum) const
 {
 	if (setenum < 0 || setenum >= NSFP_SET_COUNT) return "";
@@ -397,6 +426,10 @@ const char* NSFCore::local_text(sint32 textenum) const
 const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 {
 	if (locale < 0 || locale >= NSFP_LOCALE_COUNT || textenum < 0 || textenum >= NSFP_TEXT_COUNT)
-		return "<MISSING TEXT>";
-	return (const char*)(NSFPD_LOCAL_TEXT_DATA + NSFPD_LOCAL_TEXT[locale][textenum+NSFP_TEXT_INDEX]);
+	{
+		// text 0 is a default <MISSING TEXT> value
+		locale = 0;
+		textenum = 0;
+	}
+	return (const char*)(NSFPD_LOCAL_TEXT_DATA + NSFPD_LOCAL_TEXT[locale][textenum]);
 }

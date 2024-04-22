@@ -105,6 +105,7 @@ INPUT_FIRST = "settings.txt"
 INPUT_FOLDER = "."
 OUTPUT_ENUM = "../include/nsfplayenums.h"
 OUTPUT_DATA = "../core/enums_data.h"
+TEXT0 = "<MISSING TEXT>"
 
 VERIFY = False
 STRICT = False
@@ -562,6 +563,8 @@ def generate_enums(file_enum,file_data,do_write):
     # defs_local: key, name, list, group, set, prop, songprop, unit, channel, channelset,text
     #
     table_locale = [[] for i in range(locs)]
+    for i in range(locs): # add default 0 text to all locales
+        table_locale[i].append(gen_text(TEXT0))
     #
     # generate list data
     #
@@ -605,7 +608,7 @@ def generate_enums(file_enum,file_data,do_write):
                 local_list += names[i][j] + "\0"
             table_locale[i].append(gen_text(local_list))
     gen_break(0)
-    gen_line("const int32_t NSFPD_LIST[NSFP_LIST_COUNT] = {",1)
+    gen_line("const int32_t NSFPD_LIST_TEXT[NSFP_LIST_COUNT] = {",1)
     gen_data(table_list,mode=2)
     gen_line("};",1)
     gen_break(1)
@@ -843,10 +846,9 @@ def generate_enums(file_enum,file_data,do_write):
     # generate extra text
     #
     gen_enum("NSFP_TEXT_COUNT",len(defs_local[0][10]))
-    gen_enum("NSFP_TEXT_INDEX",len(table_locale[0]))
     for ti in range(len(defs_local[0][10])):
         text_key = defs_local[0][10][ti][0]
-        gen_enum("NSFP_"+text_key,ti)
+        gen_enum("NSFP_"+text_key,len(table_locale[0]))
         names = [text_key for i in range(locs)]
         for i in range(locs):
             name = None
@@ -887,6 +889,9 @@ def generate_enums(file_enum,file_data,do_write):
     gen_data(gen_text_blob,mode=0)
     gen_line("};",1)
     gen_break(1);
+    for i in range(1,locs):
+        if (len(table_locale[i]) != len(table_locale[0])):
+            error("Internal error? LOCAL(%s) has mismatched count: %d != %d" % (defs_local[i][0],len(table_locale[i]),len(table_locale[0])))
     #
     # save the data
     #

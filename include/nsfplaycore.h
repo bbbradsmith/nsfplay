@@ -114,7 +114,7 @@ typedef struct
 	int32_t group;
 	const char* key; // ini text key
 	const char* name; // localized name, according to current language setting
-	const char* description; // localized description, according to current language setting
+	const char* desc; // localized description, according to current language setting
 	bool is_string;
 	int32_t default_int; // 0 if is_string
 	int32_t min_int;
@@ -127,11 +127,11 @@ typedef struct
 {
 	const char* key; // not used by ini, but does give a non-localized permanent string key for this group
 	const char* name; // localized name
-	const char* description; // localized description
+	const char* desc; // localized description
 } NSFSetGroupInfo;
 
-NSFSetInfo nsfplay_set_info(int32_t setenum);
-NSFSetGroupInfo nsfplay_set_group_info(int32_t group);
+NSFSetInfo nsfplay_set_info(const NSFCore* core, int32_t setenum);
+NSFSetGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group);
 int32_t nsfplay_set_enum(const char* key); // -1 if not found
 int32_t nsfplay_group_enum(const char* key); // -1 if not found
 
@@ -196,8 +196,10 @@ typedef struct
 	int32_t type;
 } NSFPropInfo;
 
+bool nsfplay_prop_exists(const NSFCore* core, int32_t prop);
+bool nsfplay_songprop_exists(const NSFCore* core, int32_t song, int32_t prop);
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop); // type will be INVALID if not present
-NSFPropInfo nsfplay_prop_song_info(const NSFCore* core, int32_t song, int32_t prop);
+NSFPropInfo nsfplay_songprop_info(const NSFCore* core, int32_t song, int32_t prop);
 
 int32_t nsfplay_prop_int(const NSFCore* core, int32_t prop);
 int64_t nsfplay_prop_long(const NSFCore* core, int32_t prop);
@@ -206,12 +208,12 @@ int32_t nsfplay_prop_lines(const NSFCore* core, int32_t prop); // returns line c
 const char* nsfplay_prop_line(const NSFCore* core); // returns next line  (NULL if no more lines)
 const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size); // blob_size written if not NULL
 
-int32_t nsfplay_prop_song_type(const NSFCore* core, int32_t song, int32_t prop);
-int32_t nsfplay_prop_song_int(const NSFCore* core, int32_t song, int32_t prop);
-int64_t nsfplay_prop_song_long(const NSFCore* core, int32_t song, int32_t prop);
-const char* nsfplay_prop_song_str(const NSFCore* core, int32_t song, int32_t prop);
-int32_t nsfplay_prop_song_lines(const NSFCore* core, int32_t song, int32_t prop); // prepares nsfplay_prop_line
-const void* nsfplay_prop_song_blob(const NSFCore* core, int32_t song, uint32_t* blob_size);
+int32_t nsfplay_songprop_type(const NSFCore* core, int32_t song, int32_t prop);
+int32_t nsfplay_songprop_int(const NSFCore* core, int32_t song, int32_t prop);
+int64_t nsfplay_songprop_long(const NSFCore* core, int32_t song, int32_t prop);
+const char* nsfplay_songprop_str(const NSFCore* core, int32_t song, int32_t prop);
+int32_t nsfplay_songprop_lines(const NSFCore* core, int32_t song, int32_t prop); // prepares nsfplay_prop_line
+const void* nsfplay_songprop_blob(const NSFCore* core, int32_t song, uint32_t* blob_size);
 
 // NSFe or NSF2 chunks can be fetched for manual inspection
 // - fourcc does not need a terminating 0, only the first 4 characters will be used
@@ -266,7 +268,7 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 
 // other text strings adapted for the current locale, see: NSFP_TEXT_key
 // - the returned string pointer is static and has permanent lifetime
-const char* nsfplay_local_text(const NSFCore* core, int32_t key);
+const char* nsfplay_local_text(const NSFCore* core, int32_t textenum);
 
 
 } // extern "C"
