@@ -10,6 +10,7 @@
 #include <cstdlib> // std::malloc, std::free, std::exit, std::strtol
 #include <cstring> // std:;memset, std::memcpy, std::strlen
 #include <cstdarg> // va_list, va_start
+#include <cerrno> // errno
 
 // key_compare
 // - key_test can be any case, len can truncate it (len<0 will use the whole string)
