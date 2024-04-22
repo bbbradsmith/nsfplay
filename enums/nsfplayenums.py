@@ -717,6 +717,8 @@ def generate_enums(file_enum,file_data,do_write):
     gen_break(0);
     gen_line("};",1)
     gen_break(1)
+    # sort settings by group
+    sorted_sets = sorted([(defs_set[i][0],i) for i in range(len(defs_set))])
     # map each setting to a text index, gather locale strings
     gen_enum("NSFP_SET_COUNT",len(defs_set))
     gen_line("typedef struct {",1)
@@ -727,7 +729,8 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("} NSFSetData;",1)
     gen_line("const NSFSetData NSFPD_SET[NSFP_SET_COUNT] = {",1)
     setstr_count = 0
-    for si in range(len(defs_set)):
+    for ssi in range(len(sorted_sets)):
+        si = sorted_sets[ssi][1]
         gi = defs_set[si][0]
         group_key = defs_setgroup[gi][0]
         set_key = defs_set[si][1]
@@ -744,7 +747,7 @@ def generate_enums(file_enum,file_data,do_write):
         list_index = -1
         if defs_set[si][5] != None: list_index = defs_set[si][5]
         gen_line("\t{ %30s,%3d,%4d,%7d,%7d,%7d,%3d,%s }," % ('"'+set_key+'"',gi,len(table_locale[0]),default_int,defs_set[si][3],defs_set[si][4],list_index,default_str),1)
-        gen_enum("NSFP_SET_"+set_key,si)
+        gen_enum("NSFP_SET_"+set_key,ssi)
         names = [set_key for i in range(locs)]
         descs = [set_key for i in range(locs)]
         for i in range(locs):
