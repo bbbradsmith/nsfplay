@@ -29,6 +29,11 @@ const char* nsfplay_last_error(const NSFCore* core)
 	return core->last_error();
 }
 
+void nsfplay_set_error_log(void (*error_callback_)(const char* msg))
+{
+	nsfp::error_callback = error_callback_;
+}
+
 void nsfplay_set_debug_print(void (*debug_print_callback_)(const char* msg))
 {
 	nsfp::debug_print_callback = debug_print_callback_;
@@ -39,32 +44,29 @@ void nsfplay_set_fatal(void (*fatal_callback_)(const char* msg))
 	nsfp::fatal_callback = fatal_callback_;
 }
 
-// TODO: everything below this line
-
 void nsfplay_set_default(NSFCore* core)
 {
-	(void)core;
+	core->set_default();
+	core->set_apply();
 }
 
 bool nsfplay_set_ini(NSFCore* core, const char* ini_data)
 {
-	(void)core;
-	(void)ini_data;
-	return false;
+	bool result = core->set_ini(ini_data);
+	core->set_apply();
+	return result;
 }
 
 bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init)
 {
-	(void)core;
-	(void)init;
-	return false;
+	bool result = core->set_init(init);
+	core->set_apply();
+	return result;
 }
 
 const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum)
 {
-	(void)core;
-	(void)setenum;
-	return NULL;
+	return core->ini_line(setenum);
 }
 
 bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value)
@@ -238,10 +240,22 @@ uint16_t nsfplay_emu_reg_get(const NSFCore* core, char reg)
 	return 0;
 }
 
+void nsfplay_emu_init(NSFCore* core, uint8_t song)
+{
+	(void)core;
+	(void)song;
+}
+
 void nsfplay_emu_run(NSFCore* core, uint32_t cycles)
 {
 	(void)core;
 	(void)cycles;
+}
+
+uint32_t nsfplay_emu_run_frame(NSFCore* core)
+{
+	(void)core;
+	return 0;
 }
 
 uint32_t nsfplay_emu_run_instruction(NSFCore* core)

@@ -6,7 +6,7 @@
 #include "core.h"
 #include "enums_data.h"
 
-#include <cstdio> // std::fprintf, std::vsnprintf, stdout, stderr
+#include <cstdio> // std::fprintf, std::snprintf, std::vsnprintf, stdout, stderr
 #include <cstdlib> // std::malloc, std::free, std::exit, std::strtol
 #include <cstring> // std:;memset, std::memcpy, std::strlen
 #include <cstdarg> // va_list, va_start
@@ -32,6 +32,7 @@ inline static bool key_match(const char* key_test, int len, const char* key_refe
 
 namespace nsfp {
 
+void (*error_callback)(const char* msg) = NULL;
 void (*debug_print_callback)(const char* msg) = NULL;
 void (*fatal_callback)(const char* msg) = NULL;
 
@@ -97,6 +98,7 @@ void NSFCore::finalize()
 {
 	// TODO make any allocations needed based on the settings
 	// resample kernel, etc.
+	set_apply();
 }
 
 void NSFCore::release()
@@ -114,7 +116,7 @@ const char* NSFCore::last_error() const
 	return r;
 }
 
-void NSFCore::set_last_error(sint32 textenum,...)
+void NSFCore::set_error(sint32 textenum,...)
 {
 	const char* fmt = local_text(textenum);
 	// skip formatting if not needed
@@ -131,6 +133,7 @@ void NSFCore::set_last_error(sint32 textenum,...)
 	{
 		error_last = fmt;
 		NSFP_DEBUG("ERROR: %s\n",error_last);
+		if (nsfp::error_callback) nsfp::error_callback(error_last);
 		return;
 	}
 	// format
@@ -140,6 +143,18 @@ void NSFCore::set_last_error(sint32 textenum,...)
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
 	NSFP_DEBUG("ERROR: %s\n",error_last);
+	if (nsfp::error_callback) nsfp::error_callback(error_last);
+}
+
+void NSFCore::set_error_raw(const char* fmt,...)
+{
+	va_list args;
+	va_start(args,fmt);
+	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
+	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	error_last = error_last_buffer;
+	NSFP_DEBUG("ERROR: %s\n",error_last);
+	if (nsfp::error_callback) nsfp::error_callback(error_last);
 }
 
 void NSFCore::set_default()
@@ -156,70 +171,6 @@ void NSFCore::set_default()
 			setting_str_free[si] = false;
 		}
 	}
-}
-
-bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
-{
-	// trim leading whitespace
-	while (line[0]==' ' || line[0] == '\t') { ++line; --len; }
-	// truncate for comments
-	for (int i=0; i<len; ++i) { if (line[i]=='#') { len = i; break; } }
-	// trim trailing whitespace
-	while (len > 0 && (line[len-1]==' ' || line[len-1]=='\t')) { --len; }
-	// reject empty line
-	if (len < 1) return true;
-	// find equals
-	int equals = -1;
-	for (int i=0; i<len; ++i) { if (line[i]=='=') { equals=i; break; } }
-	if (equals < 0)
-	{
-		set_last_error(NSFP_ERROR_INI_NO_EQUALS,linenum);
-		return false;
-	}
-	// line starts key, find end of key
-	int keylen = equals;
-	while (keylen > 0 && (line[keylen-1]==' ' || line[keylen-1]=='\t')) { --keylen; }
-	// get enum from key
-	sint32 se = set_enum(line,keylen);
-	if (se < 0)
-	{
-		set_last_error(NSFP_ERROR_INI_BAD_KEY,linenum);
-		return false;
-	}
-	// find start of value
-	int valpos = equals+1;
-	while (valpos < len && (line[valpos]==' ' || line[valpos]=='\t')) { ++valpos; }
-	line += valpos;	len -= valpos;
-	// se is our setting
-	// line, len are now the value
-	const NSFSetData& SD = NSFPD_SET[se];
-	if (SD.default_str != NULL)
-	{
-		if (set_str(se,line,len) && error_last != NULL)
-		{
-			NSFP_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
-		}
-		return true;
-	}
-	const char* value_end = line + len;
-	char* strtol_end = const_cast<char*>(value_end);
-	errno=0;
-	sint32 value = std::strtol(line,&strtol_end,10);
-	if (errno || strtol_end != value_end)
-	{
-		set_last_error(NSFP_ERROR_INI_BAD_INT,linenum);
-		return false;
-	}
-	if (value < SD.min_int || value > SD.max_int)
-	{
-		set_last_error(NSFP_ERROR_INI_BAD_RANGE,linenum,value,SD.min_int,SD.max_int);
-		return false;
-	}
-	if (set_int(se,value) && error_last != NULL)
-	{
-		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
-	}
-	return true;
 }
 
 bool NSFCore::set_ini(const char* ini)
@@ -261,18 +212,18 @@ bool NSFCore::set_int(sint32 setenum, sint32 value)
 {
 	if (setenum < 0 || setenum > NSFP_SET_COUNT)
 	{
-		set_last_error(NSFP_ERROR_SET_INVALID);
+		set_error(NSFP_ERROR_SET_INVALID);
 		return false;
 	}
 	const NSFSetData& SD = NSFPD_SET[setenum];
 	if (SD.default_str != NULL)
 	{
-		set_last_error(NSFP_ERROR_SET_TYPE);
+		set_error(NSFP_ERROR_SET_TYPE);
 		return false;
 	}
 	if (value < SD.min_int || value > SD.max_int)
 	{
-		set_last_error(NSFP_ERROR_SETINT_RANGE,value,SD.min_int,SD.max_int);
+		set_error(NSFP_ERROR_SETINT_RANGE,value,SD.min_int,SD.max_int);
 		return false;
 	}
 	setting[setenum] = value;
@@ -283,13 +234,13 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 {
 	if (setenum < 0 || setenum > NSFP_SET_COUNT)
 	{
-		set_last_error(NSFP_ERROR_SET_INVALID);
+		set_error(NSFP_ERROR_SET_INVALID);
 		return false;
 	}
 	const NSFSetData& SD = NSFPD_SET[setenum];
 	if (SD.default_str == NULL)
 	{
-		set_last_error(NSFP_ERROR_SET_TYPE);
+		set_error(NSFP_ERROR_SET_TYPE);
 		return false;
 	}
 	sint32 si = setting[setenum];
@@ -319,6 +270,11 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 	setting_str[si] = new_str;
 	setting_str_free[si] = true;
 	return true;
+}
+
+void NSFCore::set_apply()
+{
+	// TODO apply settings that have changed
 }
 
 sint32 NSFCore::get_int(sint32 setenum) const
@@ -357,9 +313,85 @@ sint32 NSFCore::group_enum(const char* key, int len)
 	return -1;
 }
 
+const char* NSFCore::ini_line(sint32 setenum) const
+{
+	if (setenum < 0 || setenum >= NSFP_SET_COUNT) return "";
+	const NSFSetData& SD = NSFPD_SET[setenum];
+	if (SD.default_str == NULL)
+		std::snprintf(temp_text,sizeof(temp_text),"%s=%d",SD.key,setting[setenum]);
+	else
+		std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,get_str(setenum));
+	temp_text[sizeof(temp_text)-1] = 0;
+	return temp_text;
+}
+
+bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
+{
+	// trim leading whitespace
+	while (line[0]==' ' || line[0] == '\t') { ++line; --len; }
+	// truncate for comments
+	for (int i=0; i<len; ++i) { if (line[i]=='#') { len = i; break; } }
+	// trim trailing whitespace
+	while (len > 0 && (line[len-1]==' ' || line[len-1]=='\t')) { --len; }
+	// reject empty line
+	if (len < 1) return true;
+	// find equals
+	int equals = -1;
+	for (int i=0; i<len; ++i) { if (line[i]=='=') { equals=i; break; } }
+	if (equals < 0)
+	{
+		set_error(NSFP_ERROR_INI_NO_EQUALS,linenum);
+		return false;
+	}
+	// line starts key, find end of key
+	int keylen = equals;
+	while (keylen > 0 && (line[keylen-1]==' ' || line[keylen-1]=='\t')) { --keylen; }
+	// get enum from key
+	sint32 se = set_enum(line,keylen);
+	if (se < 0)
+	{
+		set_error(NSFP_ERROR_INI_BAD_KEY,linenum);
+		return false;
+	}
+	// find start of value
+	int valpos = equals+1;
+	while (valpos < len && (line[valpos]==' ' || line[valpos]=='\t')) { ++valpos; }
+	line += valpos;	len -= valpos;
+	// se is our setting
+	// line, len are now the value
+	const NSFSetData& SD = NSFPD_SET[se];
+	if (SD.default_str != NULL)
+	{
+		if (set_str(se,line,len) && error_last != NULL)
+		{
+			NSFP_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
+		}
+		return true;
+	}
+	const char* value_end = line + len;
+	char* strtol_end = const_cast<char*>(value_end);
+	errno=0;
+	sint32 value = std::strtol(line,&strtol_end,10);
+	if (errno || strtol_end != value_end)
+	{
+		set_error(NSFP_ERROR_INI_BAD_INT,linenum);
+		return false;
+	}
+	if (value < SD.min_int || value > SD.max_int)
+	{
+		set_error(NSFP_ERROR_INI_BAD_RANGE,linenum,value,SD.min_int,SD.max_int);
+		return false;
+	}
+	if (set_int(se,value) && error_last != NULL)
+	{
+		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
+	}
+	return true;
+}
+
 const char* NSFCore::local_text(sint32 textenum) const
 {
-	return NSFCore::local_text(textenum,setting[NSFP_SET_MAIN_LOCALE]);
+	return NSFCore::local_text(textenum,setting[NSFP_SET_LOCALE]);
 }
 
 const char* NSFCore::local_text(sint32 textenum, sint32 locale)

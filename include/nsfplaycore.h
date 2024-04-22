@@ -44,6 +44,13 @@ void nsfplay_destroy(NSFCore* core);
 //  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
 const char* nsfplay_last_error(const NSFCore* core);
 
+// set a callback to log errors
+// - errors are silently sent to last_error by default,
+//   but multiple errors could happen in one call,
+//   this provides a way to catch all of them.
+// - error msg will not end with newline.
+void nsfplay_set_error_log(void (*error_callback)(const char* msg));
+
 // for debug builds, sets a custom debug output function for diagnostics
 // - default will print to stdout.
 // - debug msg will not end with newline.
@@ -159,7 +166,9 @@ uint8_t nsfplay_emu_read(NSFCore* core, uint16_t address); // read memory, some 
 void nsfplay_emu_poke(NSFCore* core, uint16_t address, uint8_t value); // write to memory
 void nsfplay_emu_reg_set(NSFCore* core, char reg, uint16_t value); // reg is one of A, X, Y, S, P (flags), * (PC)
 uint16_t nsfplay_emu_reg_get(const NSFCore* core, char reg);
+void nsfplay_emu_init(NSFCore* core, uint8_t song); // set song and reset for play, set PC to beginning of INIT
 void nsfplay_emu_run(NSFCore* core, uint32_t cycles);
+uint32_t nsfplay_emu_run_frame(NSFCore* core); // runs until start of next frame, or end of INIT if just started, returns cycles elapsed
 uint32_t nsfplay_emu_run_instruction(NSFCore* core); // runs to end of current instruction, returns cycles elapsed
 const char* nsfplay_emu_trace(const NSFCore* core); // trace prints register state and next instruction
 

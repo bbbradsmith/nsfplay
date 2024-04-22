@@ -744,7 +744,7 @@ def generate_enums(file_enum,file_data,do_write):
         list_index = -1
         if defs_set[si][5] != None: list_index = defs_set[si][5]
         gen_line("\t{ %30s,%3d,%4d,%7d,%7d,%7d,%3d,%s }," % ('"'+set_key+'"',gi,len(table_locale[0]),default_int,defs_set[si][3],defs_set[si][4],list_index,default_str),1)
-        gen_enum("NSFP_SET_"+group_key+"_"+set_key,si)
+        gen_enum("NSFP_SET_"+set_key,si)
         names = [set_key for i in range(locs)]
         descs = [set_key for i in range(locs)]
         for i in range(locs):
