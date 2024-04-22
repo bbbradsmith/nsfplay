@@ -205,7 +205,10 @@ bool NSFCore::set_ini(const char* ini)
 {
 	if (ini == NULL) return true;
 	// skip UTF-8 BOM if it exists
-	if (ini[0] == 0xEF && ini[1] == 0xBB && ini[2] == 0xBF) ini += 3;
+	if ((unsigned char)(ini[0]) == 0xEF &&
+	    (unsigned char)(ini[1]) == 0xBB &&
+	    (unsigned char)(ini[2]) == 0xBF)
+		ini += 3;
 	// parse line by line
 	int linenum = 1;
 	bool result = true;
