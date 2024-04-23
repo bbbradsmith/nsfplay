@@ -1,51 +1,229 @@
+# NSFPlay English localized text set
+#
+# This is the default language (LOCALDEFAULT),
+# and should be used as a template for writing other language sets.
+# If a text entry should be the same as the English version,
+# instead of copying it use * to indicate that the English text will be copied.
+# See nsfplayenums.py for documentation.
+#
+
+#
+# Locale info
+#
+
 LOCAL ENGLISH "English"
-LOCALDEFAULT
+LOCALDEFAULT # (Don't add LOCALDEFAULT to other languages, there can be only one.)
 LOCALSETLOCALE "Language" "Display language."
 
-LOCALLIST ENABLE OFF "Off"
-LOCALLIST ENABLE ON "On"
+LOCALLIST ENABLE OFF             "Off"
+LOCALLIST ENABLE ON              "On"
 
-LOCALCHANNELSET " On" " Volume" " Pan" " enabled." " volume." " panning."
+LOCALLIST ENABLE_AUTO OFF        "Off"
+LOCALLIST ENABLE_AUTO ON         "On"
+LOCALLIST ENABLE_AUTO AUTO       "Auto"
 
-LOCALSETGROUP MAIN "Main" "Main Settings"
-LOCALSET VOLUME "Volume" "Total output loudness."
-LOCALSET SAMPLERATE "Samplerate" "Audio output samplerate."
-LOCALSET STEREO "Stereo" "Disable to output 1-channel mono sound."
-LOCALSET TITLE_FORMAT "NSF song title format" "See documentation for details."
-LOCALSET HEX "Hex" "value test"
+LOCALLIST SAMPLERATES SR_8000    "8000 Hz"
+LOCALLIST SAMPLERATES SR_11025   "11025 Hz"
+LOCALLIST SAMPLERATES SR_22050   "22050 Hz"
+LOCALLIST SAMPLERATES SR_44100   "44100 Hz"
+LOCALLIST SAMPLERATES SR_48000   "48000 Hz"
+LOCALLIST SAMPLERATES SR_96000   "96000 Hz"
+LOCALLIST SAMPLERATES SR_192000  "192,000 Hz"
+LOCALLIST SAMPLERATES SR_CPU     "Emulation CPU Rate"
 
-LOCALPROP SONG_COUNT "Song count"
-LOCALPROP TITLE "Title"
-LOCALPROP INFO "Info"
-LOCALPROP BLOB "Blob"
-LOCALPROP LIST "List"
-LOCALPROP LONG "Long"
-LOCALSONGPROP TITLE "Song title"
-LOCALSONGPROP SONGTEST "Song test"
-LOCALSONGPROP INT "Int"
-LOCALSONGPROP LONG "Long"
-LOCALSONGPROP INFO "Info"
-LOCALSONGPROP BLOB "Blob"
-LOCALSONGPROP LIST "List"
+LOCALLIST BITS BIT_8             "8-bit unsigned"
+LOCALLIST BITS BIT_16            "16-bit signed"
+LOCALLIST BITS BIT_32            "32-bit signed"
 
-LOCALUNIT APU0 "APU0" "Built-in square channels."
-LOCALCHANNEL APU0 SQU0 "Square 0"
-LOCALCHANNEL APU0 SQU1 "Square 1"
-LOCALSET APU0_NONLINEAR "Nonlinear Mix" "The volume of each square affects the other, causing a distortion effect."
+LOCALLIST WAVEOUT_BITS BIT_8     "8-bit unsigned"
+LOCALLIST WAVEOUT_BITS BIT_16    "16-bit signed"
+LOCALLIST WAVEOUT_BITS BIT_32    "32-bit signed"
+LOCALLIST WAVEOUT_BITS AUTO      "Auto"
 
-LOCALUNIT APU1 "APU1" "Built-in triangle, noise, and DPCM."
-LOCALCHANNEL APU1 TRI  "Triangle"
-LOCALCHANNEL APU1 NSE  "Noise"
-LOCALCHANNEL APU1 DPCM "DPCM"
+LOCALLIST DOWNSAMPLE NONE        "None"
+LOCALLIST DOWNSAMPLE AVERAGE     "Average Filter"
+LOCALLIST DOWNSAMPLE SINC        "Sinc Filter"
 
-LOCALTEXT TEXT "Test Text"
+LOCALLIST REGION AUTO            "Auto"
+LOCALLIST REGION NTSC            "Force NTSC"
+LOCALLIST REGION PAL             "Force PAL"
+LOCALLIST REGION DENDY           "Force DENDY"
+LOCALLIST REGION PREFER_NTSC     "Auto: Prefer NTSC"
+LOCALLIST REGION PREFER_PAL      "Auto: Prefer PAL"
+LOCALLIST REGION PREFER_DENDY    "Auto: Prefer Dendy"
 
-# errors for set checking
-LOCALERROR SET_INVALID "Invalid setting"
-LOCALERROR SET_TYPE "Wrong setting type"
-LOCALERROR SETINT_RANGE "Setting out of range: %d (%d-%d)"
-LOCALERROR INI_NO_EQUALS "Missing '='"
-LOCALERROR INI_BAD_KEY "Unknown setting"
-LOCALERROR INI_BAD_INT "Bad integer value"
-LOCALERROR INI_BAD_RANGE "Setting out of range: %d (%d-%d)"
-LOCALERROR INI_BAD_LIST_KEY "Value not an integer or list key for %s"
+LOCALLIST OPLL VRC7              "VRC7 Perfect (Nuke.YKT 2019-3-15)"
+LOCALLIST OPLL YM2413            "YM2413 (Mitsutaka Okazaki 2020-2-18)"
+LOCALLIST OPLL YMF281B           "YMF281B (plgDavid/Chabin 2021-2-28)"
+LOCALLIST OPLL VRC7_RW           "VRC7 NSFPlay 2.2-2.4 (rainwarrior 2012-8-01)"
+LOCALLIST OPLL VRC7_FT36         "VRC7 Famitracker 3.6, NSFPlay 2.0-2.1 (Quietust 2004-1-18)"
+LOCALLIST OPLL VRC7_FT35         "VRC7 Famitracker 3.5 (Mitsutaka Okazaki 2001-6-24)"
+LOCALLIST OPLL VRC7_MO           "VRC7 NSFPlay 1 (Mitsutaka Okazaki)"
+LOCALLIST OPLL VRC7_KT2          "VRC7 kevtris 2 (1999-11-15)"
+LOCALLIST OPLL VRC7_KT1          "VRC7 kevtris 1 (1999-11-14)"
+LOCALLIST OPLL YMF281B_CH        "YMF218B (Chabin 2004-4-10)"
+
+#
+# Settings
+#
+
+LOCALCHANNELSET " On" " Volume" " Pan" " Colour" " enabled." " volume." " panning." " visualization colour."
+
+LOCALSETGROUP MAIN            "Main" "Main settings: volume and ouput, song title format"
+LOCALSET VOLUME               "Volume" "Total output loudness."
+LOCALSET SAMPLERATE           "Samplerate" "Audio output samplerate."
+LOCALSET STEREO               "Stereo" "Disable to output 1-channel mono sound."
+LOCALSET BITS                 "Bit Depth" "Audio output bit depth."
+LOCALSET TITLE_FORMAT         "NSF song title format" "Format: %F filename, %P path, %T NSF title, %A NSF artist, %C NSF copyright, %L NSFe song title, %N/%n song number (%n is 3-digit with leading zeroes), %S/%s NSF starting song, %E/%e NSF song count."
+
+LOCALSETGROUP PLAY            "Playback" "Playback settings: timing and sequence"
+LOCALSET CHANNEL_RESET        "Channel Reset" "Turn all channels on whenever playing a new song."
+LOCALSET PLAY_START           "Auto Start" "Automatically play when a new track is selected."
+LOCALSET PLAY_NEXT            "Auto Next" "Automatically play the next track."
+LOCALSET ALBUM_LOOP           "Album Loop" "Restart from the first track after the last one finishes."
+LOCALSET PLAYLIST             "Playlist" "Use NSFe playlist for track order, if available."
+LOCALSET PLAY_TIME            "Play Time" "Maximum length of a track, 0 for infinite."
+LOCALSET FADE_TIME            "Fade Time" "Time to fade out before end of track, 0 for none."
+LOCALSET SILENT_TIMEOUT       "Silence Timeout" "If the track is silent for this long, it will end."
+LOCALSET DETECT_LOOP          "Loop Detection" "Enable automatic look detection"
+LOCALSET LOOP_NUM             "Loop Count" "When loops are detected, or given in NSFe data, the looped section will be played this many times, 0 for infinite."
+
+LOCALSETGROUP AUDIO           "Audio" "Audio output settings: filtering and downsampling"
+LOCALSET LPF                  "Lowpass Filter" "RC lowpass filter reduces high frequencies. 0 for none."
+LOCALSET HPF                  "Highpass Filter" "RC highpass filter removed DC bias and reduces low frequencies. 0 for none."
+LOCALSET DOWNSAMPLE           "Downsampling" "Reduces high frequency emulation to the audio samplerate."
+
+LOCALSETGROUP EMU             "Emulation" "Emulation settings: region, CPU rate, speed, IRQ"
+LOCALSET REGION               "Region" "Type of NES/Famicom emulated, can be auto-selected if the NSF contains region data."
+LOCALSET CPU_NTSC             "NTSC CPU Rate"  "Emulated NTSC CPU clock frequency."
+LOCALSET CPU_PAL              "PAL CPU Rate"   "Emulated PAL CPU clock frequency."
+LOCALSET CPU_DENDY            "Dendy CPU Rate" "Emulated Dendy CPU clock frequency."
+LOCALSET FRAME_IGNORE         "Force Framerate" "Ignore NSF playback rate settings, and force the display rate instead according to region."
+LOCALSET FRAME_SPEED          "Speed" "Adjust the playback rate to change the song speed."
+LOCALSET IRQ_ENABLE           "Force IRQ Enable" "Enable IRQ emulation for all NSFs. NSF2 files can automatically request IRQ usage."
+
+# TODO LOCALCHANNEL short names?
+
+LOCALUNIT APU1                "APU1" "Built-in: 2 square channels"
+LOCALCHANNEL APU1 SQU0        "Square 0"
+LOCALCHANNEL APU1 SQU1        "Square 1"
+LOCALSET APU1_NONLINEAR       "Nonlinear Mix" "The volume of each square affects the other, causing a distortion effect."
+LOCALSET APU1_UNMUTE          "Start Unmuted" "Some NSFs neglect to turn on the channels before using them."
+LOCALSET APU1_PHASE_RESET     "Phase Reset" "Writing $4003/$4007 resets the phase of the square channels. This often causes an unpleasant clicking during vibrato. (See: Mega Man 2 ending.)"
+LOCALSET APU1_SWEEP_UNMUTE    "Sweep Unmuted" "Some NSFs neglect to initialize the sweep registers, causing low frequency tones to be muted."
+LOCALSET APU1_SWAP_DUTY       "Swap Duty" "Some european NES clones switch two of the square channel duty settings."
+
+LOCALUNIT APU2                "APU2" "Built-in: triangle, noise, DPCM"
+LOCALCHANNEL APU2 TRI         "Triangle"
+LOCALCHANNEL APU2 NSE         "Noise"
+LOCALCHANNEL APU2 DPCM        "DPCM"
+LOCALSET APU2_NONLINEAR       "Nonlinear Mix" "The volume of triangle, noise, and DPCM each affects the other, causing a distortion effect."
+LOCALSET APU2_UNMUTE          "Start Unmuted" "Some NSFs neglect to turn on the channels before using them."
+LOCALSET TRI_MUTE0            "Triangle Mute 0" "The triangle at period 0 produces an inaudible high frequency tone, but due to emulation limitations this may alias unpleasantly at a frequency you can hear. Muting it hides this issue."
+LOCALSET TRI_RANDOM           "Triangle Randomize" "Start the triangle with a random phase."
+LOCALSET NSE_PERIODIC         "Periodic Noise" "Early Famicom units could not produce periodic noise. Turning this option off can simulat this."
+LOCALSET NSE_RANDOM           "Noise Randomize" "Start the noise with a random phase."
+LOCALSET DPCM_4011            "DPCM $4011" "The DPCM value can be set directly by writing to $4011 for PCM sounds or other effects. Some NSFs write to it with every sample played, causing a pop each time. Disabling this eliminates that pop."
+LOCALSET DPCM_REVERSE         "DPCM Bit Reverse" "Some DPCM samples were accidentally created with their bits reversed, giving them a noisy quality. This simulates what they would sound like if correctly encoded. (See: Double Dribble, or Gimmick!)"
+
+LOCALUNIT FDS                 "FDS" "Famicom Disk System: 1 waveform channel"
+LOCALCHANNEL FDS FDS          "FDS"
+LOCALSET FDS_LOWPASS          "Lowpass" "The FDS' internal lowpass filter rolls off high frequencies, giving it a duller, smoother sound. 0 for none."
+LOCALSET FDS_MOD_RESET        "Modulator Reset $4085" "The FDS does not have a modulator phase reset, but many emulators mistakenly act as if a $4085 write does. This is actually done because some Konami games have tricky timing that when emulated incorrectly causes the modulator to drift."
+LOCALSET FDS_WRITE_PROTECT    "Write Protect" "Write protect the RAM at $8000-DFFF. This cannot be done on a real FDS, but some NSFs expect this. Multi-expansion NSFs will automatically apply this."
+
+LOCALUNIT MMC5                "MMC5" "MMC5: 2 square channels, PCM"
+LOCALCHANNEL MMC5 MMC5_0      "MMC5 Square 0"
+LOCALCHANNEL MMC5 MMC5_1      "MMC5 Square 1"
+LOCALCHANNEL MMC5 MMC5_PCM    "MMC5 PCM"
+LOCALSET MMC5_NONLINEAR       "Nonlinear Mix" "The volume of each square affects the other, causing a distortion effect."
+LOCALSET MMC5_PHASE_RESET     "Phase Reset" "Writing $4003/$4007 resets the phase of the square channels. This can be disabled if desired."
+
+LOCALUNIT VRC6                "VRC6" "Konami VRC6: 2 pulse channels, 1 saw wave"
+LOCALCHANNEL VRC6 VRC6_0      "VRC6 Pulse 0"
+LOCALCHANNEL VRC6 VRC6_1      "VRC6 Pulse 1"
+LOCALCHANNEL VRC6 VRC6_SAW    "VRC6 Saw"
+
+LOCALUNIT VRC7                "VRC7" "Konami VRC7: 6-channel 2-op FM unit (a reduced version of OPLL/YM2413)"
+LOCALCHANNEL VRC7 VRC7_0      "VRC7 FM 0"
+LOCALCHANNEL VRC7 VRC7_1      "VRC7 FM 1"
+LOCALCHANNEL VRC7 VRC7_2      "VRC7 FM 2"
+LOCALCHANNEL VRC7 VRC7_3      "VRC7 FM 3"
+LOCALCHANNEL VRC7 VRC7_4      "VRC7 FM 4"
+LOCALCHANNEL VRC7 VRC7_5      "VRC7 FM 5"
+LOCALSET VRC7_OPLL            "OPLL Mode" "Replace the VRC7 with the OPLL/YM2413 it was based on."
+LOCALSET VRC7_PATCH           "VRC7 Patch Set" "The built-in patch set used by the VRC7. This is now perfectly known, but earlier patch sets were deduced by ear. Historical sets are provided to match earlier emulated sound."
+LOCALSET OPLL_PATCH           "OPLL Patch Set" "A choice of patch set for when the VRC7 is replaced by the OPLL/YM2413."
+
+LOCALUNIT N163                "N163" "Namcot N163: Up to 8 wave channels"
+LOCALCHANNEL N163 N163_0      "N163 Wave 0"
+LOCALCHANNEL N163 N163_1      "N163 Wave 1"
+LOCALCHANNEL N163 N163_2      "N163 Wave 2"
+LOCALCHANNEL N163 N163_3      "N163 Wave 3"
+LOCALCHANNEL N163 N163_4      "N163 Wave 4"
+LOCALCHANNEL N163 N163_5      "N163 Wave 5"
+LOCALCHANNEL N163 N163_6      "N163 Wave 6"
+LOCALCHANNEL N163 N163_7      "N163 Wave 7"
+LOCALSET N163_MULTIPLEX       "Multiplex" "The N163 channels are mixed with a 'time share' multiplexing, with a rate dependent on how many channels are active. For 8-channel N163 tunes this produces very unpleasant high frequency hiss. This multiplex sound is accurate, but it disabled by default because it is unpleasant. On RF connected Famicoms, the hiss was reduced a bit from the stronger lowpass filter applied by the RF process."
+LOCALSET N163_PHASE_PROTECT   "Phase Protect" "Early emulation assumed that the N163 phase registers did nothing. Some early N163 homebrew writes values to it, causing buzzing or disabling the channels. Disable this to accomodate those homebrew songs."
+LOCALSET N163_SHORT_WAVE      "Short Waveform" "Early emulation incorrectly assumed the upper 3 bits of waveform length had no effect, allowing only shorter waveforms. See: Rolling Thunder, its bass tones will sound at the wrong octave with the incorrectly shortened wave."
+
+LOCALUNIT S5B                 "5B" "Sunsoft 5B: 3 square channels with noise and envelope (an embedded YM2149F/AY-3-8910)"
+LOCALCHANNEL S5B S5B_0        "Sunsoft 5B Square 0"
+LOCALCHANNEL S5B S5B_1        "Sunsoft 5B Square 1"
+LOCALCHANNEL S5B S5B_2        "Sunsoft 5B Square 2"
+LOCALCHANNEL S5B S5B_N        "Sunsoft 5B Noise"
+LOCALCHANNEL S5B S5B_E        "Sunsoft 5B Envelope"
+LOCALSET S5B_MIXER            "5B Mixer" "Unlike other expansion audio, the Famicom audio was passed through the 5B chip, causing nonlinearity and distortion on all channels. This simualtes that feature."
+
+LOCALSETGROUP WAVEOUT         "WAV Output" "WAV output settings: can override the regular output settings"
+LOCALSET WAVEOUT_SAMPLERATE   "Samplerate" "Overrides the output samplerate when saving a WAV file. 0 to use the normal output rate, -1 to use the CPU rate."
+LOCALSET WAVEOUT_BITS         "Bit Depth" "Override the output bit depth when saving a WAV file."
+LOCALSET WAVEOUT_STEREO       "Stereo" "Override the output stereo setting when saving a WAV file."
+
+LOCALSETGROUP ADVANCED        "Advanced" "Advanced settings: specific samplerate"
+LOCALSET SAMPLERATE_OVERRIDE  "Samplerate Override" "If a custom output samplerate is needed, it can be given here. 0 to use the normal output rate, -1 to use the CPU rate."
+
+#
+# NSF Properties
+#
+
+LOCALPROP SONG_COUNT          "Song Count"
+
+#
+# Song Properties
+#
+
+#
+# Other localized text needed by the UI
+#
+
+LOCALTEXT MENU_FILE           "File"
+LOCALTEXT MENU_VIEW           "View"
+LOCALTEXT MENU_OPTIONS        "Options"
+LOCALTEXT MENU_ABOUT          "About"
+LOCALTEXT MENU_CHANNELS       "Channels"
+LOCALTEXT MENU_MEMORY         "Memory"
+LOCALTEXT MENU_LOG            "Error Log"
+LOCALTEXT MENU_KEYBOARD       "Keyboard"
+LOCALTEXT MENU_DEBUGGER       "Debugger"
+LOCALTEXT MENU_OPEN           "Open File..."
+LOCALTEXT MENU_INI_LOAD       "Load Settings..."
+LOCALTEXT MENU_INI_SAVE       "Save Settings..."
+
+
+#
+# Error mesasges
+# make sure the % fields are used identically in all localizations.
+#
+
+LOCALERROR SET_INVALID        "Invalid setting"
+LOCALERROR SET_TYPE           "Wrong setting type"
+LOCALERROR SETINT_RANGE       "Setting out of range: %d (%d to %d)"
+LOCALERROR INI_NO_EQUALS      "Missing '='"
+LOCALERROR INI_BAD_KEY        "Unknown setting"
+LOCALERROR INI_BAD_INT        "Bad integer value"
+LOCALERROR INI_BAD_RANGE      "Setting out of range: %d (%d to %d)"
+LOCALERROR INI_BAD_LIST_KEY   "Value not an integer or list key for %s"
+
+# TODO parser should check for % in these and compare locales

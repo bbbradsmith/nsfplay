@@ -132,7 +132,10 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 //   LINES   - multiple string lines (prop only)
 //   BLOB    - data blob (prop only)
 //   LIST    - integer index to enumerated list of strings
-//   HEX8-64 - hexadecimal integer
+//   HEX8-64 - hexadecimal integer (64 is LONG prop only)
+//   MSEC    - milliseconds
+//   MILL    - 1000 represents 100%
+//   HZ      - an audio frequency, may benefit from a logarithmic slider giving more resolution at low frequencies
 //   COLOR   - RGB value, 6-digit hex or color picker
 //   PRECISE - decimal integer, no slider (only manual entry)
 #define NSFP_DISPLAY_INVALID    0
@@ -147,8 +150,11 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 #define NSFP_DISPLAY_HEX32      9
 #define NSFP_DISPLAY_HEX64     10
 #define NSFP_DISPLAY_COLOR     11
-#define NSFP_DISPLAY_KEY       12
-#define NSFP_DISPLAY_PRECISE   13
+#define NSFP_DISPLAY_MSEC      12
+#define NSFP_DISPLAY_MILL      13
+#define NSFP_DISPLAY_HZ        14
+#define NSFP_DISPLAY_KEY       15
+#define NSFP_DISPLAY_PRECISE   16
 typedef struct
 {
 	// all const char* in this structure point to static strings, permanently available

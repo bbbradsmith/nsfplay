@@ -65,10 +65,12 @@
 #
 #   Global channel info.
 #   The UNIT will also generate a settings group "UNIT", with a VOL setting.
-#   The CHANNEL will also generate ON, VOL and PAN settings.
+#   The CHANNEL will also generate ON, VOL, PAN and COL settings. Color should be in hexadecimal form $RRGGBB
+#   The CHANNELUNSET can remove an automatically generated setting (CHANNELUNSET SQU1 PAN deletes its PAN setting)
 #   The CHANNELONLIST should be used once to specify a LIST to use for the CHANNEL ON settings.
 #     UNIT key
-#     CHANNEL unit-key key
+#     CHANNEL unit-key key color
+#     CHANNELUNSET unit-ley key type
 #     CHANNELONLIST list-key
 #
 #   Locales create a set of localized text for a specific language/locale.
@@ -92,7 +94,7 @@
 #     LOCALSONGPROP key "name"
 #     LOCALUNIT unit-key "name" "desc"
 #     LOCALCHANNEL unit-key key "name"
-#     LOCALCHANNELSET "enable-name" "volume-name" "pan-name" "enable-desc" "volume-desc" "pan-desc"
+#     LOCALCHANNELSET "enable-name" "volume-name" "pan-name" "col-name" "enable-desc" "volume-desc" "pan-desc" "col-desc"
 #     LOCALTEXT "key" "text"
 #     LOCALERROR "key" "text"
 #     LOCALSETLOCALE "Language" "Display language."
@@ -102,6 +104,9 @@
 #     LONG - 64-bit integer (PROPLONG only)
 #     HEX8/16/32/64 - hexadecimal integer
 #     COLOR - RGB value (6 digit hex, or colour picker)
+#     MSEC - milliseconds
+#     MILL - 1000=100%
+#     HZ - audio frequency
 #     KEY - keypress code
 #     PRECISE - integer with no slider, only manual typing
 #
@@ -179,6 +184,7 @@ defs_prop = []
 defs_songprop = []
 defs_unit = []
 defs_channel = []
+defs_channelunset = []
 defs_channelonlist = None
 defs_local = []
 defs_localdefault = None
@@ -201,13 +207,19 @@ DT_HEX16   = 8
 DT_HEX32   = 9
 DT_HEX64   = 10
 DT_COLOR   = 11
-DT_KEY     = 12
-DT_PRECISE = 13
+DT_MSEC    = 12
+DT_MILL    = 13
+DT_HZ      = 14
+DT_KEY     = 15
+DT_PRECISE = 16
 
-DT = { "INT":DT_INT, "LONG":DT_STR, # "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
+DT = { "INT":DT_INT, "LONG":DT_STR,
+       # "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
        "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64,
-       "COLOR":DT_COLOR, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
+       "COLOR":DT_COLOR, "MSEC":DT_MSEC, "MILL":DT_MILL, "HZ":DT_HZ, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
 # the commented values are only set automatically, and aren't valid for SETINT/PROPINT
+
+CHANNEL_ADD = ("ON","VOL","PAN","COL")
 
 # parsing definitions
 
@@ -236,7 +248,8 @@ PARSE_DEFS = {
     "SONGPROPBLOB":[PARSE_KEY],
     "SONGPROPLIST":[PARSE_KEY,PARSE_KEY],
     "UNIT":[PARSE_KEY],
-    "CHANNEL":[PARSE_KEY,PARSE_KEY],
+    "CHANNEL":[PARSE_KEY,PARSE_KEY,PARSE_INT],
+    "CHANNELUNSET":[PARSE_KEY,PARSE_KEY,PARSE_KEY],
     "CHANNELONLIST":[PARSE_KEY],
     "LOCAL":[PARSE_KEY,PARSE_STR],
     "LOCALDEFAULT":[],
@@ -247,7 +260,7 @@ PARSE_DEFS = {
     "LOCALSONGPROP":[PARSE_KEY,PARSE_STR],
     "LOCALUNIT":[PARSE_KEY,PARSE_STR,PARSE_STR],
     "LOCALCHANNEL":[PARSE_KEY,PARSE_KEY,PARSE_STR],
-    "LOCALCHANNELSET":[PARSE_STR,PARSE_STR,PARSE_STR,PARSE_STR,PARSE_STR,PARSE_STR],
+    "LOCALCHANNELSET":[PARSE_STR]*len(CHANNEL_ADD)*2,
     "LOCALTEXT":[PARSE_KEY,PARSE_STR],
     "LOCALERROR":[PARSE_KEY,PARSE_STR],
     "LOCALSETLOCALE":[PARSE_STR,PARSE_STR],
@@ -305,8 +318,13 @@ def parse_entry(ls):
                 return (None,None)
             p.append(ls[0])
         elif pd == PARSE_INT:
+            v = ls[0]
             try:
-                value = int(ls[0])
+                radix = 10
+                if(v[0] == '$'):
+                    radix = 16
+                    v = v[1:]
+                value = int(v,radix)
             except ValueError:
                 parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
                 return (None,None)
@@ -387,7 +405,7 @@ def check_channel(unit_key,key):
             for j in range(len(defs_channel)):
                 if defs_channel[j][0] == i and defs_channel[j][1] == key:
                     return (i,j)
-            parser_error("CHANNEL not found in UNIT("+unit_key+"): "+key)
+            parse_error("CHANNEL not found in UNIT("+unit_key+"): "+key)
             return (None,None)
     parse_error("UNIT not found: "+unit_key)
     return (None,None)   
@@ -404,7 +422,7 @@ def add_unique_entry(defs,id_elements,error_name,entry):
 # parse enums file
 
 def parse_enums(path):
-    global defs_list, defs_setgroup, defs_set, defs_prop, defs_songprop, defs_unit, defs_channel, defs_channelonlist, defs_local, defs_localdefault
+    global defs_list, defs_setgroup, defs_set, defs_prop, defs_songprop, defs_unit, defs_channel, defs_channelunset, defs_channelonlist, defs_local, defs_localdefault
     global parse_path, parse_line
     print("Parsing: " + path)
     parse_path = path
@@ -412,7 +430,11 @@ def parse_enums(path):
     localcurrent = None
     for l in open(path,"rt",encoding="utf-8").readlines():
         parse_line += 1
-        ls = shlex.split(l,comments=True)
+        try:
+            ls = shlex.split(l,comments=True)
+        except Exception as e:
+            parse_error("Line tokenization error: "+str(e))
+            continue
         if len(ls) < 1:
             continue
         (command,p) = parse_entry(ls)
@@ -458,7 +480,14 @@ def parse_enums(path):
         elif command == "CHANNEL":
             ui = check_unit(p[0])
             if ui != None:
-                defs_channel.append((ui,p[1]))
+                defs_channel.append((ui,p[1],p[2]))
+        elif command == "CHANNELUNSET":
+            (ui,ci) = check_channel(p[0],p[1])
+            if ui != None:
+                if p[2] not in CHANNEL_ADD:
+                    parse_error("CHANNELUNSET must be in %s: %s" % (str(CHANNEL_ADD),p[2]))
+                else:
+                    defs_channelunset.append((ci,p[2]))
         elif command == "CHANNELONLIST":
             (li,lk,dvcount) = check_list(p[0])
             if li != None:
@@ -493,7 +522,7 @@ def parse_enums(path):
             else:
                 si = check_set(p[0])
                 if si != None:
-                    add_unique_entry(defs_local[localcurrent][4],1,command+" "+p[1],(si,p[1],p[2])) # set, name, desc
+                    add_unique_entry(defs_local[localcurrent][4],1,command+" "+p[0],(si,p[1],p[2])) # set, name, desc
         elif command == "LOCALPROP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -688,6 +717,17 @@ def generate_enums(file_enum,file_data,do_write):
     gen_data(table_list,mode=2)
     gen_line("};",1)
     gen_break(1)
+    # generate list key enums
+    for li in range(len(defs_list)):
+        list_key = defs_list[li][0]
+        keys = list(defs_list[li][1:])
+        if list_key == "COUNT": error("LIST name COUNT is reserved")
+        gen_enum("NSFP_LK_"+list_key+"_COUNT",len(keys))
+        for k in range(len(keys)):
+            key = keys[k]
+            if key == "COUNT": error("LIST key name COUNT is reserved")
+            gen_enum("NSFP_LK_"+list_key+"_"+key,k)
+        gen_break(0)
     #
     # generate units
     #
@@ -757,7 +797,6 @@ def generate_enums(file_enum,file_data,do_write):
     # generate setting data
     #
     # generate settings for channels
-    CHANNEL_ADD = ("ON","VOL","PAN")
     gen_enum("NSFP_CHANNEL_COUNT",len(defs_channel))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
@@ -765,12 +804,14 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("} NSFChannelData;",1)
     gen_line("const NSFChannelData NSFPD_CHANNEL[NSFP_CHANNEL_COUNT] = {",1)
     for i in range(locs):
+        CAL = len(CHANNEL_ADD)
+        CAL2 = CAL * 2
         if defs_local[i][9] == None:
-            warn("LOCAL("+defs_local[i][0]+") missing: LOCALCHANNELSET * * * * * *")
-            defs_local[i][9] = ["*","*","*","*","*","*"]
-        for j in range(6):
+            warn("LOCAL("+defs_local[i][0]+") missing: LOCALCHANNELSET"+(" *" * CAL2))
+            defs_local[i][9] = ["*"] * CAL2
+        for j in range(CAL2):
             if defs_local[i][9][j] == "*":
-                if i==0: defs_local[i][9][j] = CHANNEL_ADD[i%3] # default locale defers to key
+                if i==0: defs_local[i][9][j] = CHANNEL_ADD[i%CAL] # default locale defers to key
                 else:    defs_local[i][9][j] = defs_local[0][9][j] # defer to default locale
     for ci in range(len(defs_channel)):
         ui = defs_channel[ci][0]
@@ -780,9 +821,16 @@ def generate_enums(file_enum,file_data,do_write):
         si = len(defs_set)
         gen_line("\t{ %30s,%2d,%4d }," % ('"'+channel_key+'"',ui,len(table_locale[0])),1)
         gen_enum("NSFP_CHANNEL_"+unit_key+"_"+channel_key,ci)
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[0],1,0,1,0,1,defs_channelonlist,False,DT_LIST))
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[1],500,0,1000,0,1000,None,False,DT_INT))
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[2],500,0,1000,0,1000,None,False,DT_INT))
+        CHANNEL_ADD_DEF = [
+            (1,0,1,0,1,defs_channelonlist,False,DT_LIST),
+            (500,0,8000,0,1000,None,False,DT_MILL),
+            (500,0,1000,0,1000,None,False,DT_MILL),
+            (defs_channel[ci][2],0,0xFFFFFF,0,0xFFFFFF,None,False,DT_COLOR),
+        ]
+        assert(CAL==len(CHANNEL_ADD_DEF))
+        for i in range(CAL):
+            if ((ci,CHANNEL_ADD[i]) not in defs_channelunset):
+                defs_set.append(tuple([gi,channel_key+"_"+CHANNEL_ADD[i]]+list(CHANNEL_ADD_DEF[i])))
         names = [channel_key for i in range(locs)]
         for i in range(locs):
             name = None
@@ -798,8 +846,8 @@ def generate_enums(file_enum,file_data,do_write):
                 for j in range(1,locs):
                     names[j] = names[0]
             table_locale[i].append(gen_text(names[i]))
-            for j in range(3):
-                defs_local[i][4].append((si+j,names[i]+defs_local[i][9][j+0],names[i]+defs_local[i][9][j+3]))
+            for j in range(CAL):
+                defs_local[i][4].append((si+j,names[i]+defs_local[i][9][j+0],names[i]+defs_local[i][9][j+CAL]))
     gen_break(0);
     gen_line("};",1)
     gen_break(1)

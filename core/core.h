@@ -33,13 +33,21 @@ typedef uint64_t  uint64;
 	#define DEBUG_ALLOC 0
 #endif
 
-// TODO define for each audio expansion?
-
-// NSFCore structure, code members defined in core.cpp
+// NSFCore structure, code members defined in core.cpp unless otherwised marked
 
 typedef struct NSFCore_
 {
 	// core state
+
+	// general rule of thumb:
+	//   Try not to store unnecessary state.
+	//   Use a setting directly instead of copying it, where possible.
+	//   Use prop/songprop to look up instead of store values.
+	//   Can make exceptions for performance:
+	//     Volume applies per-cycle/sample, should store that with fixed point adjustments.
+	//     Square phase reset only applies per emulated-write, just use the setting directly.
+	//     Settings are fast, props are slow, but props are generally only needed at song start.
+	//   Consider whether setting changes can apply immediately (and add to set_apply if they do).
 
 	// text and error output buffers
 	mutable const char* error_last;
