@@ -44,6 +44,9 @@ int main(int argc, char** argv)
 	for (int i=0; i<platform_argc(); ++i)
 		printf("arg(%d)=[%s]\n",i,platform_argv(i));
 	
+	const char* TEST_INI = NULL;
+	const NSFSetInit* TEST_INIT = NULL;
+	/*
 	const char* TEST_INI =
 		"# test comment\n"
 		"SAMPLERATE=12345\n"
@@ -68,11 +71,18 @@ int main(int argc, char** argv)
 		{NSFP_SET_TITLE_FORMAT,3,NULL}, // wrong type
 		{-1,0,NULL},
 	};
+	*/
 	NSFCore* core = nsfplay_create(TEST_INI);
 	nsfplay_set_init(core,TEST_INIT);
-	nsfplay_set_key_int(core,"TRI_ON",0);
-	nsfplay_set_key_str(core,"TITLE_FORMAT","keyed");
+	//nsfplay_set_key_int(core,"TRI_ON",0);
+	//nsfplay_set_key_str(core,"TITLE_FORMAT","keyed");
+	nsfplay_set_ini_line(core,"SQU0_ON = off ");
+	nsfplay_set_ini_line(core,"SQU1_ON=$-1");
+	nsfplay_set_ini_line(core,"TRI_ON=$F");
+	nsfplay_set_ini_line(core,"NSE_ON=ON");
+	nsfplay_set_ini_line(core,"DPCM_ON=false");
 
+	/*
 	// test info
 	printf("GROUPS:\n");
 	for (int i=0;i<NSFP_GROUP_COUNT;++i)
@@ -101,6 +111,8 @@ int main(int argc, char** argv)
 			printf("\n");
 		}
 	}
+	*/
+	/*
 	// test props
 	printf("PROPS:\n");
 	for (int i=0;i<NSFP_PROP_COUNT;++i)
@@ -114,10 +126,13 @@ int main(int argc, char** argv)
 		NSFPropInfo info = nsfplay_songprop_info(core,i);
 		printf("%s %s %d\n",info.key,info.name,info.type);
 	}
+	*/
 
+	/*
 	// test ini generation
 	for (int i=0;i<NSFP_SET_COUNT;++i)
 		printf("%s\\n\n",nsfplay_ini_line(core,i));
+	*/
 
 	// test ini write
 	nsfplay_ini_write(core,stdout);

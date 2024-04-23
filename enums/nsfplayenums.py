@@ -656,6 +656,9 @@ def generate_enums(file_enum,file_data,do_write):
     for li in range(len(defs_list)):
         list_key = defs_list[li][0]
         keys = list(defs_list[li][1:])
+        keys_list = ""
+        for i in range(len(keys)): keys_list += keys[i] + "\0"
+        keys_list += "\0" # double 0 to end the list
         gen_enum("NSFP_LIST_"+list_key,len(table_list))
         table_list.append(len(table_locale[0])) # locale table index used by table values
         names = [keys[:] for i in range(locs)] # keys used as fallback if no default locale
@@ -676,12 +679,12 @@ def generate_enums(file_enum,file_data,do_write):
                         names[k][j] = names[0][j]
             # the list combines into a multi-string with 0 terminators in between
             local_list = ""
-            for j in range(len(keys)):
-                local_list += names[i][j] + "\0"
+            for j in range(len(keys)): local_list += names[i][j] + "\0"
             local_list += "\0" # double 0 to end the list
+            table_locale[i].append(gen_text(keys_list))
             table_locale[i].append(gen_text(local_list))
     gen_break(0)
-    gen_line("const int32_t NSFPD_LIST_TEXT[NSFP_LIST_COUNT] = {",1)
+    gen_line("const int32_t NSFPD_LIST_TEXT[NSFP_LIST_COUNT] = { // text+0 keys, +1 local keys",1)
     gen_data(table_list,mode=2)
     gen_line("};",1)
     gen_break(1)
@@ -717,7 +720,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_enum("NSFP_GROUP_COUNT",len(defs_setgroup))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t text;",1)
+    gen_line("\tint32_t text; // text+0 name, +1 desc",1)
     gen_line("} NSFSetGroupData;",1)
     gen_line("const NSFSetGroupData NSFPD_GROUP[NSFP_GROUP_COUNT] = {",1)
     for gi in range(len(defs_setgroup)):
@@ -806,7 +809,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_enum("NSFP_SET_COUNT",len(defs_set))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t group, text;",1)
+    gen_line("\tint32_t group, text; // text+0 name, +1 desc",1)
     gen_line("\tint32_t default_int, min_int, max_int, min_hint, max_hint;",1)
     gen_line("\tint32_t display, list;",1)
     gen_line("\tconst char* default_str;",1)
@@ -870,7 +873,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_enum("NSFP_PROP_COUNT",len(defs_prop))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t text, type, display;",1)
+    gen_line("\tint32_t text, type, display; // text+0 name, +1 desc",1)
     gen_line("\tint32_t max_list, list;",1)
     gen_line("} NSFPropData;",1)
     gen_line("const NSFPropData NSFPD_PROP[NSFP_PROP_COUNT] = {",1)

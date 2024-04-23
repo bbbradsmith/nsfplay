@@ -37,6 +37,16 @@ inline static bool key_match(const char* key_test, int len, const char* key_refe
 	return (*key_reference == 0);
 }
 
+// skip UTF-8 BOM if it exists
+inline const char* utf8_bom_skip(const char* text)
+{
+	if ((unsigned char)(text[0]) == 0xEF &&
+	    (unsigned char)(text[1]) == 0xBB &&
+	    (unsigned char)(text[2]) == 0xBF)
+		return text+3;
+	return text;
+}
+
 namespace nsfp {
 
 void (*error_callback)(const char* msg) = NULL;
@@ -174,6 +184,27 @@ void NSFCore::set_error(sint32 textenum,...)
 	else { NSFP_DEBUG("ERROR: %s",error_last); }
 }
 
+void NSFCore::set_ini_error(int linenum, sint32 textenum,...)
+{
+	const char* fmt = local_text(textenum);
+	// line number prefix if linenum < 0
+	if (linenum < 0) error_last_buffer[0] = 0;
+	else
+	{
+		std::snprintf(error_last_buffer,sizeof(error_last_buffer),"INI line %d: ",linenum);
+		error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	}
+	size_t start = std::strlen(error_last_buffer);
+	// append format
+	va_list args;
+	va_start(args,textenum);
+	std::vsnprintf(error_last_buffer+start,sizeof(error_last_buffer)-start,fmt,args);
+	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	error_last = error_last_buffer;
+	if (nsfp::error_callback) nsfp::error_callback(error_last);
+	else { NSFP_DEBUG("ERROR: %s",error_last); }
+}
+
 void NSFCore::set_error_raw(const char* fmt,...)
 {
 	va_list args;
@@ -204,11 +235,8 @@ void NSFCore::set_default()
 bool NSFCore::set_ini(const char* ini)
 {
 	if (ini == NULL) return true;
-	// skip UTF-8 BOM if it exists
-	if ((unsigned char)(ini[0]) == 0xEF &&
-	    (unsigned char)(ini[1]) == 0xBB &&
-	    (unsigned char)(ini[2]) == 0xBF)
-		ini += 3;
+	// skip UTF-8 BOM if present
+	ini = utf8_bom_skip(ini);
 	// parse line by line
 	int linenum = 1;
 	bool result = true;
@@ -364,7 +392,8 @@ NSFSetInfo NSFCore::set_info(sint32 setenum) const
 	info.max_int = SD.max_int;
 	info.min_hint = SD.min_hint;
 	info.max_hint = SD.max_hint;
-	info.list = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list])) : NULL;
+	info.list      = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list]+1)) : NULL;
+	info.list_keys = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list]+0)) : NULL;
 	info.display = SD.display;
 	return info;
 }
@@ -386,9 +415,35 @@ const char* NSFCore::ini_line(sint32 setenum) const
 	if (setenum < 0 || setenum >= NSFP_SET_COUNT) return "";
 	const NSFSetData& SD = NSFPD_SET[setenum];
 	if (SD.default_str == NULL)
-		std::snprintf(temp_text,sizeof(temp_text),"%s=%d",SD.key,setting[setenum]);
+	{
+		switch (SD.display)
+		{
+			case NSFP_DISPLAY_LIST:
+				{
+					const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
+					for (int i=0; i<setting[setenum]; ++i)
+					{
+						while(*list_key) ++list_key;
+						++list_key;
+					}
+					std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,list_key);
+				} break;
+			case NSFP_DISPLAY_HEX8:
+				std::snprintf(temp_text,sizeof(temp_text),"%s=$%02X",SD.key,setting[setenum]); break;
+			case NSFP_DISPLAY_HEX16:
+				std::snprintf(temp_text,sizeof(temp_text),"%s=$%04X",SD.key,setting[setenum]); break;
+			case NSFP_DISPLAY_HEX32:
+				std::snprintf(temp_text,sizeof(temp_text),"%s=$%08X",SD.key,setting[setenum]); break;
+			case NSFP_DISPLAY_COLOR:
+				std::snprintf(temp_text,sizeof(temp_text),"%s=$%06X",SD.key,setting[setenum]); break;
+			default:
+				std::snprintf(temp_text,sizeof(temp_text),"%s=%d",SD.key,setting[setenum]); break;
+		};
+	}
 	else
+	{
 		std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,get_str(setenum));
+	}
 	temp_text[sizeof(temp_text)-1] = 0;
 	return temp_text;
 }
@@ -426,7 +481,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	for (int i=0; i<len; ++i) { if (line[i]=='=') { equals=i; break; } }
 	if (equals < 0)
 	{
-		set_error(NSFP_ERROR_INI_NO_EQUALS,linenum);
+		set_ini_error(linenum,NSFP_ERROR_INI_NO_EQUALS);
 		return false;
 	}
 	// line starts key, find end of key
@@ -436,7 +491,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	sint32 se = set_enum(line,keylen);
 	if (se < 0)
 	{
-		set_error(NSFP_ERROR_INI_BAD_KEY,linenum);
+		set_ini_error(linenum,NSFP_ERROR_INI_BAD_KEY);
 		return false;
 	}
 	// find start of value
@@ -454,18 +509,44 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 		}
 		return true;
 	}
+	// not a string, consider integer
 	const char* value_end = line + len;
+	int radix = 10;
+	if (*line == '$') // $ prefix selects hexadecimal integer
+	{
+		radix = 16;
+		line += 1;
+	}
+	else if (SD.list >= 0 && (*line < '0' || *line > '9')) // isn't a number, could be a list key
+	{
+		const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
+		for (int i=0; i<=SD.max_int; ++i)
+		{
+			if (key_match(line,len,list_key))
+			{
+				if (!set_int(se,i) && error_last != NULL)
+				{
+					NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
+				}
+				return true;
+			}
+			while (*list_key) ++list_key;
+			++list_key;
+		}
+		set_ini_error(linenum,NSFP_ERROR_INI_BAD_LIST_KEY,SD.key);
+		return false;
+	}
 	char* strtol_end = const_cast<char*>(value_end);
 	errno=0;
-	sint32 value = std::strtol(line,&strtol_end,10);
+	sint32 value = std::strtol(line,&strtol_end,radix);
 	if (errno || strtol_end != value_end)
 	{
-		set_error(NSFP_ERROR_INI_BAD_INT,linenum);
+		set_ini_error(linenum,NSFP_ERROR_INI_BAD_INT);
 		return false;
 	}
 	if (value < SD.min_int || value > SD.max_int)
 	{
-		set_error(NSFP_ERROR_INI_BAD_RANGE,linenum,value,SD.min_int,SD.max_int);
+		set_ini_error(linenum,NSFP_ERROR_INI_BAD_RANGE,value,SD.min_int,SD.max_int);
 		return false;
 	}
 	if (!set_int(se,value) && error_last != NULL)
@@ -518,7 +599,8 @@ NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
 	info.key = PD->key;
 	info.name = local_text(PD->text);
 	info.max_list = PD->max_list;
-	info.list = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list])) : NULL;
+	info.list      = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list]+1)) : NULL;
+	info.list_keys = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list]+0)) : NULL;
 	info.type = PD->type;
 	info.display = PD->display;
 	return info;

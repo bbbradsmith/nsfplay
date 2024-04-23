@@ -2,6 +2,7 @@
 //   Contains the public interface.
 
 #include "core.h"
+#include <cstring> // std::strlen
 
 NSFCore* nsfplay_create(const char* ini_data)
 {
@@ -60,6 +61,13 @@ bool nsfplay_set_ini(NSFCore* core, const char* ini_data)
 bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init)
 {
 	bool result = core->set_init(init);
+	core->set_apply();
+	return result;
+}
+
+bool nsfplay_set_ini_line(NSFCore* core, const char* ini_line)
+{
+	bool result = core->parse_ini_line(ini_line,(int)(std::strlen(ini_line)),-1);
 	core->set_apply();
 	return result;
 }

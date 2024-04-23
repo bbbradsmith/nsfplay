@@ -97,6 +97,7 @@ typedef struct NSFCore_
 
 	const char* last_error() const; // returns last error message, NULL if none since last check
 	void set_error(sint32 textenum,...); // sets last error and generates error callback
+	void set_ini_error(int linenum, sint32 textenum,...); // for ini files (-1 if no ini)
 	void set_error_raw(const char* fmt,...); // set_error with localized errors is preferred, but this can send raw text errors for debug purposes
 
 	void set_default(); // restore default settings
@@ -112,9 +113,10 @@ typedef struct NSFCore_
 	static sint32 group_enum(const char* key, int len=-1);
 	NSFSetInfo set_info(sint32 setenum) const;
 	NSFSetGroupInfo group_info(sint32 group) const;
+
 	const char* ini_line(sint32 setenum) const;
 	void ini_write(FILE* f) const;
-	bool parse_ini_line(const char* line, int len, int linenum); // used by set_ini
+	bool parse_ini_line(const char* line, int len, int linenum); // linenum=-1 to parse a line with no INI file context
 
 	bool load(const uint8* data, uint32 size, bool assume);
 	NSFPropInfo prop_info(sint32 prop, bool song=false) const; // if song, prop is a SONGPROP

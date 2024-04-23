@@ -83,12 +83,18 @@ void nsfplay_set_default(NSFCore* core);
 // - whitespace can be used before/after/around the key = and value
 // - string values will have their left and right whitespace trimmed,
 //   quotes are not treated as special, so a string cannot start or end with a space
+// - integers can be hexadecimal with a $ prefix
+// - list values may either use an integer or one of the list's keys
 bool nsfplay_set_ini(NSFCore* core, const char* ini_data);
 // apply init array
 // - easier way to apply many settings from code
 // - an init array can be used instead of ini to initialize from code, terminated by an entry with setenum -1.
 // - returns false and reports error if any entries could not be set
 bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init);
+// apply a single ini line
+// - useful for command line arguments
+// - ini_line should be null terminated, with no newline
+bool nsfplay_set_ini_line(NSFCore* core, const char* ini_line);
 
 // generate ini file
 
@@ -156,6 +162,7 @@ typedef struct
 	int32_t min_int, max_int; // true accepted range
 	int32_t min_hint, max_hint; // suggested range for slider (but let user type in the true range)
 	const char* list; // if not NULL, contains a series of (1+max_int) localized null terminated strings naming each option (last entry also has a double 0 after it)
+	const char* list_keys; // if not NULL contains the list's ID key strings (usable in INI)
 	int32_t display; // DISPLAY hint
 } NSFSetInfo;
 
@@ -235,6 +242,7 @@ typedef struct
 	const char* key; // permanent string ID
 	const char* name; // localized name
 	const char* list; // if not NULL contains (max_list+1) null terminated strings (last string has a double 0 after it)
+	const char* list_keys; // if not NULL contains the list's ID key strings (usable in INI)
 	int32_t max_list; // number of list entries - 1
 	int32_t type; // PROP_TYPE
 	int32_t display; // DISPLAY hint
