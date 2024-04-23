@@ -93,11 +93,14 @@
 #     LOCALPROP key "name"
 #     LOCALSONGPROP key "name"
 #     LOCALUNIT unit-key "name" "desc"
-#     LOCALCHANNEL unit-key key "name"
+#     LOCALCHANNEL unit-key key "short-name" "name"
 #     LOCALCHANNELSET "enable-name" "volume-name" "pan-name" "col-name" "enable-desc" "volume-desc" "pan-desc" "col-desc"
 #     LOCALTEXT "key" "text"
 #     LOCALERROR "key" "text"
 #     LOCALSETLOCALE "Language" "Display language."
+#
+#  Other commands. CANCEL skips the rest of a file.
+#     CANCEL
 #
 #  Display types:
 #     INT - integer with slider
@@ -259,11 +262,12 @@ PARSE_DEFS = {
     "LOCALPROP":[PARSE_KEY,PARSE_STR],
     "LOCALSONGPROP":[PARSE_KEY,PARSE_STR],
     "LOCALUNIT":[PARSE_KEY,PARSE_STR,PARSE_STR],
-    "LOCALCHANNEL":[PARSE_KEY,PARSE_KEY,PARSE_STR],
+    "LOCALCHANNEL":[PARSE_KEY,PARSE_KEY,PARSE_STR,PARSE_STR],
     "LOCALCHANNELSET":[PARSE_STR]*len(CHANNEL_ADD)*2,
     "LOCALTEXT":[PARSE_KEY,PARSE_STR],
     "LOCALERROR":[PARSE_KEY,PARSE_STR],
     "LOCALSETLOCALE":[PARSE_STR,PARSE_STR],
+    "CANCEL":[],
 }
 PARSE_DEF_NAME = {
     PARSE_KEY:"KEY",
@@ -549,7 +553,7 @@ def parse_enums(path):
             else:
                 (ui,ci) = check_channel(p[0],p[1])
                 if ui != None:
-                    add_unique_entry(defs_local[localcurrent][8],1,command+" "+p[1],(ci,p[2])) # channel, name
+                    add_unique_entry(defs_local[localcurrent][8],1,command+" "+p[1],(ci,p[2],p[3])) # channel, shortname, name
         elif command == "LOCALCHANNELSET":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -572,6 +576,8 @@ def parse_enums(path):
                     parse_error("LOCALSETLOCALE already used")
                 else:
                     defs_local[localcurrent][11] = list(p)
+        elif command == "CANCEL":
+            break
     parse_path = None
 
 def parse_enum_files(files):
@@ -800,7 +806,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_enum("NSFP_CHANNEL_COUNT",len(defs_channel))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t unit, text;",1)
+    gen_line("\tint32_t unit, text; // text+0 short-name, +1 name",1)
     gen_line("} NSFChannelData;",1)
     gen_line("const NSFChannelData NSFPD_CHANNEL[NSFP_CHANNEL_COUNT] = {",1)
     for i in range(locs):
@@ -831,20 +837,29 @@ def generate_enums(file_enum,file_data,do_write):
         for i in range(CAL):
             if ((ci,CHANNEL_ADD[i]) not in defs_channelunset):
                 defs_set.append(tuple([gi,channel_key+"_"+CHANNEL_ADD[i]]+list(CHANNEL_ADD_DEF[i])))
+        shortnames = [channel_key for i in range(locs)]
         names = [channel_key for i in range(locs)]
         for i in range(locs):
+            shortname = None
             name = None
             mapped = False
             for j in range(len(defs_local[i][8])):
                 if (defs_local[i][8][j][0] == ci):
                     mapped = True
-                    name = defs_local[i][8][j][1]
+                    shortname = defs_local[i][8][j][1]
+                    name = defs_local[i][8][j][2]
             if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALCHANNEL "+unit_key+" "+channel_key+" *")
             if name == "*": name = None
             if name != None: names[i] = name
             if i == 0:
                 for j in range(1,locs):
                     names[j] = names[0]
+            if shortname == "*": shortname = None
+            if shortname != None: shortnames[i] = shortname
+            if i == 0:
+                for j in range(1,locs):
+                    shortnames[j] = shortnames[0]
+            table_locale[i].append(gen_text(shortnames[i]))
             table_locale[i].append(gen_text(names[i]))
             for j in range(CAL):
                 defs_local[i][4].append((si+j,names[i]+defs_local[i][9][j+0],names[i]+defs_local[i][9][j+CAL]))
@@ -881,7 +896,7 @@ def generate_enums(file_enum,file_data,do_write):
             if (min_hint < min_int) or (max_hint > max_int):
                 error("SET %s %s hint range outside min/max: %d - %d <> %d - %d" % (group_key,set_key,min_int,max_int,min_hint,max_hint))
         if list_index == None: list_index = -1
-        gen_line("\t{ %30s,%3d,%4d,%7d,%7d,%7d,%7d,%7d,%2d,%3d,%s }," % (
+        gen_line("\t{ %30s,%3d,%4d,%10d,%11d,%10d,%11d,%10d,%2d,%3d,%s }," % (
             '"'+set_key+'"',
             gi,len(table_locale[0]),
             default_int,min_int,max_int,min_hint,max_hint,

@@ -293,6 +293,7 @@ typedef struct // NSFP_CHANNEL_key (< NSFP_CHANNEL_COUNT)
 {
 	int32_t unit; // unit
 	const char* key; // permanent string ID
+	const char* short_name; // localized short name
 	const char* name; // localized name
 } NSFChannelInfo;
 
