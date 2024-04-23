@@ -41,23 +41,27 @@
 #   Settings definitions.
 #   SETGROUP creates a group that subsequent settings will be assigned to.
 #   The SETLIST is like a SETINT but will map its numbers to a LIST.
+#   INT settings and properties have a display-type which hints to the implementer
+#   how to display that setting.
 #     SETGROUP group-key
-#     SETINT group-key key default min max
+#     SETINT group-key key default min max hintmin hintmax display-type
 #     SETLIST group-key key list-key default-key
 #     SETSTR group-key key "default"
 #
 #   NSF Properties.
-#     PROPINT key
-#     PROPLONG key
+#     PROPINT key display-type
+#     PROPLONG key display-type
 #     PROPSTR key
 #     PROPLINES key
 #     PROPBLOB key
+#     PROPLIST key list-key
 #   Song Properties.
-#     SONGPROPINT key
-#     SONGPROPLONG key
+#     SONGPROPINT key display-type
+#     SONGPROPLONG key display-type
 #     SONGPROPSTR key
 #     SONGPROPLINES key
 #     SONGPROPBLOB key
+#     SONGPROPLIST key list-key
 #
 #   Global channel info.
 #   The UNIT will also generate a settings group "UNIT", with a VOL setting.
@@ -92,6 +96,14 @@
 #     LOCALTEXT "key" "text"
 #     LOCALERROR "key" "text"
 #     LOCALSETLOCALE "Language" "Display language."
+#
+#  Display types:
+#     INT - integer with slider
+#     LONG - 64-bit integer (PROPLONG only)
+#     HEX8/16/32/64 - hexadecimal integer
+#     COLOR - RGB value (6 digit hex, or colour picker)
+#     KEY - keypress code
+#     PRECISE - integer with no slider, only manual typing
 #
 
 import sys
@@ -147,6 +159,7 @@ def fatal_error(message):
     global errors
     print_error("Fatal error: " + message);
     errors += 1
+    #assert(False) # for debugging
     terminate()
 
 def verbose(message):
@@ -175,6 +188,26 @@ PROP_LONG  = 2
 PROP_STR   = 3
 PROP_LINES = 4
 PROP_BLOB  = 5
+PROP_LIST  = 6
+
+DT_INT     = 1
+DT_LONG    = 2
+DT_STR     = 3
+DT_LINES   = 4
+DT_BLOB    = 5
+DT_LIST    = 6
+DT_HEX8    = 7
+DT_HEX16   = 8
+DT_HEX32   = 9
+DT_HEX64   = 10
+DT_COLOR   = 11
+DT_KEY     = 12
+DT_PRECISE = 13
+
+DT = { "INT":DT_INT, "LONG":DT_STR, # "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
+       "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64,
+       "COLOR":DT_COLOR, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
+# the commented values are only set automatically, and aren't valid for SETINT/PROPINT
 
 # parsing definitions
 
@@ -182,23 +215,26 @@ PARSE_KEY  = 0
 PARSE_INT  = 1
 PARSE_STR  = 2
 PARSE_KEYS = 3
+PARSE_DT   = 4
 
 PARSE_DEFS = {
     "LIST":[PARSE_KEY,PARSE_KEYS],
     "SETGROUP":[PARSE_KEY],
-    "SETINT":[PARSE_KEY,PARSE_KEY,PARSE_INT,PARSE_INT,PARSE_INT],
+    "SETINT":[PARSE_KEY,PARSE_KEY,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_DT],
     "SETLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY,PARSE_KEY],
     "SETSTR":[PARSE_KEY,PARSE_KEY,PARSE_STR],
-    "PROPINT":[PARSE_KEY],
-    "PROPLONG":[PARSE_KEY],
+    "PROPINT":[PARSE_KEY,PARSE_DT],
+    "PROPLONG":[PARSE_KEY,PARSE_DT],
     "PROPSTR":[PARSE_KEY],
     "PROPLINES":[PARSE_KEY],
     "PROPBLOB":[PARSE_KEY],
-    "SONGPROPINT":[PARSE_KEY],
-    "SONGPROPLONG":[PARSE_KEY],
+    "PROPLIST":[PARSE_KEY,PARSE_KEY],
+    "SONGPROPINT":[PARSE_KEY,PARSE_DT],
+    "SONGPROPLONG":[PARSE_KEY,PARSE_DT],
     "SONGPROPSTR":[PARSE_KEY],
     "SONGPROPLINES":[PARSE_KEY],
     "SONGPROPBLOB":[PARSE_KEY],
+    "SONGPROPLIST":[PARSE_KEY,PARSE_KEY],
     "UNIT":[PARSE_KEY],
     "CHANNEL":[PARSE_KEY,PARSE_KEY],
     "CHANNELONLIST":[PARSE_KEY],
@@ -221,6 +257,7 @@ PARSE_DEF_NAME = {
     PARSE_INT:"INT",
     PARSE_STR:"STRING",
     PARSE_KEYS:"KEY...",
+    PARSE_DT:"DISPLAY",
 }
 
 # parsing errors
@@ -275,6 +312,9 @@ def parse_entry(ls):
                 return (None,None)
             p.append(value)
         elif pd == PARSE_STR:
+            if len(ls[0]) < 1:
+                parse_error(PARSE_DEF_NAME[pd]+" may not be empty string.")
+                return (None,None)
             p.append(ls[0])
         elif pd == PARSE_KEYS:
             while len(ls) > 0:
@@ -283,6 +323,11 @@ def parse_entry(ls):
                     return (None,None)
                 p.append(ls[0])
                 ls = ls[1:]
+        elif pd == PARSE_DT:
+            if ls[0].upper() not in DT:
+                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
+                return (None,None)
+            p.append(DT[ls[0].upper()])
         ls = ls[1:]
     if len(ls) > 0:
         parse_error(command+" has too many entries, expected: "+str(len(parse_def)))
@@ -294,7 +339,7 @@ def check_list(list_key,key=None): # key=None to just check list
     for i in range(len(defs_list)):
         if defs_list[i][0] == list_key:
             if key == None:
-                return (i,None)
+                return (i,None,len(defs_list[i])-1)
             for j in range(1,len(defs_list[i])):
                 if defs_list[i][j] == key:
                     return (i,j-1,len(defs_list[i])-1)
@@ -332,13 +377,13 @@ def check_songprop(key):
 
 def check_unit(key):
     for i in range(len(defs_unit)):
-        if defs_unit[i] == key: return i
+        if defs_unit[i][0] == key: return i
     parse_error("UNIT not found: "+key)
     return None
 
 def check_channel(unit_key,key):
     for i in range(len(defs_unit)):
-        if defs_unit[i] == unit_key:
+        if defs_unit[i][0] == unit_key:
             for j in range(len(defs_channel)):
                 if defs_channel[j][0] == i and defs_channel[j][1] == key:
                     return (i,j)
@@ -375,37 +420,47 @@ def parse_enums(path):
         verbose(command + ": " + str(p))
         if   command == "LIST": defs_list.append(p)
         elif command == "SETGROUP": defs_setgroup.append(p)
-        elif command == "SETINT": # 0-group 1-key 2-default 3-min 4-max
+        elif command == "SETINT": # 0-group 1-key 2-default 3-min 4-max 5-hint-min 6-hint-max 7-display
             gi = check_setgroup(p[0])
             if gi != None:
-                defs_set.append((gi,p[1],p[2],p[3],p[4],None,False)) # set: group, key, default, int min, int max, list, is_string
+                defs_set.append((gi,p[1],p[2],p[3],p[4],p[5],p[6],None,False,p[7])) # set: group, key, default, int min, int max, hint min, hint max, list, is_string, display type
         elif command == "SETLIST": # 0-group 1-key 2-list 3-default
             gi = check_setgroup(p[0])
             if gi != None:
-                (li,dv,dcount) = check_list(p[2],p[3])
+                (li,lk,dcount) = check_list(p[2],p[3])
                 if li != None:
-                    defs_set.append((gi,p[1],dv,0,dcount-1,li,False))
+                    defs_set.append((gi,p[1],lk,0,dcount-1,0,dcount-1,li,False,DT_LIST))
         elif command == "SETSTR": # 0-group 1-key 2-default
             gi = check_setgroup(p[0])
             if gi != None:
-                defs_set.append((gi,p[1],p[2],0,0,None,True))
-        elif command == "PROPINT":   defs_prop.append((p[0],PROP_INT))            
-        elif command == "PROPLONG":  defs_prop.append((p[0],PROP_LONG))
-        elif command == "PROPSTR":   defs_prop.append((p[0],PROP_STR))
-        elif command == "PROPLINES": defs_prop.append((p[0],PROP_LINES))
-        elif command == "PROPBLOB":  defs_prop.append((p[0],PROP_BLOB))
-        elif command == "SONGPROPINT":   defs_songprop.append((p[0],PROP_INT))            
-        elif command == "SONGPROPLONG":  defs_songprop.append((p[0],PROP_LONG))
-        elif command == "SONGPROPSTR":   defs_songprop.append((p[0],PROP_STR))
-        elif command == "SONGPROPLINES": defs_songprop.append((p[0],PROP_LINES))
-        elif command == "SONGPROPBLOB":  defs_songprop.append((p[0],PROP_BLOB))
-        elif command == "UNIT": defs_unit.append(p[0])
+                defs_set.append((gi,p[1],p[2],0,0,0,0,None,True,DT_STR))
+        elif command == "PROPINT":   defs_prop.append((p[0],PROP_INT,p[1],None))
+        elif command == "PROPLONG":  defs_prop.append((p[0],PROP_LONG,p[1],None))
+        elif command == "PROPSTR":   defs_prop.append((p[0],PROP_STR,DT_STR,None))
+        elif command == "PROPLINES": defs_prop.append((p[0],PROP_LINES,DT_LINES,None))
+        elif command == "PROPBLOB":  defs_prop.append((p[0],PROP_BLOB,DT_BLOB,None))
+        elif command == "PROPLIST":
+            (li,lk,dcount) = check_list(p[1])
+            if (li != None):
+                defs_prop.append((p[0],PROP_LIST,DT_LIST,li))
+        elif command == "SONGPROPINT":   defs_songprop.append((p[0],PROP_INT,p[1],None))            
+        elif command == "SONGPROPLONG":  defs_songprop.append((p[0],PROP_LONG,p[1],None))
+        elif command == "SONGPROPSTR":   defs_songprop.append((p[0],PROP_STR,DT_STR,None))
+        elif command == "SONGPROPLINES": defs_songprop.append((p[0],PROP_LINES,DT_LINES,None))
+        elif command == "SONGPROPBLOB":  defs_songprop.append((p[0],PROP_BLOB,DT_BLOB,None))
+        elif command == "SONGPROPLIST":
+            (li,lk,dcount) = check_list(p[1])
+            if (li != None):
+                defs_songprop.append((p[0],PROP_LIST,DT_LIST,li))
+        elif command == "UNIT":
+            defs_unit.append(p)
+            defs_setgroup.append(p)
         elif command == "CHANNEL":
             ui = check_unit(p[0])
             if ui != None:
                 defs_channel.append((ui,p[1]))
         elif command == "CHANNELONLIST":
-            (li,ki) = check_list(p[0])
+            (li,lk,dvcount) = check_list(p[0])
             if li != None:
                 if defs_channelonlist != None:
                     parse_error("CHANNELONLIST already used: "+defs_list[defs_channelonlist][0])
@@ -456,7 +511,10 @@ def parse_enums(path):
             else:
                 ui = check_unit(p[0])
                 if ui != None:
+                    gi = check_setgroup(p[0])
+                    if gi == None: fatal_error("UNIT missing automatically generated GROUP: "+p[0])
                     add_unique_entry(defs_local[localcurrent][7],1,command+" "+p[0],(ui,p[1],p[2])) # unit, name, desc
+                    add_unique_entry(defs_local[localcurrent][3],1,command+" (SETGROUP) "+p[0],(gi,p[1],p[2])) # group, name, desc
         elif command == "LOCALCHANNEL":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -581,7 +639,7 @@ def generate_enums(file_enum,file_data,do_write):
     list_locale_index = len(defs_list)
     defs_list.append(list_locale)
     locale_set_index = len(defs_set)
-    defs_set.append((0,LOCALE_KEY,0,0,locs-1,list_locale_index,False)) # SETLIST: group-0, LOCALE_KEY, default, min, max, list, not-string
+    defs_set.append((0,LOCALE_KEY,0,0,locs-1,0,locs-1,list_locale_index,False,DT_LIST)) # SETLIST: group-0, LOCALE_KEY, default, min, max, hintmin, hintmax, list, not-string, display
     for i in range(len(defs_local)):
         # create the list names in each locale
         for j in range(len(defs_local)):
@@ -620,6 +678,7 @@ def generate_enums(file_enum,file_data,do_write):
             local_list = ""
             for j in range(len(keys)):
                 local_list += names[i][j] + "\0"
+            local_list += "\0" # double 0 to end the list
             table_locale[i].append(gen_text(local_list))
     gen_break(0)
     gen_line("const int32_t NSFPD_LIST_TEXT[NSFP_LIST_COUNT] = {",1)
@@ -627,26 +686,33 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("};",1)
     gen_break(1)
     #
-    # generate group data
+    # generate units
     #
-    # generate groups for units
     gen_enum("NSFP_UNIT_COUNT",len(defs_unit))
+    table_unit = []
     for ui in range(len(defs_unit)):
-        unit_key = defs_unit[ui]
+        unit_key = defs_unit[ui][0]
         gen_enum("NSFP_UNIT_"+unit_key,ui)
-        gi = len(defs_setgroup)
-        defs_setgroup.append([unit_key])
+        gi = check_setgroup(unit_key)
+        if gi == None: fatal_error("UNIT missing automatically generated GROUP: "+unit_key)
+        table_unit.append(gi);
         for i in range(locs):
             mapped = False
             for (lui,name,desc) in defs_local[i][7]:
-                if lui == gi:
-                    defs_local[i][3].append((gi,name,desc))
+                if lui == ui:
                     mapped = True
                     break
             if not mapped:
                 warn("LOCAL("+defs_local[i][0]+") missing: LOCALUNIT "+unit_key+" * *")
                 defs_local[i][3].append((gi,"*","*")) # suppress group warning
     gen_break(0)
+    gen_line("const int32_t NSFPD_UNIT_GROUP[NSFP_UNIT_COUNT] = {",1)
+    gen_data(table_unit,mode=2)
+    gen_line("};",1)
+    gen_break(1)
+    #
+    # generate group data
+    #
     # map each group to a text index, gather locale strings
     gen_enum("NSFP_GROUP_COUNT",len(defs_setgroup))
     gen_line("typedef struct {",1)
@@ -705,15 +771,15 @@ def generate_enums(file_enum,file_data,do_write):
                 else:    defs_local[i][9][j] = defs_local[0][9][j] # defer to default locale
     for ci in range(len(defs_channel)):
         ui = defs_channel[ci][0]
-        unit_key = defs_unit[ui]
+        unit_key = defs_unit[ui][0]
         gi = check_setgroup(unit_key)
         channel_key = defs_channel[ci][1]
         si = len(defs_set)
         gen_line("\t{ %30s,%2d,%4d }," % ('"'+channel_key+'"',ui,len(table_locale[0])),1)
         gen_enum("NSFP_CHANNEL_"+unit_key+"_"+channel_key,ci)
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[0],1,0,1,defs_channelonlist,False))
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[1],500,0,1000,None,False))
-        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[2],500,0,1000,None,False))
+        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[0],1,0,1,0,1,defs_channelonlist,False,DT_LIST))
+        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[1],500,0,1000,0,1000,None,False,DT_INT))
+        defs_set.append((gi,channel_key+"_"+CHANNEL_ADD[2],500,0,1000,0,1000,None,False,DT_INT))
         names = [channel_key for i in range(locs)]
         for i in range(locs):
             name = None
@@ -741,29 +807,35 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t group, text;",1)
-    gen_line("\tint32_t default_int, min_int, max_int, list;",1)
+    gen_line("\tint32_t default_int, min_int, max_int, min_hint, max_hint;",1)
+    gen_line("\tint32_t display, list;",1)
     gen_line("\tconst char* default_str;",1)
     gen_line("} NSFSetData;",1)
     gen_line("const NSFSetData NSFPD_SET[NSFP_SET_COUNT] = {",1)
     setstr_count = 0
     for ssi in range(len(sorted_sets)):
         si = sorted_sets[ssi][1]
-        gi = defs_set[si][0]
+        (gi, set_key, default_val, min_int, max_int, min_hint, max_hint, list_index, is_string, display_hint) = defs_set[si]
         group_key = defs_setgroup[gi][0]
-        set_key = defs_set[si][1]
         default_int = 0
         default_str = "NULL"
-        if defs_set[si][6]:
-            default_str = "\""+defs_set[si][2]+"\""
+        if is_string: # is_string
+            default_str = "\""+default_val+"\""
             default_int = setstr_count # default_int for string settings reused internally as as a lookup index to a string array
             setstr_count += 1
         else:
-            default_int = defs_set[si][2]
-            if (default_int < defs_set[si][3]) or (default_int > defs_set[si][4]):
-                error("SET %s %s default out of range: %d <= %d <= %d" % (group_key,set_key,defs_set[si][3],default_int,defs_set[si][4]))
-        list_index = -1
-        if defs_set[si][5] != None: list_index = defs_set[si][5]
-        gen_line("\t{ %30s,%3d,%4d,%7d,%7d,%7d,%3d,%s }," % ('"'+set_key+'"',gi,len(table_locale[0]),default_int,defs_set[si][3],defs_set[si][4],list_index,default_str),1)
+            default_int = default_val
+            if (default_int < min_int) or (default_int > max_int):
+                error("SET %s %s default out of range: %d <= %d <= %d" % (group_key,set_key,min_int,default_int,max_int))
+            if (min_hint < min_int) or (max_hint > max_int):
+                error("SET %s %s hint range outside min/max: %d - %d <> %d - %d" % (group_key,set_key,min_int,max_int,min_hint,max_hint))
+        if list_index == None: list_index = -1
+        gen_line("\t{ %30s,%3d,%4d,%7d,%7d,%7d,%7d,%7d,%2d,%3d,%s }," % (
+            '"'+set_key+'"',
+            gi,len(table_locale[0]),
+            default_int,min_int,max_int,min_hint,max_hint,
+            display_hint,list_index,
+            default_str),1)
         gen_enum("NSFP_SET_"+set_key,ssi)
         names = [set_key for i in range(locs)]
         descs = [set_key for i in range(locs)]
@@ -798,12 +870,21 @@ def generate_enums(file_enum,file_data,do_write):
     gen_enum("NSFP_PROP_COUNT",len(defs_prop))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
-    gen_line("\tint32_t type, text;",1)
+    gen_line("\tint32_t text, type, display;",1)
+    gen_line("\tint32_t max_list, list;",1)
     gen_line("} NSFPropData;",1)
     gen_line("const NSFPropData NSFPD_PROP[NSFP_PROP_COUNT] = {",1)
     for pi in range(len(defs_prop)):
         prop_key = defs_prop[pi][0]
-        gen_line("\t{ %30s,%1d,%4d }," % ('"'+prop_key+'"',defs_prop[pi][1],len(table_locale[0])),1)
+        list_index = -1
+        list_max = 0
+        if defs_prop[pi][3] != None:
+            list_index = defs_prop[pi][3]
+            list_max = len(defs_list[list_index])-2
+        gen_line("\t{ %30s,%4d,%1d,%2d,%3d,%3d }," % (
+            '"'+prop_key+'"',
+            len(table_locale[0]),defs_prop[pi][1],defs_prop[pi][2],
+            list_max,list_index),1)
         gen_enum("NSFP_PROP_"+prop_key,pi);
         names = [prop_key for i in range(locs)]
         for i in range(locs):
@@ -827,7 +908,15 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("const NSFPropData NSFPD_SONGPROP[NSFP_SONGPROP_COUNT] = {",1)
     for pi in range(len(defs_songprop)):
         prop_key = defs_songprop[pi][0]
-        gen_line("\t{ %30s,%1d,%4d }," % ('"'+prop_key+'"',defs_songprop[pi][1],len(table_locale[0])),1)
+        list_index = -1
+        list_size = 0
+        if defs_songprop[pi][3] != None:
+            list_index = defs_songprop[pi][3]
+            list_max = len(defs_list[list_index])-2
+        gen_line("\t{ %30s,%4d,%1d,%2d,%3d,%3d }," % (
+            '"'+prop_key+'"',
+            len(table_locale[0]),defs_songprop[pi][1],defs_songprop[pi][2],
+            list_max,list_index),1)
         gen_enum("NSFP_SONGPROP_"+prop_key,pi);
         names = [prop_key for i in range(locs)]
         for i in range(locs):

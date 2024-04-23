@@ -119,6 +119,30 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 
 // information about settings, useful for UI display
 
+// display hints:
+//   INT     - decimal integer, slider is appropriate
+//   LONG    - 64-bit decimal (prop only)
+//   STR     - string
+//   LINES   - multiple string lines (prop only)
+//   BLOB    - data blob (prop only)
+//   LIST    - integer index to enumerated list of strings
+//   HEX8-64 - hexadecimal integer
+//   COLOR   - RGB value, 6-digit hex or color picker
+//   PRECISE - decimal integer, no slider (only manual entry)
+#define NSFP_DISPLAY_INVALID    0
+#define NSFP_DISPLAY_INT        1
+#define NSFP_DISPLAY_LONG       2
+#define NSFP_DISPLAY_STR        3
+#define NSFP_DISPLAY_LINES      4
+#define NSFP_DISPLAY_BLOB       5
+#define NSFP_DISPLAY_LIST       6
+#define NSFP_DISPLAY_HEX8       7
+#define NSFP_DISPLAY_HEX16      8
+#define NSFP_DISPLAY_HEX32      9
+#define NSFP_DISPLAY_HEX64     10
+#define NSFP_DISPLAY_COLOR     11
+#define NSFP_DISPLAY_KEY       12
+#define NSFP_DISPLAY_PRECISE   13
 typedef struct
 {
 	// all const char* in this structure point to static strings, permanently available
@@ -127,13 +151,12 @@ typedef struct
 	const char* name; // localized name, according to current language setting
 	const char* desc; // localized description, according to current language setting
 	bool is_string;
-	int32_t default_int; // 0 if is_string
-	int32_t min_int;
-	int32_t max_int;
-	const char* list; // if not NULL, contains a series of (1+max_int) localized null terminated strings naming each option
 	const char* default_str; // NULL only if !is_string
-	// TODO: slider min/max 
-	// TODO: display hint: int, hex16, hex32, color, hotkey
+	int32_t default_int; // 0 if is_string
+	int32_t min_int, max_int; // true accepted range
+	int32_t min_hint, max_hint; // suggested range for slider (but let user type in the true range)
+	const char* list; // if not NULL, contains a series of (1+max_int) localized null terminated strings naming each option (last entry also has a double 0 after it)
+	int32_t display; // DISPLAY hint
 } NSFSetInfo;
 
 typedef struct
@@ -206,12 +229,15 @@ uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core); // cycles until
 #define NSFP_PROP_TYPE_STR       3
 #define NSFP_PROP_TYPE_LINES     4 
 #define NSFP_PROP_TYPE_BLOB      5
+#define NSFP_PROP_TYPE_LIST      6
 typedef struct
 {
 	const char* key; // permanent string ID
 	const char* name; // localized name
-	int32_t type;
-	// TODO: display hint (shared with NSFSetInfo)
+	const char* list; // if not NULL contains (max_list+1) null terminated strings (last string has a double 0 after it)
+	int32_t max_list; // number of list entries - 1
+	int32_t type; // PROP_TYPE
+	int32_t display; // DISPLAY hint
 } NSFPropInfo;
 
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop);
@@ -245,6 +271,7 @@ typedef struct // NSFP_UNIT_key (< NSFP_UNIT_COUNT)
 {
 	const char* key; // permanent string ID
 	const char* name; // localized name
+	const char* desc; // localized description
 	bool active; // whether this unit is active for this NSF
 } NSFChannelUnit;
 
@@ -286,6 +313,7 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 
 // other text strings adapted for the current locale, see: NSFP_TEXT_key
 // - the returned string pointer is static and has permanent lifetime
+// - textenum 0 is a default error string, returned instead of NULL for safety in some error cases
 const char* nsfplay_local_text(const NSFCore* core, int32_t textenum);
 
 

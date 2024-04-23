@@ -350,6 +350,7 @@ sint32 NSFCore::group_enum(const char* key, int len)
 NSFSetInfo NSFCore::set_info(sint32 setenum) const
 {
 	NSFSetInfo info = {0}; info.group = -1;
+	info.key = info.name = info.desc = local_text(0);
 	if (setenum < 0 || setenum > NSFP_SET_COUNT) return info;
 	const NSFSetData& SD = NSFPD_SET[setenum];
 	info.group = SD.group;
@@ -357,17 +358,21 @@ NSFSetInfo NSFCore::set_info(sint32 setenum) const
 	info.name = local_text(SD.text+0);
 	info.desc = local_text(SD.text+1);
 	info.is_string = (SD.default_str != NULL);
+	info.default_str = SD.default_str;
 	info.default_int = SD.default_int;
 	info.min_int = SD.min_int;
 	info.max_int = SD.max_int;
-	info.list = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list])) : NULL; 
-	info.default_str = SD.default_str;
+	info.min_hint = SD.min_hint;
+	info.max_hint = SD.max_hint;
+	info.list = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list])) : NULL;
+	info.display = SD.display;
 	return info;
 }
 
 NSFSetGroupInfo NSFCore::group_info(sint32 group) const
 {
 	NSFSetGroupInfo info = {0};
+	info.key = info.name = info.desc = local_text(0);
 	if (group < 0 || group > NSFP_GROUP_COUNT) return info;
 	const NSFSetGroupData& GD = NSFPD_GROUP[group];
 	info.key = GD.key;
@@ -498,6 +503,7 @@ NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
 {
 	NSFPropInfo info = {0};
 	info.type = NSFP_PROP_TYPE_INVALID;
+	info.key = info.name = local_text(0);
 	const NSFPropData* PD;
 	if (!song)
 	{
@@ -511,7 +517,10 @@ NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
 	}
 	info.key = PD->key;
 	info.name = local_text(PD->text);
+	info.max_list = PD->max_list;
+	info.list = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list])) : NULL;
 	info.type = PD->type;
+	info.display = PD->display;
 	return info;
 }
 

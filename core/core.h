@@ -119,7 +119,7 @@ typedef struct NSFCore_
 	bool load(const uint8* data, uint32 size, bool assume);
 	NSFPropInfo prop_info(sint32 prop, bool song=false) const; // if song, prop is a SONGPROP
 
-	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale
+	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale (local_text(0) is a default error string)
 	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
 
 	// nsf.cpp
