@@ -8,7 +8,6 @@ NSFCore* nsfplay_create(const char* ini_data)
 {
 	NSFCore* core = NSFCore::create();
 	core->set_ini(ini_data);
-	core->finalize();
 	return core;
 }
 
@@ -16,7 +15,6 @@ NSFCore* nsfplay_create_init(const NSFSetInit* init)
 {
 	NSFCore* core = NSFCore::create();
 	core->set_init(init);
-	core->finalize();
 	return core;
 }
 
@@ -154,22 +152,14 @@ int32_t nsfplay_group_enum(const char* key)
 	return NSFCore::group_enum(key);
 }
 
-bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size)
+bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool assume)
 {
-	(void)core;
-	(void)nsf_data;
-	(void)nsf_size;
-	// TODO
-	return false;
+	return core->load((uint8*)(nsf_data),nsf_size,assume,false);
 }
 
-bool nsfplay_assume(NSFCore* core, const void* nsf_data, uint32_t nsf_size)
+bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume)
 {
-	(void)core;
-	(void)nsf_data;
-	(void)nsf_size;
-	// TODO
-	return false;
+	return core->load((uint8*)(bin_data),bin_size,assume,true);
 }
 
 uint32_t nsfplay_song_count(const NSFCore* core)
@@ -341,7 +331,7 @@ bool nsfplay_prop_exists(const NSFCore* core, int32_t prop)
 
 bool nsfplay_songprop_exists(const NSFCore* core, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_exists(prop,song);
 }
 
@@ -387,37 +377,37 @@ const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size, int32_t 
 
 int32_t nsfplay_songprop_int(const NSFCore* core, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_int(prop,song);
 }
 
 int64_t nsfplay_songprop_long(const NSFCore* core, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_long(prop,song);
 }
 
 const char* nsfplay_songprop_str(const NSFCore* core, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_str(prop,song);
 }
 
 int32_t nsfplay_songprop_lines(const NSFCore* core, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_lines(prop,song);
 }
 
 const void* nsfplay_songprop_blob(const NSFCore* core, uint32_t* blob_size, int32_t prop, int32_t song)
 {
-	if (song < 0) song = core->current_song;
+	if (song < 0) song = core->song_current;
 	return core->nsf_prop_blob(blob_size,prop,song);
 }
 
 const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chunk_size)
 {
-	return core->nsf_chunk(fourcc,chunk_size);
+	return core->nsfe_chunk(fourcc,chunk_size);
 }
 
 NSFChannelUnit nsfplay_channel_unit(const NSFCore* core, int32_t unit)

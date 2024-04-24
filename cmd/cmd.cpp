@@ -74,6 +74,7 @@ int main(int argc, char** argv)
 	*/
 	NSFCore* core = nsfplay_create(TEST_INI);
 	nsfplay_set_init(core,TEST_INIT);
+	/*
 	//nsfplay_set_key_int(core,"TRI_ON",0);
 	//nsfplay_set_key_str(core,"TITLE_FORMAT","keyed");
 	nsfplay_set_ini_line(core,"SQU0_ON = off ");
@@ -81,6 +82,7 @@ int main(int argc, char** argv)
 	nsfplay_set_ini_line(core,"TRI_ON=$F");
 	nsfplay_set_ini_line(core,"NSE_ON=ON");
 	nsfplay_set_ini_line(core,"DPCM_ON=false");
+	*/
 
 	/*
 	// test info
@@ -136,6 +138,17 @@ int main(int argc, char** argv)
 
 	// test ini write
 	nsfplay_ini_write(core,stdout);
+
+	/*
+	FILE* f = platform_fopen("moon8.nsfe","rb");
+	fseek(f,0,SEEK_END);
+	int fs = ftell(f);
+	fseek(f,0,SEEK_SET);
+	void* fd = malloc(fs);
+	fread(fd,1,fs,f);
+	fclose(f);
+	nsfplay_load(core,fd,fs,false);
+	*/
 
 	nsfplay_destroy(core);
 

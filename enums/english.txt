@@ -63,6 +63,17 @@ LOCALLIST OPLL VRC7_KT2          "VRC7 kevtris 2 (1999-11-15)"
 LOCALLIST OPLL VRC7_KT1          "VRC7 kevtris 1 (1999-11-14)"
 LOCALLIST OPLL YMF281B_CH        "YMF218B (Chabin 2004-4-10)"
 
+LOCALLIST ENCODING UTF8          "UTF-8"
+LOCALLIST ENCODING SJIS          "Shift-JIS"
+LOCALLIST ENCODING AUTO          "Auto"
+
+LOCALLIST FILE_TYPE NONE         "None"
+LOCALLIST FILE_TYPE NSF          "NSF"
+LOCALLIST FILE_TYPE NSF2         "NSF2"
+LOCALLIST FILE_TYPE NSFE         "NSFe"
+LOCALLIST FILE_TYPE BIN          "Binary"
+LOCALLIST FILE_TYPE INVALID      "Invalid"
+
 #
 # Settings
 #
@@ -179,14 +190,17 @@ LOCALSET WAVEOUT_SAMPLERATE   "Samplerate" "Overrides the output samplerate when
 LOCALSET WAVEOUT_BITS         "Bit Depth" "Override the output bit depth when saving a WAV file."
 LOCALSET WAVEOUT_STEREO       "Stereo" "Override the output stereo setting when saving a WAV file."
 
-LOCALSETGROUP ADVANCED        "Advanced" "Advanced settings: specific samplerate"
+LOCALSETGROUP ADVANCED        "Advanced" "Advanced settings: specific samplerate, shift-JIS"
 LOCALSET SAMPLERATE_OVERRIDE  "Samplerate Override" "If a custom output samplerate is needed, it can be given here. 0 to use the normal output rate, -1 to use the CPU rate."
+LOCALSET SHIFT_JIS            "Shift-JIS" "Older Japanese NSF files often use Shift-JIS for their title, artist, and copyright fields. We can automatically detect it, assume Shift-JIS, or assume UTF-8. NSF2 files are always UTF-8."
 
 #
 # NSF Properties
 #
 
+LOCALPROP FILE_TYPE           "File Type"
 LOCALPROP SONG_COUNT          "Song Count"
+LOCALPROP SONG_START          "Starting Song"
 
 #
 # Song Properties
@@ -223,5 +237,13 @@ LOCALERROR INI_BAD_KEY        "Unknown setting"
 LOCALERROR INI_BAD_INT        "Bad integer value"
 LOCALERROR INI_BAD_RANGE      "Setting out of range: %d (%d to %d)"
 LOCALERROR INI_BAD_LIST_KEY   "Value not an integer or list key for %s"
+LOCALERROR BIN_BAD            "BIN file too large (maximum 40k)"
+LOCALERROR NSF_HEAD_BAD       "Unknown file type, not NSF or NSFe"
+LOCALERROR NSF_VERSION_BAD    "Invalid NSF version: 0"
+LOCALERROR NSF2_META_BAD      "Invalid NSF2 metadata"
+LOCALERROR NSF_HEAD_TEXT_BAD  "NSF header strings aren't 0 terminated"
+LOCALERROR NSFE_CHUNK_BAD     "NSFe chunk incomplete: %s"
+LOCALERROR NSFE_MANDATORY     "NSFe mandatory chunk unknown: %s"
+LOCALERROR NSFE_NO_MANDATORY  "NSFe missing mandatory chunk: %s"
 
 # TODO parser should check for % in these and compare locales

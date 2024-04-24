@@ -125,18 +125,6 @@ void NSFCore::destroy(NSFCore* core)
 	nsfp::free(core);
 }
 
-void NSFCore::finalize()
-{
-	ram8000 = memory_master;
-	ram0000 = ram8000 + 0x8000;
-	pad0    = ram0000 + 0x800;
-	pad1    = pad0    + 0x1000;
-
-	// TODO make any allocations needed based on the settings
-	// resample kernel, etc.
-	set_apply();
-}
-
 void NSFCore::release()
 {
 	// release any allocations held
@@ -154,8 +142,9 @@ const char* NSFCore::last_error() const
 	return r;
 }
 
-void NSFCore::set_error(sint32 textenum,...)
+void NSFCore::set_error(sint32 textenum,...) const
 {
+#if !(NSFP_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// skip formatting if not needed
 	bool direct = true;
@@ -180,12 +169,17 @@ void NSFCore::set_error(sint32 textenum,...)
 	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
+#else
+	(void)textenum;
+	error_last = "";
+#endif
 	if (nsfp::error_callback) nsfp::error_callback(error_last);
 	else { NSFP_DEBUG("ERROR: %s",error_last); }
 }
 
-void NSFCore::set_ini_error(int linenum, sint32 textenum,...)
+void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 {
+#if !(NSFP_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// line number prefix if linenum < 0
 	if (linenum < 0) error_last_buffer[0] = 0;
@@ -201,11 +195,16 @@ void NSFCore::set_ini_error(int linenum, sint32 textenum,...)
 	std::vsnprintf(error_last_buffer+start,sizeof(error_last_buffer)-start,fmt,args);
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
+#else
+	(void)linenum;
+	(void)textenum;
+	error_last = "";
+#endif
 	if (nsfp::error_callback) nsfp::error_callback(error_last);
 	else { NSFP_DEBUG("ERROR: %s",error_last); }
 }
 
-void NSFCore::set_error_raw(const char* fmt,...)
+void NSFCore::set_error_raw(const char* fmt,...) const
 {
 	va_list args;
 	va_start(args,fmt);
@@ -234,6 +233,7 @@ void NSFCore::set_default()
 
 bool NSFCore::set_ini(const char* ini)
 {
+#if !(NSFP_NOTEXT)
 	if (ini == NULL) return true;
 	// skip UTF-8 BOM if present
 	ini = utf8_bom_skip(ini);
@@ -254,6 +254,10 @@ bool NSFCore::set_ini(const char* ini)
 		ini += (eol+1);
 	}
 	return result;
+#else
+	(void)ini;
+	return false;
+#endif
 }
 
 bool NSFCore::set_init(const NSFSetInit* init)
@@ -412,32 +416,33 @@ NSFSetGroupInfo NSFCore::group_info(sint32 group) const
 
 const char* NSFCore::ini_line(sint32 setenum) const
 {
+#if !(NSFP_NOTEXT)
 	if (setenum < 0 || setenum >= NSFP_SET_COUNT) return "";
 	const NSFSetData& SD = NSFPD_SET[setenum];
 	if (SD.default_str == NULL)
 	{
 		switch (SD.display)
 		{
-			case NSFP_DISPLAY_LIST:
+		case NSFP_DISPLAY_LIST:
+			{
+				const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
+				for (int i=0; i<setting[setenum]; ++i)
 				{
-					const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
-					for (int i=0; i<setting[setenum]; ++i)
-					{
-						while(*list_key) ++list_key;
-						++list_key;
-					}
-					std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,list_key);
-				} break;
-			case NSFP_DISPLAY_HEX8:
-				std::snprintf(temp_text,sizeof(temp_text),"%s=$%02X",SD.key,setting[setenum]); break;
-			case NSFP_DISPLAY_HEX16:
-				std::snprintf(temp_text,sizeof(temp_text),"%s=$%04X",SD.key,setting[setenum]); break;
-			case NSFP_DISPLAY_HEX32:
-				std::snprintf(temp_text,sizeof(temp_text),"%s=$%08X",SD.key,setting[setenum]); break;
-			case NSFP_DISPLAY_COLOR:
-				std::snprintf(temp_text,sizeof(temp_text),"%s=$%06X",SD.key,setting[setenum]); break;
-			default:
-				std::snprintf(temp_text,sizeof(temp_text),"%s=%d",SD.key,setting[setenum]); break;
+					while(*list_key) ++list_key;
+					++list_key;
+				}
+				std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,list_key);
+			} break;
+		case NSFP_DISPLAY_HEX8:
+			std::snprintf(temp_text,sizeof(temp_text),"%s=$%02X",SD.key,setting[setenum]); break;
+		case NSFP_DISPLAY_HEX16:
+			std::snprintf(temp_text,sizeof(temp_text),"%s=$%04X",SD.key,setting[setenum]); break;
+		case NSFP_DISPLAY_HEX32:
+			std::snprintf(temp_text,sizeof(temp_text),"%s=$%08X",SD.key,setting[setenum]); break;
+		case NSFP_DISPLAY_COLOR:
+			std::snprintf(temp_text,sizeof(temp_text),"%s=$%06X",SD.key,setting[setenum]); break;
+		default:
+			std::snprintf(temp_text,sizeof(temp_text),"%s=%d",   SD.key,setting[setenum]); break;
 		};
 	}
 	else
@@ -446,10 +451,15 @@ const char* NSFCore::ini_line(sint32 setenum) const
 	}
 	temp_text[sizeof(temp_text)-1] = 0;
 	return temp_text;
+#else
+	(void)setenum;
+	return "";
+#endif
 }
 
 void NSFCore::ini_write(FILE* f) const
 {
+#if !(NSFP_NOTEXT)
 	sint32 last_group = -1;
 	std::fprintf(f,"# NSFPlay INI settings file\n");
 	for (sint32 i=0; i<NSFP_SET_COUNT; ++i)
@@ -464,10 +474,14 @@ void NSFCore::ini_write(FILE* f) const
 		std::fprintf(f,"%s\n",ini_line(i));
 	}
 	std::fprintf(f,"# end of settings\n");
+#else
+	(void)f;
+#endif
 }
 
 bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 {
+#if !(NSFP_NOTEXT)
 	// trim leading whitespace
 	while (line[0]==' ' || line[0] == '\t') { ++line; --len; }
 	// truncate for comments
@@ -554,14 +568,33 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
 	}
 	return true;
+#else
+	(void)line;
+	(void)len;
+	(void)linenum;
+	return false;
+#endif
 }
 
-bool NSFCore::load(const uint8* data, uint32 size, bool assume)
+bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 {
+	NSFP_DEBUG("NSFCore::load(%s,%d,%d,%d)",data?"*":"NULL",size,assume,bin);
 	if (nsf_free)
 		nsfp::free(const_cast<uint8*>(nsf));
 	nsf = NULL;
+	nsf_size = 0;
 	nsf_free = false;
+
+	// drop all potential references to the former nsf
+	rom = NULL;
+	pad0 = NULL;
+	pad1 = NULL;
+	for (int i=0; i<16; ++i)
+	{
+		rpage[i] = 0;
+		wpage[i] = 0;
+	}
+	bank_last = 0;
 
 	if (data != NULL)
 	{
@@ -573,9 +606,10 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume)
 			std::memcpy(const_cast<uint8*>(nsf),data,size);
 			nsf_free = true;
 		}
+		nsf_size = size;
 	}
 
-	bool result = nsf_parse();
+	bool result = nsf_parse(bin);
 	// TODO play song (reset/rebuilds audio stacks) which may & with result
 	return result;
 }
@@ -608,11 +642,17 @@ NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
 
 const char* NSFCore::local_text(sint32 textenum) const
 {
+#if !(NSFP_NOTEXT)
 	return NSFCore::local_text(textenum,setting[NSFP_SET_LOCALE]);
+#else
+	(void)textenum;
+	return (const char*)NSFPD_NOTEXT_LIST_KEY;
+#endif
 }
 
 const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 {
+#if !(NSFP_NOTEXT)
 	if (locale < 0 || locale >= NSFP_LOCALE_COUNT || textenum < 0 || textenum >= NSFP_TEXT_COUNT)
 	{
 		// text 0 is a default <MISSING TEXT> value
@@ -620,4 +660,9 @@ const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 		textenum = 0;
 	}
 	return (const char*)(NSFPD_LOCAL_TEXT_DATA + NSFPD_LOCAL_TEXT[locale][textenum]);
+#else
+	(void)textenum;
+	(void)locale;
+	return (const char*)NSFPD_NOTEXT_LIST_KEY;
+#endif
 }

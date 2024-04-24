@@ -186,14 +186,20 @@ int32_t nsfplay_group_enum(const char* key); // -1 if not found
 
 
 // load/change the current NSF file
-// - load makes an internal copy of nsf_data
-// - assume will instead use nsf_data directly, assuming the pointer will remain valid
-// - returns false if nsf_data could not be parsed
+// - if assume is false, the core will make its own internal copy of nsf_data
+// - if assume is true, the core will instead use nsf_data directly, assuming the pointer will remain valid until unloaded
+// - returns false if nsf_data could not be parsed (the NSF will be unloaded)
+// - if false is returned, an error will be raised,
+//   but other errors may be raised even if returned true,
+//   as long at they were recoverable
 // - a NULL nsf_data may be used to "unload" the current NSF,
 //   but even without an NSF, the core may still be used via direct emulation access
-bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size);
-bool nsfplay_assume(NSFCore* core, const void* nsf_data, uint32_t nsf_size);
-
+bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool assume);
+// load BIN file
+// - binary program testing mode
+// - load binary data directly at $6000-FFFF
+// - INIT and PLAY will both point to $6000
+bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume);
 
 // song control
 uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF
@@ -276,6 +282,7 @@ const void* nsfplay_songprop_blob(const NSFCore* core, uint32_t* blob_size, int3
 // NSFe or NSF2 chunks can be fetched for manual inspection
 // - fourcc does not need a terminating 0, only the first 4 characters will be used
 // - chunk_size will be written if not NULL
+// - if chunk does not exist, returns NULL and chunk_size 0
 const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chunk_size);
 
 

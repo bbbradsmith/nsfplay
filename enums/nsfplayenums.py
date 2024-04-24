@@ -622,12 +622,12 @@ def gen_text(text): # adds utf-8 string to text blob, returns offset to it, dupl
     gen_text_map[text] = offset
     return offset
 
-def gen_data(data,mode=0,prefix="\t",target=1): # mode: 0=hex bytes (2-digit), 1=int bytes (3-digit), 2=int 4-digit, 3=hex 24-bit (6-digit)
+def gen_data(data,mode=0,prefix="\t",target=1): # mode: 0=hex bytes (2-digit), 1=int bytes (3-digit), 2=int 4-digit, 3=hex 24-bit (6-digit), 4=int (1-digit)
     i=0
     c=0
     s=""
-    FORMS   = ["0x%02X,","%3d,","%4d,","0x%06X,"]
-    COLUMNS = [ 32,       32,    24,    16      ]
+    FORMS   = ["0x%02X,","%3d,","%4d,","0x%06X,","%1d,"]
+    COLUMNS = [ 32,       32,    24,    16,      64   ]
     columns = COLUMNS[mode]
     form    = FORMS[mode]
     for i in range(len(data)):
@@ -1035,8 +1035,10 @@ def generate_enums(file_enum,file_data,do_write):
     # generate text data tables
     #
     gen_enum("NSFP_TEXT_COUNT",len(table_locale[0]))
-    gen_break(0);
+    gen_break(0)
     gen_enum("NSFP_LOCALE_COUNT",len(defs_local))
+    gen_line("#if !(NSFP_NOTEXT)",1)
+    gen_break(1)
     gen_line("const int32_t NSFPD_LOCAL_TEXT[NSFP_LOCALE_COUNT][%d] = {" % (len(table_locale[0])),1)
     for i in range(0,locs):
         gen_enum("NSFP_LOCALE_"+defs_local[i][0],i)
@@ -1044,10 +1046,21 @@ def generate_enums(file_enum,file_data,do_write):
         gen_data(table_locale[i],mode=3)
         gen_line("},",1)
     gen_line("};",1)
-    gen_break(1);
+    gen_break(1)
     gen_line("const uint8_t NSFPD_LOCAL_TEXT_DATA[0x%06X] = {" % (len(gen_text_blob)),1)
     gen_data(gen_text_blob,mode=0)
     gen_line("};",1)
+    gen_break(1)
+    gen_line("#else // (NSFP_NOTEXT)",1)
+    gen_break(1)
+    max_list_len = 2;
+    for dl in defs_list:
+        if len(dl) > max_list_len: max_list_len = len(dl) # this is actually +1 because dl contains the list name as well, but we need the extra 0 for the double terminal
+    gen_line("const uint8_t NSFPD_NOTEXT_LIST_KEY[%d] = {" % (max_list_len),1)
+    gen_data([0]*max_list_len,mode=4);
+    gen_line("};",1)
+    gen_break(1)
+    gen_line("#endif",1)
     gen_break(1);
     for i in range(1,locs):
         if (len(table_locale[i]) != len(table_locale[0])):

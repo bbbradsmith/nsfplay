@@ -33,6 +33,12 @@ typedef uint64_t  uint64;
 	#define DEBUG_ALLOC 0
 #endif
 
+#ifndef NSFP_NOTEXT
+	// define NSFP_NOTEXT=1 to strip all unnecessary text from the build
+	//   this disables ini parsing, error messages will become blank strings, and list keys will also become blank
+	#define NSFP_NOTEXT 0
+#endif
+
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
 
 typedef struct NSFCore_
@@ -51,7 +57,7 @@ typedef struct NSFCore_
 
 	// text and error output buffers
 	mutable const char* error_last;
-	char error_last_buffer[256]; // error_last may point to this for formatted errors
+	mutable char error_last_buffer[256]; // error_last may point to this for formatted errors
 	mutable char temp_text[1024]; // used for returned text information
 	mutable const char* prop_lines;
 
@@ -62,15 +68,21 @@ typedef struct NSFCore_
 
 	// emulation
 	const uint8* nsf;
+	uint32 nsf_size;
 	bool nsf_free; // true if nsf was allocated (load rather than assume)
-	uint8 memory_master[(32+2+4+4)*1024]; // master allocation divided into blocks below
-	uint8* ram8000; // 32k of RAM at $8000
-	uint8* ram0000; // 2k of on-board RAM
-	uint8* pad0; // 4k first bank, if it needs padding due to LOAD address
-	uint8* pad1; // 4k last bank, if it needs padding due to not filling a complete bank
-	int padbank0; // the bank assigned to pad0
-	int padbank1; // the bank assigned to pad1
-	uint8 current_song;
+	bool nsf_bin; // binary file at $6000 instead of NSF
+
+	uint8 ram0000[0x00800-0x0000]; // $0000-07FF 2k of on-board RAM
+	uint8 ram6000[0x10000-0x6000]; // $6000-FFFF 40k of RAM or other workspace
+	const uint8* rom; // pointer to read only NSF data, aligned for padding (first/last banks may be masked by pad0/pad1)
+	uint8* pad0; // 4k first bank, if it needs padding due to LOAD address (may reuse ram6000 at E000)
+	uint8* pad1; // 4k last bank, if it needs padding due to not filling a complete bank (may reuse ram6000 at F000)
+	unsigned int bank_last; // last bank in data (pad1 if not NULL)
+	const uint8* rpage[16]; // currently assigned 4k bank pages for reading (null for open bus)
+	uint8* wpage[16]; // currently assigned 4k bank pages for writing
+
+	// playback
+	uint8 song_current;
 
 	// audio units
 	// TODO these should be static POD structures, each with a pointer to the core
@@ -98,22 +110,21 @@ typedef struct NSFCore_
 
 	// interface
 
-	static NSFCore* create(); // After create: ->set_... then ->finalize.
+	static NSFCore* create();
 	static void destroy(NSFCore* core); // Calls ->release before freeing the core.
-	void finalize(); // finishes creation after create and initial settings
-	void release(); // called by destroy, releases all owned allocations
+	void release(); // internal: called by destroy, releases all owned allocations
 
 	const char* last_error() const; // returns last error message, NULL if none since last check
-	void set_error(sint32 textenum,...); // sets last error and generates error callback
-	void set_ini_error(int linenum, sint32 textenum,...); // for ini files (-1 if no ini)
-	void set_error_raw(const char* fmt,...); // set_error with localized errors is preferred, but this can send raw text errors for debug purposes
+	void set_error(sint32 textenum,...) const; // sets last error and generates error callback
+	void set_ini_error(int linenum, sint32 textenum,...) const; // for ini files (-1 if no ini)
+	void set_error_raw(const char* fmt,...) const; // set_error with localized errors is preferred, but this can send raw text errors for debug purposes
 
 	void set_default(); // restore default settings
 	bool set_ini(const char* ini);
 	bool set_init(const NSFSetInit* init);
 	bool set_int(sint32 setenum, sint32 value); // integer setting (sets error if false)
 	bool set_str(sint32 setenum, const char* value, sint32 len=-1); // string setting, len truncates, len<0 will strlen (sets error if false)
-	void set_apply(); // call to apply changed settings now (as much as possible)
+	void set_apply(); // call to apply changed settings now
 	sint32 get_int(sint32 setenum) const;
 	const char* get_str(sint32 setenum) const; // use this instead of manually de-indexing setting_str
 
@@ -126,15 +137,20 @@ typedef struct NSFCore_
 	void ini_write(FILE* f) const;
 	bool parse_ini_line(const char* line, int len, int linenum); // linenum=-1 to parse a line with no INI file context
 
-	bool load(const uint8* data, uint32 size, bool assume);
+	bool load(const uint8* data, uint32 size, bool assume, bool bin=false);
 	NSFPropInfo prop_info(sint32 prop, bool song=false) const; // if song, prop is a SONGPROP
 
 	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale (local_text(0) is a default error string)
 	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
 
-	// nsf.cpp
-	bool nsf_parse();
-	const void* nsf_chunk(const char* fourcc, uint32* chunk_size) const;
+	// nsf.cpp internal
+	sint32 nsf_type() const; // returns NSFP_LK_FILETYPE enum
+	uint32 nsfe_data() const; // returns offset to NSFe data if it exists, 0 otherwise
+	bool nsf_header_present() const; // returns true if NSF or NSF2
+	// nsf.cpp external
+	bool nsf_parse(bool bin);
+	const uint8* nsfe_chunk(uint32 fourcc, uint32* chunk_size) const; // fourcc is packed little-endian into uint32
+	const uint8* nsfe_chunk(const char* fourcc, uint32* chunk_size) const;
 	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // if song>=0 prop is a SONGPROP
 	sint32 nsf_prop_int(sint32 prop, sint32 song=-1) const;
 	sint64 nsf_prop_long(sint32 prop, sint32 song=-1) const;
