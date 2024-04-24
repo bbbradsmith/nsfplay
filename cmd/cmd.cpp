@@ -114,33 +114,10 @@ int main(int argc, char** argv)
 		}
 	}
 	*/
-	/*
-	// test props
-	printf("PROPS:\n");
-	for (int i=0;i<NSFP_PROP_COUNT;++i)
-	{
-		NSFPropInfo info = nsfplay_prop_info(core,i);
-		printf("%s %s %d\n",info.key,info.name,info.type);
-	}
-	printf("SONGPROPS:\n");
-	for (int i=0;i<NSFP_SONGPROP_COUNT;++i)
-	{
-		NSFPropInfo info = nsfplay_songprop_info(core,i);
-		printf("%s %s %d\n",info.key,info.name,info.type);
-	}
-	*/
 
 	/*
-	// test ini generation
-	for (int i=0;i<NSFP_SET_COUNT;++i)
-		printf("%s\\n\n",nsfplay_ini_line(core,i));
-	*/
-
-	// test ini write
-	nsfplay_ini_write(core,stdout);
-
-	/*
-	FILE* f = platform_fopen("moon8.nsfe","rb");
+	//FILE* f = platform_fopen("moon8.nsfe","rb");
+	FILE* f = platform_fopen("moon8.nsf","rb");
 	fseek(f,0,SEEK_END);
 	int fs = ftell(f);
 	fseek(f,0,SEEK_SET);
@@ -149,6 +126,47 @@ int main(int argc, char** argv)
 	fclose(f);
 	nsfplay_load(core,fd,fs,false);
 	*/
+
+	// test props
+	printf("PROPS:\n");
+	for (int i=0;i<NSFP_PROP_COUNT;++i)
+	{
+		NSFPropInfo info = nsfplay_prop_info(core,i);
+		//printf("%s %s %d\n",info.key,info.name,info.type);
+		if (nsfplay_prop_exists(core,i))
+		{
+			if (info.type == NSFP_PROP_TYPE_INT)
+				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i));
+			else if (info.type == NSFP_PROP_TYPE_STR)
+				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i));
+			else
+				printf("%s (%d)\n",info.key,info.type);
+		}
+	}
+	printf("SONGPROPS:\n");
+	for (int i=0;i<NSFP_SONGPROP_COUNT;++i)
+	{
+		NSFPropInfo info = nsfplay_songprop_info(core,i);
+		//printf("%s %s %d\n",info.key,info.name,info.type);
+		if (nsfplay_songprop_exists(core,i))
+		{
+			if (info.type == NSFP_PROP_TYPE_INT)
+				printf("%s: %d\n",info.key,nsfplay_songprop_int(core,i));
+			else if (info.type == NSFP_PROP_TYPE_STR)
+				printf("%s: %s\n",info.key,nsfplay_songprop_str(core,i));
+			else
+				printf("%s (%d)\n",info.key,info.type);
+		}
+	}
+
+	/*
+	// test ini generation
+	for (int i=0;i<NSFP_SET_COUNT;++i)
+		printf("%s\\n\n",nsfplay_ini_line(core,i));
+	*/
+
+	// test ini write
+	//nsfplay_ini_write(core,stdout);
 
 	nsfplay_destroy(core);
 

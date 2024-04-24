@@ -145,16 +145,17 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 #define NSFP_DISPLAY_LINES      4
 #define NSFP_DISPLAY_BLOB       5
 #define NSFP_DISPLAY_LIST       6
-#define NSFP_DISPLAY_HEX8       7
-#define NSFP_DISPLAY_HEX16      8
-#define NSFP_DISPLAY_HEX32      9
-#define NSFP_DISPLAY_HEX64     10
-#define NSFP_DISPLAY_COLOR     11
-#define NSFP_DISPLAY_MSEC      12
-#define NSFP_DISPLAY_MILL      13
-#define NSFP_DISPLAY_HZ        14
-#define NSFP_DISPLAY_KEY       15
-#define NSFP_DISPLAY_PRECISE   16
+#define NSFP_DISPLAY_BOOL       7
+#define NSFP_DISPLAY_HEX8       8
+#define NSFP_DISPLAY_HEX16      9
+#define NSFP_DISPLAY_HEX32     10
+#define NSFP_DISPLAY_HEX64     11
+#define NSFP_DISPLAY_COLOR     12
+#define NSFP_DISPLAY_MSEC      13
+#define NSFP_DISPLAY_MILL      14
+#define NSFP_DISPLAY_HZ        15
+#define NSFP_DISPLAY_KEY       16
+#define NSFP_DISPLAY_PRECISE   17
 typedef struct
 {
 	// all const char* in this structure point to static strings, permanently available
@@ -261,7 +262,7 @@ typedef struct
 } NSFPropInfo;
 
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop);
-bool nsfplay_songprop_exists(const NSFCore* core, int32_t song, int32_t prop);
+bool nsfplay_songprop_exists(const NSFCore* core, int32_t prop, int32_t song=-1);
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop); // type will be INVALID if not present
 NSFPropInfo nsfplay_songprop_info(const NSFCore* core, int32_t songprop);
 

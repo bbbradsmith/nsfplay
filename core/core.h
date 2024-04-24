@@ -39,6 +39,13 @@ typedef uint64_t  uint64;
 	#define NSFP_NOTEXT 0
 #endif
 
+// convenient accessors
+#define SETTING(setenum_) (setting[NSFP_SET_##setenum_])
+#define PROP(propenum_) (nsf_prop_int(NSFP_PROP_##propenum_))
+#define PROPS(propenum_) (nsf_prop_str(NSFP_PROP_##propenum_))
+#define SONGPROP(songpropenum_) (nsf_prop_int(NSFP_SONGPROP_$$songpropenum_,song_current))
+#define SONGPROPS(songpropenum_) (nsf_prop_str(NSFP_SONGPROP_$$songpropenum_,song_current))
+
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
 
 typedef struct NSFCore_
@@ -143,11 +150,7 @@ typedef struct NSFCore_
 	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale (local_text(0) is a default error string)
 	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
 
-	// nsf.cpp internal
-	sint32 nsf_type() const; // returns NSFP_LK_FILETYPE enum
-	uint32 nsfe_data() const; // returns offset to NSFe data if it exists, 0 otherwise
-	bool nsf_header_present() const; // returns true if NSF or NSF2
-	// nsf.cpp external
+	// nsf.cpp
 	bool nsf_parse(bool bin);
 	const uint8* nsfe_chunk(uint32 fourcc, uint32* chunk_size) const; // fourcc is packed little-endian into uint32
 	const uint8* nsfe_chunk(const char* fourcc, uint32* chunk_size) const;
@@ -157,7 +160,7 @@ typedef struct NSFCore_
 	const char* nsf_prop_str(sint32 prop, sint32 song=-1) const;
 	sint32 nsf_prop_lines(sint32 prop, sint32 song=-1) const;
 	const char* nsf_prop_line() const;
-	const void* nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song=-1) const;
+	const uint8* nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song=-1) const;
 
 } NSFCore;
 

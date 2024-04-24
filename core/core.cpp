@@ -643,7 +643,7 @@ NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
 const char* NSFCore::local_text(sint32 textenum) const
 {
 #if !(NSFP_NOTEXT)
-	return NSFCore::local_text(textenum,setting[NSFP_SET_LOCALE]);
+	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
 	(void)textenum;
 	return (const char*)NSFPD_NOTEXT_LIST_KEY;

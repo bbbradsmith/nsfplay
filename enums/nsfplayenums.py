@@ -105,6 +105,7 @@
 #  Display types:
 #     INT - integer with slider
 #     LONG - 64-bit integer (PROPLONG only)
+#     BOOL - 0 or 1
 #     HEX8/16/32/64 - hexadecimal integer
 #     COLOR - RGB value (6 digit hex, or colour picker)
 #     MSEC - milliseconds
@@ -205,19 +206,21 @@ DT_STR     = 3
 DT_LINES   = 4
 DT_BLOB    = 5
 DT_LIST    = 6
-DT_HEX8    = 7
-DT_HEX16   = 8
-DT_HEX32   = 9
-DT_HEX64   = 10
-DT_COLOR   = 11
-DT_MSEC    = 12
-DT_MILL    = 13
-DT_HZ      = 14
-DT_KEY     = 15
-DT_PRECISE = 16
+DT_BOOL    = 7
+DT_HEX8    = 8
+DT_HEX16   = 9
+DT_HEX32   = 10
+DT_HEX64   = 11
+DT_COLOR   = 12
+DT_MSEC    = 13
+DT_MILL    = 14
+DT_HZ      = 15
+DT_KEY     = 16
+DT_PRECISE = 17
 
 DT = { "INT":DT_INT, "LONG":DT_STR,
        # "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
+       "BOOL":DT_BOOL,
        "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64,
        "COLOR":DT_COLOR, "MSEC":DT_MSEC, "MILL":DT_MILL, "HZ":DT_HZ, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
 # the commented values are only set automatically, and aren't valid for SETINT/PROPINT
