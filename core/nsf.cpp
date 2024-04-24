@@ -307,7 +307,6 @@ sint32 NSFCore::nsf_prop_int(sint32 prop, sint32 song) const
 {
 	const uint8* ck = NULL;
 	uint32 cks = 0;
-	const sint32 ft = nsf_type();
 
 	if (song < 0)
 	{
