@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 		//printf("%s %s %d\n",info.key,info.name,info.type);
 		if (nsfplay_prop_exists(core,i))
 		{
-			if (info.type == NSFP_PROP_TYPE_INT)
+			if (info.type == NSFP_PROP_TYPE_INT || info.type == NSFP_PROP_TYPE_LIST)
 				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i));
 			else if (info.type == NSFP_PROP_TYPE_STR)
 				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i));
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 		//printf("%s %s %d\n",info.key,info.name,info.type);
 		if (nsfplay_songprop_exists(core,i))
 		{
-			if (info.type == NSFP_PROP_TYPE_INT)
+			if (info.type == NSFP_PROP_TYPE_INT || info.type == NSFP_PROP_TYPE_LIST)
 				printf("%s: %d\n",info.key,nsfplay_songprop_int(core,i));
 			else if (info.type == NSFP_PROP_TYPE_STR)
 				printf("%s: %s\n",info.key,nsfplay_songprop_str(core,i));

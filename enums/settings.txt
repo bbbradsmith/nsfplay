@@ -207,6 +207,9 @@ PROPBLOB NSFE_PLAYLIST
 PROPBLOB NSF_HEADER
 PROPINT PLAYLIST_ACTIVE        BOOL
 
+# TODO blobs for other NSFe properties?
+# TODO song properties, how many of these have NSFe properties too?
+
 # for testing UI
 PROPINT TEST_INT INT
 PROPINT TEST_LONG LONG
