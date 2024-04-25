@@ -137,7 +137,7 @@ NSFSetInfo nsfplay_set_info(const NSFCore* core, int32_t setenum)
 	return core->set_info(setenum);
 }
 
-NSFSetGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group)
+NSFGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group)
 {
 	return core->group_info(group);
 }

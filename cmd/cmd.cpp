@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	printf("GROUPS:\n");
 	for (int i=0;i<NSFP_GROUP_COUNT;++i)
 	{
-		NSFSetGroupInfo info = nsfplay_set_group_info(core,i);
+		NSFGroupInfo info = nsfplay_set_group_info(core,i);
 		printf("%s %s - %s\n",info.key,info.name,info.desc);
 	}
 	printf("SETS:\n");

@@ -359,16 +359,16 @@ def parse_entry(ls):
                     return (None,None)
                 p.append(ls[0])
                 ls = ls[1:]
-        elif pd == PARSE_GT:
-            if ls[0].upper() not in GT:
-                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
-                return (None,None)
-            p.append(GT[ls[0].upper()])
         elif pd == PARSE_DT:
             if ls[0].upper() not in DT:
                 parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
                 return (None,None)
             p.append(DT[ls[0].upper()])
+        elif pd == PARSE_GT:
+            if ls[0].upper() not in GT:
+                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
+                return (None,None)
+            p.append(GT[ls[0].upper()])
         ls = ls[1:]
     if len(ls) > 0:
         parse_error(command+" has too many entries, expected: "+str(len(parse_def)))
@@ -786,8 +786,8 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t type, text; // text+0 name, +1 desc",1)
-    gen_line("} NSFSetGroupData;",1)
-    gen_line("const NSFSetGroupData NSFPD_GROUP[NSFP_GROUP_COUNT] = {",1)
+    gen_line("} NSFGroupData;",1)
+    gen_line("const NSFGroupData NSFPD_GROUP[NSFP_GROUP_COUNT] = {",1)
     for gi in range(len(defs_group)):
         group_key = defs_group[gi][0]
         gen_enum("NSFP_GROUP_"+group_key,gi)

@@ -402,12 +402,12 @@ NSFSetInfo NSFCore::set_info(sint32 setenum) const
 	return info;
 }
 
-NSFSetGroupInfo NSFCore::group_info(sint32 group) const
+NSFGroupInfo NSFCore::group_info(sint32 group) const
 {
-	NSFSetGroupInfo info = {0};
+	NSFGroupInfo info = {0};
 	info.key = info.name = info.desc = local_text(0);
 	if (group < 0 || group > NSFP_GROUP_COUNT) return info;
-	const NSFSetGroupData& GD = NSFPD_GROUP[group];
+	const NSFGroupData& GD = NSFPD_GROUP[group];
 	info.key = GD.key;
 	info.name = local_text(GD.text+0);
 	info.desc = local_text(GD.text+1);

@@ -187,10 +187,10 @@ typedef struct
 	const char* name; // localized name
 	const char* desc; // localized description
 	int32_t type;
-} NSFSetGroupInfo;
+} NSFGroupInfo;
 
 NSFSetInfo nsfplay_set_info(const NSFCore* core, int32_t setenum);
-NSFSetGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group);
+NSFGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group);
 int32_t nsfplay_set_enum(const char* key); // -1 if not found
 int32_t nsfplay_group_enum(const char* key); // -1 if not found
 
