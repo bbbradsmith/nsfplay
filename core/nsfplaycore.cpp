@@ -25,17 +25,17 @@ void nsfplay_destroy(NSFCore* core)
 
 void nsfplay_set_error_log(void (*error_callback_)(const char* msg))
 {
-	nsfp::error_callback = error_callback_;
+	nsf::error_callback = error_callback_;
 }
 
 void nsfplay_set_debug_print(void (*debug_print_callback_)(const char* msg))
 {
-	nsfp::debug_print_callback = debug_print_callback_;
+	nsf::debug_print_callback = debug_print_callback_;
 }
 
 void nsfplay_set_fatal(void (*fatal_callback_)(const char* msg))
 {
-	nsfp::fatal_callback = fatal_callback_;
+	nsf::fatal_callback = fatal_callback_;
 }
 
 const char* nsfplay_last_error(const NSFCore* core)
@@ -164,7 +164,7 @@ bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bo
 
 uint32_t nsfplay_song_count(const NSFCore* core)
 {
-	return core->nsf_prop_int(NSFP_PROP_ACTIVE_SONG_COUNT);
+	return core->nsf_prop_int(NSF_PROP_ACTIVE_SONG_COUNT);
 }
 
 bool nsfplay_song(NSFCore* core, uint8_t song)

@@ -11,7 +11,6 @@
 //   so that the first song in the NSF is song 1.
 
 #include <stdint.h> // explicit size integer types
-#include <stddef.h> // NULL
 #include <stdio.h> // FILE
 
 // auto-generated enumerations for settings and properties
@@ -100,7 +99,7 @@ bool nsfplay_set_ini_line(NSFCore* core, const char* ini_line);
 
 // generate an ini line for a current settings
 // - does not include newline
-// - iterate from 0 to NSFP_SET_COUNT-1 to generate a complete ini file
+// - iterate from 0 to NSF_SET_COUNT-1 to generate a complete ini file
 const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum);
 // write a complete ini to an open file
 // - uses fprintf and \n, and assumes the file is in "wt" mode for platform-appropriate line endings
@@ -109,7 +108,7 @@ void nsfplay_ini_write(const NSFCore* core, FILE* f);
 
 
 // settings by setenum
-// - use the provided NSFP_SET_x enumerations, because setenum values are subject to change
+// - use the provided NSF_SET_x enumerations, because setenum values are subject to change
 // - set returns false if setenum is out of bounds, or the wrong value type was used
 // - get returns 0 or NULL if out of bounds, or wrong type
 bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value);
@@ -138,24 +137,27 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 //   HZ      - an audio frequency, may benefit from a logarithmic slider giving more resolution at low frequencies
 //   COLOR   - RGB value, 6-digit hex or color picker
 //   PRECISE - decimal integer, no slider (only manual entry)
-#define NSFP_DISPLAY_INVALID    0
-#define NSFP_DISPLAY_INT        1
-#define NSFP_DISPLAY_LONG       2
-#define NSFP_DISPLAY_STR        3
-#define NSFP_DISPLAY_LINES      4
-#define NSFP_DISPLAY_BLOB       5
-#define NSFP_DISPLAY_LIST       6
-#define NSFP_DISPLAY_BOOL       7
-#define NSFP_DISPLAY_HEX8       8
-#define NSFP_DISPLAY_HEX16      9
-#define NSFP_DISPLAY_HEX32     10
-#define NSFP_DISPLAY_HEX64     11
-#define NSFP_DISPLAY_COLOR     12
-#define NSFP_DISPLAY_MSEC      13
-#define NSFP_DISPLAY_MILL      14
-#define NSFP_DISPLAY_HZ        15
-#define NSFP_DISPLAY_KEY       16
-#define NSFP_DISPLAY_PRECISE   17
+enum
+{
+	NSF_DISPLAY_INVALID = 0,
+	NSF_DISPLAY_INT,
+	NSF_DISPLAY_LONG,
+	NSF_DISPLAY_STR,
+	NSF_DISPLAY_LINES,
+	NSF_DISPLAY_BLOB,
+	NSF_DISPLAY_LIST,
+	NSF_DISPLAY_BOOL,
+	NSF_DISPLAY_HEX8,
+	NSF_DISPLAY_HEX16,
+	NSF_DISPLAY_HEX32,
+	NSF_DISPLAY_HEX64,
+	NSF_DISPLAY_COLOR,
+	NSF_DISPLAY_MSEC,
+	NSF_DISPLAY_MILL,
+	NSF_DISPLAY_HZ,
+	NSF_DISPLAY_KEY,
+	NSF_DISPLAY_PRECISE,
+};
 typedef struct
 {
 	// all const char* in this structure point to static strings, permanently available
@@ -177,10 +179,13 @@ typedef struct
 //   SET - settings
 //   PROP - prop, ignores song parameter
 //   SONGPROP - prop, uses song parameter
-#define NSFP_GROUP_TYPE_INVALD     0
-#define NSFP_GROUP_TYPE_SET        1
-#define NSFP_GROUP_TYPE_PROP       2
-#define NSFP_GROUP_TYPE_SONGPROP   3
+enum
+{
+	NSF_GROUP_TYPE_INVALD = 0,
+	NSF_GROUP_TYPE_SET,
+	NSF_GROUP_TYPE_PROP,
+	NSF_GROUP_TYPE_SONGPROP,
+};
 typedef struct
 {
 	const char* key; // not used by ini, but does give a non-localized permanent string key for this group
@@ -248,17 +253,19 @@ uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core); // cycles until
 
 
 // NSF properties
-// - prop parameter should use the NSFP_PROP_key enumerations, as the values are subject to change
-// - song prop uses NSFP_SONG_PROP_key enumerations
-// - NSFP_PROP_COUNT and NSFP_SONG_PROP_COUNT can be used iterate over all properties
-
-#define NSFP_PROP_TYPE_INVALID   0
-#define NSFP_PROP_TYPE_INT       1
-#define NSFP_PROP_TYPE_LONG      2
-#define NSFP_PROP_TYPE_STR       3
-#define NSFP_PROP_TYPE_LINES     4 
-#define NSFP_PROP_TYPE_BLOB      5
-#define NSFP_PROP_TYPE_LIST      6
+// - prop parameter should use the NSF_PROP_key enumerations, as the values are subject to change
+// - song prop uses NSF_SONG_PROP_key enumerations
+// - NSF_PROP_COUNT and NSF_SONG_PROP_COUNT can be used iterate over all properties
+enum
+{
+	NSF_PROP_TYPE_INVALID = 0,
+	NSF_PROP_TYPE_INT,
+	NSF_PROP_TYPE_LONG,
+	NSF_PROP_TYPE_STR,
+	NSF_PROP_TYPE_LINES,
+	NSF_PROP_TYPE_BLOB,
+	NSF_PROP_TYPE_LIST,
+};
 typedef struct
 {
 	const char* key; // permanent string ID
@@ -289,7 +296,7 @@ const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chu
 
 // Channel info
 
-typedef struct // NSFP_UNIT_key (< NSFP_UNIT_COUNT)
+typedef struct // NSF_UNIT_key (< NSF_UNIT_COUNT)
 {
 	const char* key; // permanent string ID
 	const char* name; // localized name
@@ -297,7 +304,7 @@ typedef struct // NSFP_UNIT_key (< NSFP_UNIT_COUNT)
 	bool active; // whether this unit is active for this NSF
 } NSFChannelUnit;
 
-typedef struct // NSFP_CHANNEL_key (< NSFP_CHANNEL_COUNT)
+typedef struct // NSF_CHANNEL_key (< NSF_CHANNEL_COUNT)
 {
 	int32_t unit; // unit
 	const char* key; // permanent string ID
@@ -334,7 +341,7 @@ uint64_t nsfplay_time_to_cycles(const NSFCore* core, int32_t hours, int32_t minu
 void nsfplay_samples_to_time(const NSFCore* core, uint64_t samples, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds);
 void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds);
 
-// other text strings adapted for the current locale, see: NSFP_TEXT_key
+// other text strings adapted for the current locale, see: NSF_TEXT_key
 // - the returned string pointer is static and has permanent lifetime
 // - textenum 0 is a default error string, returned instead of NULL for safety in some error cases
 const char* nsfplay_local_text(const NSFCore* core, int32_t textenum);

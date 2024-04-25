@@ -83,12 +83,12 @@ inline static sint32 speed16(uint32 rate) // convert 1/10,000 Hz setting to NSF 
 // internal core NSF parsing helpers
 //
 
-static const sint32 FT_NONE    = NSFP_LK_FILE_TYPE_NONE;
-static const sint32 FT_NSF     = NSFP_LK_FILE_TYPE_NSF;
-static const sint32 FT_NSF2    = NSFP_LK_FILE_TYPE_NSF2;
-static const sint32 FT_NSFE    = NSFP_LK_FILE_TYPE_NSFE;
-static const sint32 FT_BIN     = NSFP_LK_FILE_TYPE_BIN;
-static const sint32 FT_INVALID = NSFP_LK_FILE_TYPE_INVALID;
+static const sint32 FT_NONE    = NSF_LK_FILE_TYPE_NONE;
+static const sint32 FT_NSF     = NSF_LK_FILE_TYPE_NSF;
+static const sint32 FT_NSF2    = NSF_LK_FILE_TYPE_NSF2;
+static const sint32 FT_NSFE    = NSF_LK_FILE_TYPE_NSFE;
+static const sint32 FT_BIN     = NSF_LK_FILE_TYPE_BIN;
+static const sint32 FT_INVALID = NSF_LK_FILE_TYPE_INVALID;
 
 inline sint32 nsf_type(const NSFCore* core)
 {
@@ -139,7 +139,7 @@ inline uint32 nsfe_data(const NSFCore* core)
 
 bool NSFCore::nsf_parse(bool bin)
 {
-	NSFP_DEBUG("nsf_parse(%d)",bin);
+	NSF_DEBUG("nsf_parse(%d)",bin);
 	prop_lines = NULL;
 	nsf_bin = false;
 	song_current = 0;
@@ -156,7 +156,7 @@ bool NSFCore::nsf_parse(bool bin)
 			bin_size = (40*1024);
 		std::memcpy(ram6000,nsf,bin_size);
 		if (bin_size != nsf_size) // bin was too big, but this is recoverable
-			set_error(NSFP_ERROR_BIN_BAD);
+			set_error(NSF_ERROR_BIN_BAD);
 
 		return true;
 	}
@@ -167,7 +167,7 @@ bool NSFCore::nsf_parse(bool bin)
 
 	if (ft == FT_INVALID)
 	{
-		set_error(NSFP_ERROR_NSF_HEAD_BAD);
+		set_error(NSF_ERROR_NSF_HEAD_BAD);
 		load(NULL,0,false);
 		return false;
 	}
@@ -183,17 +183,17 @@ bool NSFCore::nsf_parse(bool bin)
 		header_found = true;
 		uint8 nsf_version = nsf[0x05];
 		load_addr = le16(nsf+0x08);
-		NSFP_DEBUG("NSF version: %d",nsf_version);
+		NSF_DEBUG("NSF version: %d",nsf_version);
 
 		nsf_data = nsf + 0x80; // data follows header
 		nsf_data_size = nsf_size - 0x80;
-		if (nsf_version < 1) set_error(NSFP_ERROR_NSF_VERSION_BAD);
+		if (nsf_version < 1) set_error(NSF_ERROR_NSF_VERSION_BAD);
 		if (nsf_version >= 2) // NSF1 may still use metadata but we will treat it as part of the NSF data if present
 		{
 			uint32 nsf2_meta = le24(nsf+0x7D);
 			if (nsf2_meta)
 			{
-				if ((nsf2_meta + 0x80) > nsf_size) set_error(NSFP_ERROR_NSF2_META_BAD);
+				if ((nsf2_meta + 0x80) > nsf_size) set_error(NSF_ERROR_NSF2_META_BAD);
 				else
 				{
 					nsf_data_size = nsf2_meta;
@@ -202,7 +202,7 @@ bool NSFCore::nsf_parse(bool bin)
 			}
 		}
 		// warning about bad header strings
-		if (!has0(nsf+0x0E,32) || !has0(nsf+0x2E,32) || !has0(nsf+0x4E,32)) set_error(NSFP_ERROR_NSF_HEAD_TEXT_BAD);
+		if (!has0(nsf+0x0E,32) || !has0(nsf+0x2E,32) || !has0(nsf+0x4E,32)) set_error(NSF_ERROR_NSF_HEAD_TEXT_BAD);
 	}
 	else mandatory = true;
 
@@ -214,23 +214,23 @@ bool NSFCore::nsf_parse(bool bin)
 		{
 			if ((offset + 8) > nsf_size)
 			{
-				set_error(NSFP_ERROR_NSFE_CHUNK_BAD,"NULL");
+				set_error(NSF_ERROR_NSFE_CHUNK_BAD,"NULL");
 				break;
 			}
 			uint32 chunk_size = le32(nsf+offset+0);
 			uint32 fcc        = le32(nsf+offset+4);
 			if ((offset + chunk_size) > nsf_size)
 			{
-				set_error(NSFP_ERROR_NSFE_CHUNK_BAD,fcc_string(fcc));
+				set_error(NSF_ERROR_NSFE_CHUNK_BAD,fcc_string(fcc));
 				break;
 			}
-			NSFP_DEBUG("NSFE %08X + %08X: %s",offset+8,chunk_size,fcc_string(fcc));
+			NSF_DEBUG("NSFE %08X + %08X: %s",offset+8,chunk_size,fcc_string(fcc));
 			switch (fcc)
 			{
 			case FOURCC("INFO"):
 				if (chunk_size < 0xA) // incomplete info chunk is unrecoverable
 				{
-					set_error(NSFP_ERROR_NSFE_CHUNK_BAD,fcc_string(fcc));
+					set_error(NSF_ERROR_NSFE_CHUNK_BAD,fcc_string(fcc));
 					if (mandatory)
 					{
 						load(NULL,0,false);
@@ -255,7 +255,7 @@ bool NSFCore::nsf_parse(bool bin)
 			default:
 				if (nsfe_mandatory(fcc)) // failing to handle a mandatory chunk is unrecoverable
 				{
-					set_error(NSFP_ERROR_NSFE_MANDATORY,fcc_string(fcc));
+					set_error(NSF_ERROR_NSFE_MANDATORY,fcc_string(fcc));
 					if (mandatory)
 					{
 						load(NULL,0,false);
@@ -270,19 +270,19 @@ bool NSFCore::nsf_parse(bool bin)
 	// we need a header and data to proceed
 	if (!header_found)
 	{
-		set_error(NSFP_ERROR_NSFE_NO_MANDATORY,"INFO");
+		set_error(NSF_ERROR_NSFE_NO_MANDATORY,"INFO");
 		load(NULL,0,false);
 		return false;
 	}
 	if (nsf_data == NULL)
 	{
-		set_error(NSFP_ERROR_NSFE_NO_MANDATORY,"DATA");
+		set_error(NSF_ERROR_NSFE_NO_MANDATORY,"DATA");
 		load(NULL,0,false);
 		return false;
 	}
 
-	NSFP_DEBUG("nsf_data_size = %08X",nsf_data_size);
-	NSFP_DEBUG("load_addr     = %04X",load_addr);
+	NSF_DEBUG("nsf_data_size = %08X",nsf_data_size);
+	NSF_DEBUG("load_addr     = %04X",load_addr);
 	// setup pad0/pad1 banks if needed
 	load_addr &= 0x0FFF;
 	int load_pad = load_addr ? (0x10000 - load_addr) : 0;
@@ -292,7 +292,7 @@ bool NSFCore::nsf_parse(bool bin)
 		int copy_size = (load_pad <= int(nsf_data_size)) ? load_pad : nsf_data_size;
 		pad0 = ram6000 + (0xE000 - 0x6000);
 		std::memcpy(pad0 + load_addr, nsf_data, copy_size);
-		NSFP_DEBUG("load_pad      = %04X",load_pad);
+		NSF_DEBUG("load_pad      = %04X",load_pad);
 	}
 	// determine index of last bank
 	bank_last = 0;
@@ -304,13 +304,13 @@ bool NSFCore::nsf_parse(bool bin)
 	{
 		pad1 = ram6000 + (0xF000 - 0x6000);
 		std::memcpy(pad1, nsf_data + (nsf_data_size - load_end), load_end);
-		NSFP_DEBUG("load_end      = %04X",load_end);
+		NSF_DEBUG("load_end      = %04X",load_end);
 	}
-	NSFP_DEBUG("bank_last     = %02X",bank_last);
+	NSF_DEBUG("bank_last     = %02X",bank_last);
 
 	// set starting song
 	song_current = uint8(PROP(ACTIVE_SONG_START));
-	NSFP_DEBUG("song_current  = %d",song_current);
+	NSF_DEBUG("song_current  = %d",song_current);
 	return true;
 }
 
@@ -353,66 +353,66 @@ bool NSFCore::nsf_prop_exists(sint32 prop, sint32 song) const
 	// this switch should handle every PROP
 	switch(prop)
 	{
-	case NSFP_PROP_FILE_TYPE: return true;
-	case NSFP_PROP_NSF_SONG_COUNT: return true;
-	case NSFP_PROP_NSF_SONG_START: return true;
-	case NSFP_PROP_NSF_VERSION: return NSF_HEADER_PRESENT();
-	case NSFP_PROP_LOAD_ADDR:
-	case NSFP_PROP_INIT_ADDR:
-	case NSFP_PROP_PLAY_ADDR:
+	case NSF_PROP_FILE_TYPE: return true;
+	case NSF_PROP_NSF_SONG_COUNT: return true;
+	case NSF_PROP_NSF_SONG_START: return true;
+	case NSF_PROP_NSF_VERSION: return NSF_HEADER_PRESENT();
+	case NSF_PROP_LOAD_ADDR:
+	case NSF_PROP_INIT_ADDR:
+	case NSF_PROP_PLAY_ADDR:
 		return true;
-	case NSFP_PROP_TITLE:
+	case NSF_PROP_TITLE:
 		if (NSF_HEADER_PRESENT()) return true;
 		CK("auth"); if(ck) return (count_strings(ck,cks) >= 1);
 		return false;
-	case NSFP_PROP_ARTIST:
+	case NSF_PROP_ARTIST:
 		if (NSF_HEADER_PRESENT()) return true;
 		CK("auth"); if(ck) return (count_strings(ck,cks) >= 2);
 		return false;
-	case NSFP_PROP_COPYRIGHT:
+	case NSF_PROP_COPYRIGHT:
 		if (NSF_HEADER_PRESENT()) return true;
 		CK("auth"); if(ck) return (count_strings(ck,cks) >= 3);
 		return false;
-	case NSFP_PROP_RIPPER:
+	case NSF_PROP_RIPPER:
 		CK("auth"); if(ck) return (count_strings(ck,cks) >= 4);
 		return false;
-	case NSFP_PROP_SPEED_NTSC:
-	case NSFP_PROP_SPEED_PAL:
-	case NSFP_PROP_SPEED_DENDY:
+	case NSF_PROP_SPEED_NTSC:
+	case NSF_PROP_SPEED_PAL:
+	case NSF_PROP_SPEED_DENDY:
 		return true;
-	case NSFP_PROP_BANKSWITCH:
+	case NSF_PROP_BANKSWITCH:
 		CK("BANK"); if(ck) return true;
 		if (NSF_HEADER_PRESENT()) return !all0(nsf+0x70,8);
 		return false;
-	case NSFP_PROP_REGION_NTSC:  return NSF_OR_NSFE();
-	case NSFP_PROP_REGION_PAL:   return NSF_OR_NSFE();
-	case NSFP_PROP_REGION_DENDY: return NSF_OR_NSFE();
-	case NSFP_PROP_REGION_PREFER:
-		CK("regn"); if(ck && cks>1 && ck[1]<NSFP_LK_REGIONLIST_COUNT) return true;
+	case NSF_PROP_REGION_NTSC:  return NSF_OR_NSFE();
+	case NSF_PROP_REGION_PAL:   return NSF_OR_NSFE();
+	case NSF_PROP_REGION_DENDY: return NSF_OR_NSFE();
+	case NSF_PROP_REGION_PREFER:
+		CK("regn"); if(ck && cks>1 && ck[1]<NSF_LK_REGIONLIST_COUNT) return true;
 		return false;
-	case NSFP_PROP_EXPANSION_FDS:
-	case NSFP_PROP_EXPANSION_MMC5:
-	case NSFP_PROP_EXPANSION_VRC6:
-	case NSFP_PROP_EXPANSION_VRC7:
-	case NSFP_PROP_EXPANSION_N163:
-	case NSFP_PROP_EXPANSION_5B:
-	case NSFP_PROP_EXPANSION_VT02:
+	case NSF_PROP_EXPANSION_FDS:
+	case NSF_PROP_EXPANSION_MMC5:
+	case NSF_PROP_EXPANSION_VRC6:
+	case NSF_PROP_EXPANSION_VRC7:
+	case NSF_PROP_EXPANSION_N163:
+	case NSF_PROP_EXPANSION_5B:
+	case NSF_PROP_EXPANSION_VT02:
 		return true;
-	case NSFP_PROP_NSF2:
-	case NSFP_PROP_NSF2_METADATA_OFF:
-	case NSFP_PROP_NSF2_IRQ:
-	case NSFP_PROP_NSF2_INIT_NORETURN:
-	case NSFP_PROP_NSF2_NOPLAY:
-	case NSFP_PROP_NSF2_MANDATORY:
+	case NSF_PROP_NSF2:
+	case NSF_PROP_NSF2_METADATA_OFF:
+	case NSF_PROP_NSF2_IRQ:
+	case NSF_PROP_NSF2_INIT_NORETURN:
+	case NSF_PROP_NSF2_NOPLAY:
+	case NSF_PROP_NSF2_MANDATORY:
 		return true;
-	case NSFP_PROP_NSFE_PLAYLIST:
+	case NSF_PROP_NSFE_PLAYLIST:
 		CK("plst"); if(ck && cks) return true;
 		return false;
-	case NSFP_PROP_NSF_HEADER: return NSF_HEADER_PRESENT();
-	case NSFP_PROP_ACTIVE_SONG_COUNT: return true;
-	case NSFP_PROP_ACTIVE_SONG_START: return true;
-	case NSFP_PROP_ACTIVE_PLAYLIST: return true;
-	case NSFP_PROP_SONG_TITLE: return true;
+	case NSF_PROP_NSF_HEADER: return NSF_HEADER_PRESENT();
+	case NSF_PROP_ACTIVE_SONG_COUNT: return true;
+	case NSF_PROP_ACTIVE_SONG_START: return true;
+	case NSF_PROP_ACTIVE_PLAYLIST: return true;
+	case NSF_PROP_SONG_TITLE: return true;
 	default:
 		break;
 	}
@@ -428,127 +428,127 @@ sint32 NSFCore::nsf_prop_int(sint32 prop, sint32 song) const
 
 	switch(prop)
 	{
-	case NSFP_PROP_FILE_TYPE:
+	case NSF_PROP_FILE_TYPE:
 		return NSF_TYPE();
-	case NSFP_PROP_NSF_SONG_COUNT:
+	case NSF_PROP_NSF_SONG_COUNT:
 		CK("INFO"); if (ck && cks > 8) return ck[8];
 		if (NSF_HEADER_PRESENT()) return nsf[0x06];
 		return 0;
-	case NSFP_PROP_NSF_SONG_START:
+	case NSF_PROP_NSF_SONG_START:
 		CK("INFO"); if (ck && cks > 0x9) return ck[0x9];
 		if (NSF_HEADER_PRESENT() && (nsf[0x07]>0)) return nsf[0x07]-1; // NSF header indexes first song as 1 (treating 0 also as first song)
 		return 0;
-	case NSFP_PROP_NSF_VERSION:
+	case NSF_PROP_NSF_VERSION:
 		if(NSF_HEADER_PRESENT()) return nsf[0x05];
 		return 0;
-	case NSFP_PROP_LOAD_ADDR:
+	case NSF_PROP_LOAD_ADDR:
 		if (nsf_bin) return 0x6000;
 		CK("INFO"); if (ck && cks > 1) return le16(ck+0);
 		if (NSF_HEADER_PRESENT())      return le16(nsf+0x08);
 		return 0x8000;
-	case NSFP_PROP_INIT_ADDR:
+	case NSF_PROP_INIT_ADDR:
 		if (nsf_bin) return 0x6000;
 		CK("INFO"); if (ck && cks > 3) return le16(ck+2);
 		if (NSF_HEADER_PRESENT())      return le16(nsf+0x0A);
 		return 0x8000;
-	case NSFP_PROP_PLAY_ADDR:
+	case NSF_PROP_PLAY_ADDR:
 		if (nsf_bin) return 0x6000;
 		CK("INFO"); if (ck && cks > 5) return le16(ck+4);
 		if (NSF_HEADER_PRESENT())      return le16(nsf+0x0C);
 		return 0x8000;
 
-	case NSFP_PROP_SPEED_NTSC:
+	case NSF_PROP_SPEED_NTSC:
 		CK("RATE"); if (ck && cks > 1) return le16(ck+0);
 		if (NSF_HEADER_PRESENT())      return le16(nsf+0x6E);
 		return speed16(SETTING(FRAME_NTSC));
-	case NSFP_PROP_SPEED_PAL:
+	case NSF_PROP_SPEED_PAL:
 		CK("RATE"); if (ck && cks > 3) return le16(ck+2);
 		if (NSF_HEADER_PRESENT())      return le16(nsf+0x78);
 		return speed16(SETTING(FRAME_PAL));
-	case NSFP_PROP_SPEED_DENDY:
+	case NSF_PROP_SPEED_DENDY:
 		CK("RATE"); if (ck && cks > 5) return le16(ck+4);
 		return speed16(SETTING(FRAME_DENDY));
 
-	case NSFP_PROP_REGION_NTSC:
+	case NSF_PROP_REGION_NTSC:
 		CK("regn"); if (ck && cks > 0 && (ck[0] & 1)) return 1;
 		CK("INFO"); if (ck && cks > 6 && (!(    ck[6]&1) || (    ck[6]&2))) return 1;
 		if (NSF_HEADER_PRESENT()      && (!(nsf[0x7A]&1) || (nsf[0x7A]&2))) return 1;
 		return 0;
-	case NSFP_PROP_REGION_PAL:
+	case NSF_PROP_REGION_PAL:
 		CK("regn"); if (ck && cks > 0 && (ck[0] & 2)) return 1;
 		CK("INFO"); if (ck && cks > 6 && ( (    ck[6]&1) || (    ck[6]&2))) return 1;
 		if (NSF_HEADER_PRESENT()      && ( (nsf[0x7A]&1) || (nsf[0x7A]&2))) return 1;
 		return 0;
-	case NSFP_PROP_REGION_DENDY:
+	case NSF_PROP_REGION_DENDY:
 		CK("regn"); if (ck && cks > 0 && (ck[0] & 4)) return 1;
 		return 0;
-	case NSFP_PROP_REGION_PREFER:
-		CK("regn"); if(ck && cks>1 && ck[1]<NSFP_LK_REGIONLIST_COUNT) return ck[1];
+	case NSF_PROP_REGION_PREFER:
+		CK("regn"); if(ck && cks>1 && ck[1]<NSF_LK_REGIONLIST_COUNT) return ck[1];
 		return 0;
-	case NSFP_PROP_EXPANSION_FDS:
+	case NSF_PROP_EXPANSION_FDS:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x04) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x04) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_MMC5:
+	case NSF_PROP_EXPANSION_MMC5:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x08) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x08) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_VRC6:
+	case NSF_PROP_EXPANSION_VRC6:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x01) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x01) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_VRC7:
+	case NSF_PROP_EXPANSION_VRC7:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x02) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x02) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_N163:
+	case NSF_PROP_EXPANSION_N163:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x10) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x10) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_5B:
+	case NSF_PROP_EXPANSION_5B:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x20) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x20) return 1;
 		return 0;		
-	case NSFP_PROP_EXPANSION_VT02:
+	case NSF_PROP_EXPANSION_VT02:
 		CK("INFO"); if(ck && cks>7 &&     ck[7]&0x40) return 1;
 		if (NSF_HEADER_PRESENT()   && nsf[0x7B]&0x40) return 1;
 		return 0;		
-	case NSFP_PROP_NSF2:
+	case NSF_PROP_NSF2:
 		return NSF_TYPE() == FT_NSF2;
-	case NSFP_PROP_NSF2_METADATA_OFF:
+	case NSF_PROP_NSF2_METADATA_OFF:
 		if (NSF_HEADER_PRESENT()) return le24(nsf+0x7D);
 		return 0;
-	case NSFP_PROP_NSF2_IRQ:
+	case NSF_PROP_NSF2_IRQ:
 		CK("NSF2"); if(ck && cks>0  &&     ck[0]&0x10) return 1;
 		if ((NSF_TYPE() == FT_NSF2) && nsf[0x7C]&0x10) return 1;
 		return 0;
-	case NSFP_PROP_NSF2_INIT_NORETURN:
+	case NSF_PROP_NSF2_INIT_NORETURN:
 		CK("NSF2"); if(ck && cks>0  &&     ck[0]&0x20) return 1;
 		if ((NSF_TYPE() == FT_NSF2) && nsf[0x7C]&0x20) return 1;
 		return 0;
-	case NSFP_PROP_NSF2_NOPLAY:
+	case NSF_PROP_NSF2_NOPLAY:
 		CK("NSF2"); if(ck && cks>0  &&     ck[0]&0x40) return 1;
 		if ((NSF_TYPE() == FT_NSF2) && nsf[0x7C]&0x40) return 1;
 		return 0;
-	case NSFP_PROP_NSF2_MANDATORY:
+	case NSF_PROP_NSF2_MANDATORY:
 		CK("NSF2"); if(ck && cks>0  &&     ck[0]&0x80) return 1;
 		if ((NSF_TYPE() == FT_NSF2) && nsf[0x7C]&0x80) return 1;
 		return 0;
 
-	case NSFP_PROP_ACTIVE_SONG_COUNT:
+	case NSF_PROP_ACTIVE_SONG_COUNT:
 		if (SETTING(PLAYLIST))
 		{
 			CK("plst"); if (ck && cks) return cks; // length of playlist replaces song count
 		}
 		return PROP(NSF_SONG_COUNT);
-	case NSFP_PROP_ACTIVE_SONG_START:
+	case NSF_PROP_ACTIVE_SONG_START:
 		if (SETTING(PLAYLIST))
 		{
 			CK("plst"); if (ck && cks) return 0; // playlist starts at the beginning
 		}
 		return PROP(NSF_SONG_START);
-	case NSFP_PROP_ACTIVE_PLAYLIST:
-		if (nsf_prop_exists(NSFP_PROP_NSFE_PLAYLIST) && SETTING(PLAYLIST)) return 1;
+	case NSF_PROP_ACTIVE_PLAYLIST:
+		if (nsf_prop_exists(NSF_PROP_NSFE_PLAYLIST) && SETTING(PLAYLIST)) return 1;
 		return 0;
 
 	default:
@@ -573,22 +573,22 @@ const char* NSFCore::nsf_prop_str(sint32 prop, sint32 song) const
 
 	switch(prop)
 	{
-	case NSFP_PROP_TITLE:
+	case NSF_PROP_TITLE:
 		CK("auth"); if(ck && count_strings(ck,cks) >= 1) return nth_string(ck,cks,0);
 		if (NSF_HEADER_PRESENT() && has0(nsf+0x0E,32)) return (const char*)nsf+0x0E;
 		break;
-	case NSFP_PROP_ARTIST:
+	case NSF_PROP_ARTIST:
 		CK("auth"); if(ck && count_strings(ck,cks) >= 2) return nth_string(ck,cks,1);
 		if (NSF_HEADER_PRESENT() && has0(nsf+0x2E,32)) return (const char*)nsf+0x2E;
 		break;
-	case NSFP_PROP_COPYRIGHT:
+	case NSF_PROP_COPYRIGHT:
 		CK("auth"); if(ck && count_strings(ck,cks) >= 3) return nth_string(ck,cks,2);
 		if (NSF_HEADER_PRESENT() && has0(nsf+0x4E,32)) return (const char*)nsf+0x4E;
 		break;
-	case NSFP_PROP_RIPPER:
+	case NSF_PROP_RIPPER:
 		CK("auth"); return nth_string(ck,cks,3);
 		break;
-	case NSFP_PROP_SONG_TITLE:
+	case NSF_PROP_SONG_TITLE:
 		// TODO
 		return MISSING_STR;
 	default:
@@ -623,14 +623,14 @@ const uint8* NSFCore::nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song)
 
 	switch(prop)
 	{
-	case NSFP_PROP_BANKSWITCH:
+	case NSF_PROP_BANKSWITCH:
 		CK("BANK"); if(ck) { bsize = cks; blob = ck; break; }
 		if (NSF_HEADER_PRESENT() && !all0(nsf+0x70,8)) { bsize = 8; blob = nsf+0x70; break; }
 		break;
-	case NSFP_PROP_NSFE_PLAYLIST:
+	case NSF_PROP_NSFE_PLAYLIST:
 		CK("plst"); if(ck && cks>0) { bsize = cks; blob = ck; break; }
 		break;
-	case NSFP_PROP_NSF_HEADER:
+	case NSF_PROP_NSF_HEADER:
 		if (NSF_HEADER_PRESENT()) { bsize = 0x80; blob = nsf; break; }
 		break;
 

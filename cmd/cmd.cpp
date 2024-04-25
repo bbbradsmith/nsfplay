@@ -5,6 +5,7 @@
 #include <cstdio> // std::fprintf
 #include <cstdlib> // std::exit, std::atexit
 #include <cstring> // std::strlen
+#include <cstddef> // NULL
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
@@ -63,12 +64,12 @@ int main(int argc, char** argv)
 		"\n"
 		"VOLUME=368";
 	const NSFSetInit TEST_INIT[] = {
-		{NSFP_SET_DPCM_ON,0,NULL},
-		{NSFP_SET_DPCM_ON,-2,NULL}, // out of range
-		{NSFP_SET_DPCM_ON,2,NULL}, // out of range
-		{NSFP_SET_DPCM_ON,0,"string"}, // wrong type
-		{NSFP_SET_TITLE_FORMAT,0,"string"},
-		{NSFP_SET_TITLE_FORMAT,3,NULL}, // wrong type
+		{NSF_SET_DPCM_ON,0,NULL},
+		{NSF_SET_DPCM_ON,-2,NULL}, // out of range
+		{NSF_SET_DPCM_ON,2,NULL}, // out of range
+		{NSF_SET_DPCM_ON,0,"string"}, // wrong type
+		{NSF_SET_TITLE_FORMAT,0,"string"},
+		{NSF_SET_TITLE_FORMAT,3,NULL}, // wrong type
 		{-1,0,NULL},
 	};
 	*/
@@ -87,13 +88,13 @@ int main(int argc, char** argv)
 	/*
 	// test info
 	printf("GROUPS:\n");
-	for (int i=0;i<NSFP_GROUP_COUNT;++i)
+	for (int i=0;i<NSF_GROUP_COUNT;++i)
 	{
 		NSFGroupInfo info = nsfplay_set_group_info(core,i);
 		printf("%s %s - %s\n",info.key,info.name,info.desc);
 	}
 	printf("SETS:\n");
-	for (int i=0;i<NSFP_SET_COUNT;++i)
+	for (int i=0;i<NSF_SET_COUNT;++i)
 	{
 		NSFSetInfo info = nsfplay_set_info(core,i);
 		printf("%s %s %s - %s %d %d %d %d %s\n",
@@ -129,15 +130,15 @@ int main(int argc, char** argv)
 
 	// test props
 	printf("PROPS:\n");
-	for (int i=0;i<NSFP_PROP_COUNT;++i)
+	for (int i=0;i<NSF_PROP_COUNT;++i)
 	{
 		NSFPropInfo info = nsfplay_prop_info(core,i);
 		//printf("%s %s %d\n",info.key,info.name,info.type);
 		if (nsfplay_prop_exists(core,i))
 		{
-			if (info.type == NSFP_PROP_TYPE_INT || info.type == NSFP_PROP_TYPE_LIST)
+			if (info.type == NSF_PROP_TYPE_INT || info.type == NSF_PROP_TYPE_LIST)
 				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i,-1));
-			else if (info.type == NSFP_PROP_TYPE_STR)
+			else if (info.type == NSF_PROP_TYPE_STR)
 				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i,-1));
 			else
 				printf("%s (%d)\n",info.key,info.type);
@@ -146,7 +147,7 @@ int main(int argc, char** argv)
 
 	/*
 	// test ini generation
-	for (int i=0;i<NSFP_SET_COUNT;++i)
+	for (int i=0;i<NSF_SET_COUNT;++i)
 		printf("%s\\n\n",nsfplay_ini_line(core,i));
 	*/
 

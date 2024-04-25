@@ -14,6 +14,7 @@
 //   without redundantly including this one.
 
 #include <nsfplaycore.h>
+#include <stddef.h> // NULL
 
 typedef int8_t    sint8;
 typedef int16_t   sint16;
@@ -26,23 +27,23 @@ typedef uint32_t  uint32;
 typedef uint64_t  uint64;
 
 #ifdef DEBUG
-	#define NSFP_DEBUG(...) { nsfp::debug_printf(__VA_ARGS__); }
+	#define NSF_DEBUG(...) { nsf::debug_printf(__VA_ARGS__); }
 	#define DEBUG_ALLOC 1
 #else
-	#define NSFP_DEBUG(...) {}
+	#define NSF_DEBUG(...) {}
 	#define DEBUG_ALLOC 0
 #endif
 
-#ifndef NSFP_NOTEXT
-	// define NSFP_NOTEXT=1 to strip all unnecessary text from the build
+#ifndef NSF_NOTEXT
+	// define NSF_NOTEXT=1 to strip all unnecessary text from the build
 	//   this disables ini parsing, error messages will become blank strings, and list keys will also become blank
-	#define NSFP_NOTEXT 0
+	#define NSF_NOTEXT 0
 #endif
 
 // convenient accessors
-#define SETTING(setenum_) (setting[NSFP_SET_##setenum_])
-#define PROP(propenum_) (nsf_prop_int(NSFP_PROP_##propenum_))
-#define PROPS(propenum_) (nsf_prop_str(NSFP_PROP_##propenum_))
+#define SETTING(setenum_) (setting[NSF_SET_##setenum_])
+#define PROP(propenum_) (nsf_prop_int(NSF_PROP_##propenum_))
+#define PROPS(propenum_) (nsf_prop_str(NSF_PROP_##propenum_))
 
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
 
@@ -67,9 +68,9 @@ typedef struct NSFCore_
 	mutable const char* prop_lines;
 
 	// settings
-	sint32 setting[NSFP_SET_COUNT]; // integer settings (can read directly, write with set_int)
-	const char* setting_str[NSFP_SETSTR_COUNT]; // string settings, indexed by value in setting[], (use set/get_str to access)
-	bool setting_str_free[NSFP_SETSTR_COUNT]; // true if string setting was allocated (not default), managed by set_str/destroy
+	sint32 setting[NSF_SET_COUNT]; // integer settings (can read directly, write with set_int)
+	const char* setting_str[NSF_SETSTR_COUNT]; // string settings, indexed by value in setting[], (use set/get_str to access)
+	bool setting_str_free[NSF_SETSTR_COUNT]; // true if string setting was allocated (not default), managed by set_str/destroy
 
 	// emulation
 	const uint8* nsf;
@@ -145,8 +146,8 @@ typedef struct NSFCore_
 	bool load(const uint8* data, uint32 size, bool assume, bool bin=false);
 	NSFPropInfo prop_info(sint32 prop) const;
 
-	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale (local_text(0) is a default error string)
-	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
+	const char* local_text(sint32 textenum) const; // NSF_TEXT_x for curent locale (local_text(0) is a default error string)
+	static const char* local_text(sint32 textenum, sint32 locale); // NSF_TEXT_x for specific locale
 
 	// nsf.cpp
 	bool nsf_parse(bool bin);
@@ -162,7 +163,7 @@ typedef struct NSFCore_
 
 } NSFCore;
 
-namespace nsfp {
+namespace nsf {
 
 // core.cpp
 
@@ -178,6 +179,6 @@ void debug_printf(const char* fmt,...); // only works if DEBUG defined
 void debug(const char* msg);
 void fatal(const char* msg);
 
-} // namespace nsfp
+} // namespace nsf
 
 #endif // __CORE_PCH__

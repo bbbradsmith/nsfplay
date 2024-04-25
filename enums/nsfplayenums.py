@@ -196,55 +196,67 @@ defs_channelonlist = None
 defs_local = []
 defs_localdefault = None
 
-PROP_INT    = 1
-PROP_LONG   = 2
-PROP_STR    = 3
-PROP_LINES  = 4
-PROP_BLOB   = 5
-PROP_LIST   = 6
+(
+PROP_INVALID,
+PROP_INT,
+PROP_LONG,
+PROP_STR,
+PROP_LINES,
+PROP_BLOB,
+PROP_LIST
+) = range(0,7)
 
-GT_SET      = 1
-GT_PROP     = 2
-GT_SONGPROP = 3
+(
+GT_INVALID,
+GT_SET,
+GT_PROP,
+GT_SONGPROP,
+) = range(0,4)
 
-DT_INT      = 1
-DT_LONG     = 2
-DT_STR      = 3
-DT_LINES    = 4
-DT_BLOB     = 5
-DT_LIST     = 6
-DT_BOOL     = 7
-DT_HEX8     = 8
-DT_HEX16    = 9
-DT_HEX32    = 10
-DT_HEX64    = 11
-DT_COLOR    = 12
-DT_MSEC     = 13
-DT_MILL     = 14
-DT_HZ       = 15
-DT_KEY      = 16
-DT_PRECISE  = 17
+(
+DT_INVALID,
+DT_INT,
+DT_LONG,
+DT_STR,
+DT_LINES,
+DT_BLOB,
+DT_LIST,
+DT_BOOL,
+DT_HEX8,
+DT_HEX16,
+DT_HEX32,
+DT_HEX64,
+DT_COLOR,
+DT_MSEC,
+DT_MILL,
+DT_HZ,
+DT_KEY,
+DT_PRECISE,
+) = range(0,18)
 
 GT = { "SET":GT_SET, "PROP":GT_PROP, "SONGPROP":GT_SONGPROP }
 GT_REVERSE = {v:k for k,v in GT.items()}
 
 DT = { "INT":DT_INT, "LONG":DT_STR,
-       # "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
+       "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
        "BOOL":DT_BOOL,
        "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64,
        "COLOR":DT_COLOR, "MSEC":DT_MSEC, "MILL":DT_MILL, "HZ":DT_HZ, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
-# the commented values are only set automatically, and aren't valid for SETINT/PROPINT
+DT_REVERSE = {v:k for k,v in DT.items()}
+DT_FORBID = { "LINES", "BLOB", "LIST" } # only set automatically, not valid for SETINT/PROPINT
 
 CHANNEL_ADD = ("ON","VOL","PAN","COL")
 
 # parsing definitions
 
-PARSE_KEY  = 0
-PARSE_INT  = 1
-PARSE_STR  = 2
-PARSE_KEYS = 3
-PARSE_DT   = 4
-PARSE_GT   = 5
+(
+PARSE_KEY,
+PARSE_INT,
+PARSE_STR,
+PARSE_KEYS,
+PARSE_GT,
+PARSE_DT,
+) = range(0,6)
 
 PARSE_DEFS = {
     "LIST":[PARSE_KEY,PARSE_KEYS],
@@ -359,16 +371,18 @@ def parse_entry(ls):
                     return (None,None)
                 p.append(ls[0])
                 ls = ls[1:]
-        elif pd == PARSE_DT:
-            if ls[0].upper() not in DT:
-                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
-                return (None,None)
-            p.append(DT[ls[0].upper()])
         elif pd == PARSE_GT:
             if ls[0].upper() not in GT:
                 parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0])
                 return (None,None)
             p.append(GT[ls[0].upper()])
+        elif pd == PARSE_DT:
+            if (ls[0].upper() in DT_FORBID):
+                parse_error(PARSE_DEF_NAME[pd]+" not allowed in SETINT/PROPINT: "+ls[0].upper())
+            if ls[0].upper() not in DT:
+                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0]+" "+str(DT.values()))
+                return (None,None)
+            p.append(DT[ls[0].upper()])
         ls = ls[1:]
     if len(ls) > 0:
         parse_error(command+" has too many entries, expected: "+str(len(parse_def)))
@@ -628,8 +642,8 @@ def gen_break(target=0):
     gen_line("",target)
 
 def gen_enum(key,value,target=0,hexadecimal=False):
-    if not hexadecimal: gen_line("#define %-40s %12d" % (key,value),target)
-    else:               gen_line("#define %-40s %12X" % (key,value),target)
+    if not hexadecimal: gen_line("const int32_t %-42s %12d;" % (key+" =",value),target)
+    else:               gen_line("const int32_t %-42s %12X;" % (key+" =",value),target)
 
 def gen_text(text): # adds utf-8 string to text blob, returns offset to it, duplicates are reused
     global gen_text_blob, gen_text_map
@@ -705,7 +719,7 @@ def generate_enums(file_enum,file_data,do_write):
             (name,desc) = ("*","*")
         defs_local[i][4].append((locale_set_index,name,desc))
     # map each list to a text index, and gather the locale strings to go with it
-    gen_enum("NSFP_LIST_COUNT",len(defs_list));
+    gen_enum("NSF_LIST_COUNT",len(defs_list));
     table_list = []
     for li in range(len(defs_list)):
         list_key = defs_list[li][0]
@@ -713,7 +727,7 @@ def generate_enums(file_enum,file_data,do_write):
         keys_list = ""
         for i in range(len(keys)): keys_list += keys[i] + "\0"
         keys_list += "\0" # double 0 to end the list
-        gen_enum("NSFP_LIST_"+list_key,len(table_list))
+        gen_enum("NSF_LIST_"+list_key,len(table_list))
         table_list.append(len(table_locale[0])) # locale table index used by table values
         names = [keys[:] for i in range(locs)] # keys used as fallback if no default locale
         for i in range(locs):
@@ -738,7 +752,7 @@ def generate_enums(file_enum,file_data,do_write):
             table_locale[i].append(gen_text(keys_list))
             table_locale[i].append(gen_text(local_list))
     gen_break(0)
-    gen_line("const int32_t NSFPD_LIST_TEXT[NSFP_LIST_COUNT] = { // text+0 keys, +1 local keys",1)
+    gen_line("const int32_t NSFD_LIST_TEXT[NSF_LIST_COUNT] = { // text+0 keys, +1 local keys",1)
     gen_data(table_list,mode=2)
     gen_line("};",1)
     gen_break(1)
@@ -747,20 +761,20 @@ def generate_enums(file_enum,file_data,do_write):
         list_key = defs_list[li][0]
         keys = list(defs_list[li][1:])
         if list_key == "COUNT": error("LIST name COUNT is reserved")
-        gen_enum("NSFP_LK_"+list_key+"_COUNT",len(keys))
+        gen_enum("NSF_LK_"+list_key+"_COUNT",len(keys))
         for k in range(len(keys)):
             key = keys[k]
             if key == "COUNT": error("LIST key name COUNT is reserved")
-            gen_enum("NSFP_LK_"+list_key+"_"+key,k)
+            gen_enum("NSF_LK_"+list_key+"_"+key,k)
         gen_break(0)
     #
     # generate units
     #
-    gen_enum("NSFP_UNIT_COUNT",len(defs_unit))
+    gen_enum("NSF_UNIT_COUNT",len(defs_unit))
     table_unit = []
     for ui in range(len(defs_unit)):
         unit_key = defs_unit[ui][0]
-        gen_enum("NSFP_UNIT_"+unit_key,ui)
+        gen_enum("NSF_UNIT_"+unit_key,ui)
         gi = check_group(unit_key,GT_SET)
         if gi == None: fatal_error("UNIT missing automatically generated GROUP: "+unit_key)
         table_unit.append(gi);
@@ -774,7 +788,7 @@ def generate_enums(file_enum,file_data,do_write):
                 warn("LOCAL("+defs_local[i][0]+") missing: LOCALUNIT "+unit_key+" * *")
                 defs_local[i][3].append((gi,"*","*")) # suppress group warning
     gen_break(0)
-    gen_line("const int32_t NSFPD_UNIT_GROUP[NSFP_UNIT_COUNT] = {",1)
+    gen_line("const int32_t NSFD_UNIT_GROUP[NSF_UNIT_COUNT] = {",1)
     gen_data(table_unit,mode=2)
     gen_line("};",1)
     gen_break(1)
@@ -782,15 +796,15 @@ def generate_enums(file_enum,file_data,do_write):
     # generate group data
     #
     # map each group to a text index, gather locale strings
-    gen_enum("NSFP_GROUP_COUNT",len(defs_group))
+    gen_enum("NSF_GROUP_COUNT",len(defs_group))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t type, text; // text+0 name, +1 desc",1)
     gen_line("} NSFGroupData;",1)
-    gen_line("const NSFGroupData NSFPD_GROUP[NSFP_GROUP_COUNT] = {",1)
+    gen_line("const NSFGroupData NSFD_GROUP[NSF_GROUP_COUNT] = {",1)
     for gi in range(len(defs_group)):
         group_key = defs_group[gi][0]
-        gen_enum("NSFP_GROUP_"+group_key,gi)
+        gen_enum("NSF_GROUP_"+group_key,gi)
         gen_line("\t{ %30s,%4d }," % ('"'+group_key+'"',len(table_locale[0])),1)
         names = [group_key for i in range(locs)]
         descs = [group_key for i in range(locs)]
@@ -822,12 +836,12 @@ def generate_enums(file_enum,file_data,do_write):
     # generate setting data
     #
     # generate settings for channels
-    gen_enum("NSFP_CHANNEL_COUNT",len(defs_channel))
+    gen_enum("NSF_CHANNEL_COUNT",len(defs_channel))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t unit, text; // text+0 short-name, +1 name",1)
     gen_line("} NSFChannelData;",1)
-    gen_line("const NSFChannelData NSFPD_CHANNEL[NSFP_CHANNEL_COUNT] = {",1)
+    gen_line("const NSFChannelData NSFD_CHANNEL[NSF_CHANNEL_COUNT] = {",1)
     for i in range(locs):
         CAL = len(CHANNEL_ADD)
         CAL2 = CAL * 2
@@ -845,7 +859,7 @@ def generate_enums(file_enum,file_data,do_write):
         channel_key = defs_channel[ci][1]
         si = len(defs_set)
         gen_line("\t{ %30s,%2d,%4d }," % ('"'+channel_key+'"',ui,len(table_locale[0])),1)
-        gen_enum("NSFP_CHANNEL_"+unit_key+"_"+channel_key,ci)
+        gen_enum("NSF_CHANNEL_"+unit_key+"_"+channel_key,ci)
         CHANNEL_ADD_DEF = [
             (1,0,1,0,1,defs_channelonlist,False,DT_LIST),
             (500,0,8000,0,1000,None,False,DT_MILL),
@@ -888,7 +902,7 @@ def generate_enums(file_enum,file_data,do_write):
     # sort settings by group
     sorted_sets = sorted([(defs_set[i][0],i) for i in range(len(defs_set))])
     # map each setting to a text index, gather locale strings
-    gen_enum("NSFP_SET_COUNT",len(defs_set))
+    gen_enum("NSF_SET_COUNT",len(defs_set))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t group, text; // text+0 name, +1 desc",1)
@@ -896,7 +910,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("\tint32_t display, list;",1)
     gen_line("\tconst char* default_str;",1)
     gen_line("} NSFSetData;",1)
-    gen_line("const NSFSetData NSFPD_SET[NSFP_SET_COUNT] = {",1)
+    gen_line("const NSFSetData NSFD_SET[NSF_SET_COUNT] = {",1)
     setstr_count = 0
     for ssi in range(len(sorted_sets)):
         si = sorted_sets[ssi][1]
@@ -921,7 +935,7 @@ def generate_enums(file_enum,file_data,do_write):
             default_int,min_int,max_int,min_hint,max_hint,
             display_hint,list_index,
             default_str),1)
-        gen_enum("NSFP_SET_"+set_key,ssi)
+        gen_enum("NSF_SET_"+set_key,ssi)
         names = [set_key for i in range(locs)]
         descs = [set_key for i in range(locs)]
         for i in range(locs):
@@ -945,7 +959,7 @@ def generate_enums(file_enum,file_data,do_write):
                     descs[j] = descs[0]
             table_locale[i].append(gen_text(names[i]))
             table_locale[i].append(gen_text(descs[i]))
-    gen_enum("NSFP_SETSTR_COUNT",setstr_count)
+    gen_enum("NSF_SETSTR_COUNT",setstr_count)
     gen_break(0)
     gen_line("};",1)
     gen_break(1)
@@ -954,13 +968,13 @@ def generate_enums(file_enum,file_data,do_write):
     #
     # sort props by group
     sorted_props = sorted([(defs_prop[i][1],i) for i in range(len(defs_prop))])
-    gen_enum("NSFP_PROP_COUNT",len(defs_prop))
+    gen_enum("NSF_PROP_COUNT",len(defs_prop))
     gen_line("typedef struct {",1)
     gen_line("\tconst char* key;",1)
     gen_line("\tint32_t group, text, type, display; // text+0 name, +1 desc",1)
     gen_line("\tint32_t max_list, list;",1)
     gen_line("} NSFPropData;",1)
-    gen_line("const NSFPropData NSFPD_PROP[NSFP_PROP_COUNT] = {",1)
+    gen_line("const NSFPropData NSFD_PROP[NSF_PROP_COUNT] = {",1)
     for spi in range(len(sorted_props)):
         pi = sorted_props[spi][1]
         (prop_key,gi,prop_type,prop_display,prop_list) = defs_prop[pi]
@@ -974,7 +988,7 @@ def generate_enums(file_enum,file_data,do_write):
             '"'+prop_key+'"',
             gi,len(table_locale[0]),prop_type,prop_display,
             list_max,list_index),1)
-        gen_enum("NSFP_PROP_"+prop_key,spi);
+        gen_enum("NSF_PROP_"+prop_key,spi);
         names = [prop_key for i in range(locs)]
         for i in range(locs):
             name = None
@@ -999,7 +1013,7 @@ def generate_enums(file_enum,file_data,do_write):
     #
     for ti in range(len(defs_local[0][9])):
         text_key = defs_local[0][9][ti][0]
-        gen_enum("NSFP_"+text_key,len(table_locale[0]))
+        gen_enum("NSF_"+text_key,len(table_locale[0]))
         names = [text_key for i in range(locs)]
         for i in range(locs):
             name = None
@@ -1025,29 +1039,29 @@ def generate_enums(file_enum,file_data,do_write):
     #
     # generate text data tables
     #
-    gen_enum("NSFP_TEXT_COUNT",len(table_locale[0]))
+    gen_enum("NSF_TEXT_COUNT",len(table_locale[0]))
     gen_break(0)
-    gen_enum("NSFP_LOCALE_COUNT",len(defs_local))
-    gen_line("#if !(NSFP_NOTEXT)",1)
+    gen_enum("NSF_LOCALE_COUNT",len(defs_local))
+    gen_line("#if !(NSF_NOTEXT)",1)
     gen_break(1)
-    gen_line("const int32_t NSFPD_LOCAL_TEXT[NSFP_LOCALE_COUNT][%d] = {" % (len(table_locale[0])),1)
+    gen_line("const int32_t NSFD_LOCAL_TEXT[NSF_LOCALE_COUNT][%d] = {" % (len(table_locale[0])),1)
     for i in range(0,locs):
-        gen_enum("NSFP_LOCALE_"+defs_local[i][0],i)
+        gen_enum("NSF_LOCALE_"+defs_local[i][0],i)
         gen_line("{",1)
         gen_data(table_locale[i],mode=3)
         gen_line("},",1)
     gen_line("};",1)
     gen_break(1)
-    gen_line("const uint8_t NSFPD_LOCAL_TEXT_DATA[0x%06X] = {" % (len(gen_text_blob)),1)
+    gen_line("const uint8_t NSFD_LOCAL_TEXT_DATA[0x%06X] = {" % (len(gen_text_blob)),1)
     gen_data(gen_text_blob,mode=0)
     gen_line("};",1)
     gen_break(1)
-    gen_line("#else // (NSFP_NOTEXT)",1)
+    gen_line("#else // (NSF_NOTEXT)",1)
     gen_break(1)
     max_list_len = 2;
     for dl in defs_list:
         if len(dl) > max_list_len: max_list_len = len(dl) # this is actually +1 because dl contains the list name as well, but we need the extra 0 for the double terminal
-    gen_line("const uint8_t NSFPD_NOTEXT_LIST_KEY[%d] = {" % (max_list_len),1)
+    gen_line("const uint8_t NSFD_NOTEXT_LIST_KEY[%d] = {" % (max_list_len),1)
     gen_data([0]*max_list_len,mode=4);
     gen_line("};",1)
     gen_break(1)

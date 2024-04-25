@@ -47,7 +47,7 @@ inline const char* utf8_bom_skip(const char* text)
 	return text;
 }
 
-namespace nsfp {
+namespace nsf {
 
 void (*error_callback)(const char* msg) = NULL;
 void (*debug_print_callback)(const char* msg) = NULL;
@@ -56,13 +56,13 @@ void (*fatal_callback)(const char* msg) = NULL;
 void* alloc(size_t size)
 {
 	void* a = std::malloc(size);
-	if (a == NULL) nsfp::fatal("Out of memory.");
+	if (a == NULL) nsf::fatal("Out of memory.");
 	#if DEBUG_ALLOC
 		debug_alloc[a] = size;
 		debug_alloc_total += size;
-		NSFP_DEBUG("alloc(%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+		NSF_DEBUG("alloc(%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
 	#else
-		NSFP_DEBUG("alloc(%7zu)",size);
+		NSF_DEBUG("alloc(%7zu)",size);
 	#endif
 	return a;
 }
@@ -74,9 +74,9 @@ void free(void* ptr)
 		size_t size = debug_alloc[ptr];
 		debug_alloc_total -= size;
 		debug_alloc.erase(ptr);
-		NSFP_DEBUG("free(-%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+		NSF_DEBUG("free(-%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
 	#else
-		NSFP_DEBUG("free()");
+		NSF_DEBUG("free()");
 	#endif
 }
 
@@ -107,12 +107,12 @@ void fatal(const char* msg)
 	std::exit(-1);
 }
 
-} // namespace nsfp
+} // namespace nsf
 
 NSFCore* NSFCore::create()
 {
-	NSFCore* core = (NSFCore*)nsfp::alloc(sizeof(NSFCore));
-	NSFP_DEBUG("create()");
+	NSFCore* core = (NSFCore*)nsf::alloc(sizeof(NSFCore));
+	NSF_DEBUG("create()");
 	std::memset(core,0,sizeof(NSFCore));
 	core->set_default();
 	return core;
@@ -120,19 +120,19 @@ NSFCore* NSFCore::create()
 
 void NSFCore::destroy(NSFCore* core)
 {
-	NSFP_DEBUG("destroy()");
+	NSF_DEBUG("destroy()");
 	core->release();
-	nsfp::free(core);
+	nsf::free(core);
 }
 
 void NSFCore::release()
 {
 	// release any allocations held
 	if (nsf_free)
-		nsfp::free(const_cast<uint8*>(nsf));
-	for (int si=0; si<NSFP_SETSTR_COUNT; ++si)
+		nsf::free(const_cast<uint8*>(nsf));
+	for (int si=0; si<NSF_SETSTR_COUNT; ++si)
 		if (setting_str_free[si])
-			nsfp::free(const_cast<char*>(setting_str[si]));
+			nsf::free(const_cast<char*>(setting_str[si]));
 }
 
 const char* NSFCore::last_error() const
@@ -144,7 +144,7 @@ const char* NSFCore::last_error() const
 
 void NSFCore::set_error(sint32 textenum,...) const
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// skip formatting if not needed
 	bool direct = true;
@@ -159,8 +159,8 @@ void NSFCore::set_error(sint32 textenum,...) const
 	if (direct)
 	{
 		error_last = fmt;
-		if (nsfp::error_callback) nsfp::error_callback(error_last);
-		else { NSFP_DEBUG("ERROR: %s",error_last); } // send errors to debug if not logged
+		if (nsf::error_callback) nsf::error_callback(error_last);
+		else { NSF_DEBUG("ERROR: %s",error_last); } // send errors to debug if not logged
 		return;
 	}
 	// format
@@ -173,13 +173,13 @@ void NSFCore::set_error(sint32 textenum,...) const
 	(void)textenum;
 	error_last = "";
 #endif
-	if (nsfp::error_callback) nsfp::error_callback(error_last);
-	else { NSFP_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(error_last);
+	else { NSF_DEBUG("ERROR: %s",error_last); }
 }
 
 void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// line number prefix if linenum < 0
 	if (linenum < 0) error_last_buffer[0] = 0;
@@ -200,8 +200,8 @@ void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 	(void)textenum;
 	error_last = "";
 #endif
-	if (nsfp::error_callback) nsfp::error_callback(error_last);
-	else { NSFP_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(error_last);
+	else { NSF_DEBUG("ERROR: %s",error_last); }
 }
 
 void NSFCore::set_error_raw(const char* fmt,...) const
@@ -211,21 +211,21 @@ void NSFCore::set_error_raw(const char* fmt,...) const
 	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
-	if (nsfp::error_callback) nsfp::error_callback(error_last);
-	else { NSFP_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(error_last);
+	else { NSF_DEBUG("ERROR: %s",error_last); }
 }
 
 void NSFCore::set_default()
 {
-	for (int i=0; i<NSFP_SET_COUNT; ++i)
+	for (int i=0; i<NSF_SET_COUNT; ++i)
 	{
-		setting[i] = NSFPD_SET[i].default_int;
-		if (NSFPD_SET[i].default_str != NULL)
+		setting[i] = NSFD_SET[i].default_int;
+		if (NSFD_SET[i].default_str != NULL)
 		{
 			sint32 si = setting[i];
 			if (setting_str_free[si])
-				nsfp::free(const_cast<char*>(setting_str[si]));
-			setting_str[si] = NSFPD_SET[i].default_str;
+				nsf::free(const_cast<char*>(setting_str[si]));
+			setting_str[si] = NSFD_SET[i].default_str;
 			setting_str_free[si] = false;
 		}
 	}
@@ -233,7 +233,7 @@ void NSFCore::set_default()
 
 bool NSFCore::set_ini(const char* ini)
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	if (ini == NULL) return true;
 	// skip UTF-8 BOM if present
 	ini = utf8_bom_skip(ini);
@@ -276,20 +276,20 @@ bool NSFCore::set_init(const NSFSetInit* init)
 
 bool NSFCore::set_int(sint32 setenum, sint32 value)
 {
-	if (setenum < 0 || setenum > NSFP_SET_COUNT)
+	if (setenum < 0 || setenum > NSF_SET_COUNT)
 	{
-		set_error(NSFP_ERROR_SET_INVALID);
+		set_error(NSF_ERROR_SET_INVALID);
 		return false;
 	}
-	const NSFSetData& SD = NSFPD_SET[setenum];
+	const NSFSetData& SD = NSFD_SET[setenum];
 	if (SD.default_str != NULL)
 	{
-		set_error(NSFP_ERROR_SET_TYPE);
+		set_error(NSF_ERROR_SET_TYPE);
 		return false;
 	}
 	if (value < SD.min_int || value > SD.max_int)
 	{
-		set_error(NSFP_ERROR_SETINT_RANGE,value,SD.min_int,SD.max_int);
+		set_error(NSF_ERROR_SETINT_RANGE,value,SD.min_int,SD.max_int);
 		return false;
 	}
 	setting[setenum] = value;
@@ -298,15 +298,15 @@ bool NSFCore::set_int(sint32 setenum, sint32 value)
 
 bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 {
-	if (setenum < 0 || setenum > NSFP_SET_COUNT)
+	if (setenum < 0 || setenum > NSF_SET_COUNT)
 	{
-		set_error(NSFP_ERROR_SET_INVALID);
+		set_error(NSF_ERROR_SET_INVALID);
 		return false;
 	}
-	const NSFSetData& SD = NSFPD_SET[setenum];
+	const NSFSetData& SD = NSFD_SET[setenum];
 	if (SD.default_str == NULL)
 	{
-		set_error(NSFP_ERROR_SET_TYPE);
+		set_error(NSF_ERROR_SET_TYPE);
 		return false;
 	}
 	sint32 si = setting[setenum];
@@ -329,8 +329,8 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 
 	// allocate and copy
 	if (setting_str_free[si])
-		nsfp::free(const_cast<char*>(setting_str[si]));
-	char* new_str = (char*)(nsfp::alloc(size_t(len)+1));
+		nsf::free(const_cast<char*>(setting_str[si]));
+	char* new_str = (char*)(nsf::alloc(size_t(len)+1));
 	std::memcpy(new_str,value,len);
 	new_str[len] = 0;
 	setting_str[si] = new_str;
@@ -345,25 +345,25 @@ void NSFCore::set_apply()
 
 sint32 NSFCore::get_int(sint32 setenum) const
 {
-	if (setenum < 0 || setenum > NSFP_SET_COUNT) return 0;
-	if (NSFPD_SET[setenum].default_str != NULL) return 0;
+	if (setenum < 0 || setenum > NSF_SET_COUNT) return 0;
+	if (NSFD_SET[setenum].default_str != NULL) return 0;
 	return setting[setenum];
 }
 
 const char* NSFCore::get_str(sint32 setenum) const
 {
 	static const char* INVALID = "<INVALID>";
-	if (setenum < 0 || setenum > NSFP_SET_COUNT) return INVALID;
-	if (NSFPD_SET[setenum].default_str == NULL) return INVALID;
+	if (setenum < 0 || setenum > NSF_SET_COUNT) return INVALID;
+	if (NSFD_SET[setenum].default_str == NULL) return INVALID;
 	sint32 si = setting[setenum];
 	return setting_str[si];
 }
 
 sint32 NSFCore::set_enum(const char* key, int len)
 {
-	for (sint32 i=0; i<NSFP_SET_COUNT; ++i)
+	for (sint32 i=0; i<NSF_SET_COUNT; ++i)
 	{
-		if (key_match(key,len,NSFPD_SET[i].key))
+		if (key_match(key,len,NSFD_SET[i].key))
 			return i;
 	}
 	return -1;
@@ -371,9 +371,9 @@ sint32 NSFCore::set_enum(const char* key, int len)
 
 sint32 NSFCore::group_enum(const char* key, int len)
 {
-	for (sint32 i=0; i<NSFP_GROUP_COUNT; ++i)
+	for (sint32 i=0; i<NSF_GROUP_COUNT; ++i)
 	{
-		if (key_match(key,len,NSFPD_GROUP[i].key))
+		if (key_match(key,len,NSFD_GROUP[i].key))
 			return i;
 	}
 	return -1;
@@ -383,8 +383,8 @@ NSFSetInfo NSFCore::set_info(sint32 setenum) const
 {
 	NSFSetInfo info = {0}; info.group = -1;
 	info.key = info.name = info.desc = local_text(0);
-	if (setenum < 0 || setenum > NSFP_SET_COUNT) return info;
-	const NSFSetData& SD = NSFPD_SET[setenum];
+	if (setenum < 0 || setenum > NSF_SET_COUNT) return info;
+	const NSFSetData& SD = NSFD_SET[setenum];
 	info.group = SD.group;
 	info.key = SD.key;
 	info.name = local_text(SD.text+0);
@@ -396,8 +396,8 @@ NSFSetInfo NSFCore::set_info(sint32 setenum) const
 	info.max_int = SD.max_int;
 	info.min_hint = SD.min_hint;
 	info.max_hint = SD.max_hint;
-	info.list      = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list]+1)) : NULL;
-	info.list_keys = (SD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[SD.list]+0)) : NULL;
+	info.list      = (SD.list >= 0) ? (local_text(NSFD_LIST_TEXT[SD.list]+1)) : NULL;
+	info.list_keys = (SD.list >= 0) ? (local_text(NSFD_LIST_TEXT[SD.list]+0)) : NULL;
 	info.display = SD.display;
 	return info;
 }
@@ -406,8 +406,8 @@ NSFGroupInfo NSFCore::group_info(sint32 group) const
 {
 	NSFGroupInfo info = {0};
 	info.key = info.name = info.desc = local_text(0);
-	if (group < 0 || group > NSFP_GROUP_COUNT) return info;
-	const NSFGroupData& GD = NSFPD_GROUP[group];
+	if (group < 0 || group > NSF_GROUP_COUNT) return info;
+	const NSFGroupData& GD = NSFD_GROUP[group];
 	info.key = GD.key;
 	info.name = local_text(GD.text+0);
 	info.desc = local_text(GD.text+1);
@@ -417,16 +417,16 @@ NSFGroupInfo NSFCore::group_info(sint32 group) const
 
 const char* NSFCore::ini_line(sint32 setenum) const
 {
-#if !(NSFP_NOTEXT)
-	if (setenum < 0 || setenum >= NSFP_SET_COUNT) return "";
-	const NSFSetData& SD = NSFPD_SET[setenum];
+#if !(NSF_NOTEXT)
+	if (setenum < 0 || setenum >= NSF_SET_COUNT) return "";
+	const NSFSetData& SD = NSFD_SET[setenum];
 	if (SD.default_str == NULL)
 	{
 		switch (SD.display)
 		{
-		case NSFP_DISPLAY_LIST:
+		case NSF_DISPLAY_LIST:
 			{
-				const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
+				const char* list_key = local_text(NSFD_LIST_TEXT[SD.list]+0);
 				for (int i=0; i<setting[setenum]; ++i)
 				{
 					while(*list_key) ++list_key;
@@ -434,13 +434,13 @@ const char* NSFCore::ini_line(sint32 setenum) const
 				}
 				std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,list_key);
 			} break;
-		case NSFP_DISPLAY_HEX8:
+		case NSF_DISPLAY_HEX8:
 			std::snprintf(temp_text,sizeof(temp_text),"%s=$%02X",SD.key,setting[setenum]); break;
-		case NSFP_DISPLAY_HEX16:
+		case NSF_DISPLAY_HEX16:
 			std::snprintf(temp_text,sizeof(temp_text),"%s=$%04X",SD.key,setting[setenum]); break;
-		case NSFP_DISPLAY_HEX32:
+		case NSF_DISPLAY_HEX32:
 			std::snprintf(temp_text,sizeof(temp_text),"%s=$%08X",SD.key,setting[setenum]); break;
-		case NSFP_DISPLAY_COLOR:
+		case NSF_DISPLAY_COLOR:
 			std::snprintf(temp_text,sizeof(temp_text),"%s=$%06X",SD.key,setting[setenum]); break;
 		default:
 			std::snprintf(temp_text,sizeof(temp_text),"%s=%d",   SD.key,setting[setenum]); break;
@@ -460,17 +460,17 @@ const char* NSFCore::ini_line(sint32 setenum) const
 
 void NSFCore::ini_write(FILE* f) const
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	sint32 last_group = -1;
 	std::fprintf(f,"# NSFPlay INI settings file\n");
-	for (sint32 i=0; i<NSFP_SET_COUNT; ++i)
+	for (sint32 i=0; i<NSF_SET_COUNT; ++i)
 	{
 		// print a group comment each time it changes
-		sint32 group = NSFPD_SET[i].group;
+		sint32 group = NSFD_SET[i].group;
 		if (group != last_group)
 		{
 			last_group = group;
-			std::fprintf(f,"# [%s]\n",NSFPD_GROUP[last_group].key);
+			std::fprintf(f,"# [%s]\n",NSFD_GROUP[last_group].key);
 		}
 		std::fprintf(f,"%s\n",ini_line(i));
 	}
@@ -482,7 +482,7 @@ void NSFCore::ini_write(FILE* f) const
 
 bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	// trim leading whitespace
 	while (line[0]==' ' || line[0] == '\t') { ++line; --len; }
 	// truncate for comments
@@ -496,7 +496,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	for (int i=0; i<len; ++i) { if (line[i]=='=') { equals=i; break; } }
 	if (equals < 0)
 	{
-		set_ini_error(linenum,NSFP_ERROR_INI_NO_EQUALS);
+		set_ini_error(linenum,NSF_ERROR_INI_NO_EQUALS);
 		return false;
 	}
 	// line starts key, find end of key
@@ -506,7 +506,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	sint32 se = set_enum(line,keylen);
 	if (se < 0)
 	{
-		set_ini_error(linenum,NSFP_ERROR_INI_BAD_KEY);
+		set_ini_error(linenum,NSF_ERROR_INI_BAD_KEY);
 		return false;
 	}
 	// find start of value
@@ -515,12 +515,12 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	line += valpos;	len -= valpos;
 	// se is our setting
 	// line, len are now the value
-	const NSFSetData& SD = NSFPD_SET[se];
+	const NSFSetData& SD = NSFD_SET[se];
 	if (SD.default_str != NULL)
 	{
 		if (!set_str(se,line,len) && error_last != NULL)
 		{
-			NSFP_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
+			NSF_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
 		}
 		return true;
 	}
@@ -534,21 +534,21 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	}
 	else if (SD.list >= 0 && (*line < '0' || *line > '9')) // isn't a number, could be a list key
 	{
-		const char* list_key = local_text(NSFPD_LIST_TEXT[SD.list]+0);
+		const char* list_key = local_text(NSFD_LIST_TEXT[SD.list]+0);
 		for (int i=0; i<=SD.max_int; ++i)
 		{
 			if (key_match(line,len,list_key))
 			{
 				if (!set_int(se,i) && error_last != NULL)
 				{
-					NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
+					NSF_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
 				}
 				return true;
 			}
 			while (*list_key) ++list_key;
 			++list_key;
 		}
-		set_ini_error(linenum,NSFP_ERROR_INI_BAD_LIST_KEY,SD.key);
+		set_ini_error(linenum,NSF_ERROR_INI_BAD_LIST_KEY,SD.key);
 		return false;
 	}
 	char* strtol_end = const_cast<char*>(value_end);
@@ -556,17 +556,17 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	sint32 value = std::strtol(line,&strtol_end,radix);
 	if (errno || strtol_end != value_end)
 	{
-		set_ini_error(linenum,NSFP_ERROR_INI_BAD_INT);
+		set_ini_error(linenum,NSF_ERROR_INI_BAD_INT);
 		return false;
 	}
 	if (value < SD.min_int || value > SD.max_int)
 	{
-		set_ini_error(linenum,NSFP_ERROR_INI_BAD_RANGE,value,SD.min_int,SD.max_int);
+		set_ini_error(linenum,NSF_ERROR_INI_BAD_RANGE,value,SD.min_int,SD.max_int);
 		return false;
 	}
 	if (!set_int(se,value) && error_last != NULL)
 	{
-		NSFP_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
+		NSF_DEBUG("Unexpected set_int error at INI line %d: %s",linenum,error_last);
 	}
 	return true;
 #else
@@ -579,9 +579,9 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 
 bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 {
-	NSFP_DEBUG("NSFCore::load(%s,%d,%d,%d)",data?"*":"NULL",size,assume,bin);
+	NSF_DEBUG("NSFCore::load(%s,%d,%d,%d)",data?"*":"NULL",size,assume,bin);
 	if (nsf_free)
-		nsfp::free(const_cast<uint8*>(nsf));
+		nsf::free(const_cast<uint8*>(nsf));
 	nsf = NULL;
 	nsf_size = 0;
 	nsf_free = false;
@@ -603,7 +603,7 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 			nsf = data;
 		else
 		{
-			nsf = (uint8*)(nsfp::alloc(size));
+			nsf = (uint8*)(nsf::alloc(size));
 			std::memcpy(const_cast<uint8*>(nsf),data,size);
 			nsf_free = true;
 		}
@@ -618,15 +618,15 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 NSFPropInfo NSFCore::prop_info(sint32 prop) const
 {
 	NSFPropInfo info = {0};
-	info.type = NSFP_PROP_TYPE_INVALID;
+	info.type = NSF_PROP_TYPE_INVALID;
 	info.key = info.name = local_text(0);
-	const NSFPropData& PD = NSFPD_PROP[prop];
+	const NSFPropData& PD = NSFD_PROP[prop];
 	info.key       = PD.key;
 	info.name      = local_text(PD.text);
 	info.max_list  = PD.max_list;
 	info.group     = PD.group;
-	info.list      = (PD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD.list]+1)) : NULL;
-	info.list_keys = (PD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD.list]+0)) : NULL;
+	info.list      = (PD.list >= 0) ? (local_text(NSFD_LIST_TEXT[PD.list]+1)) : NULL;
+	info.list_keys = (PD.list >= 0) ? (local_text(NSFD_LIST_TEXT[PD.list]+0)) : NULL;
 	info.type      = PD.type;
 	info.display   = PD.display;
 	return info;
@@ -634,27 +634,27 @@ NSFPropInfo NSFCore::prop_info(sint32 prop) const
 
 const char* NSFCore::local_text(sint32 textenum) const
 {
-#if !(NSFP_NOTEXT)
+#if !(NSF_NOTEXT)
 	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
 	(void)textenum;
-	return (const char*)NSFPD_NOTEXT_LIST_KEY;
+	return (const char*)NSFD_NOTEXT_LIST_KEY;
 #endif
 }
 
 const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 {
-#if !(NSFP_NOTEXT)
-	if (locale < 0 || locale >= NSFP_LOCALE_COUNT || textenum < 0 || textenum >= NSFP_TEXT_COUNT)
+#if !(NSF_NOTEXT)
+	if (locale < 0 || locale >= NSF_LOCALE_COUNT || textenum < 0 || textenum >= NSF_TEXT_COUNT)
 	{
 		// text 0 is a default <MISSING TEXT> value
 		locale = 0;
 		textenum = 0;
 	}
-	return (const char*)(NSFPD_LOCAL_TEXT_DATA + NSFPD_LOCAL_TEXT[locale][textenum]);
+	return (const char*)(NSFD_LOCAL_TEXT_DATA + NSFD_LOCAL_TEXT[locale][textenum]);
 #else
 	(void)textenum;
 	(void)locale;
-	return (const char*)NSFPD_NOTEXT_LIST_KEY;
+	return (const char*)NSFD_NOTEXT_LIST_KEY;
 #endif
 }
