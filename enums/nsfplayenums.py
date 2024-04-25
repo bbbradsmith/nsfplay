@@ -124,6 +124,7 @@ import os
 import shlex
 import argparse
 import datetime
+import copy
 
 INPUT_FIRST = "settings.txt"
 INPUT_FOLDER = "."
@@ -179,7 +180,7 @@ def verbose(message):
     if VERBOSE: print(message)
 
 #
-# parsing
+# data
 #
 
 parse_line = 0
@@ -247,7 +248,26 @@ DT_FORBID = { "LINES", "BLOB", "LIST" } # only set automatically, not valid for 
 
 CHANNEL_ADD = ("ON","VOL","PAN","COL")
 
+# defs_local structure
+# 0-key, 1-name, 2-list, 3-group, 4-set, 5-prop, 6-unit, 7-channel, 8-channelset, 9-text, 10-setlocale
+DL_BLANK = [None,None,[],[],[],[],[],[],None,[],(None,None)]
+(
+    DL_KEY,
+    DL_NAME,
+    DL_LIST,
+    DL_GROUP,
+    DL_SET,
+    DL_PROP,
+    DL_UNIT,
+    DL_CHANNEL,
+    DL_CHANNELSET,
+    DL_TEXT,
+    DL_SETLOCALE,
+) = range(0,11)
+
+#
 # parsing definitions
+#
 
 (
 PARSE_KEY,
@@ -303,7 +323,9 @@ PARSE_DEF_NAME = {
     PARSE_GT:"GROUP-TYPE",
 }
 
+#
 # parsing errors
+#
 
 def parse_warn(message):
     if (parse_path != None):
@@ -328,7 +350,9 @@ def is_key(s):
         return False
     return True
 
+#
 # parse defined entry
+#
 
 def parse_entry(ls):
     command = ls[0]
@@ -388,7 +412,9 @@ def parse_entry(ls):
         parse_error(command+" has too many entries, expected: "+str(len(parse_def)))
     return (command,tuple(p))
 
+#
 # validate key references
+#
 
 def check_list(list_key,key=None): # key=None to just check list
     for i in range(len(defs_list)):
@@ -415,7 +441,7 @@ def check_group(key,gt):
 
 def check_set(key):
     for i in range(len(defs_set)):
-        if defs_set[i][1] == key:
+        if defs_set[i][0] == key:
             return i
     parse_error("SET not found: "+key)
     return None
@@ -437,21 +463,32 @@ def check_channel(unit_key,key):
     for i in range(len(defs_unit)):
         if defs_unit[i][0] == unit_key:
             for j in range(len(defs_channel)):
-                if defs_channel[j][0] == i and defs_channel[j][1] == key:
+                if defs_channel[j][0] == key and defs_channel[j][1] == i:
                     return (i,j)
             parse_error("CHANNEL not found in UNIT("+unit_key+"): "+key)
             return (None,None)
     parse_error("UNIT not found: "+unit_key)
     return (None,None)   
 
-def add_unique_entry(defs,id_elements,error_name,entry):
+#
+# add to definition lists
+#
+
+def add_unique_entry(defs,id_elements,error_name,entry): # check if first id_elements are unique
     ide = entry[0:id_elements]
     for i in range(len(defs)):
-        idi = defs[i][0:id_elements]
-        if idi == ide:
+        if ide == defs[i][0:id_elements]:
             parse_error(error_name + " is not unique")
             return
     defs.append(entry)
+
+def add_set(p):
+    global defs_set
+    gi = check_group(p[1],GT_SET)
+    if gi != None:
+        p = list(p)
+        p[1] = gi
+        add_unique_entry(defs_set,1,"SET "+p[0],tuple(p))
 
 def add_prop(p,song=False):
     global defs_prop
@@ -461,7 +498,9 @@ def add_prop(p,song=False):
         p[1] = gi
         add_unique_entry(defs_prop,1,"PROP/SONGPROP "+p[0],tuple(p))
 
-# parse enums file
+#
+# parse enums file to generate defs
+#
 
 def parse_enums(path):
     global defs_list, defs_group, defs_set, defs_prop, defs_unit, defs_channel, defs_channelunset, defs_channelonlist, defs_local, defs_localdefault
@@ -487,18 +526,13 @@ def parse_enums(path):
         elif command == "GROUP": # 0-group-key 1-group-type
             add_unique_entry(defs_group,1,command+" "+p[1],(p[1],p[0]))
         elif command == "SETINT": # 0-group 1-key 2-default 3-min 4-max 5-hint-min 6-hint-max 7-display
-            gi = check_group(p[0],GT_SET)
-            if gi != None:
-                defs_set.append((gi,p[1],p[2],p[3],p[4],p[5],p[6],None,False,p[7])) # set: group, key, default, int min, int max, hint min, hint max, list, is_string, display type
+            add_set((p[1],p[0],p[2],p[3],p[4],p[5],p[6],None,False,p[7])) # set: 0-key, 1-group, 2-default, 3-int min, 4-int max, 5-hint min, 6-hint max, 7-list, 8-is_string, 9-display type
         elif command == "SETLIST": # 0-group 1-key 2-list 3-default
-            gi = check_group(p[0],GT_SET)
-            if gi != None:
-                (li,lk,dcount) = check_list(p[2],p[3])
-                if li != None:
-                    defs_set.append((gi,p[1],lk,0,dcount-1,0,dcount-1,li,False,DT_LIST))
+            (li,lk,dcount) = check_list(p[2],p[3])
+            if li != None:
+                add_set((p[1],p[0],lk,0,dcount-1,0,dcount-1,li,False,DT_LIST))
         elif command == "SETSTR": # 0-group 1-key 2-default
-            gi = check_group(p[0],GT_SET)
-            if gi != None: defs_set.append((gi,p[1],p[2],0,0,0,0,None,True,DT_STR))
+            add_set((p[1],p[0],p[2],0,0,0,0,None,True,DT_STR))
         # PROP
         elif command == "PROPINT":       add_prop((p[1],p[0],PROP_INT,p[2],None)) # 0-key 1-group-key(index) 2-type 3-display 4-list-index
         elif command == "PROPLONG":      add_prop((p[1],p[0],PROP_LONG,p[2],None))
@@ -523,7 +557,7 @@ def parse_enums(path):
         elif command == "CHANNEL":
             ui = check_unit(p[0])
             if ui != None:
-                defs_channel.append((ui,p[1],p[2]))
+                add_unique_entry(defs_channel,1,"CHANNEL "+p[1],(p[1],ui,p[2])) # 0-key 1-group-key(index) 2-colour
         elif command == "CHANNELUNSET":
             (ui,ci) = check_channel(p[0],p[1])
             if ui != None:
@@ -539,13 +573,15 @@ def parse_enums(path):
                 else:
                     defs_channelonlist = li
         elif command == "LOCAL":
-            add_unique_entry(defs_local,1,command+" "+p[0],
-                [p[0],p[1],[],[],[],[],[],[],None,[],(None,None)]) # local: 0-key, 1-name, 2-list, 3-group, 4-set, 5-prop, 6-unit, 7-channel, 8-channelset, 9-text, 10-locales
+            dl = copy.deepcopy(DL_BLANK)
+            dl[0] = p[0] # key
+            dl[1] = p[1] # name
+            add_unique_entry(defs_local,1,command+" "+p[0],dl)
             localcurrent = len(defs_local)-1
         elif command == "LOCALDEFAULT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             elif (defs_localdefault != None):
-                parse_error("LOCALDEFAULT already used: "+defs_local[defs_localdefault][0])
+                parse_error("LOCALDEFAULT already used: "+defs_local[defs_localdefault][DL_KEY])
             else:
                 defs_localdefault = localcurrent
         elif command == "LOCALLIST":
@@ -553,25 +589,25 @@ def parse_enums(path):
             else:
                 (li,lk,lcount) = check_list(p[0],p[1])
                 if li != None:
-                    add_unique_entry(defs_local[localcurrent][2],2,command+" "+p[1],(li,lk,p[2])) # list, key, name
+                    add_unique_entry(defs_local[localcurrent][DL_LIST],2,command+" "+p[1],(li,lk,p[2])) # list, key, name
         elif command == "LOCALGROUP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 gi = check_group(p[0],None)
                 if gi != None:
-                    add_unique_entry(defs_local[localcurrent][3],1,command+" "+p[0],(gi,p[1],p[2])) # group, name, desc
+                    add_unique_entry(defs_local[localcurrent][DL_GROUP],1,command+" "+p[0],(gi,p[1],p[2])) # group, name, desc
         elif command == "LOCALSET":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 si = check_set(p[0])
                 if si != None:
-                    add_unique_entry(defs_local[localcurrent][4],1,command+" "+p[0],(si,p[1],p[2])) # set, name, desc
+                    add_unique_entry(defs_local[localcurrent][DL_SET],1,command+" "+p[0],(si,p[1],p[2])) # set, name, desc
         elif command == "LOCALPROP":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 pi = check_prop(p[0])
                 if pi != None:
-                    add_unique_entry(defs_local[localcurrent][5],1,command+" "+p[0],(pi,p[1])) # prop, name
+                    add_unique_entry(defs_local[localcurrent][DL_PROP],1,command+" "+p[0],(pi,p[1])) # prop, name
         elif command == "LOCALUNIT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
@@ -579,36 +615,36 @@ def parse_enums(path):
                 if ui != None:
                     gi = check_group(p[0],GT_SET)
                     if gi == None: fatal_error("UNIT missing automatically generated GROUP: "+p[0])
-                    add_unique_entry(defs_local[localcurrent][6],1,command+" "+p[0],(ui,p[1],p[2])) # unit, name, desc
-                    add_unique_entry(defs_local[localcurrent][3],1,command+" (GROUP) "+p[0],(gi,p[1],p[2])) # group, name, desc
+                    add_unique_entry(defs_local[localcurrent][DL_UNIT],1,command+" "+p[0],(ui,p[1],p[2])) # unit, name, desc
+                    add_unique_entry(defs_local[localcurrent][DL_GROUP],1,command+" (GROUP) "+p[0],(gi,p[1],p[2])) # group, name, desc
         elif command == "LOCALCHANNEL":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
                 (ui,ci) = check_channel(p[0],p[1])
                 if ui != None:
-                    add_unique_entry(defs_local[localcurrent][7],1,command+" "+p[1],(ci,p[2],p[3])) # channel, shortname, name
+                    add_unique_entry(defs_local[localcurrent][DL_CHANNEL],1,command+" "+p[1],(ci,p[2],p[3])) # channel, shortname, name
         elif command == "LOCALCHANNELSET":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                if defs_local[localcurrent][8] != None:
+                if defs_local[localcurrent][DL_CHANNELSET] != None:
                     parse_error("LOCALCHANNELSET already used")
                 else:
-                    defs_local[localcurrent][8] = list(p)
+                    defs_local[localcurrent][DL_CHANNELSET] = list(p)
         elif command == "LOCALTEXT":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                add_unique_entry(defs_local[localcurrent][9],1,command+" "+p[0],("TEXT_"+p[0],p[1]))
+                add_unique_entry(defs_local[localcurrent][DL_TEXT],1,command+" "+p[0],("TEXT_"+p[0],p[1]))
         elif command == "LOCALERROR":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                add_unique_entry(defs_local[localcurrent][9],1,command+" "+p[0],("ERROR_"+p[0],p[1]))
+                add_unique_entry(defs_local[localcurrent][DL_TEXT],1,command+" "+p[0],("ERROR_"+p[0],p[1]))
         elif command == "LOCALSETLOCALE":
             if localcurrent == None: parse_error("LOCAL must be used before "+command)
             else:
-                if defs_local[localcurrent][10] != (None,None):
+                if defs_local[localcurrent][DL_SETLOCALE] != (None,None):
                     parse_error("LOCALSETLOCALE already used")
                 else:
-                    defs_local[localcurrent][10] = list(p)
+                    defs_local[localcurrent][DL_SETLOCALE] = list(p)
         elif command == "CANCEL":
             break
     parse_path = None
@@ -624,7 +660,9 @@ def parse_enum_files(files):
     # ensure other important things are present
     if defs_channelonlist == None: fatal_error("No CHANNELONLIST found")
 
-# generate enums data
+#
+# generate enums data after parsing
+#
 
 gen_enum_lines = None
 gen_data_lines = None
@@ -707,17 +745,22 @@ def generate_enums(file_enum,file_data,do_write):
     list_locale_index = len(defs_list)
     defs_list.append(list_locale)
     locale_set_index = len(defs_set)
-    defs_set.append((0,LOCALE_KEY,0,0,locs-1,0,locs-1,list_locale_index,False,DT_LIST)) # SETLIST: group-0, LOCALE_KEY, default, min, max, hintmin, hintmax, list, not-string, display
+    locale_group = None
+    if (len(defs_group)>0):
+        locale_group = defs_group[0][0]
+    else:
+        parse_error("At least one GROUP SET is required.")
+    add_set((LOCALE_KEY,locale_group,0,0,locs-1,0,locs-1,list_locale_index,False,DT_LIST)) # SETLIST: LOCALE_KEY, group-0, default, min, max, hintmin, hintmax, list, not-string, display
     for i in range(len(defs_local)):
         # create the list names in each locale
         for j in range(len(defs_local)):
-            defs_local[i][2].append((list_locale_index,j,defs_local[j][1])) # LOCALLIST: LOCALE_KEY, locale-key, locale-name
+            defs_local[i][DL_LIST].append((list_locale_index,j,defs_local[j][DL_NAME])) # LOCALLIST: LOCALE_KEY, locale-key, locale-name
         # create the set name/desc in each locale
-        (name,desc) = defs_local[i][10]
+        (name,desc) = defs_local[i][DL_SETLOCALE]
         if name == None or desc == None:
-            warn("LOCAL("+defs_local[i][0]+") missing: LOCALSETLOCALE * *")
+            warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALSETLOCALE * *")
             (name,desc) = ("*","*")
-        defs_local[i][4].append((locale_set_index,name,desc))
+        defs_local[i][DL_SET].append((locale_set_index,name,desc))
     # map each list to a text index, and gather the locale strings to go with it
     gen_enum("NSF_LIST_COUNT",len(defs_list));
     table_list = []
@@ -734,12 +777,12 @@ def generate_enums(file_enum,file_data,do_write):
             for j in range(len(keys)):
                 name = None
                 mapped = False
-                for (lli,lki,lname) in defs_local[i][2]:
+                for (lli,lki,lname) in defs_local[i][DL_LIST]:
                     if lli == li and lki == j:
                         mapped = True
                         name = lname
                         break
-                if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALLIST "+list_key+" "+keys[j]+" *")
+                if not mapped: warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALLIST "+list_key+" "+keys[j]+" *")
                 if name == "*": name = None
                 if name != None: names[i][j] = name
                 if i == 0: # default locale used as fallback
@@ -780,13 +823,13 @@ def generate_enums(file_enum,file_data,do_write):
         table_unit.append(gi);
         for i in range(locs):
             mapped = False
-            for (lui,name,desc) in defs_local[i][6]:
+            for (lui,name,desc) in defs_local[i][DL_UNIT]:
                 if lui == ui:
                     mapped = True
                     break
             if not mapped:
-                warn("LOCAL("+defs_local[i][0]+") missing: LOCALUNIT "+unit_key+" * *")
-                defs_local[i][3].append((gi,"*","*")) # suppress group warning
+                warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALUNIT "+unit_key+" * *")
+                defs_local[i][DL_GROUP].append((gi,"*","*")) # suppress group warning
     gen_break(0)
     gen_line("const int32_t NSFD_UNIT_GROUP[NSF_UNIT_COUNT] = {",1)
     gen_data(table_unit,mode=2)
@@ -812,13 +855,13 @@ def generate_enums(file_enum,file_data,do_write):
             name = None
             desc = None
             mapped = False
-            for (lgi,lname,ldesc) in defs_local[i][3]:
+            for (lgi,lname,ldesc) in defs_local[i][DL_GROUP]:
                 if lgi == gi:
                     mapped = True
                     name = lname
                     desc = ldesc
                     break
-            if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALGROUP "+group_key+" * *")
+            if not mapped: warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALGROUP "+group_key+" * *")
             if name == "*": name = None
             if desc == "*": desc = None
             if name != None: names[i] = name
@@ -845,18 +888,16 @@ def generate_enums(file_enum,file_data,do_write):
     for i in range(locs):
         CAL = len(CHANNEL_ADD)
         CAL2 = CAL * 2
-        if defs_local[i][8] == None:
-            warn("LOCAL("+defs_local[i][0]+") missing: LOCALCHANNELSET"+(" *" * CAL2))
-            defs_local[i][8] = ["*"] * CAL2
+        if defs_local[i][DL_CHANNELSET] == None:
+            warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALCHANNELSET"+(" *" * CAL2))
+            defs_local[i][DL_CHANNELSET] = ["*"] * CAL2
         for j in range(CAL2):
-            if defs_local[i][8][j] == "*":
-                if i==0: defs_local[i][8][j] = CHANNEL_ADD[i%CAL] # default locale defers to key
-                else:    defs_local[i][8][j] = defs_local[0][8][j] # defer to default locale
+            if defs_local[i][DL_CHANNELSET][j] == "*":
+                if i==0: defs_local[i][DL_CHANNELSET][j] = CHANNEL_ADD[i%CAL] # default locale defers to key
+                else:    defs_local[i][DL_CHANNELSET][j] = defs_local[0][DL_CHANNELSET][j] # defer to default locale
     for ci in range(len(defs_channel)):
-        ui = defs_channel[ci][0]
+        (channel_key,ui,color) = defs_channel[ci]
         unit_key = defs_unit[ui][0]
-        gi = check_group(unit_key,GT_SET)
-        channel_key = defs_channel[ci][1]
         si = len(defs_set)
         gen_line("\t{ %30s,%2d,%4d }," % ('"'+channel_key+'"',ui,len(table_locale[0])),1)
         gen_enum("NSF_CHANNEL_"+unit_key+"_"+channel_key,ci)
@@ -869,18 +910,18 @@ def generate_enums(file_enum,file_data,do_write):
         assert(CAL==len(CHANNEL_ADD_DEF))
         for i in range(CAL):
             if ((ci,CHANNEL_ADD[i]) not in defs_channelunset):
-                defs_set.append(tuple([gi,channel_key+"_"+CHANNEL_ADD[i]]+list(CHANNEL_ADD_DEF[i])))
+                add_set(tuple([channel_key+"_"+CHANNEL_ADD[i],unit_key]+list(CHANNEL_ADD_DEF[i])))
         shortnames = [channel_key for i in range(locs)]
         names = [channel_key for i in range(locs)]
         for i in range(locs):
             shortname = None
             name = None
             mapped = False
-            for j in range(len(defs_local[i][7])):
-                if (defs_local[i][7][j][0] == ci):
+            for j in range(len(defs_local[i][DL_CHANNEL])):
+                if (defs_local[i][DL_CHANNEL][j][0] == ci):
                     mapped = True
-                    shortname = defs_local[i][7][j][1]
-                    name = defs_local[i][7][j][2]
+                    shortname = defs_local[i][DL_CHANNEL][j][1]
+                    name = defs_local[i][DL_CHANNEL][j][2]
             if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALCHANNEL "+unit_key+" "+channel_key+" *")
             if name == "*": name = None
             if name != None: names[i] = name
@@ -895,12 +936,12 @@ def generate_enums(file_enum,file_data,do_write):
             table_locale[i].append(gen_text(shortnames[i]))
             table_locale[i].append(gen_text(names[i]))
             for j in range(CAL):
-                defs_local[i][4].append((si+j,names[i]+defs_local[i][8][j+0],names[i]+defs_local[i][8][j+CAL]))
+                defs_local[i][DL_SET].append((si+j,names[i]+defs_local[i][DL_CHANNELSET][j+0],names[i]+defs_local[i][DL_CHANNELSET][j+CAL]))
     gen_break(0);
     gen_line("};",1)
     gen_break(1)
     # sort settings by group
-    sorted_sets = sorted([(defs_set[i][0],i) for i in range(len(defs_set))])
+    sorted_sets = sorted([(defs_set[i][1],i) for i in range(len(defs_set))])
     # map each setting to a text index, gather locale strings
     gen_enum("NSF_SET_COUNT",len(defs_set))
     gen_line("typedef struct {",1)
@@ -914,7 +955,7 @@ def generate_enums(file_enum,file_data,do_write):
     setstr_count = 0
     for ssi in range(len(sorted_sets)):
         si = sorted_sets[ssi][1]
-        (gi, set_key, default_val, min_int, max_int, min_hint, max_hint, list_index, is_string, display_hint) = defs_set[si]
+        (set_key, gi, default_val, min_int, max_int, min_hint, max_hint, list_index, is_string, display_hint) = defs_set[si]
         group_key = defs_group[gi][0]
         default_int = 0
         default_str = "NULL"
@@ -942,13 +983,13 @@ def generate_enums(file_enum,file_data,do_write):
             name = None
             desc = None
             mapped = False
-            for (lsi,lname,ldesc) in defs_local[i][4]:
+            for (lsi,lname,ldesc) in defs_local[i][DL_SET]:
                 if lsi == si:
                     mapped = True
                     name = lname
                     desc = ldesc
                     break
-            if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALSET "+set_key+" * *")
+            if not mapped: warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALSET "+set_key+" * *")
             if name == "*": name = None
             if desc == "*": desc = None
             if name != None: names[i] = name
@@ -993,12 +1034,12 @@ def generate_enums(file_enum,file_data,do_write):
         for i in range(locs):
             name = None
             mapped = False
-            for (lpi,lname) in defs_local[i][5]:
+            for (lpi,lname) in defs_local[i][DL_PROP]:
                 if lpi == pi:
                     mapped = True
                     name = lname
                     break
-            if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALPROP "+prop_key+" *")
+            if not mapped: warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALPROP "+prop_key+" *")
             if name == "*": name = None
             if name != None: names[i] = name
             if i == 0:
@@ -1011,31 +1052,31 @@ def generate_enums(file_enum,file_data,do_write):
     #
     # generate extra text
     #
-    for ti in range(len(defs_local[0][9])):
-        text_key = defs_local[0][9][ti][0]
+    for ti in range(len(defs_local[0][DL_TEXT])):
+        text_key = defs_local[0][DL_TEXT][ti][0]
         gen_enum("NSF_"+text_key,len(table_locale[0]))
         names = [text_key for i in range(locs)]
         for i in range(locs):
             name = None
             mapped = False
-            for (lkey,lname) in defs_local[i][9]:
+            for (lkey,lname) in defs_local[i][DL_TEXT]:
                 if lkey == text_key:
                     mapped = True
                     name = lname
                     break
-            if not mapped: warn("LOCAL("+defs_local[i][0]+") missing: LOCALTEXT "+text_key+" *")
+            if not mapped: warn("LOCAL("+defs_local[i][DL_KEY]+") missing: LOCALTEXT "+text_key+" *")
             if name == "*": name = None
             if name != None: names[i] = name
             table_locale[i].append(gen_text(names[i]))
     # verify there aren't stray TEXT definitions outside the default locale
     for i in range(1,locs):
-        for (text_key,text_name) in defs_local[i][9]:
+        for (text_key,text_name) in defs_local[i][DL_TEXT]:
             mapped = False
-            for j in range(len(defs_local[0][9])):
-                if text_key == defs_local[0][9][j][0]:
+            for j in range(len(defs_local[0][DL_TEXT])):
+                if text_key == defs_local[0][DL_TEXT][j][0]:
                     mapped = True
                     break
-            if not mapped: error("LOCAL("+defs_local[i][0]+") LOCALTEXT not in default LOCAL: "+text_key)
+            if not mapped: error("LOCAL("+defs_local[i][DL_KEY]+") LOCALTEXT not in default LOCAL: "+text_key)
     #
     # generate text data tables
     #
@@ -1046,7 +1087,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_break(1)
     gen_line("const int32_t NSFD_LOCAL_TEXT[NSF_LOCALE_COUNT][%d] = {" % (len(table_locale[0])),1)
     for i in range(0,locs):
-        gen_enum("NSF_LOCALE_"+defs_local[i][0],i)
+        gen_enum("NSF_LOCALE_"+defs_local[i][DL_KEY],i)
         gen_line("{",1)
         gen_data(table_locale[i],mode=3)
         gen_line("},",1)
@@ -1069,7 +1110,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_break(1);
     for i in range(1,locs):
         if (len(table_locale[i]) != len(table_locale[0])):
-            error("Internal error? LOCAL(%s) has mismatched count: %d != %d" % (defs_local[i][0],len(table_locale[i]),len(table_locale[0])))
+            error("Internal error? LOCAL(%s) has mismatched count: %d != %d" % (defs_local[i][DL_KEY],len(table_locale[i]),len(table_locale[0])))
     #
     # save the data
     #
@@ -1083,7 +1124,9 @@ def generate_enums(file_enum,file_data,do_write):
             for l in gen_data_lines: f.write(l+"\n")
     print("Generate finished.")
 
+#
 # verify generated enums data
+#
 
 def ignore_line(l):
     ls = l.strip()
