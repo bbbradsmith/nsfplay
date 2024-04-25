@@ -43,8 +43,6 @@ typedef uint64_t  uint64;
 #define SETTING(setenum_) (setting[NSFP_SET_##setenum_])
 #define PROP(propenum_) (nsf_prop_int(NSFP_PROP_##propenum_))
 #define PROPS(propenum_) (nsf_prop_str(NSFP_PROP_##propenum_))
-#define SONGPROP(songpropenum_) (nsf_prop_int(NSFP_SONGPROP_$$songpropenum_,song_current))
-#define SONGPROPS(songpropenum_) (nsf_prop_str(NSFP_SONGPROP_$$songpropenum_,song_current))
 
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
 
@@ -55,7 +53,7 @@ typedef struct NSFCore_
 	// general rule of thumb:
 	//   Try not to store unnecessary state.
 	//   Use a setting directly instead of copying it, where possible.
-	//   Use prop/songprop to look up instead of store values.
+	//   Use prop to look up instead of store values.
 	//   Can make exceptions for performance:
 	//     Volume applies per-cycle/sample, should store that with fixed point adjustments.
 	//     Square phase reset only applies per emulated-write, just use the setting directly.
@@ -145,7 +143,7 @@ typedef struct NSFCore_
 	bool parse_ini_line(const char* line, int len, int linenum); // linenum=-1 to parse a line with no INI file context
 
 	bool load(const uint8* data, uint32 size, bool assume, bool bin=false);
-	NSFPropInfo prop_info(sint32 prop, bool song=false) const; // if song, prop is a SONGPROP
+	NSFPropInfo prop_info(sint32 prop) const;
 
 	const char* local_text(sint32 textenum) const; // NSFP_TEXT_x for curent locale (local_text(0) is a default error string)
 	static const char* local_text(sint32 textenum, sint32 locale); // NSFP_TEXT_x for specific locale
@@ -154,7 +152,7 @@ typedef struct NSFCore_
 	bool nsf_parse(bool bin);
 	const uint8* nsfe_chunk(uint32 fourcc, uint32* chunk_size) const; // fourcc is packed little-endian into uint32
 	const uint8* nsfe_chunk(const char* fourcc, uint32* chunk_size) const;
-	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // if song>=0 prop is a SONGPROP
+	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // song<0 = song_current
 	sint32 nsf_prop_int(sint32 prop, sint32 song=-1) const;
 	sint64 nsf_prop_long(sint32 prop, sint32 song=-1) const;
 	const char* nsf_prop_str(sint32 prop, sint32 song=-1) const;

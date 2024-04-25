@@ -84,14 +84,14 @@ LOCALLIST FILE_TYPE INVALID      "Invalid"
 
 LOCALCHANNELSET " On" " Volume" " Pan" " Colour" " enabled." " volume." " panning." " visualization colour."
 
-LOCALSETGROUP MAIN            "Main" "Main settings: volume and ouput, song title format"
+LOCALGROUP MAIN               "Main" "Main settings: volume and ouput, song title format"
 LOCALSET VOLUME               "Volume" "Total output loudness."
 LOCALSET SAMPLERATE           "Samplerate" "Audio output samplerate."
 LOCALSET STEREO               "Stereo" "Disable to output 1-channel mono sound."
 LOCALSET BITS                 "Bit Depth" "Audio output bit depth."
 LOCALSET TITLE_FORMAT         "NSF song title format" "Format: %F filename, %P path, %T NSF title, %A NSF artist, %C NSF copyright, %L NSFe song title, %N/%n song number (%n is 3-digit with leading zeroes), %S/%s NSF starting song, %E/%e NSF song count."
 
-LOCALSETGROUP PLAY            "Playback" "Playback settings: timing and sequence"
+LOCALGROUP PLAY               "Playback" "Playback settings: timing and sequence"
 LOCALSET CHANNEL_RESET        "Channel Reset" "Turn all channels on whenever playing a new song."
 LOCALSET PLAY_START           "Auto Start" "Automatically play when a new track is selected."
 LOCALSET PLAY_NEXT            "Auto Next" "Automatically play the next track."
@@ -103,12 +103,12 @@ LOCALSET SILENT_TIMEOUT       "Silence Timeout" "If the track is silent for this
 LOCALSET DETECT_LOOP          "Loop Detection" "Enable automatic look detection"
 LOCALSET LOOP_NUM             "Loop Count" "When loops are detected, or given in NSFe data, the looped section will be played this many times, 0 for infinite."
 
-LOCALSETGROUP AUDIO           "Audio" "Audio output settings: filtering and downsampling"
+LOCALGROUP AUDIO              "Audio" "Audio output settings: filtering and downsampling"
 LOCALSET LPF                  "Lowpass Filter" "RC lowpass filter reduces high frequencies. 0 for none."
 LOCALSET HPF                  "Highpass Filter" "RC highpass filter removed DC bias and reduces low frequencies. 0 for none."
 LOCALSET DOWNSAMPLE           "Downsampling" "Reduces high frequency emulation to the audio samplerate."
 
-LOCALSETGROUP EMU             "Emulation" "Emulation settings: region, CPU rate, speed, IRQ"
+LOCALGROUP EMU                "Emulation" "Emulation settings: region, CPU rate, speed, IRQ"
 LOCALSET REGION               "Region" "Type of NES/Famicom emulated, can be auto-selected if the NSF contains region data."
 LOCALSET CPU_NTSC             "NTSC CPU Rate"  "Emulated NTSC CPU clock frequency."
 LOCALSET CPU_PAL              "PAL CPU Rate"   "Emulated PAL CPU clock frequency."
@@ -192,12 +192,12 @@ LOCALCHANNEL S5B S5B_N        "5B:N" "Sunsoft 5B Noise"
 LOCALCHANNEL S5B S5B_E        "5B:E" "Sunsoft 5B Envelope"
 LOCALSET S5B_MIXER            "5B Mixer" "Unlike other expansion audio, the Famicom audio was passed through the 5B chip, causing nonlinearity and distortion on all channels. This simualtes that feature."
 
-LOCALSETGROUP WAVEOUT         "WAV Output" "WAV output settings: can override the regular output settings"
+LOCALGROUP WAVEOUT            "WAV Output" "WAV output settings: can override the regular output settings"
 LOCALSET WAVEOUT_SAMPLERATE   "Samplerate" "Overrides the output samplerate when saving a WAV file. 0 to use the normal output rate, -1 to use the CPU rate."
 LOCALSET WAVEOUT_BITS         "Bit Depth" "Override the output bit depth when saving a WAV file."
 LOCALSET WAVEOUT_STEREO       "Stereo" "Override the output stereo setting when saving a WAV file."
 
-LOCALSETGROUP ADVANCED        "Advanced" "Advanced settings: specific samplerate, shift-JIS"
+LOCALGROUP ADVANCED           "Advanced" "Advanced settings: specific samplerate, shift-JIS"
 LOCALSET SAMPLERATE_OVERRIDE  "Samplerate Override" "If a custom output samplerate is needed, it can be given here. 0 to use the normal output rate, -1 to use the CPU rate."
 LOCALSET SHIFT_JIS            "Shift-JIS" "Older Japanese NSF files often use Shift-JIS for their title, artist, and copyright fields. We can automatically detect it, assume Shift-JIS, or assume UTF-8. NSF2 files are always UTF-8."
 LOCALSET EXPANSION_FDS        "FDS Expansion"   "Force enable/disable FDS."
@@ -212,9 +212,10 @@ LOCALSET EXPANSION_VT02       "VT02+ Expansion" "Force enable/disable VT02+."
 # NSF Properties
 #
 
+LOCALGROUP NSF                "NSF" "NSF File Properties"
 LOCALPROP FILE_TYPE           "File Type"
-LOCALPROP SONG_COUNT          "Song Count"
-LOCALPROP SONG_START          "Starting Song"
+LOCALPROP NSF_SONG_COUNT      "Song Count"
+LOCALPROP NSF_SONG_START      "Starting Song"
 LOCALPROP NSF_VERSION         "NSF Version"
 LOCALPROP LOAD_ADDR           "LOAD address"
 LOCALPROP INIT_ADDR           "INIT address"
@@ -246,11 +247,18 @@ LOCALPROP NSF2_NOPLAY         "NSF2 No PLAY routine"
 LOCALPROP NSF2_MANDATORY      "NSF2 Mandatory Metadata Flag"
 LOCALPROP NSFE_PLAYLIST       "Playlist Present"
 LOCALPROP NSF_HEADER          "NSF Header Raw Data"
-LOCALPROP PLAYLIST_ACTIVE     "Playlist Active"
+
+LOCALGROUP ACTIVE             "Active" "Active state properties"
+LOCALPROP ACTIVE_SONG_COUNT   "Active Song Count"
+LOCALPROP ACTIVE_SONG_START   "Active Song Start"
+LOCALPROP ACTIVE_PLAYLIST     "Playlist Active"
 
 #
 # Song Properties
 #
+
+LOCALGROUP SONG               "Song" "Song Properties"
+LOCALPROP SONG_TITLE          "Song Title"
 
 #
 # Other localized text needed by the UI

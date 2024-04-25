@@ -411,6 +411,7 @@ NSFSetGroupInfo NSFCore::group_info(sint32 group) const
 	info.key = GD.key;
 	info.name = local_text(GD.text+0);
 	info.desc = local_text(GD.text+1);
+	info.type = GD.type;
 	return info;
 }
 
@@ -614,29 +615,20 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 	return result;
 }
 
-NSFPropInfo NSFCore::prop_info(sint32 prop, bool song) const
+NSFPropInfo NSFCore::prop_info(sint32 prop) const
 {
 	NSFPropInfo info = {0};
 	info.type = NSFP_PROP_TYPE_INVALID;
 	info.key = info.name = local_text(0);
-	const NSFPropData* PD;
-	if (!song)
-	{
-		if (prop < 0 || prop > NSFP_PROP_COUNT) return info;
-		PD = &NSFPD_PROP[prop];
-	}
-	else
-	{
-		if (prop < 0 || prop > NSFP_SONGPROP_COUNT) return info;
-		PD = &NSFPD_SONGPROP[prop];
-	}
-	info.key = PD->key;
-	info.name = local_text(PD->text);
-	info.max_list = PD->max_list;
-	info.list      = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list]+1)) : NULL;
-	info.list_keys = (PD->list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD->list]+0)) : NULL;
-	info.type = PD->type;
-	info.display = PD->display;
+	const NSFPropData& PD = NSFPD_PROP[prop];
+	info.key       = PD.key;
+	info.name      = local_text(PD.text);
+	info.max_list  = PD.max_list;
+	info.group     = PD.group;
+	info.list      = (PD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD.list]+1)) : NULL;
+	info.list_keys = (PD.list >= 0) ? (local_text(NSFPD_LIST_TEXT[PD.list]+0)) : NULL;
+	info.type      = PD.type;
+	info.display   = PD.display;
 	return info;
 }
 
