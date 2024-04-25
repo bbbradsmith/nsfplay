@@ -246,6 +246,8 @@ LOCALPROP NSF2_INIT_NORETURN  "NSF2 Non-Returning INIT"
 LOCALPROP NSF2_NOPLAY         "NSF2 No PLAY routine"
 LOCALPROP NSF2_MANDATORY      "NSF2 Mandatory Metadata Flag"
 LOCALPROP NSFE_PLAYLIST       "Playlist Present"
+
+LOCALGROUP DATA               "Data" "Raw NSF file data"
 LOCALPROP NSF_HEADER          "NSF Header Raw Data"
 
 LOCALGROUP ACTIVE             "Active" "Active state properties"

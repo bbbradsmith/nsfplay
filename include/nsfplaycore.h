@@ -217,13 +217,14 @@ bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool a
 bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume);
 
 // song control
-uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF
+uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF (or NSF playlist if active, see PROP_ACTIVE_PLAYLIST)
+uint32_t nsfplay_song_current(const NSFCore* core); // current active song
 bool nsfplay_song(NSFCore* core, uint8_t song); // set song, false if song out of bounds, automatically calls song_play
 void nsfplay_song_play(NSFCore* core); // resets the song and executes its INIT routine
 void nsfplay_seek(NSFCore* core, uint64_t samples);
 uint64_t nsfplay_samples_played(const NSFCore* core); // samples since song_play
 
-// advance emulation and render sound samples
+// emulate and render sound samples
 // - every two elements of stereo_output alternates left channel, right channel (length must be 2*samples)
 // - stereo_output can be NULL if the output isn't needed
 // - returns number of samples rendered, may be less than samples if song is finished (will zero fill unused output samples)

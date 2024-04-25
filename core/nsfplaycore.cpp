@@ -167,6 +167,11 @@ uint32_t nsfplay_song_count(const NSFCore* core)
 	return core->nsf_prop_int(NSF_PROP_ACTIVE_SONG_COUNT);
 }
 
+uint32_t nsfplay_song_current(const NSFCore* core)
+{
+	return core->nsf_prop_int(NSF_PROP_ACTIVE_SONG);
+}
+
 bool nsfplay_song(NSFCore* core, uint8_t song)
 {
 	(void)core;

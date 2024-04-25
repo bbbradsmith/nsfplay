@@ -173,8 +173,8 @@ SETINT TEST TEST_PRECISE 42 0 1000 0 1000 PRECISE
 
 GROUP PROP NSF
 PROPLIST  NSF FILE_TYPE              FILE_TYPE
-PROPINT   NSF NSF_SONG_COUNT         INT
-PROPINT   NSF NSF_SONG_START         INT
+PROPINT   NSF NSF_SONG_COUNT         INT "NSF header data, use ACTIVE_SONG_COUNT with NSFPlay interface"
+PROPINT   NSF NSF_SONG_START         INT "NSF header data, use ACTIVE_SONG_START with NSFPlay interface"
 PROPINT   NSF NSF_VERSION            INT
 PROPINT   NSF LOAD_ADDR              HEX16
 PROPINT   NSF INIT_ADDR              HEX16
@@ -205,12 +205,17 @@ PROPINT   NSF NSF2_INIT_NORETURN     BOOL
 PROPINT   NSF NSF2_NOPLAY            BOOL
 PROPINT   NSF NSF2_MANDATORY         BOOL
 PROPBLOB  NSF NSFE_PLAYLIST
+
+GROUP PROP DATA
 PROPBLOB  NSF NSF_HEADER
+# TODO all known NSFe blobs
 
 GROUP PROP ACTIVE
-PROPINT   ACTIVE ACTIVE_SONG_COUNT   INT
-PROPINT   ACTIVE ACTIVE_SONG_START   INT
-PROPINT   ACTIVE ACTIVE_PLAYLIST     BOOL
+PROPINT   ACTIVE ACTIVE_SONG         INT "Current song for NSFPlay interface (includes PLAYLIST override)"
+PROPINT   ACTIVE ACTIVE_SONG_COUNT   INT "Song count for NSFPlay interface (includes PLAYLIST override)"
+PROPINT   ACTIVE ACTIVE_SONG_START   INT "Song start for NSFPlay interface (includes PLAYLIST override)"
+PROPINT   ACTIVE ACTIVE_PLAYLIST     BOOL "Indicates whether a playlist is overriding the NSF song list"
+PROPINT   ACTIVE ACTIVE_SONG_NSF     INT "Current song in the NSF song list, use ACTIVE_SONG with NSFPlay interface"
 
 # TODO blobs for other NSFe properties?
 # TODO song properties, how many of these have NSFe properties too?

@@ -51,21 +51,21 @@
 #     SETLIST group-key key list-key default-key
 #     SETSTR group-key key "default"
 #
-#   Properties can have an optional comment string in the generated enum.
+#   Properties can have an optional comment string after the generated enum.
 #   NSF Properties.
-#     PROPINT key display-type [comment]
-#     PROPLONG key display-type [comment]
-#     PROPSTR key [comment]
-#     PROPLINES key [comment]
-#     PROPBLOB key [comment]
-#     PROPLIST key list-key [comment]
+#     PROPINT key display-type "comment"
+#     PROPLONG key display-type "comment"
+#     PROPSTR key "comment"
+#     PROPLINES key "comment"
+#     PROPBLOB key "comment"
+#     PROPLIST key list-key "comment"
 #   Song Properties.
-#     SONGPROPINT key display-type [comment]
-#     SONGPROPLONG key display-type [comment]
-#     SONGPROPSTR key [comment]
-#     SONGPROPLINES key [comment]
-#     SONGPROPBLOB key [comment]
-#     SONGPROPLIST key list-key [comment]
+#     SONGPROPINT key display-type "comment"
+#     SONGPROPLONG key display-type "comment"
+#     SONGPROPSTR key "comment"
+#     SONGPROPLINES key "comment"
+#     SONGPROPBLOB key "comment"
+#     SONGPROPLIST key list-key "comment"
 #
 #   Global channel info.
 #   The UNIT will also generate a settings group "UNIT", with a VOL setting.
@@ -276,7 +276,8 @@ PARSE_STR,
 PARSE_KEYS,
 PARSE_GT,
 PARSE_DT,
-) = range(0,6)
+PARSE_COM,
+) = range(0,7)
 
 PARSE_DEFS = {
     "LIST":[PARSE_KEY,PARSE_KEYS],
@@ -284,18 +285,18 @@ PARSE_DEFS = {
     "SETINT":[PARSE_KEY,PARSE_KEY,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_DT],
     "SETLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY,PARSE_KEY],
     "SETSTR":[PARSE_KEY,PARSE_KEY,PARSE_STR],
-    "PROPINT":[PARSE_KEY,PARSE_KEY,PARSE_DT],
-    "PROPLONG":[PARSE_KEY,PARSE_KEY,PARSE_DT],
-    "PROPSTR":[PARSE_KEY,PARSE_KEY],
-    "PROPLINES":[PARSE_KEY,PARSE_KEY],
-    "PROPBLOB":[PARSE_KEY,PARSE_KEY],
-    "PROPLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY],
-    "SONGPROPINT":[PARSE_KEY,PARSE_KEY,PARSE_DT],
-    "SONGPROPLONG":[PARSE_KEY,PARSE_KEY,PARSE_DT],
-    "SONGPROPSTR":[PARSE_KEY,PARSE_KEY],
-    "SONGPROPLINES":[PARSE_KEY,PARSE_KEY],
-    "SONGPROPBLOB":[PARSE_KEY,PARSE_KEY],
-    "SONGPROPLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY],
+    "PROPINT":[PARSE_KEY,PARSE_KEY,PARSE_DT,PARSE_COM],
+    "PROPLONG":[PARSE_KEY,PARSE_KEY,PARSE_DT,PARSE_COM],
+    "PROPSTR":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "PROPLINES":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "PROPBLOB":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "PROPLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "SONGPROPINT":[PARSE_KEY,PARSE_KEY,PARSE_DT,PARSE_COM],
+    "SONGPROPLONG":[PARSE_KEY,PARSE_KEY,PARSE_DT,PARSE_COM],
+    "SONGPROPSTR":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "SONGPROPLINES":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "SONGPROPBLOB":[PARSE_KEY,PARSE_KEY,PARSE_COM],
+    "SONGPROPLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY,PARSE_COM],
     "UNIT":[PARSE_KEY],
     "CHANNEL":[PARSE_KEY,PARSE_KEY,PARSE_INT],
     "CHANNELUNSET":[PARSE_KEY,PARSE_KEY,PARSE_KEY],
@@ -321,6 +322,7 @@ PARSE_DEF_NAME = {
     PARSE_KEYS:"KEY...",
     PARSE_DT:"DISPLAY",
     PARSE_GT:"GROUP-TYPE",
+    PARSE_COM:"COMMENT",
 }
 
 #
@@ -363,8 +365,13 @@ def parse_entry(ls):
     p = []
     ls = ls[1:]
     for pd in parse_def:
-        if len(ls) < 1:
-            parse_error(PARSE_DEF_NAME[pd]+" expected: (end of line)")
+        if pd == PARSE_COM: # optional comment
+            if (len(ls)>0):
+                p.append(ls[0])
+            else:
+                p.append(None)
+        elif len(ls) < 1:
+            parse_error(PARSE_DEF_NAME[pd]+" expected at end of line.")
             return (None,None)
         elif pd == PARSE_KEY:
             if not is_key(ls[0]):
@@ -534,23 +541,23 @@ def parse_enums(path):
         elif command == "SETSTR": # 0-group 1-key 2-default
             add_set((p[1],p[0],p[2],0,0,0,0,None,True,DT_STR))
         # PROP
-        elif command == "PROPINT":       add_prop((p[1],p[0],PROP_INT,p[2],None)) # 0-key 1-group-key(index) 2-type 3-display 4-list-index
-        elif command == "PROPLONG":      add_prop((p[1],p[0],PROP_LONG,p[2],None))
-        elif command == "PROPSTR":       add_prop((p[1],p[0],PROP_STR,DT_STR,None))
-        elif command == "PROPLINES":     add_prop((p[1],p[0],PROP_LINES,DT_LINES,None))
-        elif command == "PROPBLOB":      add_prop((p[1],p[0],PROP_BLOB,DT_BLOB,None))
+        elif command == "PROPINT":       add_prop((p[1],p[0],PROP_INT,p[2],None,p[3])) # 0-key 1-group-key(index) 2-type 3-display 4-list-index 5-commend
+        elif command == "PROPLONG":      add_prop((p[1],p[0],PROP_LONG,p[2],None,p[3]))
+        elif command == "PROPSTR":       add_prop((p[1],p[0],PROP_STR,DT_STR,None,p[2]))
+        elif command == "PROPLINES":     add_prop((p[1],p[0],PROP_LINES,DT_LINES,None,p[2]))
+        elif command == "PROPBLOB":      add_prop((p[1],p[0],PROP_BLOB,DT_BLOB,None,p[2]))
         elif command == "PROPLIST":
             (li,lk,dcount) = check_list(p[2])
-            if (li != None):             add_prop((p[1],p[0],PROP_LIST,DT_LIST,li))
+            if (li != None):             add_prop((p[1],p[0],PROP_LIST,DT_LIST,li,p[3]))
         # SONGPROP
-        elif command == "SONGPROPINT":   add_prop((p[1],p[0],PROP_INT,p[2],None),True)
-        elif command == "SONGPROPLONG":  add_prop((p[1],p[0],PROP_LONG,p[2],None),True)
-        elif command == "SONGPROPSTR":   add_prop((p[1],p[0],PROP_STR,DT_STR,None),True)
-        elif command == "SONGPROPLINES": add_prop((p[1],p[0],PROP_LINES,DT_LINES,None),True)
-        elif command == "SONGPROPBLOB":  add_prop((p[1],p[0],PROP_BLOB,DT_BLOB,None),True)
+        elif command == "SONGPROPINT":   add_prop((p[1],p[0],PROP_INT,p[2],None,p[3]),True)
+        elif command == "SONGPROPLONG":  add_prop((p[1],p[0],PROP_LONG,p[2],None,p[3]),True)
+        elif command == "SONGPROPSTR":   add_prop((p[1],p[0],PROP_STR,DT_STR,None,p[2]),True)
+        elif command == "SONGPROPLINES": add_prop((p[1],p[0],PROP_LINES,DT_LINES,None,p[2]),True)
+        elif command == "SONGPROPBLOB":  add_prop((p[1],p[0],PROP_BLOB,DT_BLOB,None,p[2]),True)
         elif command == "SONGPROPLIST":
             (li,lk,dcount) = check_list(p[2])
-            if (li != None):             add_prop((p[1],p[0],PROP_LIST,DT_LIST,li),True)
+            if (li != None):             add_prop((p[1],p[0],PROP_LIST,DT_LIST,li,p[3]),True)
         elif command == "UNIT":
             add_unique_entry(defs_unit,1,"UNIT "+p[0],p)
             add_unique_entry(defs_group,1,"GROUP(UNIT) "+p[0],(p[0],GT_SET))
@@ -679,9 +686,10 @@ def gen_line(l,target=0):
 def gen_break(target=0):
     gen_line("",target)
 
-def gen_enum(key,value,target=0,hexadecimal=False):
-    if not hexadecimal: gen_line("const int32_t %-42s %12d;" % (key+" =",value),target)
-    else:               gen_line("const int32_t %-42s %12X;" % (key+" =",value),target)
+def gen_enum(key,value,comment=None,target=0,hexadecimal=False):
+    suffix = "" if (comment == None or len(comment) < 1) else " // "+comment
+    if not hexadecimal: gen_line("const int32_t %-42s %12d;%s" % (key+" =",value,suffix),target)
+    else:               gen_line("const int32_t %-42s %12X;%s" % (key+" =",value,suffix),target)
 
 def gen_text(text): # adds utf-8 string to text blob, returns offset to it, duplicates are reused
     global gen_text_blob, gen_text_map
@@ -1018,7 +1026,7 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("const NSFPropData NSFD_PROP[NSF_PROP_COUNT] = {",1)
     for spi in range(len(sorted_props)):
         pi = sorted_props[spi][1]
-        (prop_key,gi,prop_type,prop_display,prop_list) = defs_prop[pi]
+        (prop_key,gi,prop_type,prop_display,prop_list,prop_comment) = defs_prop[pi]
         prop_group_type = defs_group[gi][1]
         list_index = -1
         list_max = 0
@@ -1029,7 +1037,7 @@ def generate_enums(file_enum,file_data,do_write):
             '"'+prop_key+'"',
             gi,len(table_locale[0]),prop_type,prop_display,
             list_max,list_index),1)
-        gen_enum("NSF_PROP_"+prop_key,spi);
+        gen_enum("NSF_PROP_"+prop_key,spi,prop_comment);
         names = [prop_key for i in range(locs)]
         for i in range(locs):
             name = None
