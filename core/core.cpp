@@ -125,6 +125,7 @@ NSFCore* NSFCore::create()
 	NSFCore* core = reinterpret_cast<NSFCore*>(nsf::alloc(sizeof(NSFCore)));
 	NSF_DEBUG("create()");
 	std::memset(core,0,sizeof(NSFCore));
+	core->error_last_code = -1;
 	core->set_default();
 	return core;
 }
@@ -153,8 +154,16 @@ const char* NSFCore::last_error() const
 	return r;
 }
 
+sint32 NSFCore::last_error_code() const
+{
+	sint32 r = error_last_code;
+	error_last_code = -1;
+	return r;
+}
+
 void NSFCore::set_error(sint32 textenum,...) const
 {
+	error_last_code = textenum;
 #if !(NSF_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// skip formatting if not needed
@@ -190,6 +199,7 @@ void NSFCore::set_error(sint32 textenum,...) const
 
 void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 {
+	error_last_code = textenum;
 #if !(NSF_NOTEXT)
 	const char* fmt = local_text(textenum);
 	// line number prefix if linenum < 0
@@ -217,6 +227,7 @@ void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 
 void NSFCore::set_error_raw(const char* fmt,...) const
 {
+	error_last_code = NSF_ERROR_RAW_ERROR;
 	va_list args;
 	va_start(args,fmt);
 	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
@@ -267,6 +278,7 @@ bool NSFCore::set_ini(const char* ini)
 	return result;
 #else
 	NSF_UNUSED(ini);
+	set_error(NSF_ERROR_INI_NOTEXT);
 	return false;
 #endif
 }
@@ -477,11 +489,12 @@ const char* NSFCore::ini_line(sint32 setenum) const
 #endif
 }
 
-void NSFCore::ini_write(FILE* f) const
+bool NSFCore::ini_write(FILE* f) const
 {
 #if !(NSF_NOTEXT)
+	bool result = true;
 	sint32 last_group = -1;
-	std::fprintf(f,"# NSFPlay INI settings file\n");
+	result &= (0 <= std::fprintf(f,"# NSFPlay INI settings file\n"));
 	for (sint32 i=0; i<NSF_SET_COUNT; ++i)
 	{
 		// print a group comment each time it changes
@@ -489,13 +502,17 @@ void NSFCore::ini_write(FILE* f) const
 		if (group != last_group)
 		{
 			last_group = group;
-			std::fprintf(f,"# [%s]\n",NSFD_GROUP[last_group].key);
+			result &= (0 <= std::fprintf(f,"# [%s]\n",NSFD_GROUP[last_group].key));
 		}
-		std::fprintf(f,"%s\n",ini_line(i));
+		result &= (0 <= std::fprintf(f,"%s\n",ini_line(i)));
 	}
-	std::fprintf(f,"# end of settings\n");
+	result &= (0 <= std::fprintf(f,"# end of settings\n"));
+	if (!result) set_error(NSF_ERROR_INI_BAD_WRITE);
+	return result;
 #else
 	NSF_UNUSED(f);
+	set_error(NSF_ERROR_INI_NOTEXT);
+	return false;
 #endif
 }
 
@@ -592,6 +609,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	NSF_UNUSED(line);
 	NSF_UNUSED(len);
 	NSF_UNUSED(linenum);
+	set_error(NSF_ERROR_INI_NOTEXT);
 	return false;
 #endif
 }

@@ -723,6 +723,9 @@ def gen_data(data,mode=0,prefix="\t",target=1): # mode: 0=hex bytes (2-digit), 1
     if len(s) > 0:
         gen_line(prefix+s,target)       
 
+def nsf_key(key):
+    return 'NSF_KEY("' + key + '")'
+
 def generate_enums(file_enum,file_data,do_write):
     global gen_enum_lines, gen_data_lines
     global gen_text_blob, gen_text_map
@@ -738,6 +741,12 @@ def generate_enums(file_enum,file_data,do_write):
     for i in range(2): gen_line("// "+now_string,i)
     for i in range(2): gen_break(i)
     gen_line("#include \"" + OUTPUT_ENUM + "\"",1)
+    gen_break(1)
+    gen_line("#if !(NSF_NOTEXT)",1)
+    gen_line("\t#define NSF_KEY(key_) key_",1)
+    gen_line("#else",1)
+    gen_line("\t#define NSF_KEY(key_) \"\"",1)
+    gen_line("#endif",1)
     gen_break(1)
     #
     # locale tables contain a byte index to every generated string in gen_data_blob
@@ -859,7 +868,7 @@ def generate_enums(file_enum,file_data,do_write):
     for gi in range(len(defs_group)):
         group_key = defs_group[gi][0]
         gen_enum("NSF_GROUP_"+group_key,gi)
-        gen_line("\t{ %30s,%4d }," % ('"'+group_key+'"',len(table_locale[0])),1)
+        gen_line("\t{ %40s,%4d }," % (nsf_key(group_key),len(table_locale[0])),1)
         names = [group_key for i in range(locs)]
         descs = [group_key for i in range(locs)]
         for i in range(locs):
@@ -910,7 +919,7 @@ def generate_enums(file_enum,file_data,do_write):
         (channel_key,ui,color) = defs_channel[ci]
         unit_key = defs_unit[ui][0]
         si = len(defs_set)
-        gen_line("\t{ %30s,%2d,%4d }," % ('"'+channel_key+'"',ui,len(table_locale[0])),1)
+        gen_line("\t{ %40s,%2d,%4d }," % (nsf_key(channel_key),ui,len(table_locale[0])),1)
         gen_enum("NSF_CHANNEL_"+unit_key+"_"+channel_key,ci)
         CHANNEL_ADD_DEF = [
             (1,0,1,0,1,defs_channelonlist,False,DT_LIST),
@@ -981,8 +990,8 @@ def generate_enums(file_enum,file_data,do_write):
             if (min_hint < min_int) or (max_hint > max_int):
                 error("SET %s %s hint range outside min/max: %d - %d <> %d - %d" % (group_key,set_key,min_int,max_int,min_hint,max_hint))
         if list_index == None: list_index = -1
-        gen_line("\t{ %30s,%3d,%4d,%10d,%11d,%10d,%11d,%10d,%2d,%3d,%s }," % (
-            '"'+set_key+'"',
+        gen_line("\t{ %40s,%3d,%4d,%10d,%11d,%10d,%11d,%10d,%2d,%3d,%s }," % (
+            nsf_key(set_key),
             gi,len(table_locale[0]),
             default_int,min_int,max_int,min_hint,max_hint,
             display_hint,list_index,
@@ -1039,8 +1048,8 @@ def generate_enums(file_enum,file_data,do_write):
         if prop_list != None:
             list_index = prop_list
             list_max = len(defs_list[list_index])-2
-        gen_line("\t{ %30s,%2d,%4d,%1d,%2d,%3d,%3d }," % (
-            '"'+prop_key+'"',
+        gen_line("\t{ %40s,%2d,%4d,%1d,%2d,%3d,%3d }," % (
+            nsf_key(prop_key),
             gi,len(table_locale[0]),prop_type,prop_display,
             list_max,list_index),1)
         gen_enum("NSF_PROP_"+prop_key,spi,prop_comment);

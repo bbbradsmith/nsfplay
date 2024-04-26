@@ -69,10 +69,15 @@ void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
 void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
 
 // returns a localized string describing the last error for this core
-//  - NULL if there has been no logged error since the last call to nsfplay_test_error
+//  - NULL if there has been no logged error since the last call to nsfplay_last_error
 //  - only remembers the latest error, use set_error_log if you need to catch them all
 //  - once returned, the error state will be cleared, and subsequent calls will return NULL until another error is caught
 const char* nsfplay_last_error(const NSFCore* core);
+// returns the textenum associated with last_error (but normally the last_error text has additional description)
+//  - -1 if there has been no logged error since the last call to nsfplay_last_error_code
+//  - intended mainly as a substitute for last_error when NSF_NOTEXT is defined for the core
+//  - can be called from the error log callback if it knows which NSFCore it belonged to
+int32_t nsfplay_last_error_code(const NSFCore* core);
 
 
 // reset all settings to default values
@@ -109,7 +114,8 @@ const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum);
 // write a complete ini to an open file
 // - uses fprintf and \n, and assumes the file is in "wt" mode for platform-appropriate line endings
 // - does not close the file
-void nsfplay_ini_write(const NSFCore* core, FILE* f);
+// - returns false if there is a write error
+bool nsfplay_ini_write(const NSFCore* core, FILE* f);
 
 
 // settings by setenum

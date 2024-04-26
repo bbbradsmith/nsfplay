@@ -16,9 +16,12 @@ FILE* platform_fopen(const char* path, const char* mode);
 
 // logging functions
 
+NSFCore* error_core = NULL;
+
 void error_log(const char* msg)
 {
-	std::fprintf(stderr,"Error: %s\n",msg);
+	if (error_core) std::fprintf(stderr,"Error (%d): %s\n",nsfplay_last_error_code(error_core),msg);
+	else std::fprintf(stderr,"Error: %s\n",msg);
 }
 
 void debug_print(const char* msg)
@@ -74,6 +77,7 @@ int main(int argc, char** argv)
 	};
 	*/
 	NSFCore* core = nsfplay_create(TEST_INI);
+	error_core = core;
 	nsfplay_set_init(core,TEST_INIT);
 	/*
 	//nsfplay_set_key_int(core,"TRI_ON",0);

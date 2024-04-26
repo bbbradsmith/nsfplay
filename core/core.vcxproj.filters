@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Enum Files">
+      <UniqueIdentifier>{98cf1676-046f-4915-a6e4-593ddc14c289}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp">
@@ -37,5 +40,24 @@
     <ClInclude Include="enums_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\enums\english.txt">
+      <Filter>Enum Files</Filter>
+    </Text>
+    <Text Include="..\enums\japanese.txt">
+      <Filter>Enum Files</Filter>
+    </Text>
+    <Text Include="..\enums\settings.txt">
+      <Filter>Enum Files</Filter>
+    </Text>
+    <Text Include="..\version.txt">
+      <Filter>Enum Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\enums\nsfplayenums.py">
+      <Filter>Enum Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

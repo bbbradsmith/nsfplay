@@ -36,7 +36,8 @@ typedef uint64_t  uint64;
 
 #ifndef NSF_NOTEXT
 	// define NSF_NOTEXT=1 to strip all unnecessary text from the build
-	//   this disables ini parsing, error messages will become blank strings, and list keys will also become blank
+	//   this disables ini parsing and key looking, error messages and keys will become blank strings
+	//   last_error_code can still be used to disambiguate errors
 	#define NSF_NOTEXT 0
 #endif
 
@@ -64,6 +65,7 @@ typedef struct NSFCore_
 
 	// text and error output buffers
 	mutable const char* error_last;
+	mutable sint32 error_last_code;
 	mutable char error_last_buffer[256]; // error_last may point to this for formatted errors
 	mutable char temp_text[1024]; // used for returned text information
 	mutable const char* active_prop_lines;
@@ -123,6 +125,7 @@ typedef struct NSFCore_
 	void release(); // internal: called by destroy, releases all owned allocations
 
 	const char* last_error() const; // returns last error message, NULL if none since last check
+	sint32 last_error_code() const; // returns last error message textenum, -1 if none since last check
 	void set_error(sint32 textenum,...) const; // sets last error and generates error callback
 	void set_ini_error(int linenum, sint32 textenum,...) const; // for ini files (-1 if no ini)
 	void set_error_raw(const char* fmt,...) const; // set_error with localized errors is preferred, but this can send raw text errors for debug purposes
@@ -142,7 +145,7 @@ typedef struct NSFCore_
 	NSFGroupInfo group_info(sint32 group) const;
 
 	const char* ini_line(sint32 setenum) const;
-	void ini_write(FILE* f) const;
+	bool ini_write(FILE* f) const; // use a "wt" file, writes with fprintf to generate native newlines, returns false if errors writing
 	bool parse_ini_line(const char* line, int len, int linenum); // linenum=-1 to parse a line with no INI file context
 
 	bool load(const uint8* data, uint32 size, bool assume, bool bin=false);

@@ -290,14 +290,17 @@ LOCALTEXT MENU_INI_SAVE       "Save Settings..."
 # make sure the % fields are used identically in all localizations.
 #
 
+LOCALERROR RAW_ERROR          "Raw Error (Unknown)"
 LOCALERROR SET_INVALID        "Invalid setting"
 LOCALERROR SET_TYPE           "Wrong setting type"
 LOCALERROR SETINT_RANGE       "Setting out of range: %d (%d to %d)"
+LOCALERROR INI_NOTEXT         "NOTEXT core build does not support INI"
 LOCALERROR INI_NO_EQUALS      "Missing '='"
 LOCALERROR INI_BAD_KEY        "Unknown setting"
 LOCALERROR INI_BAD_INT        "Bad integer value"
 LOCALERROR INI_BAD_RANGE      "Setting out of range: %d (%d to %d)"
 LOCALERROR INI_BAD_LIST_KEY   "Value not an integer or list key for %s"
+LOCALERROR INI_BAD_WRITE      "Unable to write to INI file"
 LOCALERROR BIN_BAD            "BIN file too large (maximum 40k)"
 LOCALERROR NSF_HEAD_BAD       "Unknown file type, not NSF or NSFe"
 LOCALERROR NSF_VERSION_BAD    "Invalid NSF version: 0"

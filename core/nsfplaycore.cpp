@@ -49,6 +49,11 @@ const char* nsfplay_last_error(const NSFCore* core)
 	return core->last_error();
 }
 
+int32_t nsfplay_last_error_code(const NSFCore* core)
+{
+	return core->last_error_code();
+}
+
 void nsfplay_set_default(NSFCore* core)
 {
 	core->set_default();
@@ -81,7 +86,7 @@ const char* nsfplay_ini_line(const NSFCore* core, int32_t setenum)
 	return core->ini_line(setenum);
 }
 
-void nsfplay_ini_write(const NSFCore* core, FILE* f)
+bool nsfplay_ini_write(const NSFCore* core, FILE* f)
 {
 	return core->ini_write(f);
 }

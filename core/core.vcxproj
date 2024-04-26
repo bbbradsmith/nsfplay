@@ -195,6 +195,15 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="enums_data.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\enums\english.txt" />
+    <Text Include="..\enums\japanese.txt" />
+    <Text Include="..\enums\settings.txt" />
+    <Text Include="..\version.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\enums\nsfplayenums.py" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
