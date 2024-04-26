@@ -329,6 +329,13 @@ uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core)
 	return 0;
 }
 
+NSFOpcode nsfplay_emu_opcode(uint8 op)
+{
+	NSF_UNUSED(op);
+	// TODO
+	return {0};
+}
+
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop)
 {
 	return core->prop_info(prop);
@@ -460,5 +467,6 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 
 const char* nsfplay_local_text(const NSFCore* core, int32_t textenum)
 {
+	if (!core) return NSFCore::local_text(textenum,0); // default locale
 	return core->local_text(textenum);
 }

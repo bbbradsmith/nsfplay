@@ -219,6 +219,8 @@ PROPINT   ACTIVE ACTIVE_SONG_START   INT "Song start for NSFPlay interface (incl
 PROPINT   ACTIVE ACTIVE_PLAYLIST     BOOL "Indicates whether a playlist is overriding the NSF song list"
 PROPINT   ACTIVE ACTIVE_SONG_NSF     INT "Current song in the NSF song list, use ACTIVE_SONG with NSFPlay interface"
 PROPINT   ACTIVE ACTIVE_CPU_FREQ     INT "Current CPU frequency"
+PROPBLOB  ACTIVE ACTIVE_BANKS            "Current banks: 8 bytes, 10 for FDS expansion"
+PROPINT   ACTIVE ACTIVE_EMU_FRAME_CY INT "Current cycle within frame"
 
 # TODO blobs for other NSFe properties?
 # TODO song properties, how many of these have NSFe properties too?

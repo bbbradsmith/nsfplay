@@ -254,6 +254,39 @@ void nsfplay_emu_cancel_pending(NSFCore* core);
 uint64_t nsfplay_emu_cycles(const NSFCore* core); // cycles since song_play
 uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core); // cycles until next pending sample is generated
 
+// opcode information to assist implementing a debugger
+typedef struct
+{
+	enum { // 6502 addressing mode
+		AD_IMP = 0, // implicit         (0 bytes param)  e.g. RTS
+		AD_ACC,     // accumulator      (0 bytes param)  e.g. ROL
+		AD_IMM,     // immediate        (1 bytes param)  e.g. LDA #$05
+		AD_ZP,      // zeropage         (1 bytes param)  e.g. LDA $05
+		AD_ZPX,     // zeropage,X       (1 bytes param)  e.g. LDA $05,X
+		AD_ZPY,     // zeropage,Y       (1 bytes param)  e.g. LDA $05,Y
+		AD_REL,     // relative         (1 bytes param)  e.g. BNE label
+		AD_ABS,     // absolute         (2 bytes param)  e.g. LDA $5000
+		AD_ABX,     // absolute,X       (2 bytes param)  e.g. LDA $5000,X
+		AD_ABY,     // absolute,Y       (2 bytes param)  e.g. LDA $5000,Y
+		AD_IND,     // indirect         (2 bytes param)  e.g. JMP ($FFFC)
+		AD_IDX,     // indexed indirect (1 bytes param)  e.g. LDA ($05,X)
+		AD_IDY,     // indirect indexed (1 bytes param)  e.g. LDA ($05),Y
+		AD_COUNT
+	};
+	enum { // flags bitfield
+		ILLEGAL      = 0x0001, // illegal instruction
+		CYCLE_BRANCH = 0x0002, // branch instruction: +1 cycle if branch taken, +2 if branch taken to new page
+		CYCLE_INDEX  = 0x0004, // indexing instruction: +1 cycle if page is crossed when adding index (does not affect AD_IDX)
+	};
+
+	const char* name;
+	uint32_t admode; // 6502 addressing mode
+	uint32_t cycles; // cycles to execute (may have extra, see flags)
+	uint32_t flags; // other information
+} NSFOpcode;
+
+NSFOpcode nsfplay_emu_opcode(uint8_t op);
+
 
 // NSF properties
 // - prop parameter should use the NSF_PROP_key enumerations, as the values are subject to change
@@ -282,6 +315,7 @@ typedef struct
 } NSFPropInfo;
 
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop);
+
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop, int32_t song=-1); // song<0 = current song
 int32_t nsfplay_prop_int(const NSFCore* core, int32_t prop, int32_t song=-1);
 int64_t nsfplay_prop_long(const NSFCore* core, int32_t prop, int32_t song=-1);
@@ -347,6 +381,7 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 // other text strings adapted for the current locale, see: NSF_TEXT_key
 // - the returned string pointer is static and has permanent lifetime
 // - textenum 0 is a default error string, returned instead of NULL for safety in some error cases
+// - core can be NULL but will give default locale strings
 const char* nsfplay_local_text(const NSFCore* core, int32_t textenum);
 
 

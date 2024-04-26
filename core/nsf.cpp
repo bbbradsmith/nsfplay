@@ -466,6 +466,8 @@ bool NSFCore::nsf_prop_exists(sint32 prop, sint32 song) const
 	case NSF_PROP_ACTIVE_SONG_NSF:
 	case NSF_PROP_ACTIVE_CPU_FREQ:
 		return true;
+	case NSF_PROP_ACTIVE_BANKS: return nsf_prop_exists(NSF_PROP_BANKSWITCH);
+	case NSF_PROP_ACTIVE_EMU_FRAME_CY: return true;
 	// song props
 	case NSF_PROP_SONG_TITLE:
 
@@ -562,6 +564,7 @@ sint32 NSFCore::nsf_prop_int(sint32 prop, sint32 song) const
 	case NSF_PROP_ACTIVE_PLAYLIST: return active_playlist_len(this) ? 1 : 0;
 	case NSF_PROP_ACTIVE_SONG_NSF: return resolve_nsf_song(this,active_song);
 	case NSF_PROP_ACTIVE_CPU_FREQ: return 0; // TODO
+	case NSF_PROP_ACTIVE_EMU_FRAME_CY: return 0; // TODO
 
 	default:
 		break;
@@ -651,6 +654,9 @@ const uint8* NSFCore::nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song)
 		if (NSFHDR()) { bsize = 0x80; blob = nsf; break; }
 		break;
 	case NSF_PROP_NSFE_PLST: blob = nsfe_chunk(FOURCC("plst"),&bsize); break;
+
+	case NSF_PROP_ACTIVE_BANKS:
+		break; // TODO
 
 	default:
 		break;

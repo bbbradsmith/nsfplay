@@ -257,6 +257,8 @@ LOCALPROP ACTIVE_SONG_START   "Active Song Start"
 LOCALPROP ACTIVE_PLAYLIST     "Playlist Active"
 LOCALPROP ACTIVE_SONG_NSF     "Active NSF Song"
 LOCALPROP ACTIVE_CPU_FREQ     "Active CPU Frequency"
+LOCALPROP ACTIVE_BANKS        "Emulation bankswitch registers"
+LOCALPROP ACTIVE_EMU_FRAME_CY "Emulation Frame Cycle"
 
 #
 # Song Properties
@@ -281,7 +283,6 @@ LOCALTEXT MENU_DEBUGGER       "Debugger"
 LOCALTEXT MENU_OPEN           "Open File..."
 LOCALTEXT MENU_INI_LOAD       "Load Settings..."
 LOCALTEXT MENU_INI_SAVE       "Save Settings..."
-
 
 #
 # Error mesasges
