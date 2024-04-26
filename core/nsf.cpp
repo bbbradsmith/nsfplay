@@ -131,22 +131,30 @@ inline static uint32 nsfe_data(const NSFCore* core)
 
 inline static uint32 active_playlist_len(const NSFCore* core)
 {
-	if (!core->setting[NSF_SET_PLAYLIST]) return 0;
-	uint32 cs = 0;
-	core->nsfe_chunk(FOURCC("plst"),&cs);
-	return cs;
+	const int setplay = core->setting[NSF_SET_PLAYLIST];
+	if (setplay != NSF_LK_PLAYLIST_OFF)
+	{
+		uint32 cs = 0;
+		core->nsfe_chunk((setplay==NSF_LK_PLAYLIST_PSFX) ? FOURCC("psfx") : FOURCC("plst"),&cs);
+		return cs;
+	}
+	return 0;
 }
 
 inline static sint32 resolve_nsf_song(const NSFCore* core, sint32 song)
 {
 	if (song < 0) song = core->active_song;
 	if (song < 0) return 0; // invalid active_song?
-	if (!core->setting[NSF_SET_PLAYLIST]) return song;
-	uint32 cs = 0;
-	const uint8* chk = core->nsfe_chunk(FOURCC("plst"),&cs);
-	if (!chk) return song;
-	if (cs <= (uint32)song) return 0; // outside of playlist?
-	return chk[song];
+	const int setplay = core->setting[NSF_SET_PLAYLIST];
+	if (setplay != NSF_LK_PLAYLIST_OFF)
+	{
+		uint32 cs = 0;
+		const uint8* chk = core->nsfe_chunk((setplay==NSF_LK_PLAYLIST_PSFX) ? FOURCC("psfx") : FOURCC("plst"),&cs);
+		if (!chk) return song;
+		if (cs <= (uint32)song) return 0; // outside of playlist?
+		return chk[song];
+	}
+	return song; // no playlist
 }
 
 inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, uint32 nsfe_offset, uint32 nsf_offset, uint8 bitmask)
