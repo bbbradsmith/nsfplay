@@ -13,6 +13,13 @@ OBJS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.d))
 CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON)
 
+# minimal build test to make sure the core still compiles with as much defined out as possible
+
+MINIMAL ?= 0
+ifeq ($(MINIMAL),1)
+	CXXFLAGS_ALL += -DNSF_NOTEXT
+endif
+
 # precompiled header
 
 PCH_H = core.h

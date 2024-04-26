@@ -10,14 +10,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-gen:
-    name: Check Generated Files
+  code-tests:
+    name: Code Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Files
         uses: actions/checkout@v4
-      - name: Verify Enums
+      - name: Verify Generated Enums
         run: make enums_verify
+      - name: Build Minimal Core
+        run: make core_minimal
 
   build-msvc:
     name: Windows MSVC

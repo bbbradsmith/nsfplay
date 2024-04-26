@@ -80,6 +80,7 @@ On Windows (including MSYS2), you don't need to keep the cmake generated directo
 * `make` - builds `cmd`, `gui`
 * `make clean` - deletes `intermediate/` and `output/` directories.
 * `make core` - build core library `nsfcore` to `output/make/`.
+* `make core_minimal` - build core with all optional features defined out.
 * `make cmd` - build `nsfplac` to `output/make/`.
 * `make gui` - build gui library `nsfgui` to `output/make/`.
 * `make nsfplay` - build `nsfplay` to `output/make/`.
