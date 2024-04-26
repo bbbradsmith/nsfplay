@@ -68,7 +68,7 @@ typedef struct NSFCore_
 	mutable sint32 error_last_code;
 	mutable char error_last_buffer[256]; // error_last may point to this for formatted errors
 	mutable char temp_text[1024]; // used for returned text information
-	mutable const char* active_prop_lines;
+	mutable const uint8* active_prop_lines;
 	mutable uint32 active_prop_lines_len;
 
 	// settings

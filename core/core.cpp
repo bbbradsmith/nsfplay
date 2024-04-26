@@ -264,16 +264,16 @@ bool NSFCore::set_ini(const char* ini)
 	bool result = true;
 	while (*ini) // ini is the start of a line
 	{
-		int eol = 0;
+		unsigned int eol = 0;
 		while (ini[eol] != 10 && ini[eol] != 13 && ini[eol] != 0)
 			++eol;
 		result &= parse_ini_line(ini,eol,linenum);
 		if (ini[eol] == 0) break;
 		if ((ini[eol] == 10 && ini[eol+1] == 13) || // LF CR (obscure)
-		    (ini[eol] == 13 && ini[eol+1] == 10)) // CR LF (windows)
+		    (ini[eol] == 13 && ini[eol+1] == 10))   // CR LF (windows)
 			++eol;
 		linenum += 1;
-		ini += (eol+1);
+		ini += intptr_t(eol)+1;
 	}
 	return result;
 #else

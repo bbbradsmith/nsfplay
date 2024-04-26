@@ -219,6 +219,7 @@ LOCALSET OVERRIDE_NSF_SONG    "NSF Song Override" "Force a specific song value, 
 #
 
 LOCALGROUP NSF                "NSF" "NSF File Properties"
+LOCALPROP TEXT                "File Text"
 LOCALPROP FILE_TYPE           "File Type"
 LOCALPROP NSF_SONG_COUNT      "Song Count"
 LOCALPROP NSF_SONG_START      "Starting Song"

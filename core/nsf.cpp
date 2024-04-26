@@ -416,6 +416,7 @@ bool NSFCore::prop_exists(sint32 prop, sint32 song) const
 	PROPSETUP();
 	switch(prop) // this switch should handle every PROP
 	{
+	case NSF_PROP_TEXT: return CHK("text");
 	case NSF_PROP_FILE_TYPE: return true;
 	case NSF_PROP_NSF_SONG_COUNT: return true;
 	case NSF_PROP_NSF_SONG_START: return true;
@@ -632,6 +633,8 @@ const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 	return MISSING_STR;
 }
 
+const uint32 MAX_PROP_LINE_WIDTH = (sizeof(NSFCore::temp_text)/sizeof(NSFCore::temp_text[0])) - 1;
+
 sint32 NSFCore::prop_lines(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
@@ -639,22 +642,87 @@ sint32 NSFCore::prop_lines(sint32 prop, sint32 song) const
 	active_prop_lines_len = 0;
 	switch(prop)
 	{
-	case 0: // TODO
+	case NSF_PROP_TEXT: if (CHK("text")) break;
+
 	default:
 		break;
 	}
-	// TODO count lines if active_prop_lines != NULL
+	if (chk)
+	{
+		// can handle data without a terminating zero
+		// newline at end of data will still count as an extra line, it is not eliminated
+		active_prop_lines = chk;
+		active_prop_lines_len = cs;
+		sint32 lines = 1;
+		uint32 line_width = 0;
+		while (cs > 0 && *chk)
+		{
+			uint8 c = *chk;
+			++chk;
+			--cs;
+			if (c == 10 || c == 13)
+			{
+				line_width = 0;
+				++lines;
+				if ((c == 10 && *chk == 13) || // LF CR (obscure)
+				    (c == 13 && *chk == 10))   // CR LF (windows)
+				{
+					++chk;
+					--cs;
+				}
+			}
+			else
+			{
+				++line_width;
+				if (line_width >= MAX_PROP_LINE_WIDTH) // break lines too long for temp_text
+				{
+					++lines;
+					line_width = 0;
+				}
+			}
+			++chk;
+		}
+		return lines;
+	}
 	return 0;
 }
 
 const char* NSFCore::prop_line() const
 {
 	if (active_prop_lines == NULL) return NULL;
-	// TODO
-	// copy active_prop_lines up to newline or active_prop_lines_len
-	// advance to next line (or set active_prop_lines NULL if finished) -> support all line endings
-	// return starting value
-	return NULL;
+	uint32 line_width = 0;
+	bool newline = false;
+	while (active_prop_lines_len > 0 && *active_prop_lines)
+	{
+		uint8 c = *active_prop_lines;
+		++active_prop_lines;
+		--active_prop_lines_len;
+		if (c == 10 || c == 13)
+		{
+			newline = true;
+			if ((c == 10 && *active_prop_lines == 13) || // LF CR
+			    (c == 13 && *active_prop_lines == 10))   // CR LF
+			{
+				++active_prop_lines;
+				if (active_prop_lines_len) --active_prop_lines_len;
+			}
+			break;
+		}
+		else
+		{
+			temp_text[line_width] = c;
+			++line_width;
+			if (line_width >= MAX_PROP_LINE_WIDTH) break;
+		}
+	}
+	temp_text[line_width] = 0;
+	// if we don't break because of a newline, stop if it was from end of data or null terminator
+	if (!newline && (active_prop_lines_len == 0 || *active_prop_lines == 0))
+	{
+		active_prop_lines = NULL;
+		active_prop_lines_len = 0;
+	}
+	return temp_text;
 }
 
 const uint8* NSFCore::prop_blob(uint32* blob_size, sint32 prop, sint32 song) const
