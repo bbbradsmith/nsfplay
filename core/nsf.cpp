@@ -161,7 +161,7 @@ inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, ui
 
 inline const char* legacy_string(const NSFCore* core, const char* s)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO detect impossibility of shift-jis (ASCII only?)
 	bool plain = true;
 	if (plain) return s;
@@ -190,9 +190,9 @@ inline const char* legacy_string(const NSFCore* core, const char* s)
 	const uint8* chk = NULL; /* resable chunk pointer */ \
 	uint32 cs = 0; /* chunk size */ \
 	sint32 nsf_song = resolve_nsf_song(this,song); \
-	(void)chk; \
-	(void)cs; \
-	(void)nsf_song;
+	NSF_UNUSED(chk); \
+	NSF_UNUSED(cs); \
+	NSF_UNUSED(nsf_song);
 
 //
 // parse the loaded file

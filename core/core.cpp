@@ -96,7 +96,7 @@ void debug_printf(const char* fmt,...)
 	msg[sizeof(msg)-1] = 0;
 	debug(msg);
 #else
-	(void)fmt;
+	NSF_UNUSED(fmt);
 #endif
 }
 
@@ -170,7 +170,7 @@ void NSFCore::set_error(sint32 textenum,...) const
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
 #else
-	(void)textenum;
+	NSF_UNUSED(textenum);
 	error_last = "";
 #endif
 	if (nsf::error_callback) nsf::error_callback(error_last);
@@ -196,8 +196,8 @@ void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
 	error_last = error_last_buffer;
 #else
-	(void)linenum;
-	(void)textenum;
+	NSF_UNUSED(linenum);
+	NSF_UNUSED(textenum);
 	error_last = "";
 #endif
 	if (nsf::error_callback) nsf::error_callback(error_last);
@@ -255,7 +255,7 @@ bool NSFCore::set_ini(const char* ini)
 	}
 	return result;
 #else
-	(void)ini;
+	NSF_UNUSED(ini);
 	return false;
 #endif
 }
@@ -453,7 +453,7 @@ const char* NSFCore::ini_line(sint32 setenum) const
 	temp_text[sizeof(temp_text)-1] = 0;
 	return temp_text;
 #else
-	(void)setenum;
+	NSF_UNUSED(setenum);
 	return "";
 #endif
 }
@@ -476,7 +476,7 @@ void NSFCore::ini_write(FILE* f) const
 	}
 	std::fprintf(f,"# end of settings\n");
 #else
-	(void)f;
+	NSF_UNUSED(f);
 #endif
 }
 
@@ -570,9 +570,9 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	}
 	return true;
 #else
-	(void)line;
-	(void)len;
-	(void)linenum;
+	NSF_UNUSED(line);
+	NSF_UNUSED(len);
+	NSF_UNUSED(linenum);
 	return false;
 #endif
 }
@@ -637,7 +637,7 @@ const char* NSFCore::local_text(sint32 textenum) const
 #if !(NSF_NOTEXT)
 	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
-	(void)textenum;
+	NSF_UNUSED(textenum);
 	return (const char*)NSFD_NOTEXT_LIST_KEY;
 #endif
 }
@@ -653,8 +653,8 @@ const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 	}
 	return (const char*)(NSFD_LOCAL_TEXT_DATA + NSFD_LOCAL_TEXT[locale][textenum]);
 #else
-	(void)textenum;
-	(void)locale;
+	NSF_UNUSED(textenum);
+	NSF_UNUSED(locale);
 	return (const char*)NSFD_NOTEXT_LIST_KEY;
 #endif
 }

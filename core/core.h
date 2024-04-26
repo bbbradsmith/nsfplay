@@ -45,6 +45,7 @@ typedef uint64_t  uint64;
 #define PROP(propenum_) (nsf_prop_int(NSF_PROP_##propenum_))
 #define PROPS(propenum_) (nsf_prop_str(NSF_PROP_##propenum_))
 
+#define NSF_UNUSED(variable_) {(void)(variable_);}
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
 
 typedef struct NSFCore_

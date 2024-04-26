@@ -174,157 +174,157 @@ uint32_t nsfplay_song_current(const NSFCore* core)
 
 bool nsfplay_song(NSFCore* core, uint8_t song)
 {
-	(void)core;
-	(void)song;
+	NSF_UNUSED(core);
+	NSF_UNUSED(song);
 	// TODO
 	return false;
 }
 
 void nsfplay_song_play(NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 }
 
 void nsfplay_seek(NSFCore* core, uint64_t samples)
 {
-	(void)core;
-	(void)samples;
+	NSF_UNUSED(core);
+	NSF_UNUSED(samples);
 	// TODO
 }
 
 uint64_t nsfplay_samples_played(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
 {
-	(void)core;
-	(void)samples;
-	(void)stereo_output;
+	NSF_UNUSED(core);
+	NSF_UNUSED(samples);
+	NSF_UNUSED(stereo_output);
 	// TODO
 	return 0;
 }
 
 uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output)
 {
-	(void)core;
-	(void)samples;
-	(void)stereo_output;
+	NSF_UNUSED(core);
+	NSF_UNUSED(samples);
+	NSF_UNUSED(stereo_output);
 	// TODO
 	return 0;
 }
 
 uint8_t nsfplay_emu_peek(const NSFCore* core, uint16_t address)
 {
-	(void)core;
-	(void)address;
+	NSF_UNUSED(core);
+	NSF_UNUSED(address);
 	// TODO
 	return 0;
 }
 
 uint8_t nsfplay_emu_read(NSFCore* core, uint16_t address)
 {
-	(void)core;
-	(void)address;
+	NSF_UNUSED(core);
+	NSF_UNUSED(address);
 	// TODO
 	return 0;
 }
 
 void nsfplay_emu_poke(NSFCore* core, uint16_t address, uint8_t value)
 {
-	(void)core;
-	(void)address;
-	(void)value;
+	NSF_UNUSED(core);
+	NSF_UNUSED(address);
+	NSF_UNUSED(value);
 	// TODO
 }
 
 void nsfplay_emu_reg_set(NSFCore* core, char reg, uint16_t value)
 {
-	(void)core;
-	(void)reg;
-	(void)value;
+	NSF_UNUSED(core);
+	NSF_UNUSED(reg);
+	NSF_UNUSED(value);
 	// TODO
 }
 
 uint16_t nsfplay_emu_reg_get(const NSFCore* core, char reg)
 {
-	(void)core;
-	(void)reg;
+	NSF_UNUSED(core);
+	NSF_UNUSED(reg);
 	// TODO
 	return 0;
 }
 
 void nsfplay_emu_init(NSFCore* core, uint8_t song)
 {
-	(void)core;
-	(void)song;
+	NSF_UNUSED(core);
+	NSF_UNUSED(song);
 	// TODO
 }
 
 void nsfplay_emu_run(NSFCore* core, uint32_t cycles)
 {
-	(void)core;
-	(void)cycles;
+	NSF_UNUSED(core);
+	NSF_UNUSED(cycles);
 	// TODO
 }
 
 uint32_t nsfplay_emu_run_frame(NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 uint32_t nsfplay_emu_run_instruction(NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 const char* nsfplay_emu_trace(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return NULL;
 }
 
 void nsfplay_emu_gamepad(NSFCore* core, int32_t pad, uint32_t report)
 {
-	(void)core;
-	(void)pad;
-	(void)report;
+	NSF_UNUSED(core);
+	NSF_UNUSED(pad);
+	NSF_UNUSED(report);
 	// TODO
 	return;
 }
 
 uint32_t nsfplay_emu_samples_pending(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 void nsfplay_emu_cancel_pending(NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 }
 
 uint64_t nsfplay_emu_cycles(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
@@ -376,85 +376,85 @@ const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chu
 
 NSFChannelUnit nsfplay_channel_unit(const NSFCore* core, int32_t unit)
 {
-	(void)core;
-	(void)unit;
+	NSF_UNUSED(core);
+	NSF_UNUSED(unit);
 	// TODO
 	return {};
 }
 
 NSFChannelInfo nsfplay_channel_info(int32_t global_channel)
 {
-	(void)global_channel;
+	NSF_UNUSED(global_channel);
 	// TODO
 	return {};
 }
 
 int32_t nsfplay_channel_count(const NSFCore* core)
 {
-	(void)core;
+	NSF_UNUSED(core);
 	// TODO
 	return 0;
 }
 
 NSFChannelState nsfplay_channel_state(const NSFCore* core, int32_t active_channel)
 {
-	(void)core;
-	(void)active_channel;
+	NSF_UNUSED(core);
+	NSF_UNUSED(active_channel);
 	// TODO
 	return {};
 }
 
 uint32_t nsfplay_channel_state_ex(const NSFCore* core, int32_t active_channel, void* data, uint32_t data_size)
 {
-	(void)core;
-	(void)active_channel;
-	(void)data;
-	(void)data_size;
+	NSF_UNUSED(core);
+	NSF_UNUSED(active_channel);
+	NSF_UNUSED(data);
+	NSF_UNUSED(data_size);
 	// TODO
 	return 0;
 }
 
 uint64_t nsfplay_time_to_samples(const NSFCore* core, int32_t hours, int32_t minutes, int32_t seconds, int32_t milliseconds)
 {
-	(void)core;
-	(void)hours;
-	(void)minutes;
-	(void)seconds;
-	(void)milliseconds;
+	NSF_UNUSED(core);
+	NSF_UNUSED(hours);
+	NSF_UNUSED(minutes);
+	NSF_UNUSED(seconds);
+	NSF_UNUSED(milliseconds);
 	// TODO
 	return 0;
 }
 
 uint64_t nsfplay_time_to_cycles(const NSFCore* core, int32_t hours, int32_t minutes, int32_t seconds, int32_t milliseconds)
 {
-	(void)core;
-	(void)hours;
-	(void)minutes;
-	(void)seconds;
-	(void)milliseconds;
+	NSF_UNUSED(core);
+	NSF_UNUSED(hours);
+	NSF_UNUSED(minutes);
+	NSF_UNUSED(seconds);
+	NSF_UNUSED(milliseconds);
 	// TODO
 	return 0;
 }
 
 void nsfplay_samples_to_time(const NSFCore* core, uint64_t samples, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds)
 {
-	(void)core;
-	(void)samples;
-	(void)hours;
-	(void)minutes;
-	(void)seconds;
-	(void)milliseconds;
+	NSF_UNUSED(core);
+	NSF_UNUSED(samples);
+	NSF_UNUSED(hours);
+	NSF_UNUSED(minutes);
+	NSF_UNUSED(seconds);
+	NSF_UNUSED(milliseconds);
 	// TODO
 }
 
 void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours, int32_t* minutes, int32_t* seconds, int32_t* milliseconds)
 {
-	(void)core;
-	(void)cycles;
-	(void)hours;
-	(void)minutes;
-	(void)seconds;
-	(void)milliseconds;
+	NSF_UNUSED(core);
+	NSF_UNUSED(cycles);
+	NSF_UNUSED(hours);
+	NSF_UNUSED(minutes);
+	NSF_UNUSED(seconds);
+	NSF_UNUSED(milliseconds);
 	// TODO
 }
 
