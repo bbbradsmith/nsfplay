@@ -866,9 +866,10 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("} NSFGroupData;",1)
     gen_line("const NSFGroupData NSFD_GROUP[NSF_GROUP_COUNT] = {",1)
     for gi in range(len(defs_group)):
-        group_key = defs_group[gi][0]
+        (group_key, group_type) = defs_group[gi]
         gen_enum("NSF_GROUP_"+group_key,gi)
-        gen_line("\t{ %40s,%4d }," % (nsf_key(group_key),len(table_locale[0])),1)
+        gen_line("\t{ %40s,%2d,%4d }," %
+            (nsf_key(group_key),group_type,len(table_locale[0])),1)
         names = [group_key for i in range(locs)]
         descs = [group_key for i in range(locs)]
         for i in range(locs):

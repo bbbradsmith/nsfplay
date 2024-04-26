@@ -456,7 +456,20 @@ bool NSFCore::prop_exists(sint32 prop, sint32 song) const
 	case NSF_PROP_NSF2_MANDATORY:
 		return true;
 	case NSF_PROP_NSF_HEADER: return NSFHDR();
-	case NSF_PROP_NSFE_PLST: return (CHKS("plst",0));
+	case NSF_PROP_NSFE_INFO: return CHK("INFO");
+	case NSF_PROP_NSFE_BANK: return CHK("BANK");
+	case NSF_PROP_NSFE_RATE: return CHK("RATE");
+	case NSF_PROP_NSFE_NSF2: return CHK("NSF2");
+	case NSF_PROP_NSFE_VRC7: return CHK("VRC7");
+	case NSF_PROP_NSFE_PLST: return CHK("plst");
+	case NSF_PROP_NSFE_PSFX: return CHK("psfx");
+	case NSF_PROP_NSFE_TIME: return CHK("time");
+	case NSF_PROP_NSFE_FADE: return CHK("fade");
+	case NSF_PROP_NSFE_TLBL: return CHK("tlbl");
+	case NSF_PROP_NSFE_TAUT: return CHK("taut");
+	case NSF_PROP_NSFE_TEXT: return CHK("text");
+	case NSF_PROP_NSFE_MIXE: return CHK("mixe");
+	case NSF_PROP_NSFE_REGN: return CHK("regn");
 	case NSF_PROP_ACTIVE_SONG:
 	case NSF_PROP_ACTIVE_SONG_COUNT:
 	case NSF_PROP_ACTIVE_SONG_START:
@@ -651,7 +664,20 @@ const uint8* NSFCore::prop_blob(uint32* blob_size, sint32 prop, sint32 song) con
 	case NSF_PROP_NSF_HEADER:
 		if (NSFHDR()) { bsize = 0x80; blob = nsf; break; }
 		break;
+	case NSF_PROP_NSFE_INFO: blob = nsfe_chunk(FOURCC("INFO"),&bsize); break;
+	case NSF_PROP_NSFE_BANK: blob = nsfe_chunk(FOURCC("BANK"),&bsize); break;
+	case NSF_PROP_NSFE_RATE: blob = nsfe_chunk(FOURCC("RATE"),&bsize); break;
+	case NSF_PROP_NSFE_NSF2: blob = nsfe_chunk(FOURCC("NSF2"),&bsize); break;
+	case NSF_PROP_NSFE_VRC7: blob = nsfe_chunk(FOURCC("VRC7"),&bsize); break;
 	case NSF_PROP_NSFE_PLST: blob = nsfe_chunk(FOURCC("plst"),&bsize); break;
+	case NSF_PROP_NSFE_PSFX: blob = nsfe_chunk(FOURCC("psfx"),&bsize); break;
+	case NSF_PROP_NSFE_TIME: blob = nsfe_chunk(FOURCC("time"),&bsize); break;
+	case NSF_PROP_NSFE_FADE: blob = nsfe_chunk(FOURCC("fade"),&bsize); break;
+	case NSF_PROP_NSFE_TLBL: blob = nsfe_chunk(FOURCC("tlbl"),&bsize); break;
+	case NSF_PROP_NSFE_TAUT: blob = nsfe_chunk(FOURCC("taut"),&bsize); break;
+	case NSF_PROP_NSFE_TEXT: blob = nsfe_chunk(FOURCC("text"),&bsize); break;
+	case NSF_PROP_NSFE_MIXE: blob = nsfe_chunk(FOURCC("mixe"),&bsize); break;
+	case NSF_PROP_NSFE_REGN: blob = nsfe_chunk(FOURCC("regn"),&bsize); break;
 
 	case NSF_PROP_ACTIVE_BANKS:
 		break; // TODO

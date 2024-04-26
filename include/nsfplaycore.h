@@ -210,7 +210,7 @@ typedef struct
 } NSFGroupInfo;
 
 NSFSetInfo nsfplay_set_info(const NSFCore* core, int32_t setenum);
-NSFGroupInfo nsfplay_set_group_info(const NSFCore* core, int32_t group);
+NSFGroupInfo nsfplay_group_info(const NSFCore* core, int32_t group);
 int32_t nsfplay_set_enum(const char* key); // -1 if not found
 int32_t nsfplay_group_enum(const char* key); // -1 if not found
 

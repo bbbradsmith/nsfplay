@@ -134,18 +134,56 @@ int main(int argc, char** argv)
 
 	// test props
 	printf("PROPS:\n");
+	int32_t last_group = -1;
 	for (int i=0;i<NSF_PROP_COUNT;++i)
 	{
 		NSFPropInfo info = nsfplay_prop_info(core,i);
+		if (info.group != last_group)
+		{
+			last_group = info.group;
+			NSFGroupInfo ginfo = nsfplay_group_info(core,last_group);
+			printf("PROP GROUP: %s\n",ginfo.name);
+		}
 		//printf("%s %s %d\n",info.key,info.name,info.type);
 		if (nsfplay_prop_exists(core,i))
 		{
 			if (info.type == NSF_PROP_TYPE_INT || info.type == NSF_PROP_TYPE_LIST)
-				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i,-1));
+				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i));
 			else if (info.type == NSF_PROP_TYPE_STR)
-				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i,-1));
+				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i));
+			else if (info.type == NSF_PROP_TYPE_BLOB)
+			{
+				uint32_t blob_size = 0;
+				const uint8_t* blob = reinterpret_cast<const uint8_t*>(nsfplay_prop_blob(core,&blob_size,i));
+				printf("%s: %d bytes\n",info.key,blob_size);
+				const int COLS = 16;
+				for (uint32_t j=0; j<blob_size; j+=COLS) // print rows of hex + ascii
+				{
+					for (uint32_t k=0; k<COLS; ++k) if ((j+k)<(blob_size)) { printf(" %02X",blob[j+k]); } else { printf("   "); }
+					printf(" ");
+					for (uint32_t k=0; k<COLS; ++k)
+					{
+						if ((j+k)<(blob_size))
+						{
+							uint8_t c = blob[j+k];
+							if (c > 0x20 && c < 0x7F) printf("%c",c);
+							else printf("."); // unprintable
+						}
+						else printf(" ");
+					}
+					printf("\n");
+				}
+			}
+			else if (info.type == NSF_PROP_TYPE_LINES)
+			{
+				int32_t lines = nsfplay_prop_lines(core,i);
+				printf("%s: %d lines\n",info.key,lines);
+				const char* line;
+				while ((line = nsfplay_prop_line(core)) != NULL)
+					printf(" %s\n",line);
+			}
 			else
-				printf("%s (%d)\n",info.key,info.type);
+				printf("%s (Type: %d)\n",info.key,info.type);
 		}
 	}
 
