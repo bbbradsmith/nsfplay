@@ -160,12 +160,12 @@ int32_t nsfplay_group_enum(const char* key)
 
 bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool assume)
 {
-	return core->load((uint8*)(nsf_data),nsf_size,assume,false);
+	return core->load(reinterpret_cast<const uint8*>(nsf_data),nsf_size,assume,false);
 }
 
 bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume)
 {
-	return core->load((uint8*)(bin_data),bin_size,assume,true);
+	return core->load(reinterpret_cast<const uint8*>(bin_data),bin_size,assume,true);
 }
 
 uint32_t nsfplay_song_count(const NSFCore* core)

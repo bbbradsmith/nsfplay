@@ -1116,9 +1116,7 @@ def generate_enums(file_enum,file_data,do_write):
     max_list_len = 2;
     for dl in defs_list:
         if len(dl) > max_list_len: max_list_len = len(dl) # this is actually +1 because dl contains the list name as well, but we need the extra 0 for the double terminal
-    gen_line("const uint8_t NSFD_NOTEXT_LIST_KEY[%d] = {" % (max_list_len),1)
-    gen_data([0]*max_list_len,mode=4);
-    gen_line("};",1)
+    gen_line("const char* NSFD_NOTEXT_LIST_KEY = \"" + ("\\0"*max_list_len) +"\";",1)
     gen_break(1)
     gen_line("#endif",1)
     gen_break(1);

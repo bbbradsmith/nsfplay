@@ -13,6 +13,10 @@
 #include <cerrno> // errno
 
 static_assert(sizeof(char)==sizeof(uint8),"char must be byte sized, because UTF-8 is assumed");
+// It's unlikely that char of other size will be needed,
+// but if it comes up, search the code for reinterpret_cast
+// to find the couple of char*<->uint8* conversion points
+// that would need to add a conversion and/or reallocation step.
 
 #if DEBUG_ALLOC
 #include <map> // std::map
@@ -118,7 +122,7 @@ void fatal(const char* msg)
 
 NSFCore* NSFCore::create()
 {
-	NSFCore* core = (NSFCore*)nsf::alloc(sizeof(NSFCore));
+	NSFCore* core = reinterpret_cast<NSFCore*>(nsf::alloc(sizeof(NSFCore)));
 	NSF_DEBUG("create()");
 	std::memset(core,0,sizeof(NSFCore));
 	core->set_default();
@@ -618,7 +622,7 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 			nsf = data;
 		else
 		{
-			nsf = (uint8*)(nsf::alloc(size));
+			nsf = reinterpret_cast<uint8*>(nsf::alloc(size));
 			std::memcpy(const_cast<uint8*>(nsf),data,size);
 			nsf_free = true;
 		}
@@ -653,7 +657,7 @@ const char* NSFCore::local_text(sint32 textenum) const
 	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
 	NSF_UNUSED(textenum);
-	return reinterpret_cast<const char*>(NSFD_NOTEXT_LIST_KEY);
+	return NSFD_NOTEXT_LIST_KEY;
 #endif
 }
 
@@ -670,6 +674,6 @@ const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 #else
 	NSF_UNUSED(textenum);
 	NSF_UNUSED(locale);
-	return reinterpret_cast<const char*>(NSFD_NOTEXT_LIST_KEY);
+	return NSFD_NOTEXT_LIST_KEY;
 #endif
 }

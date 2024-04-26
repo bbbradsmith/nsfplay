@@ -159,15 +159,13 @@ inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, ui
 	return false;
 }
 
-inline const char* legacy_string(const NSFCore* core, const char* s)
+inline const char* legacy_string(const NSFCore* core, const uint8* data)
 {
 	NSF_UNUSED(core);
-	// TODO detect impossibility of shift-jis (ASCII only?)
-	bool plain = true;
-	if (plain) return s;
+	return reinterpret_cast<const char*>(data);
+	// TODO detect impossibility of shift-jis (ASCII only?) and return direct reinterpret
 	//if (core->setting[SHIFT_JIS] == NSF_LK_ENABLE_AUTO_AUTO) // detect Shift-JIS, copy to temp_text
 	//if (core->setting[SHIFT_JIS] == NSF_LK_ENABLE_ON) // force Shift-JIS, copy to temp_text
-	return s;
 }
 
 // check NSF type, NSFx = NSF/NSF2/NSFe
@@ -591,15 +589,15 @@ const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 	{
 	case NSF_PROP_TITLE:
 		if (CHK("auth") && count_strings(chk,cs) >= 1) return nth_string(chk,cs,0);
-		if (NSFHDR() && has0(nsf+0x0E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x0E));
+		if (NSFHDR() && has0(nsf+0x0E,32)) return legacy_string(this,nsf+0x0E);
 		break;
 	case NSF_PROP_ARTIST:
 		if (CHK("auth") && count_strings(chk,cs) >= 2) return nth_string(chk,cs,1);
-		if (NSFHDR() && has0(nsf+0x2E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x2E));
+		if (NSFHDR() && has0(nsf+0x2E,32)) return legacy_string(this,nsf+0x2E);
 		break;
 	case NSF_PROP_COPYRIGHT:
 		if (CHK("auth") && count_strings(chk,cs) >= 3) return nth_string(chk,cs,2);
-		if (NSFHDR() && has0(nsf+0x4E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x4E));
+		if (NSFHDR() && has0(nsf+0x4E,32)) return legacy_string(this,nsf+0x4E);
 		break;
 	case NSF_PROP_RIPPER:
 		if (CHK("auth") && count_strings(chk,cs) >= 4) return nth_string(chk,cs,3);
