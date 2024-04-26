@@ -208,7 +208,7 @@ PROPINT   NSF NSF2_INIT_NORETURN     BOOL
 PROPINT   NSF NSF2_NOPLAY            BOOL
 PROPINT   NSF NSF2_MANDATORY         BOOL
 
-GROUP PROP DATA
+GROUP PROP DATA "Raw data chunks from the NSF file"
 PROPBLOB  DATA NSF_HEADER
 PROPBLOB  DATA NSFE_INFO
 PROPBLOB  DATA NSFE_BANK
@@ -225,7 +225,7 @@ PROPBLOB  DATA NSFE_TEXT
 PROPBLOB  DATA NSFE_MIXE
 PROPBLOB  DATA NSFE_REGN
 
-GROUP PROP ACTIVE
+GROUP PROP ACTIVE "Playback/emulation state"
 PROPINT   ACTIVE ACTIVE_SONG         INT "Current song for NSFPlay interface (includes PLAYLIST override)"
 PROPINT   ACTIVE ACTIVE_SONG_COUNT   INT "Song count for NSFPlay interface (includes PLAYLIST override)"
 PROPINT   ACTIVE ACTIVE_SONG_START   INT "Song start for NSFPlay interface (includes PLAYLIST override)"
@@ -235,10 +235,7 @@ PROPINT   ACTIVE ACTIVE_CPU_FREQ     INT "Current CPU frequency"
 PROPBLOB  ACTIVE ACTIVE_BANKS            "Current banks: 8 bytes, 10 for FDS expansion"
 PROPINT   ACTIVE ACTIVE_EMU_FRAME_CY INT "Current cycle within frame"
 
-# TODO blobs for other NSFe properties?
-# TODO song properties, how many of these have NSFe properties too?
-# Expansions active properties?
-# 
+# TODO Expansions active properties?
 
 GROUP PROP PTEST
 # for testing UI

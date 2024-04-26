@@ -38,10 +38,10 @@
 #   A set of options that can be used for an INT setting.
 #     LIST list-key key-0 key-1 ...
 #
-#   A grouping of settings, properties, or song properties
-#     GROUP SET group-key
-#     GROUP PROP group-key
-#     GROUP SONGPROP group-key
+#   A grouping of settings, properties, or song properties, with an optional comment string after the generated enum.
+#     GROUP SET group-key "comment"
+#     GROUP PROP group-key "comment"
+#     GROUP SONGPROP group-key "comment"
 #
 #   Settings definitions.
 #   The SETLIST is like a SETINT but will map its numbers to a LIST.
@@ -284,7 +284,7 @@ PARSE_COM,
 
 PARSE_DEFS = {
     "LIST":[PARSE_KEY,PARSE_KEYS],
-    "GROUP":[PARSE_GT,PARSE_KEY],
+    "GROUP":[PARSE_GT,PARSE_KEY,PARSE_COM],
     "SETINT":[PARSE_KEY,PARSE_KEY,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_INT,PARSE_DT],
     "SETLIST":[PARSE_KEY,PARSE_KEY,PARSE_KEY,PARSE_KEY],
     "SETSTR":[PARSE_KEY,PARSE_KEY,PARSE_STR],
@@ -534,7 +534,7 @@ def parse_enums(path):
         if   command == "LIST": # 0-list-key 1-key...
             add_unique_entry(defs_list,1,command+" "+p[0],p)
         elif command == "GROUP": # 0-group-key 1-group-type
-            add_unique_entry(defs_group,1,command+" "+p[1],(p[1],p[0]))
+            add_unique_entry(defs_group,1,command+" "+p[1],(p[1],p[0],p[2]))
         elif command == "SETINT": # 0-group 1-key 2-default 3-min 4-max 5-hint-min 6-hint-max 7-display
             add_set((p[1],p[0],p[2],p[3],p[4],p[5],p[6],None,False,p[7])) # set: 0-key, 1-group, 2-default, 3-int min, 4-int max, 5-hint min, 6-hint max, 7-list, 8-is_string, 9-display type
         elif command == "SETLIST": # 0-group 1-key 2-list 3-default
@@ -563,7 +563,7 @@ def parse_enums(path):
             if (li != None):             add_prop((p[1],p[0],PROP_LIST,DT_LIST,li,p[3]),True)
         elif command == "UNIT":
             add_unique_entry(defs_unit,1,"UNIT "+p[0],p)
-            add_unique_entry(defs_group,1,"GROUP(UNIT) "+p[0],(p[0],GT_SET))
+            add_unique_entry(defs_group,1,"GROUP(UNIT) "+p[0],(p[0],GT_SET,None))
         elif command == "CHANNEL":
             ui = check_unit(p[0])
             if ui != None:
@@ -689,7 +689,7 @@ def gen_line(l,target=0):
 def gen_break(target=0):
     gen_line("",target)
 
-def gen_enum(key,value,comment=None,target=0,hexadecimal=False):
+def gen_enum(key,value,comment=None,hexadecimal=False,target=0):
     suffix = "" if (comment == None or len(comment) < 1) else " // "+comment
     if not hexadecimal: gen_line("const int32_t %-42s %12d;%s" % (key+" =",value,suffix),target)
     else:               gen_line("const int32_t %-42s %12X;%s" % (key+" =",value,suffix),target)
@@ -866,8 +866,8 @@ def generate_enums(file_enum,file_data,do_write):
     gen_line("} NSFGroupData;",1)
     gen_line("const NSFGroupData NSFD_GROUP[NSF_GROUP_COUNT] = {",1)
     for gi in range(len(defs_group)):
-        (group_key, group_type) = defs_group[gi]
-        gen_enum("NSF_GROUP_"+group_key,gi)
+        (group_key, group_type, group_comment) = defs_group[gi]
+        gen_enum("NSF_GROUP_"+group_key,gi,group_comment)
         gen_line("\t{ %40s,%2d,%4d }," %
             (nsf_key(group_key),group_type,len(table_locale[0])),1)
         names = [group_key for i in range(locs)]
