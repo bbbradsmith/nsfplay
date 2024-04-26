@@ -633,8 +633,6 @@ const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 	return MISSING_STR;
 }
 
-const uint32 MAX_PROP_LINE_WIDTH = (sizeof(NSFCore::temp_text)/sizeof(NSFCore::temp_text[0])) - 1;
-
 sint32 NSFCore::prop_lines(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
@@ -674,7 +672,7 @@ sint32 NSFCore::prop_lines(sint32 prop, sint32 song) const
 			else
 			{
 				++line_width;
-				if (line_width >= MAX_PROP_LINE_WIDTH) // break lines too long for temp_text
+				if (line_width >= (TEMP_TEXT_SIZE-1)) // break lines too long for temp_text
 				{
 					++lines;
 					line_width = 0;
@@ -712,7 +710,7 @@ const char* NSFCore::prop_line() const
 		{
 			temp_text[line_width] = c;
 			++line_width;
-			if (line_width >= MAX_PROP_LINE_WIDTH) break;
+			if (line_width >= (TEMP_TEXT_SIZE-1)) break;
 		}
 	}
 	temp_text[line_width] = 0;
