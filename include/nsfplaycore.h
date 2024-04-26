@@ -324,6 +324,21 @@ int32_t nsfplay_prop_lines(const NSFCore* core, int32_t prop, int32_t song=-1); 
 const char* nsfplay_prop_line(const NSFCore* core); // returns next line  (NULL if no more lines)
 const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size, int32_t prop, int32_t song=-1); // blob_size written if not NULL
 
+typedef struct
+{
+	NSFPropInfo info;
+	bool exists;
+	int32_t ival; // int
+	int64_t lval; // long
+	const char* str;
+	int32_t lines;
+	const void* blob;
+	uint32_t blob_size;
+} NSFPropMulti;
+
+NSFPropMulti nsfplay_prop_multi(const NSFCore* core, int32_t prop, int32_t song=-1); // all-in-one convenience (calls all the prop functions at once)
+
+
 // NSFe or NSF2 chunks can be fetched for manual inspection
 // - fourcc does not need a terminating 0, only the first 4 characters will be used
 // - chunk_size will be written if not NULL

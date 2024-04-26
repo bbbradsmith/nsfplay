@@ -164,12 +164,12 @@ bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bo
 
 uint32_t nsfplay_song_count(const NSFCore* core)
 {
-	return core->nsf_prop_int(NSF_PROP_ACTIVE_SONG_COUNT);
+	return core->prop_int(NSF_PROP_ACTIVE_SONG_COUNT);
 }
 
 uint32_t nsfplay_song_current(const NSFCore* core)
 {
-	return core->nsf_prop_int(NSF_PROP_ACTIVE_SONG);
+	return core->prop_int(NSF_PROP_ACTIVE_SONG);
 }
 
 bool nsfplay_song(NSFCore* core, uint8_t song)
@@ -343,37 +343,50 @@ NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop)
 
 bool nsfplay_prop_exists(const NSFCore* core, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_exists(prop,song);
+	return core->prop_exists(prop,song);
 }
 
 int32_t nsfplay_prop_int(const NSFCore* core, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_int(prop,song);
+	return core->prop_int(prop,song);
 }
 
 int64_t nsfplay_prop_long(const NSFCore* core, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_long(prop,song);
+	return core->prop_long(prop,song);
 }
 
 const char* nsfplay_prop_str(const NSFCore* core, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_str(prop,song);
+	return core->prop_str(prop,song);
 }
 
 int32_t nsfplay_prop_lines(const NSFCore* core, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_lines(prop,song);
+	return core->prop_lines(prop,song);
 }
 
 const char* nsfplay_prop_line(const NSFCore* core)
 {
-	return core->nsf_prop_line();
+	return core->prop_line();
 }
 
 const void* nsfplay_prop_blob(const NSFCore* core, uint32_t* blob_size, int32_t prop, int32_t song)
 {
-	return core->nsf_prop_blob(blob_size,prop,song);
+	return core->prop_blob(blob_size,prop,song);
+}
+
+NSFPropMulti nsfplay_prop_multi(const NSFCore* core, int32_t prop, int32_t song)
+{
+	NSFPropMulti pm = {{0},0};
+	pm.info = core->prop_info(prop);
+	pm.exists = core->prop_exists(prop,song);
+	pm.ival = core->prop_int(prop,song);
+	pm.lval = core->prop_long(prop,song);
+	pm.str = core->prop_str(prop,song);
+	pm.lines = core->prop_lines(prop,song);
+	pm.blob = static_cast<const void*>(core->prop_blob(&pm.blob_size,prop,song));
+	return pm;
 }
 
 const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chunk_size)

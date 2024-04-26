@@ -42,8 +42,8 @@ typedef uint64_t  uint64;
 
 // convenient accessors
 #define SETTING(setenum_) (setting[NSF_SET_##setenum_])
-#define PROP(propenum_) (nsf_prop_int(NSF_PROP_##propenum_))
-#define PROPS(propenum_) (nsf_prop_str(NSF_PROP_##propenum_))
+#define PROP(propenum_) (prop_int(NSF_PROP_##propenum_))
+#define PROPS(propenum_) (prop_str(NSF_PROP_##propenum_))
 
 #define NSF_UNUSED(variable_) {(void)(variable_);}
 // NSFCore structure, code members defined in core.cpp unless otherwised marked
@@ -66,8 +66,8 @@ typedef struct NSFCore_
 	mutable const char* error_last;
 	mutable char error_last_buffer[256]; // error_last may point to this for formatted errors
 	mutable char temp_text[1024]; // used for returned text information
-	mutable const char* prop_lines;
-	mutable uint32 prop_lines_len;
+	mutable const char* active_prop_lines;
+	mutable uint32 active_prop_lines_len;
 
 	// settings
 	sint32 setting[NSF_SET_COUNT]; // integer settings (can read directly, write with set_int)
@@ -155,13 +155,13 @@ typedef struct NSFCore_
 	bool nsf_parse(bool bin);
 	const uint8* nsfe_chunk(uint32 fourcc, uint32* chunk_size) const; // fourcc is packed little-endian into uint32
 	const uint8* nsfe_chunk(const char* fourcc, uint32* chunk_size) const;
-	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // song<0 = active_song
-	sint32 nsf_prop_int(sint32 prop, sint32 song=-1) const;
-	sint64 nsf_prop_long(sint32 prop, sint32 song=-1) const;
-	const char* nsf_prop_str(sint32 prop, sint32 song=-1) const;
-	sint32 nsf_prop_lines(sint32 prop, sint32 song=-1) const;
-	const char* nsf_prop_line() const;
-	const uint8* nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song=-1) const;
+	bool prop_exists(sint32 prop, sint32 song=-1) const; // song<0 = active_song
+	sint32 prop_int(sint32 prop, sint32 song=-1) const;
+	sint64 prop_long(sint32 prop, sint32 song=-1) const;
+	const char* prop_str(sint32 prop, sint32 song=-1) const;
+	sint32 prop_lines(sint32 prop, sint32 song=-1) const;
+	const char* prop_line() const;
+	const uint8* prop_blob(uint32* blob_size, sint32 prop, sint32 song=-1) const;
 
 } NSFCore;
 

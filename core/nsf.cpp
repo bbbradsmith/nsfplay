@@ -201,7 +201,7 @@ inline const char* legacy_string(const NSFCore* core, const char* s)
 bool NSFCore::nsf_parse(bool bin)
 {
 	NSF_DEBUG("nsf_parse(%d)",bin);
-	prop_lines = NULL;
+	active_prop_lines = NULL;
 	nsf_bin = false;
 	active_song = 0;
 	std::memset(ram0000,0,sizeof(ram0000));
@@ -405,7 +405,7 @@ const uint8* NSFCore::nsfe_chunk(const char* fourcc, uint32* chunk_size) const
 	return nsfe_chunk(FOURCC(fourcc), chunk_size);
 }
 
-bool NSFCore::nsf_prop_exists(sint32 prop, sint32 song) const
+bool NSFCore::prop_exists(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
 	switch(prop) // this switch should handle every PROP
@@ -466,7 +466,7 @@ bool NSFCore::nsf_prop_exists(sint32 prop, sint32 song) const
 	case NSF_PROP_ACTIVE_SONG_NSF:
 	case NSF_PROP_ACTIVE_CPU_FREQ:
 		return true;
-	case NSF_PROP_ACTIVE_BANKS: return nsf_prop_exists(NSF_PROP_BANKSWITCH);
+	case NSF_PROP_ACTIVE_BANKS: return prop_exists(NSF_PROP_BANKSWITCH);
 	case NSF_PROP_ACTIVE_EMU_FRAME_CY: return true;
 	// song props
 	case NSF_PROP_SONG_TITLE:
@@ -478,7 +478,7 @@ bool NSFCore::nsf_prop_exists(sint32 prop, sint32 song) const
 	return false;
 }
 
-sint32 NSFCore::nsf_prop_int(sint32 prop, sint32 song) const
+sint32 NSFCore::prop_int(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
 	switch(prop)
@@ -572,7 +572,7 @@ sint32 NSFCore::nsf_prop_int(sint32 prop, sint32 song) const
 	return 0;
 }
 
-sint64 NSFCore::nsf_prop_long(sint32 prop, sint32 song) const
+sint64 NSFCore::prop_long(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
 	switch(prop)
@@ -581,10 +581,10 @@ sint64 NSFCore::nsf_prop_long(sint32 prop, sint32 song) const
 	default:
 		break;
 	}
-	return nsf_prop_int(prop,song); // fallback to prop int
+	return prop_int(prop,song); // fallback to prop int
 }
 
-const char* NSFCore::nsf_prop_str(sint32 prop, sint32 song) const
+const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
 	switch(prop)
@@ -613,32 +613,32 @@ const char* NSFCore::nsf_prop_str(sint32 prop, sint32 song) const
 	return MISSING_STR;
 }
 
-sint32 NSFCore::nsf_prop_lines(sint32 prop, sint32 song) const
+sint32 NSFCore::prop_lines(sint32 prop, sint32 song) const
 {
 	PROPSETUP();
-	prop_lines = NULL;
-	prop_lines_len = 0;
+	active_prop_lines = NULL;
+	active_prop_lines_len = 0;
 	switch(prop)
 	{
 	case 0: // TODO
 	default:
 		break;
 	}
-	// TODO count lines if prop_lines != NULL
+	// TODO count lines if active_prop_lines != NULL
 	return 0;
 }
 
-const char* NSFCore::nsf_prop_line() const
+const char* NSFCore::prop_line() const
 {
-	if (prop_lines == NULL) return NULL;
+	if (active_prop_lines == NULL) return NULL;
 	// TODO
-	// copy prop_lines up to newline or prop_lines_len
-	// advance to next line (or set prop_lines NULL if finished) -> support all line endings
+	// copy active_prop_lines up to newline or active_prop_lines_len
+	// advance to next line (or set active_prop_lines NULL if finished) -> support all line endings
 	// return starting value
 	return NULL;
 }
 
-const uint8* NSFCore::nsf_prop_blob(uint32* blob_size, sint32 prop, sint32 song) const
+const uint8* NSFCore::prop_blob(uint32* blob_size, sint32 prop, sint32 song) const
 {
 	PROPSETUP();
 	const uint8* blob = NULL;
