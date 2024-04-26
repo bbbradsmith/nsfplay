@@ -49,7 +49,7 @@ endif
 
 ifeq ($(OS),Windows_NT)
 	# Windows (MSYS2, gcc)
-	CXXFLAGS_EXTRA ?= -municode $(CXXFLAGS_DEBUG)
+	CXXFLAGS_EXTRA ?= -std=c++11 -municode $(CXXFLAGS_DEBUG)
 	LDFLAGS_EXTRA ?= -static -static-libgcc -static-libstdc++ -Wl,--fatal-warnings
 	LDFLAGS_CMD ?= -mconsole
 	LDFLAGS_GUI ?=
@@ -87,7 +87,7 @@ ifeq ($(OS),Windows_NT)
 	#   comctl32.lib, rpcrt4.lib, ws2_32.lib, wininet.lib, winmm.lib
 else ifeq ($(shell uname),Darwin)
 	# MacOS (clang)
-	CXXFLAGS_EXTRA ?= -Wno-c++11-extensions $(CXXFLAGS_DEBUG)
+	CXXFLAGS_EXTRA ?= -std=c++11 $(CXXFLAGS_DEBUG)
 	LDFLAGS_EXTRA ?=
 	LDFLAGS_CMD ?=
 	LDFLAGS_GUI ?=
@@ -104,7 +104,7 @@ else ifeq ($(shell uname),Darwin)
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
 else
 	# Linux / Other (gcc)
-	CXXFLAGS_EXTRA ?= $(CXXFLAGS_DEBUG)
+	CXXFLAGS_EXTRA ?= -std=c++11 $(CXXFLAGS_DEBUG)
 	LDFLAGS_EXTRA ?= -Wl,--fatal-warnings
 	LDFLAGS_CMD ?=
 	LDFLAGS_GUI ?=
