@@ -38,11 +38,11 @@ The NSFPlay core library is intended to be easy to include in and project that n
 * The core makes no access to the file system. You load files and provide the data to the core.
 * All strings are UTF-8 char.
 * Can be used with no NSF file, and direct register writes can be used to manipulate the emulated sound devices directly. This may be suitable for use as an NES sound engine for a game.
-* Allocations are kept to a minimum, and you can provide your own allocator instead of the default `malloc`/`free`.
-  * 1 allocation to create the core state structure.
-  * 1 small optional allocation for every string setting that is changed from the default.
-  * 1 optional allocation to make a copy of the NSF file, but you can instead tell the core to use the read only file contents you give it directly, assuming the pointer will be valid until it is unloaded.
-  * 1 allocation for internal rendering buffers, made when emulation begins, or can be manually triggered. These will not be reallocated unless a change in settings or selected audio expansions require a larger total allocation.
+* Allocations are kept to a minimum, and you can provide your own allocator instead of the default `malloc`/`free`:
+  * 1 allocation to create the core state structure, this will always be the same size for any given build.
+  * 1 allocation for internal rendering buffers, made when emulation begins, or can be manually triggered with `ready()`. These will not be reallocated unless a change in settings or selected audio expansions require a larger total allocation. In particular, samplerate and downsampling settings will affect the amount needed.
+  * 1 (optional) allocation to make an internal copy of the NSF file. An `assume` option will instead use the read only file contents given directly, assuming the pointer will be valid until it is unloaded.
+  * 1 (optional) small allocation for every string setting that is changed from the default (there are very few of these). An `assume` option is provided which will use the passed string settings directly instead of making internal copies.
 * Some features like the expansion audio, or the text data for user interfaces, can be defined out to reduce the library footprint.
 * The interfaces are designed so that new settings and properties can be easily added in future versions easily through new enumerations, rather than requiring new interface members. Use the constants provided in `nsfplayenums.h`, and they should still work in future versions.
 

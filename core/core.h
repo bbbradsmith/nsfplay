@@ -129,9 +129,9 @@ typedef struct NSFCore_
 
 	void set_default(); // restore default settings
 	bool set_ini(const char* ini);
-	bool set_init(const NSFSetInit* init);
+	bool set_init(const NSFSetInit* init, bool assume_str=false);
 	bool set_int(sint32 setenum, sint32 value); // integer setting (sets error if false)
-	bool set_str(sint32 setenum, const char* value, sint32 len=-1); // string setting, len truncates, len<0 will strlen (sets error if false)
+	bool set_str(sint32 setenum, const char* value, bool assume=false, sint32 len=-1); // string setting, assume treats value as permanent (no copy), len truncates (if assume=false), len<0 will strlen (sets error if false)
 	void set_apply(); // call to apply changed settings now
 	sint32 get_int(sint32 setenum) const;
 	const char* get_str(sint32 setenum) const; // use this instead of manually de-indexing setting_str

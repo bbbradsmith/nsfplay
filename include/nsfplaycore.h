@@ -35,8 +35,9 @@ typedef struct
 // create or destroy an core instance
 // - see set_init/set_init below for an explanation of the create parameters
 // - a null ini_data/init will just use the default settings
+// - assume_str=true will assume string values are permanent, and will use them directly instead of allocating internal copies
 NSFCore* nsfplay_create(const char* ini_data);
-NSFCore* nsfplay_create_init(const NSFSetInit* init);
+NSFCore* nsfplay_create_init(const NSFSetInit* init, bool assume_str=false);
 void nsfplay_destroy(NSFCore* core);
 
 // The default allocators (malloc/free) can be replaced if needed.
@@ -92,7 +93,8 @@ bool nsfplay_set_ini(NSFCore* core, const char* ini_data);
 // - easier way to apply many settings from code
 // - an init array can be used instead of ini to initialize from code, terminated by an entry with setenum -1.
 // - returns false and reports error if any entries could not be set
-bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init);
+// - assume_str=true will assume string values are permanent, and will use them directly instead of allocating internal copies
+bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init, bool assume_str=false);
 // apply a single ini line
 // - useful for command line arguments
 // - ini_line should be null terminated, with no newline
@@ -114,8 +116,9 @@ void nsfplay_ini_write(const NSFCore* core, FILE* f);
 // - use the provided NSF_SET_x enumerations, because setenum values are subject to change
 // - set returns false if setenum is out of bounds, or the wrong value type was used
 // - get returns 0 or NULL if out of bounds, or wrong type
+// - for set_str, assume=true will assume value is permanent, and will use it directly instead of allocating an internal copy
 bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value);
-bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value);
+bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value, bool assume=false);
 int32_t nsfplay_get_int(const NSFCore* core, int32_t setenum);
 const char* nsfplay_get_str(const NSFCore* core, int32_t setenum);
 

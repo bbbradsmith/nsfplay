@@ -11,10 +11,10 @@ NSFCore* nsfplay_create(const char* ini_data)
 	return core;
 }
 
-NSFCore* nsfplay_create_init(const NSFSetInit* init)
+NSFCore* nsfplay_create_init(const NSFSetInit* init, bool assume_str)
 {
 	NSFCore* core = NSFCore::create();
-	core->set_init(init);
+	core->set_init(init,assume_str);
 	return core;
 }
 
@@ -62,9 +62,9 @@ bool nsfplay_set_ini(NSFCore* core, const char* ini_data)
 	return result;
 }
 
-bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init)
+bool nsfplay_set_init(NSFCore* core, const NSFSetInit* init, bool assume_str)
 {
-	bool result = core->set_init(init);
+	bool result = core->set_init(init,assume_str);
 	core->set_apply();
 	return result;
 }
@@ -93,9 +93,9 @@ bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value)
 	return result;
 }
 
-bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value)
+bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value, bool assume)
 {
-	bool result = core->set_str(setenum,value);
+	bool result = core->set_str(setenum,value,assume);
 	core->set_apply();
 	return result;
 }

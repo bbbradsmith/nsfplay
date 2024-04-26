@@ -267,14 +267,14 @@ bool NSFCore::set_ini(const char* ini)
 #endif
 }
 
-bool NSFCore::set_init(const NSFSetInit* init)
+bool NSFCore::set_init(const NSFSetInit* init, bool assume_str)
 {
 	if (init == NULL) return true;
 	bool result = true;
 	for (int i=0; init[i].setenum >= 0; ++i)
 	{
 		if (init[i].val_str != NULL)
-			result &= set_str(init[i].setenum,init[i].val_str);
+			result &= set_str(init[i].setenum,init[i].val_str,assume_str);
 		else
 			result &= set_int(init[i].setenum,init[i].val_int);
 	}
@@ -303,7 +303,7 @@ bool NSFCore::set_int(sint32 setenum, sint32 value)
 	return true;
 }
 
-bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
+bool NSFCore::set_str(sint32 setenum, const char* value, bool assume, sint32 len)
 {
 	if (setenum < 0 || setenum > NSF_SET_COUNT)
 	{
@@ -318,7 +318,16 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 	}
 	sint32 si = setting[setenum];
 
-	// auto-calculate 
+	// assume directly
+	if (assume)
+	{
+		if (setting_str_free[si]) nsf::free(const_cast<char*>(setting_str[si]));
+		setting_str[si] = value;
+		setting_str_free[si] = false;
+		return true;
+	}
+
+	// auto-calculate length
 	if (len < 0) len = sint32(std::strlen(value));
 
 	// don't reallocate if the setting is redundant
@@ -335,8 +344,7 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 		return true;
 
 	// allocate and copy
-	if (setting_str_free[si])
-		nsf::free(const_cast<char*>(setting_str[si]));
+	if (setting_str_free[si]) nsf::free(const_cast<char*>(setting_str[si]));
 	char* new_str = static_cast<char*>(nsf::alloc(size_t(len)+1));
 	std::memcpy(new_str,value,len);
 	new_str[len] = 0;
@@ -525,7 +533,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	const NSFSetData& SD = NSFD_SET[se];
 	if (SD.default_str != NULL)
 	{
-		if (!set_str(se,line,len) && error_last != NULL)
+		if (!set_str(se,line,false,len) && error_last != NULL)
 		{
 			NSF_DEBUG("Unexpected set_str error at INI line %d: %s",linenum,error_last);
 		}
