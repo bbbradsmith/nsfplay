@@ -114,9 +114,10 @@
 #     COLOR - RGB value (6 digit hex, or colour picker)
 #     MSEC - milliseconds
 #     MILL - 1000=100%
-#     HZ - audio frequency
+#     HZ - audio frequency (whole number)
 #     KEY - keypress code
 #     PRECISE - integer with no slider, only manual typing
+#     PRDMILL - 10000=1, also PRECISE
 #
 
 import sys
@@ -205,14 +206,14 @@ PROP_STR,
 PROP_LINES,
 PROP_BLOB,
 PROP_LIST
-) = range(0,7)
+) = range(0,7) # must match nsfplaycore.h
 
 (
 GT_INVALID,
 GT_SET,
 GT_PROP,
 GT_SONGPROP,
-) = range(0,4)
+) = range(0,4) # must match nsfplaycore.h
 
 (
 DT_INVALID,
@@ -233,7 +234,8 @@ DT_MILL,
 DT_HZ,
 DT_KEY,
 DT_PRECISE,
-) = range(0,18)
+DT_PRDMILL,
+) = range(0,19) # must match nsfplaycore.h
 
 GT = { "SET":GT_SET, "PROP":GT_PROP, "SONGPROP":GT_SONGPROP }
 GT_REVERSE = {v:k for k,v in GT.items()}
@@ -241,8 +243,9 @@ GT_REVERSE = {v:k for k,v in GT.items()}
 DT = { "INT":DT_INT, "LONG":DT_STR,
        "LINES":DT_LINES, "BLOB":DT_BLOB, "LIST":DT_LIST,
        "BOOL":DT_BOOL,
-       "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64,
-       "COLOR":DT_COLOR, "MSEC":DT_MSEC, "MILL":DT_MILL, "HZ":DT_HZ, "KEY":DT_KEY, "PRECISE":DT_PRECISE }
+       "HEX8":DT_HEX8, "HEX16":DT_HEX16, "HEX32":DT_HEX32, "HEX64":DT_HEX64, "COLOR":DT_COLOR,      
+       "MSEC":DT_MSEC, "MILL":DT_MILL, "HZ":DT_HZ, "KEY":DT_KEY,
+       "PRECISE":DT_PRECISE, "PRDMILL":DT_PRDMILL, }
 DT_REVERSE = {v:k for k,v in DT.items()}
 DT_FORBID = { "LINES", "BLOB", "LIST" } # only set automatically, not valid for SETINT/PROPINT
 
@@ -411,7 +414,7 @@ def parse_entry(ls):
             if (ls[0].upper() in DT_FORBID):
                 parse_error(PARSE_DEF_NAME[pd]+" not allowed in SETINT/PROPINT: "+ls[0].upper())
             if ls[0].upper() not in DT:
-                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0]+" "+str(DT.values()))
+                parse_error(PARSE_DEF_NAME[pd]+" expected: "+ls[0]+" not in "+str(sorted(DT,key=DT.get)))
                 return (None,None)
             p.append(DT[ls[0].upper()])
         ls = ls[1:]

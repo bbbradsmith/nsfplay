@@ -134,9 +134,10 @@ const char* nsfplay_get_key_str(const NSFCore* core, const char* key);
 //   HEX8-64 - hexadecimal integer (64 is LONG prop only)
 //   MSEC    - milliseconds
 //   MILL    - 1000 represents 100%
-//   HZ      - an audio frequency, may benefit from a logarithmic slider giving more resolution at low frequencies
+//   HZ      - an audio frequency (whole number), may benefit from a logarithmic slider giving more resolution at low frequencies
 //   COLOR   - RGB value, 6-digit hex or color picker
 //   PRECISE - decimal integer, no slider (only manual entry)
+//   PRDMILL - 10000 represents 1, also PRECISE
 enum
 {
 	NSF_DISPLAY_INVALID = 0,
@@ -157,6 +158,7 @@ enum
 	NSF_DISPLAY_HZ,
 	NSF_DISPLAY_KEY,
 	NSF_DISPLAY_PRECISE,
+	NSF_DISPLAY_PRDMILL,
 };
 typedef struct
 {

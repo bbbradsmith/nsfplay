@@ -66,6 +66,7 @@ typedef struct NSFCore_
 	mutable char error_last_buffer[256]; // error_last may point to this for formatted errors
 	mutable char temp_text[1024]; // used for returned text information
 	mutable const char* prop_lines;
+	mutable uint32 prop_lines_len;
 
 	// settings
 	sint32 setting[NSF_SET_COUNT]; // integer settings (can read directly, write with set_int)
@@ -88,7 +89,7 @@ typedef struct NSFCore_
 	uint8* wpage[16]; // currently assigned 4k bank pages for writing
 
 	// playback
-	uint8 song_current;
+	uint8 active_song;
 
 	// audio units
 	// TODO these should be static POD structures, each with a pointer to the core
@@ -153,7 +154,7 @@ typedef struct NSFCore_
 	bool nsf_parse(bool bin);
 	const uint8* nsfe_chunk(uint32 fourcc, uint32* chunk_size) const; // fourcc is packed little-endian into uint32
 	const uint8* nsfe_chunk(const char* fourcc, uint32* chunk_size) const;
-	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // song<0 = song_current
+	bool nsf_prop_exists(sint32 prop, sint32 song=-1) const; // song<0 = active_song
 	sint32 nsf_prop_int(sint32 prop, sint32 song=-1) const;
 	sint64 nsf_prop_long(sint32 prop, sint32 song=-1) const;
 	const char* nsf_prop_str(sint32 prop, sint32 song=-1) const;
