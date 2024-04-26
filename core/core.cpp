@@ -12,6 +12,8 @@
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // errno
 
+static_assert(sizeof(char)==sizeof(uint8),"char must be byte sized, because UTF-8 is assumed");
+
 #if DEBUG_ALLOC
 #include <map> // std::map
 std::map<void*,size_t> debug_alloc;
@@ -330,7 +332,7 @@ bool NSFCore::set_str(sint32 setenum, const char* value, sint32 len)
 	// allocate and copy
 	if (setting_str_free[si])
 		nsf::free(const_cast<char*>(setting_str[si]));
-	char* new_str = (char*)(nsf::alloc(size_t(len)+1));
+	char* new_str = static_cast<char*>(nsf::alloc(size_t(len)+1));
 	std::memcpy(new_str,value,len);
 	new_str[len] = 0;
 	setting_str[si] = new_str;
@@ -638,7 +640,7 @@ const char* NSFCore::local_text(sint32 textenum) const
 	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
 	NSF_UNUSED(textenum);
-	return (const char*)NSFD_NOTEXT_LIST_KEY;
+	return reinterpret_cast<const char*>(NSFD_NOTEXT_LIST_KEY);
 #endif
 }
 
@@ -651,10 +653,10 @@ const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 		locale = 0;
 		textenum = 0;
 	}
-	return (const char*)(NSFD_LOCAL_TEXT_DATA + NSFD_LOCAL_TEXT[locale][textenum]);
+	return reinterpret_cast<const char*>(NSFD_LOCAL_TEXT_DATA + NSFD_LOCAL_TEXT[locale][textenum]);
 #else
 	NSF_UNUSED(textenum);
 	NSF_UNUSED(locale);
-	return (const char*)NSFD_NOTEXT_LIST_KEY;
+	return reinterpret_cast<const char*>(NSFD_NOTEXT_LIST_KEY);
 #endif
 }

@@ -67,7 +67,7 @@ inline static const char* nth_string(const uint8* chunk, uint32 chunk_size, int 
 		++chunk;
 		--chunk_size;
 	}
-	return (const char*)(chunk);
+	return reinterpret_cast<const char*>(chunk);
 }
 
 inline static sint32 nsf_speed16(uint32 rate) // convert 1/10,000 Hz setting to NSF rate setting
@@ -591,15 +591,15 @@ const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 	{
 	case NSF_PROP_TITLE:
 		if (CHK("auth") && count_strings(chk,cs) >= 1) return nth_string(chk,cs,0);
-		if (NSFHDR() && has0(nsf+0x0E,32)) return legacy_string(this,(const char*)(nsf+0x0E));
+		if (NSFHDR() && has0(nsf+0x0E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x0E));
 		break;
 	case NSF_PROP_ARTIST:
 		if (CHK("auth") && count_strings(chk,cs) >= 2) return nth_string(chk,cs,1);
-		if (NSFHDR() && has0(nsf+0x2E,32)) return legacy_string(this,(const char*)(nsf+0x2E));
+		if (NSFHDR() && has0(nsf+0x2E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x2E));
 		break;
 	case NSF_PROP_COPYRIGHT:
 		if (CHK("auth") && count_strings(chk,cs) >= 3) return nth_string(chk,cs,2);
-		if (NSFHDR() && has0(nsf+0x4E,32)) return legacy_string(this,(const char*)(nsf+0x4E));
+		if (NSFHDR() && has0(nsf+0x4E,32)) return legacy_string(this,reinterpret_cast<const char*>(nsf+0x4E));
 		break;
 	case NSF_PROP_RIPPER:
 		if (CHK("auth") && count_strings(chk,cs) >= 4) return nth_string(chk,cs,3);
