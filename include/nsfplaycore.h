@@ -39,6 +39,9 @@ NSFCore* nsfplay_create(const char* ini_data);
 NSFCore* nsfplay_create_init(const NSFSetInit* init);
 void nsfplay_destroy(NSFCore* core);
 
+// The default allocators (malloc/free) can be replaced if needed.
+// Call with NULL pointers to restore the defaults.
+void nsfplay_set_alloc(void* (*custom_alloc)(size_t size),void* (*custom_free)(void* ptr));
 
 // logging and error handling
 
@@ -235,6 +238,13 @@ uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
 // - ensure the output volume is low enough to prevent overflow (32-bit render is not able to clip out of range samples)
 uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output);
 
+// manually trigger render buffer allocations if needed
+// - normally this will be automatically called by render as the first song begins,
+//   but you can call this function to make sure it is done ahead of time if needed
+// - allocation size depends on settings, and the set of active audo expansions
+// - apply settings, then either load the desired NSF, or manually activate expansions
+//   with the EXPANSION_x settings, and at this point we can call ready() to trigger the allocation
+void nsfplay_ready(NSFCore* core);
 
 // direct emulation access
 uint8_t nsfplay_emu_peek(const NSFCore* core, uint16_t address); // peek at memory, no read side effects

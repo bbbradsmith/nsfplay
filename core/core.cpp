@@ -51,13 +51,17 @@ inline const char* utf8_bom_skip(const char* text)
 
 namespace nsf {
 
+void* (*custom_alloc)(size_t size) = NULL;
+void* (*custom_free)(void* ptr) = NULL;
 void (*error_callback)(const char* msg) = NULL;
 void (*debug_print_callback)(const char* msg) = NULL;
 void (*fatal_callback)(const char* msg) = NULL;
 
 void* alloc(size_t size)
 {
-	void* a = std::malloc(size);
+	void* a;
+	if (custom_alloc) a = custom_alloc(size);
+	else              a = std::malloc(size);
 	if (a == NULL) nsf::fatal("Out of memory.");
 	#if DEBUG_ALLOC
 		debug_alloc[a] = size;
@@ -71,7 +75,8 @@ void* alloc(size_t size)
 
 void free(void* ptr)
 {
-	std::free(ptr);
+	if (custom_free) custom_free(ptr);
+	else             std::free(ptr);
 	#if DEBUG_ALLOC
 		size_t size = debug_alloc[ptr];
 		debug_alloc_total -= size;

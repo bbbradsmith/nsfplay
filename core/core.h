@@ -170,6 +170,8 @@ namespace nsf {
 // core.cpp
 
 extern "C" {
+extern void* (*custom_alloc)(size_t size);
+extern void* (*custom_free)(void* ptr);
 extern void (*error_callback)(const char* msg);
 extern void (*debug_print_callback)(const char* msg);
 extern void (*fatal_callback)(const char* msg);

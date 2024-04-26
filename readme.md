@@ -26,6 +26,26 @@ Support:
 * `enum` - Definitions of all settings and text used by NSFPlay, allowing localized text in multiple languages ([python](https://www.python.org/) required).
 * `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4) cross platform GUI library.
 
+## Core Library
+
+The NSFPlay core library is intended to be easy to include in and project that needs NES/Famicom sound emulation. Here are some notes on its goals and useful properties:
+
+* The code is C++11 with no external dependencies.
+* Interface is `extern "C"`, to allow integration into both C and C++ projects.
+* [Very permissively licensed](license.txt).
+* All state is stored in an `NSFCore` [PIMPL](https://en.cppreference.com/w/cpp/language/pimpl) structure. Multiple core instances can be used simultaneously and are completely independent.
+* Interaction with the core has no internal thread-safety. If `nsfplay_render` or other functions are called from different threads, you should use a mutex to prevent other interactions with that `NSFCore` instance from conflicting.
+* The core makes no access to the file system. You load files and provide the data to the core.
+* All strings are UTF-8 char.
+* Can be used with no NSF file, and direct register writes can be used to manipulate the emulated sound devices directly. This may be suitable for use as an NES sound engine for a game.
+* Allocations are kept to a minimum, and you can provide your own allocator instead of the default `malloc`/`free`.
+  * 1 allocation to create the core state structure.
+  * 1 small optional allocation for every string setting that is changed from the default.
+  * 1 optional allocation to make a copy of the NSF file, but you can instead tell the core to use the read only file contents you give it directly, assuming the pointer will be valid until it is unloaded.
+  * 1 allocation for internal rendering buffers, made when emulation begins, or can be manually triggered. These will not be reallocated unless a change in settings or selected audio expansions require a larger total allocation.
+* Some features like the expansion audio, or the text data for user interfaces, can be defined out to reduce the library footprint.
+* The interfaces are designed so that new settings and properties can be easily added in future versions easily through new enumerations, rather than requiring new interface members. Use the constants provided in `nsfplayenums.h`, and they should still work in future versions.
+
 ## Build
 
 Building the GUI components `nsfplay`/`winamp` requires first setting up the wxWidgets libraries. If you only need to use the command-line `nsfplac`, then you can skip this step.
@@ -40,7 +60,7 @@ Building the GUI components `nsfplay`/`winamp` requires first setting up the wxW
   * Run `wxlib.bat` to build the wxWidgets libraries.
   * Use `nsfplay.sln` to build.
 
-[Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) is the target build tool. Alternatively, [MSYS2](https://www.msys2.org/) can be used to
+[Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) is the target build tool for Windows. Alternatively, [MSYS2](https://www.msys2.org/) can be used to
 build with make instead. If you want to use Visual Studio 2022, see the note below about the wxWidgets Library.
 
 ### Make

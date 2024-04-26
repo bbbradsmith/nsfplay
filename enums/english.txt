@@ -206,8 +206,9 @@ LOCALSET EXPANSION_MMC5       "MMC5 Expansion"  "Force enable/disable MMC5."
 LOCALSET EXPANSION_VRC6       "VRC6 Expansion"  "Force enable/disable VRC6."
 LOCALSET EXPANSION_VRC7       "VRC7 Expansion"  "Force enable/disable VRC7."
 LOCALSET EXPANSION_N163       "N163 Expansion"  "Force enable/disable N163."
-LOCALSET EXPANSION_S5B         "5B Expansion"    "Force enable/disable 5B."
+LOCALSET EXPANSION_S5B        "5B Expansion"    "Force enable/disable 5B."
 LOCALSET EXPANSION_VT02       "VT02+ Expansion" "Force enable/disable VT02+."
+LOCALSET OVERRIDE_NSF_SONG    "NSF Song Override" "Force a specific song value, regardless of song count. -1 to disable."
 
 #
 # NSF Properties

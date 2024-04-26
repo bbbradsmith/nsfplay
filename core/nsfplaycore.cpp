@@ -23,6 +23,12 @@ void nsfplay_destroy(NSFCore* core)
 	NSFCore::destroy(core);
 }
 
+void nsfplay_set_alloc(void* (*custom_alloc_)(size_t size),void* (*custom_free_)(void* ptr))
+{
+	nsf::custom_alloc = custom_alloc_;
+	nsf::custom_free = custom_free_;
+}
+
 void nsfplay_set_error_log(void (*error_callback_)(const char* msg))
 {
 	nsf::error_callback = error_callback_;
@@ -216,6 +222,12 @@ uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_outpu
 	NSF_UNUSED(stereo_output);
 	// TODO
 	return 0;
+}
+
+void nsfplay_ready(NSFCore* core)
+{
+	NSF_UNUSED(core);
+	// TODO
 }
 
 uint8_t nsfplay_emu_peek(const NSFCore* core, uint16_t address)
