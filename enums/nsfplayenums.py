@@ -987,7 +987,10 @@ def generate_enums(file_enum,file_data,do_write):
             default_int,min_int,max_int,min_hint,max_hint,
             display_hint,list_index,
             default_str),1)
-        gen_enum("NSF_SET_"+set_key,ssi)
+        set_comment = None
+        if (is_string): set_comment = "String"
+        if (list_index >= 0): set_comment = "List: "+defs_list[list_index][0];
+        gen_enum("NSF_SET_"+set_key,ssi,set_comment)
         names = [set_key for i in range(locs)]
         descs = [set_key for i in range(locs)]
         for i in range(locs):

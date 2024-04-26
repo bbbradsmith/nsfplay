@@ -117,6 +117,7 @@ void nsfplay_ini_write(const NSFCore* core, FILE* f);
 // - set returns false if setenum is out of bounds, or the wrong value type was used
 // - get returns 0 or NULL if out of bounds, or wrong type
 // - for set_str, assume=true will assume value is permanent, and will use it directly instead of allocating an internal copy
+// - if a setting is a list type, the LK enums should be used to set their value
 bool nsfplay_set_int(NSFCore* core, int32_t setenum, int32_t value);
 bool nsfplay_set_str(NSFCore* core, int32_t setenum, const char* value, bool assume=false);
 int32_t nsfplay_get_int(const NSFCore* core, int32_t setenum);
