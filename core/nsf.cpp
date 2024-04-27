@@ -363,7 +363,7 @@ bool NSFCore::nsf_parse(bool bin)
 	NSF_DEBUG("load_addr     = %04X",load_addr);
 	// setup pad0/pad1 banks if needed
 	load_addr &= 0x0FFF;
-	int load_pad = load_addr ? (0x10000 - load_addr) : 0;
+	int load_pad = load_addr ? (0x1000 - load_addr) : 0;
 	rom = nsf_data - load_pad;
 	if (load_addr) // pad0 reuses ram6000 @ E000 to make a padded version of bank 0
 	{
