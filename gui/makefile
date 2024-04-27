@@ -31,6 +31,6 @@ $(dir $(TARGET)):
 
 clean:
 	rm -rf $(GUI_INTDIR)
-	rm -rf $(dir $(TARGET))
+	rm -rf $(TARGET)
 
 -include $(DEPS)

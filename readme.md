@@ -33,24 +33,39 @@ The NSFPlay core library is intended to be easy to include in and project that n
 * The code is C++11 with no external dependencies.
 * Interface is `extern "C"`, to allow integration into both C and C++ projects.
 * [Very permissively licensed](license.txt).
-* All state is stored in an `NSFCore` [PIMPL](https://en.cppreference.com/w/cpp/language/pimpl) structure. Multiple core instances can be used simultaneously and are completely independent.
-* Interaction with the core has no internal thread-safety. If `nsfplay_render` or other functions are called from different threads, you should use a mutex to prevent other interactions with that `NSFCore` instance from conflicting.
-* The core makes no access to the file system. You load files and provide the data to the core.
-* All strings are UTF-8 char.
+* All state is stored in an `NSFCore` [PIMPL](https://en.cppreference.com/w/cpp/language/pimpl) structure. Multiple core instances can be used simultaneously.
 * Can be used with no NSF file, and direct register writes can be used to manipulate the emulated sound devices directly. This may be suitable for use as an NES sound engine for a game.
-* Allocations are kept to a minimum, and you can provide your own allocator instead of the default `malloc`/`free`:
-  * 1 allocation to create the core state structure, this will always be the same size for any given build.
-  * 1 allocation for internal rendering buffers, made when emulation begins, or can be manually triggered with `ready()`. These will not be reallocated unless a change in settings or selected audio expansions require a larger total allocation. In particular, samplerate and downsampling settings will affect the amount needed.
-  * 1 (optional) allocation to make an internal copy of the NSF file. An `assume` option will instead use the read only file contents given directly, assuming the pointer will be valid until it is unloaded.
-  * 1 (optional) small allocation for every string setting that is changed from the default (there are very few of these). An `assume` option is provided which will use the passed string settings directly instead of making internal copies.
-* Some features like the expansion audio, or the text data for user interfaces, can be defined out to reduce the library footprint.
+* All strings are UTF-8 char.
+* The core makes no access to the file system. You load files and provide the data to the core.
 * The interfaces are designed so that new settings and properties can be easily added in future versions easily through new enumerations, rather than requiring new interface members. Use the constants provided in `nsfplayenums.h`, and they should still work in future versions.
+* Some features like the expansion audio, or the text data for user interfaces, can be defined out to reduce the library footprint.
+* To avoid name collision, all public interface functions are prefixed with `nsfplay_`. All public interface structs and enumerations are prefixed with `NSF`. All internal non-static functions and variables are kept within an `nsf` namespace.
+* Allocations are kept to a minimum, and you can provide your own allocator instead of the default `malloc`/`free`:
+  * 1 allocation from `nsfplay_create` for a new `NSFCore` state structure, this will always be the same size for any given build.
+  * 1 allocation for internal rendering buffers, made when emulation begins (`nsfplay_render` or `nsfplay_emu_init`/`nsfplay_emu_run`), or can be manually triggered with `nsfplay_ready`. These will not be reallocated unless a change in settings or selected audio expansions require a larger total allocation. In particular, samplerate and downsampling settings will affect the amount needed.
+  * 1 (optional) allocation from `nsfplay_load` to make an internal copy of the NSF file. The `assume` option will instead use the read only file contents given directly, as it will assume the pointer will be valid until it is unloaded.
+  * 1 (optional) small allocation for every string setting that is changed from the default (there are very few of these). This can happen in `nsfplay_set_str` or indirectly through `nsfplay_set_ini` or `nsfplay_set_init` if they include string settings. An `assume` option is provided which will use the passed string settings directly instead of making internal copies.
+* Interaction with the core has no internal thread-safety. There are a few recommended ways to use the library with multi-threading:
+  1. Run all core library functions from one thread. This is suitable for rendering an entire song at once, perhaps for WAV output, or later playback.
+  2. Run all core library functions from one thread. Keep 2 or more render buffers full in your main loop, and use a mutex to exchange finished buffer pointers with the audio thread for consumption. Some audio interface libraries may already provide a ready-made thread-safe consumption interface like this. The disadvantage is that if your buffers are too short, or the main loop takes too long before filling new buffers, the audio queue could starve.
+  3. Run the core entirely in your audio callback thread. Use a small mutexed command state to pass control messages to the core's thread.
+  4. Run `nsfplay_render` render in your audio callback thread, but stop the audio thread (or block the render call) whenever you need to call core functions from the main thread.
+  5. Create your own mutex to use for all core library calls. This can be done by building the core with `NSF_MUTEX=1` defined.
+* `NSFCore` instances do not have any shared state and two cores can be safely used in different threads, with the following caveats:
+  * If you use `nsfplay_set_alloc` to provide a custom allocator, this allocator should have its own thread safety. The default is `std::malloc`/`std::free` which are usually already thread safe.
+  * If you use `nsfplay_set_error_log` to set a global error log callback, this callback should have its own thread safety.
+  * With a `DEBUG` build, if you use `nsfplay_set_debug_print` to replace the default debug log, this callback should have its own thread safety. The default uses `std::fprintf(stdout,...)` which is usually already thread safe.
 
 ## Build
 
 Building the GUI components `nsfplay`/`winamp` requires first setting up the wxWidgets libraries. If you only need to use the command-line `nsfplac`, then you can skip this step.
 
-### Visual Studio 2019
+If you need an example for how to build, you might look at the [build_nsfplay3.yml](.github/workflows/build_nsfplay3.yml) script used for the automated CI builds.
+
+### Windows
+
+[Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) is the target build tool for Windows. Alternatively, MSYS2 can be used to build with make instead. If you want to use Visual Studio 2022, see the note below about the wxWidgets Library.
+
   * Initialize the git submodules if it wasn't done when cloning:
     * `git submodule init`
     * `git submodule update --depth 1`
@@ -60,10 +75,9 @@ Building the GUI components `nsfplay`/`winamp` requires first setting up the wxW
   * Run `wxlib.bat` to build the wxWidgets libraries.
   * Use `nsfplay.sln` to build.
 
-[Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) is the target build tool for Windows. Alternatively, [MSYS2](https://www.msys2.org/) can be used to
-build with make instead. If you want to use Visual Studio 2022, see the note below about the wxWidgets Library.
-
 ### Make
+
+Other target platforms can be built with `make`. [MSYS2](https://www.msys2.org/) can also be used to do this on Windows.
 
   * Run `make wxlib` to prepare the wxWidgets libraries.
   * Use `make` to build.
@@ -74,8 +88,6 @@ Requirements:
   * `git` (optional) to download the repository and its submodules.
   * `cmake` (optional) to build wxWidgets libraries.
   * `libgtk-3-dev` (optional) used by wxWidgets on Ubuntu.
-
-If using MSYS2 you'll need a specific version of `gcc` and `cmake`. You might look at the [build.yml](.github/workflows/build.yml) script to help understand what you need.
 
 ### wxWidgets Library
 
@@ -100,7 +112,9 @@ On Windows (including MSYS2), you don't need to keep the cmake generated directo
 * `make` - builds `cmd`, `gui`
 * `make clean` - deletes `intermediate/` and `output/` directories.
 * `make core` - build core library `nsfcore` to `output/make/`.
-* `make core_minimal` - build core with all optional features defined out.
+* `make core_mutex` - (build test) rebuild core with blanket mutex around public interface.
+* `make core_notext` - (build test) rebuild core with all text data defined out.
+* `make core_minimal` - (build test) rebuild core with all optional features defined out.
 * `make cmd` - build `nsfplac` to `output/make/`.
 * `make gui` - build gui library `nsfgui` to `output/make/`.
 * `make nsfplay` - build `nsfplay` to `output/make/`.
@@ -111,7 +125,7 @@ On Windows (including MSYS2), you don't need to keep the cmake generated directo
 * `make uninstall prefix=~/my/directory` - uninstall from custom directory.
 * `make icons` - rebuild windows icons from PNG source.
 * `make enums` - generate enums and text data.
-* `make enums_verify` - verify that current generated enums/text data match their source.
+* `make enums_verify` - (build test) verify that current generated enums/text data match their source.
 * `make mac` - packages `nsfplay` into `nsfplay.app` (build nsfplay first).
 * `make wxlib` - fetches wxWidgets submodule in `wx/` and builds libraries to `wxlib/`.
 

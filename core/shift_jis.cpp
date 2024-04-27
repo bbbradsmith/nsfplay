@@ -96,7 +96,7 @@ void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 outp
 	output[pos] = 0;
 }
 
-#else // (NSF_NOTEXT)
+#else // NSF_NOTEXT
 
 // NOTEXT won't convert, just assume UTF-8
 bool valid_utf8(const uint8* s)

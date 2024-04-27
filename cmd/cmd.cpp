@@ -6,6 +6,7 @@
 #include <cstdlib> // std::exit, std::atexit
 #include <cstring> // std::strlen
 #include <cstddef> // NULL
+#include <cstdarg> // va_list, va_start
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
@@ -14,14 +15,14 @@ int platform_argc();
 const char* platform_argv(int index);
 FILE* platform_fopen(const char* path, const char* mode);
 
+//
 // logging functions
+//
 
-NSFCore* error_core = NULL;
-
-void error_log(const char* msg)
+void error_log(const NSFCore* core, int32_t code, const char* msg)
 {
-	if (error_core) std::fprintf(stderr,"Error (%d): %s\n",nsfplay_last_error_code(error_core),msg);
-	else std::fprintf(stderr,"Error: %s\n",msg);
+	(void)core;
+	std::fprintf(stderr,"Error(%d): %s\n",code,msg);
 }
 
 void debug_print(const char* msg)
@@ -36,7 +37,53 @@ void fatal_log(const char* msg)
 	std::exit(-1);
 }
 
+//
 // main
+//
+
+int arg_input = -1;
+const char* arg_input_file = NULL;
+bool arg_ini;
+
+int parse_commandline(NSFCore* core) // returns -1 on success, otherwise is index of bad argument
+{
+	#ifdef DEBUG
+		for (int i=0; i<platform_argc(); ++i) std::printf("Debug: arg[%d] = \"%s\"\n",i,platform_argv(i));
+	#endif
+	for (int i=1; i<platform_argc(); ++i)
+	{
+		const char* v = platform_argv(i);
+
+		if (v[0] != '-') // input file
+		{
+			if (arg_input >= 0) return i; // too many input files
+			arg_input =  i;
+			continue;
+		}
+		if (v[1] != 0 && v[2] == 0) // single character argument
+		{
+			switch(v[1])
+			{
+			// TODO
+			case 'w': // TODO
+			default:
+				return i; // unknown argument
+			}
+		}
+		else // core setting
+		{
+			if (!nsfplay_set_ini_line(core,v+1))
+				return i; // invalid core setting
+		}
+		// TODO we want arguments that involve loading ini or core settings to apply in-order, but we also want to load default settings first IF no ini is loaded. two passes?
+	}
+	return -1;
+}
+
+void help_commandline()
+{
+	// TODO
+}
 
 int main(int argc, char** argv)
 {
@@ -45,9 +92,19 @@ int main(int argc, char** argv)
 	nsfplay_set_debug_print(debug_print);
 	nsfplay_set_fatal(fatal_log);
 
-	for (int i=0; i<platform_argc(); ++i)
-		printf("arg(%d)=[%s]\n",i,platform_argv(i));
-	
+	NSFCore* core = nsfplay_create();
+	if (core == NULL) fatal_log("Out of memory.");
+
+	// parse command line
+	{
+		int bad_arg = parse_commandline(core);
+		if (bad_arg >= 0)
+		{
+			fprintf(stderr,"Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
+			exit(-1);
+		}
+	}
+
 	const char* TEST_INI = NULL;
 	const NSFSetInit* TEST_INIT = NULL;
 	/*
@@ -76,8 +133,7 @@ int main(int argc, char** argv)
 		{-1,0,NULL},
 	};
 	*/
-	NSFCore* core = nsfplay_create(TEST_INI);
-	error_core = core;
+	nsfplay_set_ini(core,TEST_INI);
 	nsfplay_set_init(core,TEST_INIT);
 	/*
 	//nsfplay_set_key_int(core,"TRI_ON",0);
@@ -120,17 +176,21 @@ int main(int argc, char** argv)
 	}
 	*/
 
-	/*
 	//FILE* f = platform_fopen("moon8.nsfe","rb");
 	FILE* f = platform_fopen("moon8.nsf","rb");
+	//FILE* f = platform_fopen("LunaAscension.nsf","rb");
+	//FILE* f = platform_fopen("katoken_sky_v01.nsf","rb");
+	//FILE* f = platform_fopen("ct109_v01.nsf","rb");
+	if (f == NULL) fatal_log("file not found");
 	fseek(f,0,SEEK_END);
 	int fs = ftell(f);
 	fseek(f,0,SEEK_SET);
 	void* fd = malloc(fs);
+	if (fd == NULL) fatal_log("out of memory");
 	fread(fd,1,fs,f);
 	fclose(f);
 	nsfplay_load(core,fd,fs,false);
-	*/
+	//nsfplay_load(core,fd,fs,true);
 
 	// test props
 	printf("PROPS:\n");

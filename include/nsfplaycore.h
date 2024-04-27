@@ -36,36 +36,40 @@ typedef struct
 // - see set_init/set_init below for an explanation of the create parameters
 // - a null ini_data/init will just use the default settings
 // - assume_str=true will assume string values are permanent, and will use them directly instead of allocating internal copies
-NSFCore* nsfplay_create(const char* ini_data);
+NSFCore* nsfplay_create(const char* ini_data=NULL);
 NSFCore* nsfplay_create_init(const NSFSetInit* init, bool assume_str=false);
 void nsfplay_destroy(NSFCore* core);
 
-// The default allocators (malloc/free) can be replaced if needed.
-// Call with NULL pointers to restore the defaults.
+// The default allocators (malloc/free) can be replaced if needed
+// - call with NULL,NULL to restore the default allocator
 void nsfplay_set_alloc(void* (*custom_alloc)(size_t size),void* (*custom_free)(void* ptr));
 
 // logging and error handling
 
 // set a callback to log errors
 // - errors are silently sent to last_error by default,
-//   but this provides a way to catch all of them as they happen.
-// - error msg will not end with newline.
-// - global, can be set before creating a core.
-void nsfplay_set_error_log(void (*error_callback)(const char* msg));
+//   but this provides a way to catch all of them as they happen
+// - error msg will not end with newline
+// - global, can be set before creating a core
+// - core parameter may be NULL for a global error
+// - call with NULL to restore the default callback
+void nsfplay_set_error_log(void (*error_callback)(const NSFCore* core, int32_t code, const char* msg));
 
 // for debug builds, sets a custom debug output function for diagnostics
-// - default will print to stdout.
-// - debug msg will not end with newline.
-// - global, can be set before creating a core.
+// - default will print to stdout
+// - debug msg will not end with newline
+// - global, can be set before creating a core
+// - call with NULL to restore the default callback
 void nsfplay_set_debug_print(void (*debug_print_callback)(const char* msg));
 
 // set a callback to handle a fatal error
-// - May be called if out of memory or some other irrecoverable error.
-// - Allows you to report the error message in some other way before exiting, luck willing.
+// - May be called if out of memory or some other irrecoverable error
+// - Allows you to report the error message in some other way before exiting, luck willing
 // - If no callback is provided, or if it returns, it will print msg to stderr,
-//   then std::exit(-1) to close the application.
-// - fatal msg will not end with newline.
-// - global, can be set before creating a core.
+//   then std::exit(-1) to close the application
+// - fatal msg will not end with newline
+// - global, can be set before creating a core
+// - call with NULL to restore the default callback
 void nsfplay_set_fatal(void (*fatal_callback)(const char* msg));
 
 // returns a localized string describing the last error for this core
@@ -76,7 +80,6 @@ const char* nsfplay_last_error(const NSFCore* core);
 // returns the textenum associated with last_error (but normally the last_error text has additional description)
 //  - -1 if there has been no logged error since the last call to nsfplay_last_error_code
 //  - intended mainly as a substitute for last_error when NSF_NOTEXT is defined for the core
-//  - can be called from the error log callback if it knows which NSFCore it belonged to
 int32_t nsfplay_last_error_code(const NSFCore* core);
 
 
@@ -249,11 +252,12 @@ uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
 uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output);
 
 // manually trigger render buffer allocations if needed
-// - normally this will be automatically called by render as the first song begins,
-//   but you can call this function to make sure it is done ahead of time if needed
-// - allocation size depends on settings, and the set of active audo expansions
-// - apply settings, then either load the desired NSF, or manually activate expansions
-//   with the EXPANSION_x settings, and at this point we can call ready() to trigger the allocation
+// call after the desired NSF is loaded and all settings have been made, but before the first render or emu_init/run
+// - when a new song begins rendering, either via render, emu_init or an emu_run, ready will automatically be called
+//   to ensure allocations are finished, but you can call this prior if you need to ensure it is done earlier,
+//   for thread safety or other reasons
+// - allocation size depends on some settings, and the set of active audio expansions
+//   TODO: list of settings that affect allocations
 void nsfplay_ready(NSFCore* core);
 
 // direct emulation access
@@ -396,7 +400,7 @@ typedef struct
 
 // every channel of every expansion audio unit has a unique global index
 NSFChannelUnit nsfplay_channel_unit(const NSFCore* core, int32_t unit); // information about a unit
-NSFChannelInfo nsfplay_channel_info(int32_t global_channel); // information about a global channel
+NSFChannelInfo nsfplay_channel_info(const NSFCore* core, int32_t global_channel); // information about a global channel
 
 // an NSF has a list of active channels, and their playback state can be queried
 int32_t nsfplay_channel_count(const NSFCore* core); // number of active channels

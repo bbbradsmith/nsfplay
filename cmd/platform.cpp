@@ -9,10 +9,6 @@
 #include <cstdlib> // std::malloc, std::free
 #include <cstdio> // std::_wfopen
 
-#if defined(_MSC_VER)
-#pragma warning(disable:6387) // MSVC thinks store_wconvert could be NULL and warns about _wfopen_s
-#endif
-
 static UINT store_cp = 0;
 static LPWSTR* store_argv;
 static int store_argc;
@@ -70,8 +66,10 @@ const char* platform_argv(int index)
 	if (new_size > store_convert_size)
 	{
 		free(store_convert);
-		store_convert_size = new_size;
+		store_convert_size = 0;
 		store_convert = (char*)std::malloc(store_convert_size);
+		if (store_convert == NULL) return "<OUT OF MEMORY>";
+		store_convert_size = new_size;
 	}
 	WideCharToMultiByte(CP_UTF8,0,store_argv[index],-1,store_convert,store_convert_size,NULL,NULL);
 	return store_convert;
@@ -84,14 +82,16 @@ FILE* platform_fopen(const char* path, const char* mode)
 		printf("fopen(\"%s\",\"%s\")\n",path,mode);
 	#endif
 	static wchar_t wmode[16];
-	MultiByteToWideChar(CP_UTF8,0,mode,-1,wmode,sizeof(wmode)/sizeof(wmode[0]));
+	MultiByteToWideChar(CP_UTF8,0,mode,-1,wmode,16);
 
 	int new_size = MultiByteToWideChar(CP_UTF8,0,path,-1,NULL,0);
 	if (new_size > store_wconvert_size)
 	{
 		free(store_wconvert);
-		store_wconvert_size = new_size;
+		store_wconvert_size = 0;
 		store_wconvert = (wchar_t*)std::malloc(store_wconvert_size*sizeof(wchar_t));
+		if (store_wconvert == NULL) return NULL;
+		store_wconvert_size = new_size;
 	}
 	MultiByteToWideChar(CP_UTF8,0,path,-1,store_wconvert,store_wconvert_size);
 
@@ -104,7 +104,7 @@ FILE* platform_fopen(const char* path, const char* mode)
 
 #include <cstdio> // std::fopen
 
-// other platforms assume a UTF-8 by default
+// other platforms assume a UTF-8 console by default
 
 static int store_argc;
 static const char* const* store_argv;

@@ -13,11 +13,28 @@ OBJS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(CORE_INTDIR)/,$(SRCS:.cpp=.d))
 CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON)
 
-# minimal build test to make sure the core still compiles with as much defined out as possible
+# MUTEX=1 blankets the public interface with a mutex for simple thread safety
+# NOTEXT=1 removes most text data from the build, for usage that doesn't need a UI
+# MINIMAL=1 removes everything possible to make sure the core still compiles that way
 
+MUTEX ?= 0
+NOTEXT ?= 0
 MINIMAL ?= 0
+
+ifeq ($(MUTEX),1)
+	CXXFLAGS_ALL += -DNSF_MUTEX=1
+endif
+
+ifeq ($(NOTEXT),1)
+	CXXFLAGS_ALL += -DNSF_NOTEXT=1
+endif
+
 ifeq ($(MINIMAL),1)
-	CXXFLAGS_ALL += -DNSF_NOTEXT
+	# TODO more things will eventually be defined here
+	CXXFLAGS_ALL += 
+	ifneq  ($(NOTEXT),1)
+		CXXFLAGS_ALL += -DNSF_NOTEXT=1
+	endif
 endif
 
 # precompiled header
@@ -58,6 +75,6 @@ $(dir $(TARGET)):
 
 clean:
 	rm -rf $(CORE_INTDIR)
-	rm -rf $(dir $(TARGET))
+	rm -rf $(TARGET)
 
 -include $(PCH).d $(DEPS)

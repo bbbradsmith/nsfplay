@@ -57,7 +57,7 @@ uninstall:
 
 clean:
 	rm -rf $(NSFPLAY_INTDIR)
-	rm -rf $(dir $(TARGET))
+	rm -rf $(TARGET)
 
 # mac app build
 # intentionally does not depend on $(TARGET) to allow modifying it for fat builds before creating the app

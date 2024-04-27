@@ -323,6 +323,7 @@ LOCALTEXT MENU_INI_SAVE       "Save Settings..."
 #
 
 LOCALERROR RAW_ERROR          "Raw Error (Unknown)"
+LOCALERROR OUT_OF_MEMORY      "Out of memory"
 LOCALERROR SET_INVALID        "Invalid setting"
 LOCALERROR SET_TYPE           "Wrong setting type"
 LOCALERROR SETINT_RANGE       "Setting out of range: %d (%d to %d)"

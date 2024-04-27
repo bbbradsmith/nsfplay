@@ -1,13 +1,22 @@
 include makefile.common
 
-.PHONY: default core core_minimal cmd gui nsfplay mac winamp icons enums enums_verify wxlib install uninstall clean
+.PHONY: default core core_mutex core_notext core_minimal cmd gui nsfplay mac winamp icons enums enums_verify wxlib install uninstall clean
 
 default: core cmd nsfplay
 
 core:
 	$(MAKE) -C core
 
+core_mutex:
+	$(MAKE) -C core clean
+	$(MAKE) -C core MUTEX=1
+
+core_notext:
+	$(MAKE) -C core clean
+	$(MAKE) -C core NOTEXT=1
+
 core_minimal:
+	$(MAKE) -C core clean
 	$(MAKE) -C core MINIMAL=1
 
 cmd: core

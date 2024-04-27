@@ -18,10 +18,14 @@ static_assert(sizeof(char)==sizeof(uint8),"char must be byte sized, because UTF-
 // to find the couple of char*<->uint8* conversion points
 // that would need to add a conversion and/or reallocation step.
 
-#if DEBUG_ALLOC
+#if NSF_DEBUG_ALLOC
 #include <map> // std::map
-std::map<void*,size_t> debug_alloc;
-size_t debug_alloc_total = 0;
+#include <mutex> // std::mutex
+namespace nsf {
+	std::map<void*,size_t> debug_alloc;
+	size_t debug_alloc_total = 0;
+	std::mutex debug_alloc_mutex;
+}
 #endif
 
 // key_compare
@@ -44,7 +48,7 @@ inline static bool key_match(const char* key_test, int len, const char* key_refe
 }
 
 // skip UTF-8 BOM if it exists
-inline const char* utf8_bom_skip(const char* text)
+inline static const char* utf8_bom_skip(const char* text)
 {
 	if ((unsigned char)(text[0]) == 0xEF &&
 	    (unsigned char)(text[1]) == 0xBB &&
@@ -57,7 +61,7 @@ namespace nsf {
 
 void* (*custom_alloc)(size_t size) = NULL;
 void* (*custom_free)(void* ptr) = NULL;
-void (*error_callback)(const char* msg) = NULL;
+void (*error_callback)(const NSFCore* core, sint32 code, const char* msg) = NULL;
 void (*debug_print_callback)(const char* msg) = NULL;
 void (*fatal_callback)(const char* msg) = NULL;
 
@@ -65,30 +69,38 @@ void* alloc(size_t size)
 {
 	void* a;
 	if (custom_alloc) a = custom_alloc(size);
-	else              a = std::malloc(size);
+	else
+	{
+		a = std::malloc(size);
+		#if NSF_DEBUG_ALLOC
+			const std::lock_guard<std::mutex> debug_alloc_guard(debug_alloc_mutex);
+			debug_alloc[a] = size;
+			debug_alloc_total += size;
+			NSF_DEBUG("alloc(%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+		#else
+			NSF_DEBUG("alloc(%7zu)",size);
+		#endif
+	}
 	if (a == NULL) nsf::fatal("Out of memory.");
-	#if DEBUG_ALLOC
-		debug_alloc[a] = size;
-		debug_alloc_total += size;
-		NSF_DEBUG("alloc(%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
-	#else
-		NSF_DEBUG("alloc(%7zu)",size);
-	#endif
 	return a;
 }
 
 void free(void* ptr)
 {
 	if (custom_free) custom_free(ptr);
-	else             std::free(ptr);
-	#if DEBUG_ALLOC
-		size_t size = debug_alloc[ptr];
-		debug_alloc_total -= size;
-		debug_alloc.erase(ptr);
-		NSF_DEBUG("free(-%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
-	#else
-		NSF_DEBUG("free()");
-	#endif
+	else
+	{
+		std::free(ptr);
+		#if NSF_DEBUG_ALLOC
+			const std::lock_guard<std::mutex> debug_alloc_guard(debug_alloc_mutex);
+			size_t size = debug_alloc[ptr];
+			debug_alloc_total -= size;
+			debug_alloc.erase(ptr);
+			NSF_DEBUG("free(-%7zu) total %7zu in %3zu",size,debug_alloc_total,debug_alloc.size());
+		#else
+			NSF_DEBUG("free()");
+		#endif
+	}
 }
 
 void debug(const char* msg)
@@ -100,11 +112,12 @@ void debug(const char* msg)
 void debug_printf(const char* fmt,...)
 {
 #ifdef DEBUG
-	static char msg[2048];
+	const int MSG_SIZE = 2048;
+	char msg[MSG_SIZE];
 	va_list args;
 	va_start(args,fmt);
-	std::vsnprintf(msg,sizeof(msg),fmt,args);
-	msg[sizeof(msg)-1] = 0;
+	std::vsnprintf(msg,MSG_SIZE,fmt,args);
+	msg[MSG_SIZE-1] = 0;
 	debug(msg);
 #else
 	NSF_UNUSED(fmt);
@@ -118,12 +131,18 @@ void fatal(const char* msg)
 	std::exit(-1);
 }
 
+void assert(const char* msg)
+{
+	fatal(msg);
+}
+
 } // namespace nsf
 
 NSFCore* NSFCore::create()
 {
-	NSFCore* core = reinterpret_cast<NSFCore*>(nsf::alloc(sizeof(NSFCore)));
 	NSF_DEBUG("create()");
+	NSFCore* core = reinterpret_cast<NSFCore*>(nsf::alloc(sizeof(NSFCore)));
+	if (core == NULL) { NSFCore::global_error(NSF_ERROR_OUT_OF_MEMORY); return NULL; }
 	std::memset(core,0,sizeof(NSFCore));
 	core->error_last_code = -1;
 	core->set_default();
@@ -133,7 +152,7 @@ NSFCore* NSFCore::create()
 void NSFCore::destroy(NSFCore* core)
 {
 	NSF_DEBUG("destroy()");
-	core->release();
+	if (core) core->release();
 	nsf::free(core);
 }
 
@@ -164,7 +183,7 @@ sint32 NSFCore::last_error_code() const
 void NSFCore::set_error(sint32 textenum,...) const
 {
 	error_last_code = textenum;
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	const char* fmt = local_text(textenum);
 	// skip formatting if not needed
 	bool direct = true;
@@ -179,50 +198,50 @@ void NSFCore::set_error(sint32 textenum,...) const
 	if (direct)
 	{
 		error_last = fmt;
-		if (nsf::error_callback) nsf::error_callback(error_last);
-		else { NSF_DEBUG("ERROR: %s",error_last); } // send errors to debug if not logged
+		if (nsf::error_callback) nsf::error_callback(this,error_last_code,error_last);
+		else { NSF_DEBUG("ERROR(%d): %s",error_last_code,error_last); } // send errors to debug if not logged
 		return;
 	}
 	// format
 	va_list args;
 	va_start(args,textenum);
-	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
-	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	std::vsnprintf(error_last_buffer,ERROR_LAST_BUFFER_SIZE,fmt,args);
+	error_last_buffer[ERROR_LAST_BUFFER_SIZE-1] = 0;
 	error_last = error_last_buffer;
 #else
 	NSF_UNUSED(textenum);
 	error_last = "";
 #endif
-	if (nsf::error_callback) nsf::error_callback(error_last);
-	else { NSF_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(this,error_last_code,error_last);
+	else { NSF_DEBUG("ERROR(%d): %s",error_last_code,error_last); }
 }
 
 void NSFCore::set_ini_error(int linenum, sint32 textenum,...) const
 {
 	error_last_code = textenum;
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	const char* fmt = local_text(textenum);
 	// line number prefix if linenum < 0
 	if (linenum < 0) error_last_buffer[0] = 0;
 	else
 	{
-		std::snprintf(error_last_buffer,sizeof(error_last_buffer),"INI line %d: ",linenum);
-		error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+		std::snprintf(error_last_buffer,ERROR_LAST_BUFFER_SIZE,"INI line %d: ",linenum);
+		error_last_buffer[ERROR_LAST_BUFFER_SIZE-1] = 0;
 	}
 	size_t start = std::strlen(error_last_buffer);
 	// append format
 	va_list args;
 	va_start(args,textenum);
-	std::vsnprintf(error_last_buffer+start,sizeof(error_last_buffer)-start,fmt,args);
-	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	std::vsnprintf(error_last_buffer+start,ERROR_LAST_BUFFER_SIZE-start,fmt,args);
+	error_last_buffer[ERROR_LAST_BUFFER_SIZE-1] = 0;
 	error_last = error_last_buffer;
 #else
 	NSF_UNUSED(linenum);
 	NSF_UNUSED(textenum);
 	error_last = "";
 #endif
-	if (nsf::error_callback) nsf::error_callback(error_last);
-	else { NSF_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(this,error_last_code,error_last);
+	else { NSF_DEBUG("ERROR(%d): %s",error_last_code,error_last); }
 }
 
 void NSFCore::set_error_raw(const char* fmt,...) const
@@ -230,11 +249,18 @@ void NSFCore::set_error_raw(const char* fmt,...) const
 	error_last_code = NSF_ERROR_RAW_ERROR;
 	va_list args;
 	va_start(args,fmt);
-	std::vsnprintf(error_last_buffer,sizeof(error_last_buffer),fmt,args);
-	error_last_buffer[sizeof(error_last_buffer)-1] = 0;
+	std::vsnprintf(error_last_buffer,ERROR_LAST_BUFFER_SIZE,fmt,args);
+	error_last_buffer[ERROR_LAST_BUFFER_SIZE-1] = 0;
 	error_last = error_last_buffer;
-	if (nsf::error_callback) nsf::error_callback(error_last);
-	else { NSF_DEBUG("ERROR: %s",error_last); }
+	if (nsf::error_callback) nsf::error_callback(this,error_last_code,error_last);
+	else { NSF_DEBUG("ERROR(%d): %s",error_last_code,error_last); }
+}
+
+void NSFCore::global_error(sint32 textenum)
+{
+	const char* msg = local_text(textenum,0);
+	if (nsf::error_callback) nsf::error_callback(NULL,textenum,msg);
+	else { NSF_DEBUG("ERROR(%d): %s",textenum,msg); }
 }
 
 void NSFCore::set_default()
@@ -255,7 +281,7 @@ void NSFCore::set_default()
 
 bool NSFCore::set_ini(const char* ini)
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	if (ini == NULL) return true;
 	// skip UTF-8 BOM if present
 	ini = utf8_bom_skip(ini);
@@ -360,8 +386,9 @@ bool NSFCore::set_str(sint32 setenum, const char* value, bool assume, sint32 len
 		return true;
 
 	// allocate and copy
-	if (setting_str_free[si]) nsf::free(const_cast<char*>(setting_str[si]));
 	char* new_str = static_cast<char*>(nsf::alloc(size_t(len)+1));
+	if (new_str == NULL) { set_error(NSF_ERROR_OUT_OF_MEMORY); return false; }
+	if (setting_str_free[si]) nsf::free(const_cast<char*>(setting_str[si]));
 	std::memcpy(new_str,value,len);
 	new_str[len] = 0;
 	setting_str[si] = new_str;
@@ -448,7 +475,7 @@ NSFGroupInfo NSFCore::group_info(sint32 group) const
 
 const char* NSFCore::ini_line(sint32 setenum) const
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	if (setenum < 0 || setenum >= NSF_SET_COUNT) return "";
 	const NSFSetData& SD = NSFD_SET[setenum];
 	if (SD.default_str == NULL)
@@ -463,25 +490,25 @@ const char* NSFCore::ini_line(sint32 setenum) const
 					while(*list_key) ++list_key;
 					++list_key;
 				}
-				std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,list_key);
+				std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=%s",SD.key,list_key);
 			} break;
 		case NSF_DISPLAY_HEX8:
-			std::snprintf(temp_text,sizeof(temp_text),"%s=$%02X",SD.key,setting[setenum]); break;
+			std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=$%02X",SD.key,setting[setenum]); break;
 		case NSF_DISPLAY_HEX16:
-			std::snprintf(temp_text,sizeof(temp_text),"%s=$%04X",SD.key,setting[setenum]); break;
+			std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=$%04X",SD.key,setting[setenum]); break;
 		case NSF_DISPLAY_HEX32:
-			std::snprintf(temp_text,sizeof(temp_text),"%s=$%08X",SD.key,setting[setenum]); break;
+			std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=$%08X",SD.key,setting[setenum]); break;
 		case NSF_DISPLAY_COLOR:
-			std::snprintf(temp_text,sizeof(temp_text),"%s=$%06X",SD.key,setting[setenum]); break;
+			std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=$%06X",SD.key,setting[setenum]); break;
 		default:
-			std::snprintf(temp_text,sizeof(temp_text),"%s=%d",   SD.key,setting[setenum]); break;
+			std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=%d",   SD.key,setting[setenum]); break;
 		};
 	}
 	else
 	{
-		std::snprintf(temp_text,sizeof(temp_text),"%s=%s",SD.key,get_str(setenum));
+		std::snprintf(temp_text,TEMP_TEXT_SIZE,"%s=%s",SD.key,get_str(setenum));
 	}
-	temp_text[sizeof(temp_text)-1] = 0;
+	temp_text[TEMP_TEXT_SIZE-1] = 0;
 	return temp_text;
 #else
 	NSF_UNUSED(setenum);
@@ -491,7 +518,7 @@ const char* NSFCore::ini_line(sint32 setenum) const
 
 bool NSFCore::ini_write(FILE* f) const
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	bool result = true;
 	sint32 last_group = -1;
 	result &= (0 <= std::fprintf(f,"# NSFPlay INI settings file\n"));
@@ -518,7 +545,7 @@ bool NSFCore::ini_write(FILE* f) const
 
 bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	// trim leading whitespace
 	while (line[0]==' ' || line[0] == '\t') { ++line; --len; }
 	// truncate for comments
@@ -641,6 +668,7 @@ bool NSFCore::load(const uint8* data, uint32 size, bool assume, bool bin)
 		else
 		{
 			nsf = reinterpret_cast<uint8*>(nsf::alloc(size));
+			if (nsf == NULL) { set_error(NSF_ERROR_OUT_OF_MEMORY); return load(NULL,0,false); }
 			std::memcpy(const_cast<uint8*>(nsf),data,size);
 			nsf_free = true;
 		}
@@ -671,7 +699,7 @@ NSFPropInfo NSFCore::prop_info(sint32 prop) const
 
 const char* NSFCore::local_text(sint32 textenum) const
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	return NSFCore::local_text(textenum,SETTING(LOCALE));
 #else
 	NSF_UNUSED(textenum);
@@ -681,7 +709,7 @@ const char* NSFCore::local_text(sint32 textenum) const
 
 const char* NSFCore::local_text(sint32 textenum, sint32 locale)
 {
-#if !(NSF_NOTEXT)
+#if !NSF_NOTEXT
 	if (locale < 0 || locale >= NSF_LOCALE_COUNT || textenum < 0 || textenum >= NSF_TEXT_COUNT)
 	{
 		// text 0 is a default <MISSING TEXT> value

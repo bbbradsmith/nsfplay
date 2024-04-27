@@ -44,6 +44,6 @@ uninstall:
 
 clean:
 	rm -rf $(CMD_INTDIR)
-	rm -rf $(dir $(TARGET))
+	rm -rf $(TARGET)
 
 -include $(DEPS)
