@@ -37,11 +37,11 @@ bool valid_utf8(const uint8* s) // true if s is valid UTF-8
 //   CP932_E0_EE - Double byte group E000-EEFF
 //   CP932_FA_FC - Double byte group FA00-FCFF
 
-void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_len)
+void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_size)
 {
 	uint32 db = 0;
 	uint32 pos = 0;
-	while (*sjis && pos < output_len)
+	while (*sjis && pos < (output_size-1))
 	{
 		uint16 unicode = 0;
 		uint8 c = *sjis;
@@ -77,14 +77,14 @@ void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 outp
 			}
 			else if (unicode < 0x800)
 			{
-				if ((pos+1) >= output_len) break;
+				if ((pos+1) >= (output_size-1)) break;
 				output[pos+0] = 0xC0 | ((unicode >>  6) & 0x1F);
 				output[pos+1] = 0x80 | ((unicode >>  0) & 0x3F);
 				pos += 2;
 			}
 			else //if (unicode < 0x10000)
 			{
-				if ((pos+2) >= output_len) break;
+				if ((pos+2) >= (output_size-1)) break;
 				output[pos+0] = 0xE0 | ((unicode >> 12) & 0x0F);
 				output[pos+1] = 0x80 | ((unicode >>  6) & 0x3F);
 				output[pos+2] = 0x80 | ((unicode >>  0) & 0x3F);
@@ -106,16 +106,16 @@ bool valid_utf8(const uint8* s)
 }
 
 // NOTEXT don't convert, just copy
-void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_len)
+void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_size)
 {
 	(void)unmapped;
-	for (uint32 i=0; i<output_len; ++i)
+	for (uint32 i=0; i<(output_size-1); ++i)
 	{
 		output[i] = *sjis;
 		if (*sjis == 0) break;
 		++sjis;
 	}
-	output[output_len-1] = 0;
+	output[output_size-1] = 0;
 }
 
 #endif

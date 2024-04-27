@@ -169,7 +169,7 @@ inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, ui
 
 // from shift_jis.cpp
 bool valid_utf8(const uint8* s); // true if s is value unicode
-void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_len);
+void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_size);
 
 inline const char* legacy_string(const NSFCore* core, const uint8* data)
 {
