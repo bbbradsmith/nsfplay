@@ -182,15 +182,18 @@ int main(int argc, char** argv)
 	//FILE* f = platform_fopen("katoken_sky_v01.nsf","rb");
 	//FILE* f = platform_fopen("ct109_v01.nsf","rb");
 	if (f == NULL) fatal_log("file not found");
-	fseek(f,0,SEEK_END);
-	int fs = ftell(f);
-	fseek(f,0,SEEK_SET);
-	void* fd = malloc(fs);
-	if (fd == NULL) fatal_log("out of memory");
-	fread(fd,1,fs,f);
-	fclose(f);
-	nsfplay_load(core,fd,fs,false);
-	//nsfplay_load(core,fd,fs,true);
+	else
+	{
+		fseek(f,0,SEEK_END);
+		int fs = ftell(f);
+		fseek(f,0,SEEK_SET);
+		void* fd = malloc(fs);
+		if (fd == NULL) fatal_log("out of memory");
+		else { size_t fr = fread(fd,1,fs,f); (void)fr; }
+		fclose(f);
+		nsfplay_load(core,fd,fs,false);
+		//nsfplay_load(core,fd,fs,true);
+	}
 
 	// test props
 	printf("PROPS:\n");
