@@ -321,9 +321,7 @@ void nsfplay_emu_gamepad(NSFCore* core, int32_t pad, uint32_t report)
 
 uint32_t nsfplay_emu_samples_pending(const NSFCore* core)
 {
-	NSF_UNUSED(core);
-	// TODO
-	return 0;
+	return core->prop_int(NSF_PROP_EMU_PENDING);
 }
 
 void nsfplay_emu_cancel_pending(NSFCore* core)
@@ -334,16 +332,12 @@ void nsfplay_emu_cancel_pending(NSFCore* core)
 
 uint64_t nsfplay_emu_cycles(const NSFCore* core)
 {
-	NSF_UNUSED(core);
-	// TODO
-	return 0;
+	return core->prop_long(NSF_PROP_EMU_CYCLES);
 }
 
 uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core)
 {
-	NSF_UNUSED(core);
-	// TODO
-	return 0;
+	return core->prop_int(NSF_PROP_EMU_NEXT_CYCLES);
 }
 
 NSFOpcode nsfplay_emu_opcode(uint8 op)

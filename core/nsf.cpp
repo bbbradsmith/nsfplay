@@ -46,7 +46,7 @@ inline static bool nsfe_mandatory(uint32 fcc) // first letter of fcc is capital 
 	return a >= 'A' && a <= 'Z';
 }
 
-inline static int count_strings(const uint8* chunk, uint32 chunk_size) // count null terminated strings within chunk
+inline static unsigned int count_strings(const uint8* chunk, uint32 chunk_size) // count null terminated strings within chunk
 {
 	int count = 0;
 	while (chunk_size > 0)
@@ -141,7 +141,7 @@ inline static uint32 active_playlist_len(const NSFCore* core)
 	return 0;
 }
 
-inline static sint32 resolve_nsf_song(const NSFCore* core, sint32 song)
+inline static uint32 resolve_nsf_song(const NSFCore* core, sint32 song)
 {
 	if (song < 0) song = core->active_song;
 	if (song < 0) return 0; // invalid active_song?
@@ -154,7 +154,7 @@ inline static sint32 resolve_nsf_song(const NSFCore* core, sint32 song)
 		if (cs <= (uint32)song) return 0; // outside of playlist?
 		return chk[song];
 	}
-	return song; // no playlist
+	return uint32(song); // no playlist
 }
 
 inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, uint32 nsfe_offset, uint32 nsf_offset, uint8 bitmask)
@@ -195,7 +195,7 @@ inline const char* legacy_string(const NSFCore* core, const uint8* data)
 	if (song < 0) song = active_song; \
 	const uint8* chk = NULL; /* resable chunk pointer */ \
 	uint32 cs = 0; /* chunk size */ \
-	sint32 nsf_song = resolve_nsf_song(this,song); \
+	uint32 nsf_song = resolve_nsf_song(this,song); \
 	NSF_UNUSED(chk); \
 	NSF_UNUSED(cs); \
 	NSF_UNUSED(nsf_song);
@@ -449,13 +449,13 @@ bool NSFCore::prop_exists(sint32 prop, sint32 song) const
 		return ISNSFX();
 	case NSF_PROP_REGION_PREFER:
 		return (CHKS("regn",1) && (chk[1] < NSF_LK_REGIONLIST_COUNT));
-	case NSF_PROP_EXPANSION_FDS:
-	case NSF_PROP_EXPANSION_MMC5:
-	case NSF_PROP_EXPANSION_VRC6:
-	case NSF_PROP_EXPANSION_VRC7:
-	case NSF_PROP_EXPANSION_N163:
-	case NSF_PROP_EXPANSION_S5B:
-	case NSF_PROP_EXPANSION_VT02:
+	case NSF_PROP_EXP_FDS:
+	case NSF_PROP_EXP_MMC5:
+	case NSF_PROP_EXP_VRC6:
+	case NSF_PROP_EXP_VRC7:
+	case NSF_PROP_EXP_N163:
+	case NSF_PROP_EXP_S5B:
+	case NSF_PROP_EXP_VT02:
 		return true;
 	case NSF_PROP_NSF2:
 	case NSF_PROP_NSF2_METADATA_OFF:
@@ -487,9 +487,17 @@ bool NSFCore::prop_exists(sint32 prop, sint32 song) const
 	case NSF_PROP_ACTIVE_CPU_FREQ:
 		return true;
 	case NSF_PROP_ACTIVE_BANKS: return prop_exists(NSF_PROP_BANKSWITCH);
-	case NSF_PROP_ACTIVE_EMU_FRAME_CY: return true;
+	case NSF_PROP_EMU_FRAME_CYCLE:
+	case NSF_PROP_EMU_PENDING:
+	case NSF_PROP_EMU_CYCLES:
+	case NSF_PROP_EMU_NEXT_CYCLES:
+		return true;
 	// song props
-	case NSF_PROP_SONG_TITLE:
+	case NSF_PROP_SONG_TITLE: return true;
+	case NSF_PROP_SONG_TIME:   return CHKS("time",(nsf_song*4)+3);
+	case NSF_PROP_SONG_FADE:   return CHKS("fade",(nsf_song*4)+3);
+	case NSF_PROP_SONG_LABEL:  return CHK("tlbl") && count_strings(chk,cs) >= nsf_song;
+	case NSF_PROP_SONG_AUTHOR: return CHK("taut") && count_strings(chk,cs) >= nsf_song;
 
 	default:
 		break;
@@ -558,13 +566,13 @@ sint32 NSFCore::prop_int(sint32 prop, sint32 song) const
 	case NSF_PROP_REGION_PREFER:
 		if (CHKS("regn",1) && chk[0x01] < NSF_LK_REGIONLIST_COUNT) return chk[0x01];
 		return 0;
-	case NSF_PROP_EXPANSION_FDS:      return NSFE_NSF_BIT("INFO",0x07,0x7B,0x04) ? 1: 0;
-	case NSF_PROP_EXPANSION_MMC5:     return NSFE_NSF_BIT("INFO",0x07,0x7B,0x08) ? 1: 0;
-	case NSF_PROP_EXPANSION_VRC6:     return NSFE_NSF_BIT("INFO",0x07,0x7B,0x01) ? 1: 0;
-	case NSF_PROP_EXPANSION_VRC7:     return NSFE_NSF_BIT("INFO",0x07,0x7B,0x02) ? 1: 0;
-	case NSF_PROP_EXPANSION_N163:     return NSFE_NSF_BIT("INFO",0x07,0x7B,0x10) ? 1: 0;
-	case NSF_PROP_EXPANSION_S5B:      return NSFE_NSF_BIT("INFO",0x07,0x7B,0x20) ? 1: 0;
-	case NSF_PROP_EXPANSION_VT02:     return NSFE_NSF_BIT("INFO",0x07,0x7B,0x40) ? 1: 0;
+	case NSF_PROP_EXP_FDS:            return NSFE_NSF_BIT("INFO",0x07,0x7B,0x04) ? 1: 0;
+	case NSF_PROP_EXP_MMC5:           return NSFE_NSF_BIT("INFO",0x07,0x7B,0x08) ? 1: 0;
+	case NSF_PROP_EXP_VRC6:           return NSFE_NSF_BIT("INFO",0x07,0x7B,0x01) ? 1: 0;
+	case NSF_PROP_EXP_VRC7:           return NSFE_NSF_BIT("INFO",0x07,0x7B,0x02) ? 1: 0;
+	case NSF_PROP_EXP_N163:           return NSFE_NSF_BIT("INFO",0x07,0x7B,0x10) ? 1: 0;
+	case NSF_PROP_EXP_S5B:            return NSFE_NSF_BIT("INFO",0x07,0x7B,0x20) ? 1: 0;
+	case NSF_PROP_EXP_VT02:           return NSFE_NSF_BIT("INFO",0x07,0x7B,0x40) ? 1: 0;
 	case NSF_PROP_NSF2: return (NSFTYPE() == FT_NSF2) ? 1 : 0;
 	case NSF_PROP_NSF2_METADATA_OFF:
 		if (NSFHDR()) return le24(nsf+0x7D);
@@ -582,9 +590,25 @@ sint32 NSFCore::prop_int(sint32 prop, sint32 song) const
 		if (active_playlist_len(this)) return 0; // playlist starts at the beginning
 		return PROP(NSF_SONG_START);
 	case NSF_PROP_ACTIVE_PLAYLIST: return active_playlist_len(this) ? 1 : 0;
-	case NSF_PROP_ACTIVE_SONG_NSF: return resolve_nsf_song(this,active_song);
+	case NSF_PROP_ACTIVE_SONG_NSF: return sint32(resolve_nsf_song(this,active_song));
 	case NSF_PROP_ACTIVE_CPU_FREQ: return 0; // TODO
-	case NSF_PROP_ACTIVE_EMU_FRAME_CY: return 0; // TODO
+	case NSF_PROP_EMU_FRAME_CYCLE: return 0; // TODO
+	case NSF_PROP_EMU_PENDING: return 0; // TODO
+	case NSF_PROP_EMU_NEXT_CYCLES: return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_FDS:  return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_MMC5: return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_VRC6: return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_VRC7: return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_N163: return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_S5B:  return 0; // TODO
+	case NSF_PROP_ACTIVE_EXP_VT02: return 0; // TODO
+
+	case NSF_PROP_SONG_TIME:
+		if (CHKS("time",(nsf_song*4)+3)) return le32(chk+(nsf_song*4));
+		break;
+	case NSF_PROP_SONG_FADE:
+		if (CHKS("fade",(nsf_song*4)+3)) return le32(chk+(nsf_song*4));
+		break;
 
 	default:
 		break;
@@ -597,7 +621,8 @@ sint64 NSFCore::prop_long(sint32 prop, sint32 song) const
 	PROPSETUP();
 	switch(prop)
 	{
-	case 0: // TODO
+	case NSF_PROP_EMU_CYCLES: return 0; // TODO
+
 	default:
 		break;
 	}
@@ -624,8 +649,15 @@ const char* NSFCore::prop_str(sint32 prop, sint32 song) const
 	case NSF_PROP_RIPPER:
 		if (CHK("auth") && count_strings(chk,cs) >= 4) return nth_string(chk,cs,3);
 		break;
+
 	case NSF_PROP_SONG_TITLE:
 		return MISSING_STR; // TODO generate song title
+	case NSF_PROP_SONG_LABEL:
+		if (CHK("tlbl") && count_strings(chk,cs) >= nsf_song) return nth_string(chk,cs,nsf_song);
+		break;
+	case NSF_PROP_SONG_AUTHOR:
+		if (CHK("taut") && count_strings(chk,cs) >= nsf_song) return nth_string(chk,cs,nsf_song);
+		break;
 
 	default:
 		break;
