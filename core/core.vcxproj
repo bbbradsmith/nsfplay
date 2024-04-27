@@ -188,12 +188,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="nsf.cpp" />
+    <ClCompile Include="shift_jis.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\nsfplaycore.h" />
     <ClInclude Include="..\include\nsfplayenums.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="enums_data.h" />
+    <ClInclude Include="shift_jis_table.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\enums\english.txt" />

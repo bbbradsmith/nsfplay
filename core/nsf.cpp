@@ -167,13 +167,21 @@ inline static uint8 nsfe_nsf_shared_bit(const NSFCore* core, uint32 nsfe_fcc, ui
 	return false;
 }
 
+// from shift_jis.cpp
+bool valid_utf8(const uint8* s); // true if s is value unicode
+void sjis_to_utf8(const uint8* sjis, uint16 unmapped, uint8* output, uint32 output_len);
+
 inline const char* legacy_string(const NSFCore* core, const uint8* data)
 {
-	NSF_UNUSED(core);
-	return reinterpret_cast<const char*>(data);
-	// TODO detect impossibility of shift-jis (ASCII only?) and return direct reinterpret
-	//if (core->setting[SHIFT_JIS] == NSF_LK_ENABLE_AUTO_AUTO) // detect Shift-JIS, copy to temp_text
-	//if (core->setting[SHIFT_JIS] == NSF_LK_ENABLE_ON) // force Shift-JIS, copy to temp_text
+	sint32 sjis = core->setting[NSF_SET_SHIFT_JIS];
+	if ((sjis == NSF_LK_ENCODING_AUTO && !valid_utf8(data)) || // automatic setting assumes Shift-JIS if not UTF-8
+	    (sjis == NSF_LK_ENCODING_SJIS)) // force Shift-JIS
+	{
+		sjis_to_utf8(data,'.',reinterpret_cast<uint8*>(core->temp_text),NSFCore::TEMP_TEXT_SIZE);
+		return core->temp_text;
+	}
+	//else: sjis == NSF_LK_ENCODING_UTF8
+	return reinterpret_cast<const char*>(data); // already UTF-8
 }
 
 // check NSF type, NSFx = NSF/NSF2/NSFe

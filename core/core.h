@@ -36,7 +36,9 @@ typedef uint64_t  uint64;
 
 #ifndef NSF_NOTEXT
 	// define NSF_NOTEXT=1 to strip all unnecessary text from the build
-	//   this disables ini parsing and key looking, error messages and keys will become blank strings
+	//   this disables ini parsing and key lookup
+	//   error messages and keys will become blank strings
+	//   shift-jis decoding will be disabled
 	//   last_error_code can still be used to disambiguate errors
 	#define NSF_NOTEXT 0
 #endif

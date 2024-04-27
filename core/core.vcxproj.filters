@@ -26,6 +26,9 @@
     <ClCompile Include="nsf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shift_jis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\nsfplaycore.h">
@@ -38,6 +41,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="enums_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shift_jis_table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
