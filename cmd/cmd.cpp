@@ -11,6 +11,7 @@
 #include <cstddef> // NULL
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // cerrno
+#include <string.h> // strcpy_s, strcat_s
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);

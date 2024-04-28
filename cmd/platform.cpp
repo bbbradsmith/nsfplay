@@ -110,7 +110,7 @@ const char* platform_getenv(const char* name)
 	// convert to UTF-8
 	int newi_size;
 	newi_size = WideCharToMultiByte(CP_UTF8,0,store_wconvert,-1,NULL,0,NULL,NULL);
-	if (!resize_store_convert(new_size)) return NULL;
+	if (!resize_store_convert(newi_size)) return NULL;
 	WideCharToMultiByte(CP_UTF8,0,store_wconvert,-1,store_convert,int(store_convert_size),NULL,NULL);
 	return store_convert;
 }
