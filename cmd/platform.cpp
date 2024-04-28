@@ -65,9 +65,9 @@ const char* platform_argv(int index)
 	int new_size = WideCharToMultiByte(CP_UTF8,0,store_argv[index],-1,NULL,0,NULL,NULL);
 	if (new_size > store_convert_size)
 	{
-		free(store_convert);
+		std::free(store_convert);
 		store_convert_size = 0;
-		store_convert = (char*)std::malloc(store_convert_size);
+		store_convert = reinterpret_cast<char*>(std::malloc(new_size));
 		if (store_convert == NULL) return "<OUT OF MEMORY>";
 		store_convert_size = new_size;
 	}
@@ -87,9 +87,9 @@ FILE* platform_fopen(const char* path, const char* mode)
 	int new_size = MultiByteToWideChar(CP_UTF8,0,path,-1,NULL,0);
 	if (new_size > store_wconvert_size)
 	{
-		free(store_wconvert);
+		std::free(store_wconvert);
 		store_wconvert_size = 0;
-		store_wconvert = (wchar_t*)std::malloc(store_wconvert_size*sizeof(wchar_t));
+		store_wconvert = reinterpret_cast<wchar_t*>(std::malloc(new_size*sizeof(wchar_t)));
 		if (store_wconvert == NULL) return NULL;
 		store_wconvert_size = new_size;
 	}

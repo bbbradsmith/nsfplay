@@ -38,52 +38,177 @@ void fatal_log(const char* msg)
 }
 
 //
-// main
+// load a file
 //
 
-int arg_input = -1;
-const char* arg_input_file = NULL;
-bool arg_ini;
+void* load_file(const char* filename, const char* mode, size_t& filesize)
+{
+	filesize = 0;
+	// open file
+	FILE* f = platform_fopen(filename,mode);
+	if (f == NULL)
+	{
+		std::fprintf(stderr,"Could not open: %s\n",filename);
+		return NULL;
+	}
+	// get size
+	std::fseek(f,0,SEEK_END);
+	size_t fs = std::ftell(f);
+	std::fseek(f,0,SEEK_SET);
+	// allocate memory
+	void* fd = std::malloc(fs);
+	if (fd == NULL)
+	{
+		std::fprintf(stderr,"Out of memory loading: %s\n",filename);
+		std::fclose(f);
+		return NULL;
+	}
+	// read data
+	size_t frs = std::fread(fd,1,fs,f);
+	if (frs != fs)
+	{
+		std::fprintf(stderr,"Read error in: %s\n",filename);
+		std::fclose(f);
+		std::free(fd);
+		return NULL;
+	}
+	std::fclose(f);
+	filesize = fs;
+	return fd;
+}
+
+//
+// command line parsing
+//
+
+struct
+{
+	int input = -1;
+	int waveout = -1;
+	int unit_test = -1;
+	int save_default_ini = -1;
+	bool help = false;
+} arg;
 
 int parse_commandline(NSFCore* core) // returns -1 on success, otherwise is index of bad argument
 {
+	bool implied_ini = false;
+	arg.input = -1;
+	arg.waveout = -1;
+	arg.unit_test = -1;
+	arg.save_default_ini = -1;
+
 	#ifdef DEBUG
 		for (int i=0; i<platform_argc(); ++i) std::printf("Debug: arg[%d] = \"%s\"\n",i,platform_argv(i));
 	#endif
+
+	// start with default settings
+	nsfplay_set_default(core);
+
+	// first pass does not change any settings
 	for (int i=1; i<platform_argc(); ++i)
 	{
 		const char* v = platform_argv(i);
-
 		if (v[0] != '-') // input file
 		{
-			if (arg_input >= 0) return i; // too many input files
-			arg_input =  i;
+			if (arg.input >= 0) return i; // too many input files
+			arg.input =  i;
 			continue;
 		}
 		if (v[1] != 0 && v[2] == 0) // single character argument
 		{
+			char c = v[1]; if (c >= 'A' && c <= 'Z') c += 'a'-'A';
 			switch(v[1])
 			{
-			// TODO
-			case 'w': // TODO
-			default:
-				return i; // unknown argument
+			case 'h': arg.help = true; break;
+			case 'i': ++i;
+				if (arg.input >= 0) return i; // too many input files
+				arg.input = i; break;
+			case 'w': ++i; arg.waveout = i; break;
+			case 'u': ++i; arg.unit_test = i; break;
+			case 'd': ++i; arg.save_default_ini = i; break;
+			case 'n': implied_ini = false; break;
+			case 'a': ++i; implied_ini = false; break; // any commandline ini disables the implied ini
+			//case 's': TODO solo channel by key
+			//case 'm': TODO mute channel by key
+			//case 'p': TODO fade time override
+			//case 't': TODO time override
+			default: return i; // unknown single character argument
 			}
 		}
-		else // core setting
+		else { } // assume, core setting, do in second pass
+	}
+
+	// load implied ini file
+	if (implied_ini)
+	{
+		// TODO
+	}
+
+	// second pass apply settings
+	for (int i=1; i<platform_argc(); ++i)
+	{
+		const char* v = platform_argv(i);
+		if (v[0] != '-') continue;
+		if (v[1] != 0 && v[2] == 0)
+		{
+			char c = v[1]; if (c >= 'A' && c <= 'Z') c += 'a'-'A';
+			switch(v[1])
+			{
+			case 'h': ++i; break;
+			case 'i': ++i; break;
+			case 'w': ++i; break;
+			case 'u': ++i; break;
+			case 'd': ++i; break;
+			case 'n': break;
+			case 'a':
+				++i;
+				// TODO load the ini
+				break;
+			//case 's':
+			//case 'm':
+			//case 'p':
+			//case 'f':
+			default: return i;
+			}
+		}
+		else // apply as core setting
 		{
 			if (!nsfplay_set_ini_line(core,v+1))
 				return i; // invalid core setting
 		}
-		// TODO we want arguments that involve loading ini or core settings to apply in-order, but we also want to load default settings first IF no ini is loaded. two passes?
 	}
 	return -1;
 }
 
-void help_commandline()
-{
-	// TODO
-}
+const char HELP_TEXT[] =
+	"nsfplac command line help:\n"
+	"  Any argument beginning with - is an option, otherwise it gives the input file.\n"
+	"  Only one input files is permitted.\n"
+	"options:\n"
+	"  -h        print command line help\n"
+	"  -i file   set input file (useful if filename begins with -)\n"
+	"  -w file   wave output to file\n"
+	"  -v        wave output all tracks in file, use TITLE_FORMAT as filename\n"
+	"  -u file   run unit test file\n"
+	"  -d file   save default settings to an ini file\n"
+	"  -n        don't automatically load the user ini\n"
+	"  -a file   use additional ini file (implies -n)\n"
+	"  -s chan   solo channel\n"
+	"  -m chan   mute channel\n"
+	"  -p smps   play time override in samples\n"
+	"  -f smps   fade time override in samples\n"
+	"can also use ini file settings, examples:\n"
+	"  -CPU_NTSC=1789772\n"
+	"  -REGION=DENDY\n"
+	"  \"-TITLE_FORMAT=my title format\"\n"
+	"  -OVERRIDE_NSF_SONG=$2A\n"
+	"  \"-WAVEOUT_SAMPLERATE = 9000\"\n"
+	;
+
+//
+// main
+//
 
 int main(int argc, char** argv)
 {
@@ -100,50 +225,29 @@ int main(int argc, char** argv)
 		int bad_arg = parse_commandline(core);
 		if (bad_arg >= 0)
 		{
-			fprintf(stderr,"Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
-			exit(-1);
+			std::fprintf(stderr,"Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
+			std::exit(-1);
 		}
 	}
 
-	const char* TEST_INI = NULL;
-	const NSFSetInit* TEST_INIT = NULL;
-	/*
-	const char* TEST_INI =
-		"# test comment\n"
-		"SAMPLERATE=12345\n"
-		"    STEREO_ENABLE     =      0      \r\n"
-		" error no equals\n"
-		"TITLE_format =      a b   c d     \n\r"
-		"\tTITLE_FORMAT=\t1234\n"
-		"TITLE_FORMAT=1234\n"
-		"\tTITLE_FORMAT =    1234     \n"
-		"TRI_VOL =  12#34   \n"
-		"error bad key  = 5\n"
-		"NSE_VOL=string # error bad int\n"
-		"DPCM_VOL=-3 # error range\n"
-		"\n"
-		"VOLUME=368";
-	const NSFSetInit TEST_INIT[] = {
-		{NSF_SET_DPCM_ON,0,NULL},
-		{NSF_SET_DPCM_ON,-2,NULL}, // out of range
-		{NSF_SET_DPCM_ON,2,NULL}, // out of range
-		{NSF_SET_DPCM_ON,0,"string"}, // wrong type
-		{NSF_SET_TITLE_FORMAT,0,"string"},
-		{NSF_SET_TITLE_FORMAT,3,NULL}, // wrong type
-		{-1,0,NULL},
-	};
-	*/
-	nsfplay_set_ini(core,TEST_INI);
-	nsfplay_set_init(core,TEST_INIT);
-	/*
-	//nsfplay_set_key_int(core,"TRI_ON",0);
-	//nsfplay_set_key_str(core,"TITLE_FORMAT","keyed");
-	nsfplay_set_ini_line(core,"SQU0_ON = off ");
-	nsfplay_set_ini_line(core,"SQU1_ON=$-1");
-	nsfplay_set_ini_line(core,"TRI_ON=$F");
-	nsfplay_set_ini_line(core,"NSE_ON=ON");
-	nsfplay_set_ini_line(core,"DPCM_ON=false");
-	*/
+	// print help
+	if (arg.help)
+	{
+		std::printf(HELP_TEXT);
+		// TODO print channel shortname list?
+		nsfplay_destroy(core);
+		platform_shutdown();
+		std::exit(0);
+	}
+
+	// load input file
+	if (arg.input >= 0)
+	{
+		size_t fs;
+		void* fd = load_file(platform_argv(arg.input),"rb",fs);
+		nsfplay_load(core,fd,uint32_t(fs));
+		std::free(fd);
+	}
 
 	/*
 	// test info
@@ -175,25 +279,6 @@ int main(int argc, char** argv)
 		}
 	}
 	*/
-
-	//FILE* f = platform_fopen("moon8.nsfe","rb");
-	FILE* f = platform_fopen("moon8.nsf","rb");
-	//FILE* f = platform_fopen("LunaAscension.nsf","rb");
-	//FILE* f = platform_fopen("katoken_sky_v01.nsf","rb");
-	//FILE* f = platform_fopen("ct109_v01.nsf","rb");
-	if (f == NULL) fatal_log("file not found");
-	else
-	{
-		fseek(f,0,SEEK_END);
-		int fs = ftell(f);
-		fseek(f,0,SEEK_SET);
-		void* fd = malloc(fs);
-		if (fd == NULL) fatal_log("out of memory");
-		else { size_t fr = fread(fd,1,fs,f); (void)fr; }
-		fclose(f);
-		nsfplay_load(core,fd,fs,false);
-		//nsfplay_load(core,fd,fs,true);
-	}
 
 	// test props
 	printf("PROPS:\n");
@@ -250,17 +335,16 @@ int main(int argc, char** argv)
 		}
 	}
 
-	/*
 	// test ini generation
 	for (int i=0;i<NSF_SET_COUNT;++i)
-		printf("%s\\n\n",nsfplay_ini_line(core,i));
+		printf("%s\n",nsfplay_ini_line(core,i));
+
+	/*
+	// test ini write
+	nsfplay_ini_write(core,stdout);
 	*/
 
-	// test ini write
-	//nsfplay_ini_write(core,stdout);
-
-	nsfplay_destroy(core);
-
+	//nsfplay_destroy(core);
 	platform_shutdown();
 	return 0;
 }

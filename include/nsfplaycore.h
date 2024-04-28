@@ -227,12 +227,12 @@ int32_t nsfplay_group_enum(const char* key); // -1 if not found
 //   as long at they were recoverable
 // - a NULL nsf_data may be used to "unload" the current NSF,
 //   but even without an NSF, the core may still be used via direct emulation access
-bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool assume);
+bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool assume=false);
 // load BIN file
 // - binary program testing mode
 // - load binary data directly at $6000-FFFF
 // - INIT and PLAY will both point to $6000
-bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume);
+bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume=false);
 
 // song control
 uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF (or NSF playlist if active, see PROP_ACTIVE_PLAYLIST)
