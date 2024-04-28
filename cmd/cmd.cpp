@@ -1,27 +1,38 @@
 // cmd.cpp
 //   Main entry point for nsfplac.
 
+#define DEFAULT_INI      "nsfplay.ini"
+#define DEFAULT_INI_ENV  "NSFPLAY_INI"
+
 #include <nsfplaycore.h>
 #include <cstdio> // std::fprintf
-#include <cstdlib> // std::exit, std::atexit
-#include <cstring> // std::strlen
+#include <cstdlib> // std::exit, std::atexit, std::strtol
+#include <cstring> // std::strlen, std::memset
 #include <cstddef> // NULL
 #include <cstdarg> // va_list, va_start
+#include <cerrno> // cerrno
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
 void platform_shutdown();
 int platform_argc();
-const char* platform_argv(int index);
+const char* platform_argv(int index); // note: return only valid until next argv/getenv
+const char* platform_getenv(const char* name); // note: return only valid until next argv/getenv, name limit of 63 chars
 FILE* platform_fopen(const char* path, const char* mode);
+
+//
+// global data
+//
+
+NSFCore* core = NULL;
 
 //
 // logging functions
 //
 
-void error_log(const NSFCore* core, int32_t code, const char* msg)
+void error_log(const NSFCore* core_, int32_t code, const char* msg)
 {
-	(void)core;
+	(void)core_;
 	std::fprintf(stderr,"Error(%d): %s\n",code,msg);
 }
 
@@ -38,17 +49,17 @@ void fatal_log(const char* msg)
 }
 
 //
-// load a file
+// load files
 //
 
-void* load_file(const char* filename, const char* mode, size_t& filesize)
+void* load_file(const char* path, const char* mode, size_t& filesize, bool silent_notfound=false)
 {
 	filesize = 0;
 	// open file
-	FILE* f = platform_fopen(filename,mode);
+	FILE* f = platform_fopen(path,mode);
 	if (f == NULL)
 	{
-		std::fprintf(stderr,"Could not open: %s\n",filename);
+		if (!silent_notfound) std::fprintf(stderr,"Could not open: %s\n",path);
 		return NULL;
 	}
 	// get size
@@ -56,18 +67,19 @@ void* load_file(const char* filename, const char* mode, size_t& filesize)
 	size_t fs = std::ftell(f);
 	std::fseek(f,0,SEEK_SET);
 	// allocate memory
-	void* fd = std::malloc(fs);
+	uint8_t* fd = reinterpret_cast<uint8_t*>(std::malloc(fs+1));
 	if (fd == NULL)
 	{
-		std::fprintf(stderr,"Out of memory loading: %s\n",filename);
+		std::fprintf(stderr,"Out of memory loading: %s\n",path);
 		std::fclose(f);
 		return NULL;
 	}
+	fd[fs] = 0; // terminating zero, needed for some purposes (e.g. ini file)
 	// read data
 	size_t frs = std::fread(fd,1,fs,f);
 	if (frs != fs)
 	{
-		std::fprintf(stderr,"Read error in: %s\n",filename);
+		std::fprintf(stderr,"Read error in: %s\n",path);
 		std::fclose(f);
 		std::free(fd);
 		return NULL;
@@ -77,9 +89,76 @@ void* load_file(const char* filename, const char* mode, size_t& filesize)
 	return fd;
 }
 
+bool load_ini(const char* path, bool silent_notfound=false)
+{
+	size_t filesize;
+	char* ini = reinterpret_cast<char*>(load_file(path,"rt",filesize,silent_notfound));
+	if (!ini) return false;
+	nsfplay_set_ini(core,ini);
+	std::printf("Loaded INI: %s\n",path);
+	std::free(ini);
+	return true;
+}
+
 //
 // command line parsing
 //
+
+static bool parse_i32(const char* s, int32_t& v)
+{
+	int radix = 10;
+	if (*s == '$') { radix=16; ++s; } // $ prefix selects hexadecimal integer
+	errno=0;
+	v = std::strtol(s,NULL,radix);
+	if (errno) return false;
+	return true;
+}
+
+static bool parse_i64(const char* s, int64_t& v)
+{
+	int radix = 10;
+	if (*s == '$') { radix=16; ++s; }
+	errno=0;
+	v = std::strtoll(s,NULL,radix);
+	if (errno) return false;
+	return true;
+}
+
+inline static bool key_match(const char* key_test, int len, const char* key_reference)
+{
+	if (len < 0) len = 256; // greater than maximum possible key_reference length
+	while ((len==0 || *key_test != 0) && *key_reference != 0)
+	{
+		char c = *key_test;
+		if (c >= 'a' && c <= 'z') c = (c - 'a') + 'A';
+		if (c != *key_reference) return false;
+		++key_test;
+		++key_reference;
+		--len;
+	}
+	return (*key_reference == 0);
+}
+
+int32_t parse_chan(const char* s, bool ch[NSF_CHANNEL_COUNT])
+{
+	for (int32_t i=0; i<NSF_CHANNEL_COUNT; ++i)
+	{
+		const char* key = nsfplay_channel_info(core,i).key;
+		const char* sm = s;
+		while (*key && *sm)
+		{
+			char c = *sm;
+			if (c >= 'a' && c <= 'z') c = (c - 'a') + 'A';
+			if (c != *key) break;
+		}
+		if (*key == 0 && *sm == 0)
+		{
+			ch[i] = true;
+			return i;
+		}
+	}
+	return -1;
+}
 
 struct
 {
@@ -87,16 +166,29 @@ struct
 	int waveout = -1;
 	int unit_test = -1;
 	int save_default_ini = -1;
+	int32_t track = 0;
+	int32_t fade = -1;
+	int64_t time = -1;
+	bool waveout_multi = false;
 	bool help = false;
+	bool solo[NSF_CHANNEL_COUNT] = {0};
+	bool mute[NSF_CHANNEL_COUNT] = {0};
 } arg;
 
-int parse_commandline(NSFCore* core) // returns -1 on success, otherwise is index of bad argument
+int parse_commandline() // returns -1 on success, otherwise is index of bad argument
 {
-	bool implied_ini = false;
+	bool implied_ini = true;
 	arg.input = -1;
 	arg.waveout = -1;
 	arg.unit_test = -1;
 	arg.save_default_ini = -1;
+	arg.track = 0;
+	arg.fade = -1;
+	arg.time = -1;
+	arg.waveout_multi = false;
+	arg.help = false;
+	std::memset(arg.solo,0,sizeof(arg.solo));
+	std::memset(arg.mute,0,sizeof(arg.mute));
 
 	#ifdef DEBUG
 		for (int i=0; i<platform_argc(); ++i) std::printf("Debug: arg[%d] = \"%s\"\n",i,platform_argv(i));
@@ -121,28 +213,36 @@ int parse_commandline(NSFCore* core) // returns -1 on success, otherwise is inde
 			switch(v[1])
 			{
 			case 'h': arg.help = true; break;
-			case 'i': ++i;
-				if (arg.input >= 0) return i; // too many input files
-				arg.input = i; break;
+			case 'i': ++i; { if (arg.input >= 0) return i; } arg.input = i; break;
+			case 't': ++i; if (!parse_i32(platform_argv(i),arg.track)) return i; break;
 			case 'w': ++i; arg.waveout = i; break;
-			case 'u': ++i; arg.unit_test = i; break;
+			case 'v': arg.waveout_multi = true; break;
 			case 'd': ++i; arg.save_default_ini = i; break;
-			case 'n': implied_ini = false; break;
 			case 'a': ++i; implied_ini = false; break; // any commandline ini disables the implied ini
-			//case 's': TODO solo channel by key
-			//case 'm': TODO mute channel by key
-			//case 'p': TODO fade time override
-			//case 't': TODO time override
+			case 'n': implied_ini = false; break;
+			case 's': ++i; if (parse_chan(platform_argv(i),arg.solo) < 0) return i; break;
+			case 'm': ++i; if (parse_chan(platform_argv(i),arg.mute) < 0) return i; break;
+			case 'p': ++i; if (!parse_i64(platform_argv(i),arg.time)) return i; break;
+			case 'f': ++i; if (!parse_i32(platform_argv(i),arg.fade)) return i; break;
+			case 'u': ++i; arg.unit_test = i; break;
 			default: return i; // unknown single character argument
 			}
 		}
 		else { } // assume, core setting, do in second pass
 	}
 
-	// load implied ini file
+	// load implied default INI file
 	if (implied_ini)
 	{
-		// TODO
+		if (!load_ini(DEFAULT_INI,true)) // look in current directory
+		{
+			static_assert(sizeof(DEFAULT_INI_ENV)<=64,"platform_getenv has a 64 character limit");
+			const char* path = platform_getenv(DEFAULT_INI_ENV);
+			if (!path || !load_ini(path,true))
+			{
+				std::printf("No default INI file found.\n");
+			}
+		}
 	}
 
 	// second pass apply settings
@@ -157,18 +257,17 @@ int parse_commandline(NSFCore* core) // returns -1 on success, otherwise is inde
 			{
 			case 'h': ++i; break;
 			case 'i': ++i; break;
+			case 't': ++i; break;
 			case 'w': ++i; break;
-			case 'u': ++i; break;
+			case 'v': break;
 			case 'd': ++i; break;
+			case 'a': ++i; if(!load_ini(platform_argv(i))) return i; break;
 			case 'n': break;
-			case 'a':
-				++i;
-				// TODO load the ini
-				break;
-			//case 's':
-			//case 'm':
-			//case 'p':
-			//case 'f':
+			case 's': ++i; break;
+			case 'm': ++i; break;
+			case 'p': ++i; break;
+			case 'f': ++i; break;
+			case 'u': ++i; break;
 			default: return i;
 			}
 		}
@@ -185,20 +284,24 @@ const char HELP_TEXT[] =
 	"nsfplac command line help:\n"
 	"  Any argument beginning with - is an option, otherwise it gives the input file.\n"
 	"  Only one input files is permitted.\n"
+	"  A default INI settings file \"" DEFAULT_INI "\" will be applied from the current directory.\n"
+	"    If this INI file is not found, the \"" DEFAULT_INI_ENV "\" environment variable will be used\n"
+	"    to look for another INI file, and applied if found. -n disables this default INI.\n"
 	"options:\n"
 	"  -h        print command line help\n"
 	"  -i file   set input file (useful if filename begins with -)\n"
+	"  -t num    set starting track (1-256)\n"
 	"  -w file   wave output to file\n"
-	"  -v        wave output all tracks in file, use TITLE_FORMAT as filename\n"
-	"  -u file   run unit test file\n"
-	"  -d file   save default settings to an ini file\n"
-	"  -n        don't automatically load the user ini\n"
-	"  -a file   use additional ini file (implies -n)\n"
-	"  -s chan   solo channel\n"
+	"  -v        wave output all tracks in file using TITLE_FORMAT as filename\n"
+	"  -d file   create a new INI file with default settings\n"
+	"  -a file   apply INI file (implies -n)\n"
+	"  -n        don't automatically load the default INI\n"
+	"  -s chan   solo channel (can use multiple -s arguments to get more than 1 channel)\n"
 	"  -m chan   mute channel\n"
 	"  -p smps   play time override in samples\n"
 	"  -f smps   fade time override in samples\n"
-	"can also use ini file settings, examples:\n"
+	"  -u file   run unit test file\n"
+	"INI file settings may also be used, examples:\n"
 	"  -CPU_NTSC=1789772\n"
 	"  -REGION=DENDY\n"
 	"  \"-TITLE_FORMAT=my title format\"\n"
@@ -206,27 +309,37 @@ const char HELP_TEXT[] =
 	"  \"-WAVEOUT_SAMPLERATE = 9000\"\n"
 	;
 
+void help_chans()
+{
+	printf("channels:");
+	int32_t last_unit = -1;
+	for (int32_t i=0; i<NSF_CHANNEL_COUNT; ++i)
+	{
+		NSFChannelInfo info = nsfplay_channel_info(core,i);
+		if (info.unit != last_unit)
+		{
+			printf("\n ");
+			last_unit = info.unit;
+		}
+		printf(" %s",info.short_name);
+	}
+	printf("\n");
+}
+
 //
 // main
 //
 
-int main(int argc, char** argv)
+int run()
 {
-	platform_setup(argc,argv);
-	nsfplay_set_error_log(error_log);
-	nsfplay_set_debug_print(debug_print);
-	nsfplay_set_fatal(fatal_log);
-
-	NSFCore* core = nsfplay_create();
-	if (core == NULL) fatal_log("Out of memory.");
-
 	// parse command line
 	{
-		int bad_arg = parse_commandline(core);
+		int bad_arg = parse_commandline();
 		if (bad_arg >= 0)
 		{
 			std::fprintf(stderr,"Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
-			std::exit(-1);
+			std::printf("Try -h for command line usage help.\n");
+			return -1;
 		}
 	}
 
@@ -234,10 +347,31 @@ int main(int argc, char** argv)
 	if (arg.help)
 	{
 		std::printf(HELP_TEXT);
-		// TODO print channel shortname list?
-		nsfplay_destroy(core);
-		platform_shutdown();
-		std::exit(0);
+		help_chans();
+		return 0;
+	}
+
+	// save default ini
+	if (arg.save_default_ini >= 0)
+	{
+		const char* path = platform_argv(arg.save_default_ini);
+		std::printf("Generate default INI file: %s\n",path);
+		FILE* f = platform_fopen(path,"wt");
+		if (f == NULL)
+		{
+			std::fprintf(stderr,"Could not open: %s\n",path);
+			return -1;
+		}
+		nsfplay_set_default(core);
+		bool result = nsfplay_ini_write(core,f);
+		std::fclose(f);
+		if (!result)
+		{
+			std::fprintf(stderr,"Error writitng to file: %s\n",path);
+			return -1;
+		}
+		std::printf("Success.\n");
+		return 0;
 	}
 
 	// load input file
@@ -248,6 +382,11 @@ int main(int argc, char** argv)
 		nsfplay_load(core,fd,uint32_t(fs));
 		std::free(fd);
 	}
+	
+	// set track if requested
+	if (arg.track > 0) nsfplay_song(core,uint8_t(arg.track-1));
+
+	// TODO  the rest of this function is test code I am keeping as an example for later menus
 
 	/*
 	// test info
@@ -344,7 +483,22 @@ int main(int argc, char** argv)
 	nsfplay_ini_write(core,stdout);
 	*/
 
-	//nsfplay_destroy(core);
-	platform_shutdown();
 	return 0;
+}
+
+int main(int argc, char** argv)
+{
+	platform_setup(argc,argv);
+	nsfplay_set_error_log(error_log);
+	nsfplay_set_debug_print(debug_print);
+	nsfplay_set_fatal(fatal_log);
+
+	core = nsfplay_create();
+	if (core == NULL) fatal_log("Out of memory.");
+
+	int result = run();
+
+	nsfplay_destroy(core);
+	platform_shutdown();
+	return result;
 }

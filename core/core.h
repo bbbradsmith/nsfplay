@@ -187,7 +187,10 @@ typedef struct NSFCore_
 	bool parse_ini_line(const char* line, int len, int linenum); // linenum=-1 to parse a line with no INI file context
 
 	bool load(const uint8* data, uint32 size, bool assume=false, bool bin=false);
+
 	NSFPropInfo prop_info(sint32 prop) const;
+	NSFUnitInfo unit_info(sint32 unit) const;
+	NSFChannelInfo channel_info(sint32 channel) const;
 
 	const char* local_text(sint32 textenum) const; // NSF_TEXT_x for curent locale (local_text(0) is a default error string)
 	static const char* local_text(sint32 textenum, sint32 locale); // NSF_TEXT_x for specific locale

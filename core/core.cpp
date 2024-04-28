@@ -593,7 +593,7 @@ bool NSFCore::parse_ini_line(const char* line, int len, int linenum)
 	if (*line == '$') // $ prefix selects hexadecimal integer
 	{
 		radix = 16;
-		line += 1;
+		++line;
 	}
 	else if (SD.list >= 0 && (*line < '0' || *line > '9')) // isn't a number, could be a list key
 	{
@@ -685,6 +685,7 @@ NSFPropInfo NSFCore::prop_info(sint32 prop) const
 	NSFPropInfo info = {0};
 	info.type = NSF_PROP_TYPE_INVALID;
 	info.key = info.name = local_text(0);
+	if (prop < 0 || prop >= NSF_PROP_COUNT) return info;
 	const NSFPropData& PD = NSFD_PROP[prop];
 	info.key       = PD.key;
 	info.name      = local_text(PD.text);
@@ -694,6 +695,34 @@ NSFPropInfo NSFCore::prop_info(sint32 prop) const
 	info.list_keys = (PD.list >= 0) ? (local_text(NSFD_LIST_TEXT[PD.list]+0)) : NULL;
 	info.type      = PD.type;
 	info.display   = PD.display;
+	return info;
+}
+
+NSFUnitInfo NSFCore::unit_info(sint32 unit) const
+{
+	NSFUnitInfo info = {0};
+	info.key = info.name = info.desc = local_text(0);
+	if (unit < 0 || unit >= NSF_UNIT_COUNT) return info;
+	sint32 group = NSFD_UNIT_GROUP[unit];
+	const NSFGroupData& GD = NSFD_GROUP[group];
+	info.active = false; // TODO
+	info.key = GD.key;
+	info.name = local_text(GD.text+0);
+	info.desc = local_text(GD.text+1);
+	return info;
+}
+
+NSFChannelInfo NSFCore::channel_info(sint32 channel) const
+{
+	NSFChannelInfo info = {0};
+	info.unit = -1;
+	info.key = info.short_name = info.name = local_text(0);
+	if (channel < 0 || channel >= NSF_CHANNEL_COUNT) return info;
+	const NSFChannelData& CD = NSFD_CHANNEL[channel];
+	info.key = CD.key;
+	info.unit = CD.unit;
+	info.short_name = local_text(CD.text+0);
+	info.name = local_text(CD.text+1);
 	return info;
 }
 

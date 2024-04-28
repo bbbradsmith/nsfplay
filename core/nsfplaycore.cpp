@@ -556,22 +556,29 @@ const void* nsfplay_chunk(const NSFCore* core, const char* fourcc, uint32_t* chu
 	return core->nsfe_chunk(fourcc,chunk_size);
 }
 
-NSFChannelUnit nsfplay_channel_unit(const NSFCore* core, int32_t unit)
+NSFUnitInfo nsfplay_unit_info(const NSFCore* core, int32_t unit)
 {
 	NSF_MUTEX_GUARD();
-	NSF_UNUSED(core);
-	NSF_UNUSED(unit);
-	// TODO
-	return {0};
+	if (!core)
+	{
+		NSFUnitInfo info = {0};
+		info.key = info.name = info.desc = "";
+		return info;
+	}
+	return core->unit_info(unit);
 }
 
 NSFChannelInfo nsfplay_channel_info(const NSFCore* core, int32_t global_channel)
 {
 	NSF_MUTEX_GUARD();
-	NSF_UNUSED(core);
-	NSF_UNUSED(global_channel);
-	// TODO
-	return {0};
+	if (!core)
+	{
+		NSFChannelInfo info = {0};
+		info.unit = -1;
+		info.key = info.short_name = info.name = "";
+		return info;
+	}
+	return core->channel_info(global_channel);
 }
 
 int32_t nsfplay_channel_count(const NSFCore* core)

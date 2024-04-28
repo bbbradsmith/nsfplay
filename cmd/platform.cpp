@@ -13,11 +13,11 @@ static UINT store_cp = 0;
 static LPWSTR* store_argv;
 static int store_argc;
 static char* store_convert = NULL;
-static int store_convert_size = 0;
+static size_t store_convert_size = 0;
 static wchar_t* store_wconvert = NULL;
-static int store_wconvert_size = 0;
+static size_t store_wconvert_size = 0;
 
-UINT set_code_page(UINT cp)
+static UINT set_code_page(UINT cp)
 {
 	UINT old_cp = GetConsoleOutputCP();
 	SetConsoleOutputCP(cp);
@@ -29,10 +29,36 @@ UINT set_code_page(UINT cp)
 }
 
 extern "C" {
-void platform_atexit()
+static void platform_atexit()
 {
 	set_code_page(store_cp);
 }
+}
+
+static bool resize_store_convert(size_t new_size)
+{
+	if (new_size > store_convert_size)
+	{
+		std::free(store_convert);
+		store_convert_size = 0;
+		store_convert = reinterpret_cast<char*>(std::malloc(new_size*sizeof(char)));
+		if (store_convert == NULL) return false;
+		store_convert_size = new_size;
+	}
+	return true;
+}
+
+static bool resize_store_wconvert(size_t new_size)
+{
+	if (new_size > store_wconvert_size)
+	{
+		std::free(store_wconvert);
+		store_wconvert_size = 0;
+		store_wconvert = reinterpret_cast<wchar_t*>(std::malloc(new_size*sizeof(wchar_t)));
+		if (store_wconvert == NULL) return false;
+		store_wconvert_size = new_size;
+	}
+	return true;
 }
 
 void platform_setup(int argc, char** argv)
@@ -63,15 +89,28 @@ const char* platform_argv(int index)
 {
 	// convert wchar arguments to UTF-8
 	int new_size = WideCharToMultiByte(CP_UTF8,0,store_argv[index],-1,NULL,0,NULL,NULL);
-	if (new_size > store_convert_size)
-	{
-		std::free(store_convert);
-		store_convert_size = 0;
-		store_convert = reinterpret_cast<char*>(std::malloc(new_size));
-		if (store_convert == NULL) return "<OUT OF MEMORY>";
-		store_convert_size = new_size;
-	}
-	WideCharToMultiByte(CP_UTF8,0,store_argv[index],-1,store_convert,store_convert_size,NULL,NULL);
+	if (!resize_store_convert(new_size)) return "<OUT OF MEMORY>";
+	WideCharToMultiByte(CP_UTF8,0,store_argv[index],-1,store_convert,int(store_convert_size),NULL,NULL);
+	return store_convert;
+}
+
+const char* platform_getenv(const char* name)
+{
+	// get wchar environment variable
+	static wchar_t wname[64];
+	MultiByteToWideChar(CP_UTF8,0,name,-1,wname,64);
+
+	size_t new_size;
+	_wgetenv_s(&new_size, NULL, 0, wname);
+	if (new_size == 0) return NULL;
+	if (!resize_store_wconvert(new_size)) return NULL;
+	if (0 != _wgetenv_s(&new_size,store_wconvert,new_size,wname)) return NULL;
+
+	// convert to UTF-8
+	int newi_size;
+	newi_size = WideCharToMultiByte(CP_UTF8,0,store_wconvert,-1,NULL,0,NULL,NULL);
+	if (!resize_store_convert(new_size)) return NULL;
+	WideCharToMultiByte(CP_UTF8,0,store_wconvert,-1,store_convert,int(store_convert_size),NULL,NULL);
 	return store_convert;
 }
 
@@ -85,15 +124,8 @@ FILE* platform_fopen(const char* path, const char* mode)
 	MultiByteToWideChar(CP_UTF8,0,mode,-1,wmode,16);
 
 	int new_size = MultiByteToWideChar(CP_UTF8,0,path,-1,NULL,0);
-	if (new_size > store_wconvert_size)
-	{
-		std::free(store_wconvert);
-		store_wconvert_size = 0;
-		store_wconvert = reinterpret_cast<wchar_t*>(std::malloc(new_size*sizeof(wchar_t)));
-		if (store_wconvert == NULL) return NULL;
-		store_wconvert_size = new_size;
-	}
-	MultiByteToWideChar(CP_UTF8,0,path,-1,store_wconvert,store_wconvert_size);
+	if (!resize_store_wconvert(new_size)) return NULL;
+	MultiByteToWideChar(CP_UTF8,0,path,-1,store_wconvert,int(store_wconvert_size));
 
 	FILE* f;
 	if (0 == _wfopen_s(&f,store_wconvert,wmode)) return f;
@@ -127,6 +159,11 @@ int platform_argc()
 const char* platform_argv(int index)
 {
 	return store_argv[index];
+}
+
+const char* platform_getenv(const char* name)
+{
+	return std::getenv(name);
 }
 
 FILE* platform_fopen(const char* path, const char* mode)

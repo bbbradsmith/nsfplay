@@ -253,7 +253,7 @@ uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_outpu
 
 // manually trigger render buffer allocations if needed
 // call after the desired NSF is loaded and all settings have been made, but before the first render or emu_init/run
-// - when a new song begins rendering, either via render, emu_init or an emu_run, ready will automatically be called
+// - when a new song begins rendering, either via song/song_play/render/emu_init/emu_run, ready will automatically be called
 //   to ensure allocations are finished, but you can call this prior if you need to ensure it is done earlier,
 //   for thread safety or other reasons
 // - allocation size depends on some settings, and the set of active audio expansions
@@ -378,7 +378,7 @@ typedef struct // NSF_UNIT_key (< NSF_UNIT_COUNT)
 	const char* name; // localized name
 	const char* desc; // localized description
 	bool active; // whether this unit is active for this NSF
-} NSFChannelUnit;
+} NSFUnitInfo;
 
 typedef struct // NSF_CHANNEL_key (< NSF_CHANNEL_COUNT)
 {
@@ -399,7 +399,7 @@ typedef struct
 } NSFChannelState;
 
 // every channel of every expansion audio unit has a unique global index
-NSFChannelUnit nsfplay_channel_unit(const NSFCore* core, int32_t unit); // information about a unit
+NSFUnitInfo nsfplay_unit_info(const NSFCore* core, int32_t unit); // information about a unit
 NSFChannelInfo nsfplay_channel_info(const NSFCore* core, int32_t global_channel); // information about a global channel
 
 // an NSF has a list of active channels, and their playback state can be queried
