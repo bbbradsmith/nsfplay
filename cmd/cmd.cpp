@@ -12,6 +12,7 @@
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // cerrno
 #include <string.h> // strcpy_s, strcat_s
+#include <thread> // std::this_thread::sleep_for
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
@@ -20,7 +21,7 @@ int platform_argc();
 const char* platform_argv(int index); // note: return only valid until next argv/getenv
 const char* platform_getenv(const char* name); // note: return only valid until next argv/getenv, name limit of 63 chars
 FILE* platform_fopen(const char* path, const char* mode);
-bool platform_kbhit();
+int platform_nonblock_getc();
 
 // unit testing (unit_test.cpp)
 int unit_test(const char* path);
@@ -402,13 +403,13 @@ int run()
 	if (arg.track > 0) nsfplay_song(core,uint8_t(arg.track-1));
 
 	// WAV file output
-	if (arg.waveout)
+	if (arg.waveout >= 0)
 	{
 		if (!waveout(platform_argv(arg.waveout))) return -1;
 		std::printf("Success.\n");
 		return 0;
 	}
-	if (arg.waveout_multi)
+	if (arg.waveout_multi >= 0)
 	{
 		if (nsfplay_song_count(core) < 1)
 		{
@@ -435,6 +436,25 @@ int run()
 	// prompt is a branching menu
 
 	// TODO  the rest of this function is test code I am keeping as an example for later menus
+
+	// test of non blocking getc
+	printf("Q to quit...\n");
+	int kc = -1;
+	while (kc != 'q' && kc != 'Q')
+	{
+		printf("check?\n");
+		int kn = platform_nonblock_getc();
+		if (kn)
+		{
+			kc = kn;
+			printf("key %3d $%02X '%c'\n",kc,kc,char(kc));
+		}
+		else
+		{
+			printf("Waiting...\n");
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+	}
 
 	/*
 	// test info

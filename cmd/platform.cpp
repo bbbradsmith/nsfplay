@@ -8,7 +8,7 @@
 #include <shellapi.h> // GetCommandLineW, CommandLineToArgW
 #include <cstdlib> // std::malloc, std::free
 #include <cstdio> // std::_wfopen
-#include <conio.h> // kbhit
+#include <conio.h> // _kbhit, _getch
 
 static UINT store_cp = 0;
 static LPWSTR* store_argv;
@@ -133,14 +133,16 @@ FILE* platform_fopen(const char* path, const char* mode)
 	return NULL;
 }
 
-bool platform_kbhit()
+int platform_nonblock_getc()
 {
-	return _kbhit();
+	if (::_kbhit()) return ::_getch();
+	return 0;
 }
 
 #else
 
-#include <cstdio> // std::fopen
+#include <cstdio> // std::fopen, std::getc
+#include <termios.h> // termios, tcgetattr
 
 // other platforms assume a UTF-8 console by default
 
@@ -180,10 +182,24 @@ FILE* platform_fopen(const char* path, const char* mode)
 	return std::fopen(path,mode);
 }
 
-bool platform_kbhit()
+bool platform_nonblock_getc()
 {
-	// TODO
-	return true;
+	// adust stdin so that we can read a byte from it without it blocking
+	struct termios old_term;
+	::tcgetattr(STDIN_FILENO, &old_term);
+	struct termios new_term = old_term;
+	new_term.c_lflag &= ~(ICANON|ECHO); // disable line-buffered input, disable echo
+	::tcsetattr(STDIN_FILENO, &new_term);
+	int old_fl = ::fcntl(STDIN_FILENO, F_GETFL, 0);
+	::fcntl(STDIN_FILENO, F_SETFL, old_fl | O_NONBLOCK); // non-blocking stdin
+	// read a byte
+	int c = std::getc(stdin);
+	// restore stdin to its previous state
+	::tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
+	::fcntl(STDIN_FILENO, F_SETFL, old_fl);
+	// if EOF there's no key waiting
+	if (c == EOF) return 0;
+	return c;
 }
 
 #endif
