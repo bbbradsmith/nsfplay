@@ -141,8 +141,11 @@ int platform_nonblock_getc()
 
 #else
 
-#include <cstdio> // std::fopen, std::getc
+#include <cstdio> // std::fopen, std::getchar
+#include <cstdlib> // std::getenv
 #include <termios.h> // termios, tcgetattr
+#include <fcntl.h> // fcntl
+#include <unistd.h> // STDIN_FILENO
 
 // other platforms assume a UTF-8 console by default
 
@@ -182,18 +185,18 @@ FILE* platform_fopen(const char* path, const char* mode)
 	return std::fopen(path,mode);
 }
 
-bool platform_nonblock_getc()
+int platform_nonblock_getc()
 {
 	// adust stdin so that we can read a byte from it without it blocking
 	struct termios old_term;
 	::tcgetattr(STDIN_FILENO, &old_term);
 	struct termios new_term = old_term;
 	new_term.c_lflag &= ~(ICANON|ECHO); // disable line-buffered input, disable echo
-	::tcsetattr(STDIN_FILENO, &new_term);
+	::tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
 	int old_fl = ::fcntl(STDIN_FILENO, F_GETFL, 0);
 	::fcntl(STDIN_FILENO, F_SETFL, old_fl | O_NONBLOCK); // non-blocking stdin
 	// read a byte
-	int c = std::getc(stdin);
+	int c = std::getchar();
 	// restore stdin to its previous state
 	::tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
 	::fcntl(STDIN_FILENO, F_SETFL, old_fl);

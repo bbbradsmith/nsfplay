@@ -7,11 +7,10 @@
 #include <nsfplaycore.h>
 #include <cstdio> // std::fprintf
 #include <cstdlib> // std::exit, std::atexit, std::strtol
-#include <cstring> // std::strlen, std::memset
+#include <cstring> // std::strlen, std::memset, std::snprintf
 #include <cstddef> // NULL
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // cerrno
-#include <string.h> // strcpy_s, strcat_s
 #include <thread> // std::this_thread::sleep_for
 
 // platform specific abstractions (platform.cpp)
@@ -421,9 +420,7 @@ int run()
 			nsfplay_song(core,uint8_t(i));
 			const int PATH_SIZE = 2048;
 			char path[PATH_SIZE];
-			::strcpy_s(path,PATH_SIZE,platform_argv(arg.waveout_multi));
-			::strcat_s(path,PATH_SIZE,nsfplay_prop_str(core,NSF_PROP_SONG_TITLE));
-			::strcat_s(path,PATH_SIZE,".wav");
+			std::snprintf(path,PATH_SIZE,"%s%s.wav",platform_argv(arg.waveout_multi),nsfplay_prop_str(core,NSF_PROP_SONG_TITLE));
 			if (!waveout(path)) return -1;
 		}
 		std::printf("Success.\n");
