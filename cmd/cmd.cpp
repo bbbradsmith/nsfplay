@@ -19,6 +19,10 @@ int platform_argc();
 const char* platform_argv(int index); // note: return only valid until next argv/getenv
 const char* platform_getenv(const char* name); // note: return only valid until next argv/getenv, name limit of 63 chars
 FILE* platform_fopen(const char* path, const char* mode);
+bool platform_kbhit();
+
+// unit testing (unit_test.cpp)
+int unit_test(const char* path);
 
 //
 // global data
@@ -52,7 +56,7 @@ void fatal_log(const char* msg)
 // load files
 //
 
-void* load_file(const char* path, const char* mode, size_t& filesize, bool silent_notfound=false)
+static void* load_file(const char* path, const char* mode, size_t& filesize, bool silent_notfound=false)
 {
 	filesize = 0;
 	// open file
@@ -89,7 +93,7 @@ void* load_file(const char* path, const char* mode, size_t& filesize, bool silen
 	return fd;
 }
 
-bool load_ini(const char* path, bool silent_notfound=false)
+static bool load_ini(const char* path, bool silent_notfound=false)
 {
 	size_t filesize;
 	char* ini = reinterpret_cast<char*>(load_file(path,"rt",filesize,silent_notfound));
@@ -124,22 +128,7 @@ static bool parse_i64(const char* s, int64_t& v)
 	return true;
 }
 
-inline static bool key_match(const char* key_test, int len, const char* key_reference)
-{
-	if (len < 0) len = 256; // greater than maximum possible key_reference length
-	while ((len==0 || *key_test != 0) && *key_reference != 0)
-	{
-		char c = *key_test;
-		if (c >= 'a' && c <= 'z') c = (c - 'a') + 'A';
-		if (c != *key_reference) return false;
-		++key_test;
-		++key_reference;
-		--len;
-	}
-	return (*key_reference == 0);
-}
-
-int32_t parse_chan(const char* s, bool ch[NSF_CHANNEL_COUNT])
+static int32_t parse_chan(const char* s, bool ch[NSF_CHANNEL_COUNT])
 {
 	for (int32_t i=0; i<NSF_CHANNEL_COUNT; ++i)
 	{
@@ -147,9 +136,11 @@ int32_t parse_chan(const char* s, bool ch[NSF_CHANNEL_COUNT])
 		const char* sm = s;
 		while (*key && *sm)
 		{
-			char c = *sm;
-			if (c >= 'a' && c <= 'z') c = (c - 'a') + 'A';
-			if (c != *key) break;
+			char ck = *key;
+			char cs = *sm;
+			if (ck >= 'a' && ck <= 'z') ck = (ck - 'a') + 'A';
+			if (cs >= 'a' && cs <= 'z') cs = (cs - 'a') + 'A';
+			if (ck != cs) break;
 		}
 		if (*key == 0 && *sm == 0)
 		{
@@ -164,12 +155,12 @@ struct
 {
 	int input = -1;
 	int waveout = -1;
+	int waveout_multi = -1;
 	int unit_test = -1;
 	int save_default_ini = -1;
 	int32_t track = 0;
 	int32_t fade = -1;
 	int64_t time = -1;
-	bool waveout_multi = false;
 	bool help = false;
 	bool solo[NSF_CHANNEL_COUNT] = {0};
 	bool mute[NSF_CHANNEL_COUNT] = {0};
@@ -180,12 +171,12 @@ int parse_commandline() // returns -1 on success, otherwise is index of bad argu
 	bool implied_ini = true;
 	arg.input = -1;
 	arg.waveout = -1;
+	arg.waveout_multi = -1;
 	arg.unit_test = -1;
 	arg.save_default_ini = -1;
 	arg.track = 0;
 	arg.fade = -1;
 	arg.time = -1;
-	arg.waveout_multi = false;
 	arg.help = false;
 	std::memset(arg.solo,0,sizeof(arg.solo));
 	std::memset(arg.mute,0,sizeof(arg.mute));
@@ -216,7 +207,7 @@ int parse_commandline() // returns -1 on success, otherwise is index of bad argu
 			case 'i': ++i; { if (arg.input >= 0) return i; } arg.input = i; break;
 			case 't': ++i; if (!parse_i32(platform_argv(i),arg.track)) return i; break;
 			case 'w': ++i; arg.waveout = i; break;
-			case 'v': arg.waveout_multi = true; break;
+			case 'v': ++i; arg.waveout_multi = i; break;
 			case 'd': ++i; arg.save_default_ini = i; break;
 			case 'a': ++i; implied_ini = false; break; // any commandline ini disables the implied ini
 			case 'n': implied_ini = false; break;
@@ -259,7 +250,7 @@ int parse_commandline() // returns -1 on success, otherwise is index of bad argu
 			case 'i': ++i; break;
 			case 't': ++i; break;
 			case 'w': ++i; break;
-			case 'v': break;
+			case 'v': ++i; break;
 			case 'd': ++i; break;
 			case 'a': ++i; if(!load_ini(platform_argv(i))) return i; break;
 			case 'n': break;
@@ -292,7 +283,7 @@ const char HELP_TEXT[] =
 	"  -i file   set input file (useful if filename begins with -)\n"
 	"  -t num    set starting track (1-256)\n"
 	"  -w file   wave output to file\n"
-	"  -v        wave output all tracks in file using TITLE_FORMAT as filename\n"
+	"  -v path   wave output all tracks in path, appending TITLE_FORMAT + .wav as filename\n"
 	"  -d file   create a new INI file with default settings\n"
 	"  -a file   apply INI file (implies -n)\n"
 	"  -n        don't automatically load the default INI\n"
@@ -324,6 +315,22 @@ void help_chans()
 		printf(" %s",info.short_name);
 	}
 	printf("\n");
+}
+
+//
+// WAVE file output
+//
+
+static bool waveout(const char* path)
+{
+	(void)path;
+	// TODO
+	// open file, print error and return fale if failed
+	// print song info brief
+	// print a progress bar [----]\r
+	// fill in the progress one character at a time (so a log will just make 2 lines)
+	// fixup WAV header for file length
+	return false;
 }
 
 //
@@ -374,6 +381,12 @@ int run()
 		return 0;
 	}
 
+	// unit test
+	if (arg.unit_test >= 0)
+	{
+		return unit_test(platform_argv(arg.unit_test));
+	}
+
 	// load input file
 	if (arg.input >= 0)
 	{
@@ -382,9 +395,43 @@ int run()
 		nsfplay_load(core,fd,uint32_t(fs));
 		std::free(fd);
 	}
+	// TODO print NSF info brief
 	
 	// set track if requested
 	if (arg.track > 0) nsfplay_song(core,uint8_t(arg.track-1));
+
+	// WAV file output
+	if (arg.waveout)
+	{
+		if (!waveout(platform_argv(arg.waveout))) return -1;
+		std::printf("Success.\n");
+		return 0;
+	}
+	if (arg.waveout_multi)
+	{
+		if (nsfplay_song_count(core) < 1)
+		{
+			std::fprintf(stderr,"No songs in input file.\n");
+			return -1;
+		}
+		for (int32_t i=0; i<nsfplay_song_count(core); ++i)
+		{
+			nsfplay_song(core,uint8_t(i));
+			const int PATH_SIZE = 2048;
+			char path[PATH_SIZE];
+			::strcpy_s(path,PATH_SIZE,platform_argv(arg.waveout_multi));
+			::strcat_s(path,PATH_SIZE,nsfplay_prop_str(core,NSF_PROP_SONG_TITLE));
+			::strcat_s(path,PATH_SIZE,".wav");
+			if (!waveout(path)) return -1;
+		}
+		std::printf("Success.\n");
+		return 0;
+	}
+
+	// TODO regular playback with prompt
+	// print song brief
+	// enter prompt with playback loop (if autoplay, otherwise just prompt)
+	// prompt is a branching menu
 
 	// TODO  the rest of this function is test code I am keeping as an example for later menus
 

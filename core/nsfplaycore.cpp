@@ -219,11 +219,13 @@ NSFGroupInfo nsfplay_group_info(const NSFCore* core, int32_t group)
 
 int32_t nsfplay_set_enum(const char* key)
 {
+	// no mutex needed, just a static lookup
 	return NSFCore::set_enum(key);
 }
 
 int32_t nsfplay_group_enum(const char* key)
 {
+	// no mutex needed, just a static lookup
 	return NSFCore::group_enum(key);
 }
 
@@ -241,14 +243,14 @@ bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bo
 	return core->load(reinterpret_cast<const uint8*>(bin_data),bin_size,assume,true);
 }
 
-uint32_t nsfplay_song_count(const NSFCore* core)
+int32_t nsfplay_song_count(const NSFCore* core)
 {
 	NSF_MUTEX_GUARD();
 	if (!core) return 0;
 	return core->prop_int(NSF_PROP_ACTIVE_SONG_COUNT);
 }
 
-uint32_t nsfplay_song_current(const NSFCore* core)
+int32_t nsfplay_song_current(const NSFCore* core)
 {
 	NSF_MUTEX_GUARD();
 	if (!core) return 0;
@@ -457,6 +459,7 @@ uint32_t nsfplay_emu_cycles_to_next_sample(const NSFCore* core)
 
 NSFOpcode nsfplay_emu_opcode(uint8 op)
 {
+	// no mutex needed, just a static lookup
 	NSF_UNUSED(op);
 	// TODO
 	return {0};
@@ -660,7 +663,7 @@ void nsfplay_cycles_to_time(const NSFCore* core, uint64_t cycles, int32_t* hours
 
 const char* nsfplay_local_text(const NSFCore* core, int32_t textenum)
 {
-	NSF_MUTEX_GUARD();
 	if (!core) return NSFCore::local_text(textenum,0); // default locale
+	NSF_MUTEX_GUARD();
 	return core->local_text(textenum);
 }

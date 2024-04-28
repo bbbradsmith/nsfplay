@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="platform.cpp" />
+    <ClCompile Include="unit_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

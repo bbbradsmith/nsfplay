@@ -8,6 +8,7 @@
 #include <shellapi.h> // GetCommandLineW, CommandLineToArgW
 #include <cstdlib> // std::malloc, std::free
 #include <cstdio> // std::_wfopen
+#include <conio.h> // kbhit
 
 static UINT store_cp = 0;
 static LPWSTR* store_argv;
@@ -132,6 +133,11 @@ FILE* platform_fopen(const char* path, const char* mode)
 	return NULL;
 }
 
+bool platform_kbhit()
+{
+	return _kbhit();
+}
+
 #else
 
 #include <cstdio> // std::fopen
@@ -172,6 +178,12 @@ FILE* platform_fopen(const char* path, const char* mode)
 		printf("fopen(\"%s\",\"%s\")\n",path,mode);
 	#endif
 	return std::fopen(path,mode);
+}
+
+bool platform_kbhit()
+{
+	// TODO
+	return true;
 }
 
 #endif

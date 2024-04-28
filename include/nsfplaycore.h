@@ -235,8 +235,8 @@ bool nsfplay_load(NSFCore* core, const void* nsf_data, uint32_t nsf_size, bool a
 bool nsfplay_load_bin(NSFCore* core, const void* bin_data, uint32_t bin_size, bool assume=false);
 
 // song control
-uint32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF (or NSF playlist if active, see PROP_ACTIVE_PLAYLIST)
-uint32_t nsfplay_song_current(const NSFCore* core); // current active song
+int32_t nsfplay_song_count(const NSFCore* core); // number of songs in loaded NSF (or NSF playlist if active, see PROP_ACTIVE_PLAYLIST)
+int32_t nsfplay_song_current(const NSFCore* core); // current active song
 bool nsfplay_song(NSFCore* core, uint8_t song); // set song, false if song out of bounds, automatically calls song_play
 void nsfplay_song_play(NSFCore* core); // resets the song and executes its INIT routine
 void nsfplay_seek(NSFCore* core, uint64_t samples);
