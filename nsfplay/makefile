@@ -23,6 +23,19 @@ ifeq ($(OS),Windows_NT)
 OBJS += $(NSFPLAY_INTDIR)/nsfplay_rc.o
 endif
 
+# NOSOUND=1 builds with no audio output (WAV out only)
+
+NOSOUND ?= 0
+
+ifeq ($(NOSOUND),1)
+	CXXFLAGS_ALL += -DNSF_NOSOUND=1
+else
+	CXXFLAGS_ALL += $(PAL_CXXFLAGS)
+	LIBS += $(PAL_LIBS)
+endif
+
+# target build
+
 $(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
 	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(LIBS)
 	$(STRIP_DEBUG)

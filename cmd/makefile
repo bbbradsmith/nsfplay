@@ -15,9 +15,23 @@ DEPS = $(addprefix $(CMD_INTDIR)/,$(SRCS:.cpp=.d))
 CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
 CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON)
 LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_CMD)
+LIBS =
+
+# NOSOUND=1 builds with no audio output (WAV out only)
+
+NOSOUND ?= 0
+
+ifeq ($(NOSOUND),1)
+	CXXFLAGS_ALL += -DNSF_NOSOUND=1
+else
+	CXXFLAGS_ALL += $(PAL_CXXFLAGS)
+	LIBS += $(PAL_LIBS)
+endif
+
+# target build
 
 $(TARGET): $(OBJS) $(CORE) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(CORE)
+	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(CORE) $(LIBS)
 	$(STRIP_DEBUG)
 
 $(CMD_INTDIR)/%.d: %.cpp | $(CMD_INTDIR)/

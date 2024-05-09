@@ -4,5 +4,6 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="platform.cpp" />
     <ClCompile Include="unit_test.cpp" />
+    <ClCompile Include="sound.cpp" />
   </ItemGroup>
 </Project>

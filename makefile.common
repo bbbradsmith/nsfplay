@@ -27,6 +27,12 @@ OPTIMIZE ?= -O3
 
 DEBUG ?= 0
 
+# PortAudio
+
+PAL_DIR ?= ../portaudiolib/make
+PAL_CXXFLAGS ?= -I$(PAL_DIR)/include
+PAL_LIB ?= -L$(PAL_DIR)/lib -lportaudio
+
 # wxWidgets
 
 WXL_DEBUG ?= 0
@@ -85,6 +91,7 @@ ifeq ($(OS),Windows_NT)
 	#   kernel32.lib, user32.lib, gdi32.lib, comdlg32.lib, winspool.lib, shell32.lib
 	#   shlwapi.lib, ole32.lib, oleaut32.lib, uuid.lib, advapi32.lib, version.lib
 	#   comctl32.lib, rpcrt4.lib, ws2_32.lib, wininet.lib, winmm.lib
+	PAL_LIBS ?= $(PAL_LIB) -lwinmm -lole32 -lsetupapi
 else ifeq ($(shell uname),Darwin)
 	# MacOS (clang)
 	CXXFLAGS_EXTRA ?= -std=c++11 $(CXXFLAGS_DEBUG)
@@ -102,6 +109,7 @@ else ifeq ($(shell uname),Darwin)
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
+	PAL_LIBS ?=
 else
 	# Linux / Other (gcc)
 	CXXFLAGS_EXTRA ?= -std=c++11 $(CXXFLAGS_DEBUG)
@@ -119,6 +127,7 @@ else
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
+	PAL_LIBS ?=
 endif
 
 ifneq ("$(WXL_CONFIG)","")

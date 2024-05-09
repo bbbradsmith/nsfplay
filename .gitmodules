@@ -2,3 +2,7 @@
 	path = wx
 	url = https://github.com/wxWidgets/wxWidgets.git
 	shallow = true
+[submodule "portaudio"]
+	path = portaudio
+	url = https://github.com/PortAudio/portaudio.git
+	shallow = true
