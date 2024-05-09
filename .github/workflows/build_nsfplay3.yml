@@ -232,12 +232,12 @@ jobs:
       - name: Make
         run: |
           export CC=clang
-          export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -Wno-c++11-extensions"
+          export CXXFLAGS_EXTRA="-target arm64-apple-macos11"
           export LDFLAGS_EXTRA="-target arm64-apple-macos11"
           export WXL_DIR=../wxlibArm
           export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make cmd nsfplay
-          export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -Wno-c++11-extensions"
+          export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13"
           export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
           export WXL_DIR=../wxlibIntel
           export OUTDIR=output/makeIntel INTDIR=intermediate/makeIntel
