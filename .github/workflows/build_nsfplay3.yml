@@ -198,7 +198,7 @@ jobs:
             wxlib/make
             wx/include
             portaudiolib/make
-          key: sub-ubuntu-${{ env.WXHASH }}-${{ env.PAHASH }
+          key: sub-ubuntu-${{ env.WXHASH }}-${{ env.PAHASH }}
         # Cache needs the source include because wx-config does not reference the cmake --install
         # directories, only the source build for some reason?
       - name: Build Submodules
