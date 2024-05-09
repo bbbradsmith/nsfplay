@@ -39,8 +39,9 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Submodule Cache Keys
         shell: pwsh
-        run: echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
-        run: echo "PAHASH=$($(git submodule status portaudio) -replace '\s','')" >> $env:GITHUB_ENV
+        run: |
+          echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
+          echo "PAHASH=$($(git submodule status portaudio) -replace '\s','')" >> $env:GITHUB_ENV
       - name: Cache Submodules
         id: cache-sub
         uses: actions/cache@v4
@@ -110,8 +111,9 @@ jobs:
           install: git make mingw-w64-ucrt-x86_64-gcc mingw-w64-i686-gcc mingw-w64-ucrt-x86_64-cmake mingw-w64-i686-cmake
       - name: Submodule Cache Keys
         shell: pwsh
-        run: echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
-        run: echo "PAHASH=$($(git submodule status portaudio) -replace '\s','')" >> $env:GITHUB_ENV
+        run: |
+          echo "WXHASH=$($(git submodule status wx) -replace '\s','')" >> $env:GITHUB_ENV
+          echo "PAHASH=$($(git submodule status portaudio) -replace '\s','')" >> $env:GITHUB_ENV
       - name: Cache Submodules
         id: cache-sub
         uses: actions/cache@v4
@@ -185,8 +187,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install git make gcc cmake libgtk-3-dev
       - name: Submoudle Cache Keys
-        run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
-        run: echo "PAHASH=$(git submodule status portaudio | tr -d '[:blank:]')" >> $GITHUB_ENV
+        run: |
+          echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
+          echo "PAHASH=$(git submodule status portaudio | tr -d '[:blank:]')" >> $GITHUB_ENV
       - name: Cache Submodules
         id: cache-sub
         uses: actions/cache@v4
@@ -229,8 +232,9 @@ jobs:
       - name: Setup MacOS
         run: brew install imagemagick
       - name: Submodule Cache Keys
-        run: echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
-        run: echo "PAHASH=$(git submodule status portaudio | tr -d '[:blank:]')" >> $GITHUB_ENV
+        run: |
+          echo "WXHASH=$(git submodule status wx | tr -d '[:blank:]')" >> $GITHUB_ENV
+          echo "PAHASH=$(git submodule status portaudio | tr -d '[:blank:]')" >> $GITHUB_ENV
       - name: Cache Submodules
         id: cache-sub
         uses: actions/cache@v4
