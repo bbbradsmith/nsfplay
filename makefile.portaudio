@@ -29,8 +29,8 @@ submodules:
 
 portaudiolib: submodules
 	mkdir -p $(PACMAKE_ABS)
-	(cd $(PACMAKE_ABS) && cmake $(PAREL) $(PACONF) $(PACONF_EXTRA) $(PABUILD_TYPE) --trace)
-	(cd $(PACMAKE_ABS) && cmake --build . --verbose)
+	(cd $(PACMAKE_ABS) && cmake $(PAREL) $(PACONF) $(PACONF_EXTRA) $(PABUILD_TYPE))
+	(cd $(PACMAKE_ABS) && cmake --build .)
 	(cd $(PACMAKE_ABS) && cmake --install . --prefix $(PAOUT_ABS))
 
 clean:

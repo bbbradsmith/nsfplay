@@ -66,10 +66,10 @@ jobs:
           cd ..
           set WXB_NODEBUG=1
           set WXB_NOPAUSE=1
-          wxlib.bat
+          call wxlib.bat
           set PAB_NODEBUG=1
           set PAB_NOPAUSE=1
-          portaudiolib.bat
+          call portaudiolib.bat
       - name: Build 64-bit
         run: msbuild nsfplay.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
       - name: Build 32-bit
@@ -143,6 +143,7 @@ jobs:
       - name: Make 64-bit
         shell: msys2 {0}
         run: |
+          export PAL_DIR=../portaudiolib/make64
           export OUTDIR=output/make64 INTDIR=intermediate/make64
           make cmd nsfplay
       - name: Make 32-bit
@@ -150,6 +151,7 @@ jobs:
         run: |
           export PATH="/mingw32/bin:$PATH"
           export WXL_LIBDIR=gcc_lib
+          export PAL_DIR=../portaudiolib/make32
           export OUTDIR=output/make32 INTDIR=intermediate/make32
           make cmd nsfplay winamp
       - name: Prepare Artifacts
@@ -273,11 +275,13 @@ jobs:
           export CXXFLAGS_EXTRA="-target arm64-apple-macos11 -std=c++11"
           export LDFLAGS_EXTRA="-target arm64-apple-macos11"
           export WXL_DIR=../wxlibArm
+          export PAL_DIR=../portaudiolib/makeArm
           export OUTDIR=output/makeArm INTDIR=intermediate/makeArm
           make cmd nsfplay
           export CXXFLAGS_EXTRA="-target x86_64-apple-macos10.13 -std=c++11"
           export LDFLAGS_EXTRA="-target x86_64-apple-macos10.13"
           export WXL_DIR=../wxlibIntel
+          export PAL_DIR=../portaudiolib/makeIntel
           export OUTDIR=output/makeIntel INTDIR=intermediate/makeIntel
           make cmd nsfplay
       - name: Make Fat App

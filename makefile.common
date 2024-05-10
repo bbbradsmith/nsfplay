@@ -109,7 +109,7 @@ else ifeq ($(shell uname),Darwin)
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
-	PAL_LIBS ?=
+	PAL_LIBS ?= $(PAL_LIB)
 else
 	# Linux / Other (gcc)
 	CXXFLAGS_EXTRA ?= -std=c++11 $(CXXFLAGS_DEBUG)
@@ -127,7 +127,7 @@ else
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
-	PAL_LIBS ?=
+	PAL_LIBS ?= $(PAL_LIB)
 endif
 
 ifneq ("$(WXL_CONFIG)","")
