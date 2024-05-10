@@ -5,3 +5,4 @@ portaudiolib
 secrets
 *.user
 .vs
+.DS_Store
