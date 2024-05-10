@@ -1,6 +1,6 @@
 include makefile.common
 
-.PHONY: default core core_mutex core_notext core_minimal cmd gui nsfplay mac winamp icons enums enums_verify wxlib install uninstall clean
+.PHONY: default core core_mutex core_notext core_minimal cmd cmd_nosound gui nsfplay mac winamp icons enums enums_verify portaudiolib wxlib install uninstall clean
 
 default: core cmd nsfplay
 
@@ -22,11 +22,19 @@ core_minimal:
 cmd: core
 	$(MAKE) -C cmd
 
+cmd_nosound: core
+	$(MAKE) -C cmd clean
+	$(MAKE) -C cmd NOSOUND=1
+
 gui: core
 	$(MAKE) -C gui
 
 nsfplay: core gui
 	$(MAKE) -C nsfplay
+
+nsfplay_nosound: core gui
+	$(MAKE) -C nsfplay clean
+	$(MAKE) -C nsfplay NOSOUND=1
 
 mac:
 	$(MAKE) -C nsfplay mac
@@ -42,6 +50,9 @@ enums:
 
 enums_verify:
 	$(MAKE) -C enums verify
+
+portaudiolib:
+	$(MAKE) -f makefile.portaudio
 
 wxlib:
 	$(MAKE) -f makefile.wx

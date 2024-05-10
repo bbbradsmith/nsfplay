@@ -22,6 +22,11 @@ const char* platform_getenv(const char* name); // note: return only valid until 
 FILE* platform_fopen(const char* path, const char* mode);
 int platform_nonblock_getc();
 
+// sound output (sound.cpp)
+const char* sound_error_text();
+bool sound_setup();
+void sound_shutdown();
+
 // unit testing (unit_test.cpp)
 int unit_test(const char* path);
 
@@ -434,6 +439,8 @@ int run()
 
 	// TODO  the rest of this function is test code I am keeping as an example for later menus
 
+	//sound_setup();
+
 	// test of non blocking getc
 	printf("Q to quit...\n");
 	int kc = -1;
@@ -452,6 +459,8 @@ int run()
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 	}
+
+	//sound_shutdown();
 
 	/*
 	// test info

@@ -1,6 +1,7 @@
 intermediate
 output
 wxlib
+portaudiolib
 secrets
 *.user
 .vs

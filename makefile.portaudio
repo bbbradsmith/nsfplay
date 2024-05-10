@@ -1,0 +1,39 @@
+include makefile.common
+
+PASRC ?= portaudio
+PAOUT ?= portaudiolib/make
+PACMAKE ?= ../make_cmake
+PAREL ?= ../../portaudio
+
+PAOUT_ABS = $(PWD)/$(PAOUT)
+PACMAKE_ABS = $(PAOUT_ABS)/$(PACMAKE)
+
+PACONF ?= \
+	-DCMAKE_POLICY_DEFAULT_CMP0091=NEW \
+	-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded \
+	-DPA_BUILD_SHARED=OFF \
+	-DPA_BUILD_TESTS=OFF \
+	-DPA_BUILD_EXAMPLES=OFF \
+	-DPA_LIBNAME_ADD_SUFFIX=OFF
+
+PACONF_EXTRA ?=
+
+PABUILD_TYPE ?= -DCMAKE_BUILD_TYPE=Release
+
+.PHONY: default submodules portaudiolib
+
+default: portaudiolib
+
+submodules:
+	git submodule init
+	git submodule update --depth 1
+
+portaudiolib: submodules
+	mkdir -p $(PACMAKE_ABS)
+	(cd $(PACMAKE_ABS) && cmake $(PAREL) $(PACONF) $(PACONF_EXTRA) $(PABUILD_TYPE))
+	(cd $(PACMAKE_ABS) && cmake --build .)
+	(cd $(PACMAKE_ABS) && cmake --install . --prefix $(PAOUT_ABS))
+
+clean:
+	rm -f -r $(PACMAKE_ABS)
+	rm -f -r $(PAOUT_ABS)

@@ -49,7 +49,7 @@ else
 endif
 
 
-.PHONY: default wxlib
+.PHONY: default submodules wxlib
 
 default: wxlib
 
