@@ -127,7 +127,7 @@ else
 	DLL_SUFFIX ?= .so
 	WXL_LIBDIR ?= .
 	WXL_CONFIG ?= $(WXL_DIR)/$(WXL_CMAKEDIR)/wx-config
-	PAL_LIBS ?= $(PAL_LIB)
+	PAL_LIBS ?= $(PAL_LIB) -ljack -lasound
 endif
 
 ifneq ("$(WXL_CONFIG)","")
