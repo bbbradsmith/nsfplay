@@ -4,9 +4,7 @@
 #include <nsfplaycore.h>
 #include "sound.h"
 
-#include <cstdlib> // std::malloc, std::free
 #include <cstddef> // NULL
-#include <cstdio> // std::snprintf
 
 #ifndef NSF_NOSOUND
 	// define NSF_NOSOUND=1 to remove audio output, allow WAV output only.
@@ -18,20 +16,34 @@ extern void err_printf(const char* fmt, ...); // print to stderr
 
 #if !NSF_NOSOUND
 
+#include <cstdlib> // std::malloc, std::free
+#include <cstdio> // std::snprintf
+#include <cstring> // std::memcpy, std::memset
+#include <mutex>
 #include <portaudio.h>
-
-#include <cmath> // TODO test
 
 static bool pa_initialized = false;
 static PaError pa_last_error = 0;
 static PaStream* pa_stream = NULL;
 static int pa_device = -1;
 static SoundStreamInfo pa_stream_info = { 0 };
+static size_t pa_latency = 0;
+static size_t pa_sample_size = 0;
+static double pa_samplerate = 0;
 
-void* pa_buffer = NULL;
-size_t pa_buffer_size = 0; // total size in bytes
-size_t pa_buffer_play_pos = 0; // next play position for callback
-size_t pa_buffer_send_pos = 0; // next send position for write
+static std::mutex pa_mutex;
+static void* pa_buffer = NULL;
+static size_t pa_buffer_size = 0; // total size in bytes
+static size_t pa_buffer_play_pos = 0; // next play position for callback
+static size_t pa_buffer_send_pos = 0; // next send position for write
+static size_t pa_buffer_send_get_size = 0; // bytes from sound_buffer_get to send at next sound_buffer_send
+static bool pa_pause = false;
+static uint32_t pa_mark_index = 0;
+static double pa_mark_time = 0.0;
+static bool pa_mark_active = false;
+static uint32_t pa_mark_active_index = 0;
+static size_t pa_mark_active_pos = 0;
+
 // This has to be longer than PortAudio's possible callback buffer size,
 // but the size of that is unspecified. We also shouldn't make it huge,
 // to prevent CPU spikes from overgeneration.
@@ -83,26 +95,81 @@ static int pa_callback(
 	PaStreamCallbackFlags status_flags,
 	void* user_data )
 {
-	// TODO test
 	(void)input;
-	(void)time_info;
 	(void)status_flags;
 	(void)user_data;
-	int16_t* data = reinterpret_cast<int16_t*>(output);
-	for (unsigned int i=0; i<frame_count; ++i)
+
+	size_t frame_bytes = size_t(frame_count) * pa_sample_size;
+	const uint8_t* pa_buffer_data = reinterpret_cast<uint8_t*>(pa_buffer);
+	uint8_t* output_data = reinterpret_cast<uint8_t*>(output);
+
+	// TODO if we had a separate play_pos and play_end,
+	//      we could mutex just to change play_end,
+	//      then unlock before doing the memcpy etc.
+	//      and re-lock to change play_pos after (and update time/mark)
+	//      (maybe just flag a mark update bool that we pick up at the end)
+
+	// lock play/send buffer
+	pa_mutex.lock();
+
+	// calculate sent bytes available in the ring buffer to play
+	size_t segment0_size = pa_buffer_size - pa_buffer_play_pos;
+	size_t available =
+		(pa_buffer_send_pos >= pa_buffer_play_pos) ?
+		(pa_buffer_send_pos - pa_buffer_play_pos) :
+		(segment0_size + pa_buffer_send_pos);
+
+	if (pa_pause) available = 0; // pause sound
+
+	// copy first segment
+	size_t segment0 = (frame_bytes < segment0_size) ? frame_bytes : segment0_size;
+	if (segment0 > available) segment0 = available;
+	if (pa_mark_active && pa_buffer_play_pos <= pa_mark_active_pos && (pa_buffer_play_pos + segment0) > pa_mark_active_pos)
 	{
-		static int phase_l = 0;
-		static int phase_r = 0;
-		const double PERIOD_L = int(48000.0 / 220.0);
-		const double PERIOD_R = int((3.0 * 48000.0) / (4.0 * 220.0));
-		data[0] = int16_t(5000.0 * std::sin(double(phase_l) * (2.0 * 3.14158 / PERIOD_L)));
-		data[1] = int16_t(5000.0 * std::sin(double(phase_r) * (2.0 * 3.14158 / PERIOD_R)));
-		++phase_l;
-		++phase_r;
-		data += 2;
+		pa_mark_active = false;
+		pa_mark_index = pa_mark_active_index;
+		pa_mark_time = time_info->outputBufferDacTime;
 	}
-	// TODO this callback should just memcpy an available ready buffer into the target
-	// TODO if nothing is ready just copy zeroes
+	std::memcpy(output_data, pa_buffer_data + pa_buffer_play_pos, segment0);
+	pa_buffer_play_pos += segment0;
+	if (pa_buffer_play_pos >= pa_buffer_size) pa_buffer_play_pos = 0;
+	frame_bytes -= segment0;
+	available -= segment0;
+	output_data += segment0;
+
+	// copy second segment if not finished
+	if (frame_bytes > 0)
+	{
+		size_t segment1 = (frame_bytes < available) ? frame_bytes : available;
+		if (pa_mark_active && pa_buffer_play_pos <= pa_mark_active_pos && (pa_buffer_play_pos + segment1) > pa_mark_active_pos)
+		{
+			pa_mark_active = false;
+			pa_mark_index = pa_mark_active_index;
+			pa_mark_time = time_info->outputBufferDacTime;
+		}
+		std::memcpy(output_data, pa_buffer_data + pa_buffer_play_pos, segment1);
+		pa_buffer_play_pos += segment1;
+		if (pa_buffer_play_pos >= pa_buffer_size) pa_buffer_play_pos = 1;
+		frame_bytes -= segment1;
+		available -= segment1;
+		output_data += segment1;
+	}
+
+	if (frame_bytes > 0) // adjust mark time to account for the skipped bytes
+	{
+		double skip_samples = double(frame_bytes / pa_sample_size);
+		pa_mark_time += (skip_samples / pa_samplerate);
+	}
+
+	// finished with play/send buffer
+	pa_mutex.unlock();
+
+	// if we didn't have enough data we need to blank fill the rest (don't need mutex for this)
+	if (frame_bytes > 0)
+	{
+		std::memset(output_data, (pa_stream_info.bits == 8) ? 128 : 0, frame_bytes);
+	}
+
 	return 0;
 }
 
@@ -222,10 +289,114 @@ SoundStreamInfo sound_stream_info()
 	return pa_stream_info;
 }
 
+uint32_t sound_buffer_get(void** buffer)
+{
+	// callback thread will only ever increase play_pos
+	// so reading it here we can guarantee that the available
+	// ring buffer space between send_pos and play_pos will not shrink
+	pa_mutex.lock();
+	size_t play_pos = pa_buffer_play_pos;
+	size_t send_pos = pa_buffer_send_pos;
+	pa_mutex.unlock();
+
+	// calculate empty bytes available in the ring buffer,
+	// split at end of buffer
+	size_t empty =
+		(play_pos >= send_pos) ?
+		(play_pos - send_pos) :
+		(pa_buffer_size - send_pos);
+
+	// return a packet size and pointer to the buffer to use
+	size_t max_packet = pa_latency * pa_sample_size;
+	if (empty > max_packet) empty = max_packet;
+	pa_buffer_send_get_size = empty;
+	if (buffer)
+		*buffer = reinterpret_cast<void*>(reinterpret_cast<uint8_t*>(pa_buffer)+send_pos);
+	return uint32_t(pa_buffer_send_get_size / pa_sample_size);
+}
+
+void sound_buffer_send()
+{
+	// update the send_pos to indicate the buffer is ready to play
+	pa_mutex.lock();
+	pa_buffer_send_pos += pa_buffer_send_get_size;
+	if (pa_buffer_send_pos >= pa_buffer_size) pa_buffer_send_pos = 0;
+	pa_mutex.unlock();
+
+	pa_buffer_send_get_size = 0;
+}
+
+void sound_buffer_flush()
+{
+	size_t keep = pa_latency * pa_sample_size;
+
+	// flush unsent data but keep up to pa_latency samples if available
+	pa_mutex.lock();
+
+	// calculate sent bytes available in the ring buffer to play
+	size_t segment0_size = pa_buffer_size - pa_buffer_play_pos;
+	size_t available =
+		(pa_buffer_send_pos >= pa_buffer_play_pos) ?
+		(pa_buffer_send_pos - pa_buffer_play_pos) :
+		(segment0_size + pa_buffer_send_pos);
+
+	if (available > keep) // only discard samples if we have too many
+	{
+		pa_buffer_send_pos = pa_buffer_play_pos + keep;
+		if (pa_buffer_send_pos >= pa_buffer_size)
+			pa_buffer_send_pos -= pa_buffer_size;
+	}
+
+	// safe to allow
+	pa_mutex.unlock();
+
+	// this was invalidated, sound_buffer_get again before writing any new samples
+	pa_buffer_send_get_size = 0;
+}
+
+void sound_mark_time(uint32_t mark_index)
+{
+	pa_mutex.lock();
+	pa_mark_active = true;
+	pa_mark_active_index = mark_index;
+	pa_mark_active_pos = pa_buffer_send_pos;
+	pa_mutex.unlock();
+}
+
+int64_t sound_play_time(uint32_t* mark_index)
+{
+	if (!pa_initialized || !pa_stream) return 0;
+
+	pa_mutex.lock();
+	double mark_time = pa_mark_time;
+	uint32_t mark_index_ = pa_mark_index;
+	pa_mutex.unlock();
+
+	double pa_time = Pa_GetStreamTime(pa_stream);
+	if (mark_index) *mark_index = mark_index_;
+	return int64_t((pa_samplerate*(pa_time-mark_time))+0.5);
+}
+
+void sound_pause(bool pause)
+{
+	pa_mutex.lock();
+	pa_pause = pause;
+	pa_mutex.unlock();
+}
+
 bool sound_setup(const NSFCore* core)
 {
 	pa_device = -1;
 	pa_stream_info = {0};
+	pa_sample_size = 0;
+	pa_samplerate = 0.0;
+	pa_latency = 0;
+	pa_pause = false;
+	pa_mark_index = 0;
+	pa_mark_time = 0.0;
+	pa_mark_active = false;
+	pa_mark_active_index = 0;
+	pa_mark_active_pos = 0;
 
 	if (!pa_initialized)
 	{
@@ -249,9 +420,10 @@ bool sound_setup(const NSFCore* core)
 		pa_stream = NULL;
 	}
 
-	// reset buffers
+	// reset buffers while stream is stopped
 	pa_buffer_play_pos = 0;
 	pa_buffer_send_pos = 0;
+	pa_buffer_send_get_size = 0;
 
 	int samplerate = 48000;
 	int bits = 16;
@@ -267,17 +439,18 @@ bool sound_setup(const NSFCore* core)
 	case NSF_LK_SAMPLERATES_SR_11025:  samplerate = 11025;  break;
 	case NSF_LK_SAMPLERATES_SR_22050:  samplerate = 22050;  break;
 	case NSF_LK_SAMPLERATES_SR_44100:  samplerate = 44100;  break;
+	default:
 	case NSF_LK_SAMPLERATES_SR_48000:  samplerate = 48000;  break;
 	case NSF_LK_SAMPLERATES_SR_96000:  samplerate = 96000;  break;
 	case NSF_LK_SAMPLERATES_SR_192000: samplerate = 192000; break;
-	default: break;
 	}
 	switch (nsfplay_get_int(core,NSF_SET_BITS))
 	{
 	case NSF_LK_BITS_BIT_8:  bits = 8; break;
+	default:
 	case NSF_LK_BITS_BIT_16: bits = 16; break;
+	case NSF_LK_BITS_BIT_24: bits = 24; break;
 	case NSF_LK_BITS_BIT_32: bits = 32; break;
-	default: break;
 	}
 	if (!nsfplay_get_int(core,NSF_SET_STEREO)) channels = 1;
 	// ADVANCED group settings
@@ -318,14 +491,17 @@ bool sound_setup(const NSFCore* core)
 	switch (bits)
 	{
 	case 8:  pa_params.sampleFormat = paUInt8; break;
+	default:
 	case 16: pa_params.sampleFormat = paInt16; break;
 	case 24: pa_params.sampleFormat = paInt24; break;
 	case 32: pa_params.sampleFormat = paInt32; break;
 	}
 	int latency = 64; // desired latency in samples
 	for (; sound_latency > 0; --sound_latency) latency <<= 1;
+	pa_latency = latency;
 	pa_params.suggestedLatency = double(latency) / double(samplerate);
 	pa_params.hostApiSpecificStreamInfo = NULL;
+	pa_sample_size = (bits * channels) / 8;
 
 	pa_last_error = Pa_OpenStream(
 		&pa_stream,
@@ -345,15 +521,41 @@ bool sound_setup(const NSFCore* core)
 
 	pa_stream_info.bits = bits;
 	pa_stream_info.channels = channels;
+	pa_samplerate = double(samplerate);
 	const PaStreamInfo* pa_info = Pa_GetStreamInfo(pa_stream);
 	if (pa_info)
 	{
-		pa_stream_info.samplerate = int(pa_info->sampleRate);
+		pa_samplerate = pa_info->sampleRate;
+		samplerate = int(pa_info->sampleRate + 0.5);
+		pa_stream_info.samplerate = samplerate;
 		pa_stream_info.latency = int(pa_info->outputLatency * pa_info->sampleRate);
 	}
 
-	// TODO allocate pa_buffer (if too small)
-	// is there a convenient pa error for out of memory?
+	size_t buffer_size = pa_sample_size * size_t((samplerate * PA_BUFFER_MS) / 1000);
+	if (buffer_size < (pa_sample_size * 2 * pa_latency)) // need at least 2 buffers at the requested latency
+		buffer_size = (pa_sample_size * 2 * pa_latency);
+	if (pa_buffer && pa_buffer_size < buffer_size)
+	{
+		std::free(pa_buffer);
+		pa_buffer = NULL;
+		pa_buffer_size = 0;
+	}
+	if (!pa_buffer || pa_buffer_size < buffer_size)
+	{
+		pa_buffer = std::malloc(buffer_size);
+		if (pa_buffer == NULL)
+		{
+			pa_last_error = Pa_StopStream(pa_stream);
+			pa_result_check("Pa_StopStream");
+			pa_last_error = Pa_CloseStream(pa_stream);
+			pa_result_check("Pa_CloseStream");
+			pa_stream = NULL;
+			pa_last_error = paInsufficientMemory;
+			pa_result_check("std::malloc, playback buffer");
+			return false;
+		}
+	}
+	pa_buffer_size = pa_sample_size;
 
 	return true;
 }
@@ -367,6 +569,13 @@ void sound_shutdown()
 		pa_last_error = Pa_CloseStream(pa_stream);
 		pa_result_check("Pa_CloseStream");
 		pa_stream = NULL;
+	}
+
+	if (pa_buffer)
+	{
+		std::free(pa_buffer);
+		pa_buffer = NULL;
+		pa_buffer_size = 0;
 	}
 
 	if (pa_initialized)
@@ -400,8 +609,39 @@ SoundDeviceInfo sound_device_info(int device)
 	return info;
 }
 
+uint32_t sound_buffer_get(void** buffer)
+{
+	if (buffer) *buffer = NULL;
+	return 0;
+}
+
+void sound_buffer_send()
+{
+}
+
+void sound_buffer_flush()
+{
+}
+
+void sound_mark_time(uint32_t mark_index)
+{
+	(void)mark_index;
+}
+
+int64_t sound_play_time(uint32_t* mark_index)
+{
+	if (mark_index) *mark_index = 0;
+	return 0;
+}
+
+void sound_pause(bool pause)
+{
+	(void)pause;
+}
+
 bool sound_setup(const NSFCore* core)
 {
+	(void)core;
 	return false;
 }
 

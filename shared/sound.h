@@ -33,11 +33,13 @@ int sound_device_count();
 SoundDeviceInfo sound_device_info(int device);
 SoundStreamInfo sound_stream_info();
 
+uint32_t sound_buffer_get(void** buffer); // returns a number of samples that can be sent, with a pointer to their buffer (can ignore result if we don't want to fill it yet), 0 if full
+void sound_buffer_send(); // sends the buffer last retrieved via sound_buffer_get (invalidates buffer from sound_buffer_get)
+void sound_buffer_flush(); // discards unplayed samples down to chosen latency amount (invalidates last sound_buffer_get)
+
+void sound_mark_time(uint32_t mark_index); // the next sent buffer will mark its time when it begins playback
+int64_t sound_play_time(uint32_t* mark_index); // get current playback sample, relative to mark time (may return a previous mark if the latest hasn't been called back yet)
+void sound_pause(bool pause); // pause playback
+
 bool sound_setup(const NSFCore* core);
 void sound_shutdown();
-
-// TODO
-//   uint32_t sound_buffer_get(void** buffer) returns number of samples to fill (ring buffer can be split with this)
-//   sound_buffer_send(); // sends the buffer just requested by sound_buffer_get
-//   sound_buffer_flush(); // redact unplayed buffers (leaving 1x latency extra)
-//   (setup should allocate at least 10 buffers, maybe minimum 1 second worth)
