@@ -45,6 +45,7 @@ static double pa_mark_time = 0.0;
 static bool pa_mark_active = false;
 static uint32_t pa_mark_active_index = 0;
 static size_t pa_mark_active_pos = 0;
+static uint8_t pa_last_sample[8] = { 0 };
 
 // This has to be longer than PortAudio's possible callback buffer size,
 // but the size of that is unspecified. We also shouldn't make it huge,
@@ -137,6 +138,7 @@ static int pa_callback(
 		if (mark_active && play_pos <= mark_active_pos && (play_pos + segment0) > mark_active_pos)
 			mark_active_triggered = true;
 		std::memcpy(output_data, buffer_data + play_pos, segment0);
+		if (segment0 >= pa_sample_size) std::memcpy(pa_last_sample, output_data + (segment0 - pa_sample_size), pa_sample_size);
 		play_pos += segment0;
 		if (play_pos >= pa_buffer_size) play_pos = 0;
 		frame_bytes -= segment0;
@@ -151,6 +153,7 @@ static int pa_callback(
 		if (mark_active && play_pos <= mark_active_pos && (play_pos + segment1) > mark_active_pos)
 			mark_active_triggered = true;
 		std::memcpy(output_data, buffer_data + play_pos, segment1);
+		if (segment1 >= pa_sample_size) std::memcpy(pa_last_sample, output_data + (segment1 - pa_sample_size), pa_sample_size);
 		play_pos += segment1;
 		if (play_pos >= pa_buffer_size) play_pos = 1;
 		frame_bytes -= segment1;
@@ -179,10 +182,19 @@ static int pa_callback(
 	// finished with play/send buffer and mark
 	pa_mutex.unlock();
 
-	// if we didn't have enough data we need to blank fill the rest (don't need mutex for this)
+	// if we didn't have enough data we need to fill the rest (don't need mutex for this)
 	if (frame_bytes > 0)
 	{
-		std::memset(output_data, (pa_stream_info.bits == 8) ? 128 : 0, frame_bytes);
+		switch (pa_sample_size)
+		{
+		case 1: while (frame_bytes > 0) { *output_data = pa_last_sample[0]; ++output_data; --frame_bytes; } break;
+		case 2: while (frame_bytes >= 2) { std::memcpy(output_data, pa_last_sample, 2); output_data += 2; frame_bytes -= 2; } break;
+		case 3: while (frame_bytes >= 3) { std::memcpy(output_data, pa_last_sample, 3); output_data += 3; frame_bytes -= 3; } break;
+		case 4: while (frame_bytes >= 4) { std::memcpy(output_data, pa_last_sample, 4); output_data += 4; frame_bytes -= 4; } break;
+		case 6: while (frame_bytes >= 6) { std::memcpy(output_data, pa_last_sample, 6); output_data += 6; frame_bytes -= 6; } break;
+		case 8: while (frame_bytes >= 8) { std::memcpy(output_data, pa_last_sample, 8); output_data += 8; frame_bytes -= 8; } break;
+		default: while(frame_bytes >= pa_sample_size) { std::memcpy(output_data, pa_last_sample, pa_sample_size); output_data += pa_sample_size; frame_bytes -= pa_sample_size; } break;
+		}
 	}
 
 	// success
@@ -437,6 +449,7 @@ bool sound_start(const NSFCore* core)
 	pa_buffer_play_end = 0;
 	pa_buffer_send_pos = 0;
 	pa_buffer_send_get_size = 0;
+	std::memset(pa_last_sample, 0, sizeof(pa_last_sample));
 
 	int samplerate = 48000;
 	int bits = 16;
@@ -515,6 +528,7 @@ bool sound_start(const NSFCore* core)
 	pa_params.suggestedLatency = double(latency) / double(samplerate);
 	pa_params.hostApiSpecificStreamInfo = NULL;
 	pa_sample_size = (bits * channels) / 8;
+	if (bits == 8) pa_last_sample[0] = pa_last_sample[1] = 128;
 
 	pa_last_error = Pa_OpenStream(
 		&pa_stream,
