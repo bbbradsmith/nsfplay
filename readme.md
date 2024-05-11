@@ -9,7 +9,7 @@ This is a work in progress total rewrite of NSFPlay. Goals include:
 * Rewrite to change the emulation architecture, hopefully more efficient and easier to maintain.
 
 ### Unstable Build
-  * [Download](https://nightly.link/bbbradsmith/nsfplay/workflows/build/nsfplay3)
+  * [Download](https://nightly.link/bbbradsmith/nsfplay/workflows/build_nsfplay3/nsfplay3)
 
 ## Components
 
