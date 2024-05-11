@@ -34,7 +34,8 @@ static double pa_samplerate = 0;
 static std::mutex pa_mutex;
 static void* pa_buffer = NULL;
 static size_t pa_buffer_size = 0; // total size in bytes
-static size_t pa_buffer_play_pos = 0; // next play position for callback
+static size_t pa_buffer_play_pos = 0; // start of play position for next callback
+static size_t pa_buffer_play_end = 0; // end of play buffer for next callback (usually same as play_pos, except when the callback is busy copying)
 static size_t pa_buffer_send_pos = 0; // next send position for write
 static size_t pa_buffer_send_get_size = 0; // bytes from sound_buffer_get to send at next sound_buffer_send
 static bool pa_pause = false;
@@ -100,16 +101,11 @@ static int pa_callback(
 	(void)user_data;
 
 	size_t frame_bytes = size_t(frame_count) * pa_sample_size;
-	const uint8_t* pa_buffer_data = reinterpret_cast<uint8_t*>(pa_buffer);
+	const uint8_t* buffer_data = reinterpret_cast<uint8_t*>(pa_buffer);
 	uint8_t* output_data = reinterpret_cast<uint8_t*>(output);
+	bool mark_active_triggered = false;
 
-	// TODO if we had a separate play_pos and play_end,
-	//      we could mutex just to change play_end,
-	//      then unlock before doing the memcpy etc.
-	//      and re-lock to change play_pos after (and update time/mark)
-	//      (maybe just flag a mark update bool that we pick up at the end)
-
-	// lock play/send buffer
+	// lock send buffer while we adjust pa_buffer_play_end, and check for active mark
 	pa_mutex.lock();
 
 	// calculate sent bytes available in the ring buffer to play
@@ -120,48 +116,66 @@ static int pa_callback(
 		(segment0_size + pa_buffer_send_pos);
 
 	if (pa_pause) available = 0; // pause sound
+	else if (available > frame_bytes) available = frame_bytes;
+
+	size_t play_pos = pa_buffer_play_pos;
+	pa_buffer_play_end = pa_buffer_play_pos + available;
+	if (pa_buffer_play_end >= pa_buffer_size)
+		pa_buffer_play_end -= pa_buffer_size;
+
+	bool mark_active = pa_mark_active; // check if mark has an active update
+	size_t mark_active_pos = pa_mark_active_pos;
+
+	// with play_pos/play_end marking the buffer we're using, we're ready to copy
+	pa_mutex.unlock();
 
 	// copy first segment
-	size_t segment0 = (frame_bytes < segment0_size) ? frame_bytes : segment0_size;
-	if (segment0 > available) segment0 = available;
-	if (pa_mark_active && pa_buffer_play_pos <= pa_mark_active_pos && (pa_buffer_play_pos + segment0) > pa_mark_active_pos)
 	{
-		pa_mark_active = false;
-		pa_mark_index = pa_mark_active_index;
-		pa_mark_time = time_info->outputBufferDacTime;
+		size_t segment0 = (frame_bytes < segment0_size) ? frame_bytes : segment0_size;
+		if (segment0 > available) segment0 = available;
+		if (mark_active && play_pos <= mark_active_pos && (play_pos + segment0) > mark_active_pos)
+			mark_active_triggered = true;
+		std::memcpy(output_data, buffer_data + play_pos, segment0);
+		play_pos += segment0;
+		if (play_pos >= pa_buffer_size) play_pos = 0;
+		frame_bytes -= segment0;
+		available -= segment0;
+		output_data += segment0;
 	}
-	std::memcpy(output_data, pa_buffer_data + pa_buffer_play_pos, segment0);
-	pa_buffer_play_pos += segment0;
-	if (pa_buffer_play_pos >= pa_buffer_size) pa_buffer_play_pos = 0;
-	frame_bytes -= segment0;
-	available -= segment0;
-	output_data += segment0;
 
-	// copy second segment if not finished
+	// copy second segment if we wrapped
 	if (frame_bytes > 0)
 	{
 		size_t segment1 = (frame_bytes < available) ? frame_bytes : available;
-		if (pa_mark_active && pa_buffer_play_pos <= pa_mark_active_pos && (pa_buffer_play_pos + segment1) > pa_mark_active_pos)
-		{
-			pa_mark_active = false;
-			pa_mark_index = pa_mark_active_index;
-			pa_mark_time = time_info->outputBufferDacTime;
-		}
-		std::memcpy(output_data, pa_buffer_data + pa_buffer_play_pos, segment1);
-		pa_buffer_play_pos += segment1;
-		if (pa_buffer_play_pos >= pa_buffer_size) pa_buffer_play_pos = 1;
+		if (mark_active && play_pos <= mark_active_pos && (play_pos + segment1) > mark_active_pos)
+			mark_active_triggered = true;
+		std::memcpy(output_data, buffer_data + play_pos, segment1);
+		play_pos += segment1;
+		if (play_pos >= pa_buffer_size) play_pos = 1;
 		frame_bytes -= segment1;
 		available -= segment1;
 		output_data += segment1;
 	}
 
-	if (frame_bytes > 0) // adjust mark time to account for the skipped bytes
+	// lock send buffer while we adjust pa_buffer_play_pos, and mark if needed
+	pa_mutex.lock();
+
+	pa_buffer_play_pos = pa_buffer_play_end;
+
+	if (mark_active_triggered)
+	{
+		pa_mark_active = false;
+		pa_mark_index = pa_mark_active_index;
+		pa_mark_time = time_info->outputBufferDacTime;
+	}
+
+	if (frame_bytes > 0) // if skipping bytes, adjust mark time to account for it
 	{
 		double skip_samples = double(frame_bytes / pa_sample_size);
 		pa_mark_time += (skip_samples / pa_samplerate);
 	}
 
-	// finished with play/send buffer
+	// finished with play/send buffer and mark
 	pa_mutex.unlock();
 
 	// if we didn't have enough data we need to blank fill the rest (don't need mutex for this)
@@ -170,6 +184,7 @@ static int pa_callback(
 		std::memset(output_data, (pa_stream_info.bits == 8) ? 128 : 0, frame_bytes);
 	}
 
+	// success
 	return 0;
 }
 
@@ -295,15 +310,15 @@ uint32_t sound_buffer_get(void** buffer)
 	// so reading it here we can guarantee that the available
 	// ring buffer space between send_pos and play_pos will not shrink
 	pa_mutex.lock();
-	size_t play_pos = pa_buffer_play_pos;
+	size_t play_end = pa_buffer_play_end;
 	size_t send_pos = pa_buffer_send_pos;
 	pa_mutex.unlock();
 
 	// calculate empty bytes available in the ring buffer,
 	// split at end of buffer
 	size_t empty =
-		(play_pos >= send_pos) ?
-		(play_pos - send_pos) :
+		(play_end >= send_pos) ?
+		(play_end - send_pos) :
 		(pa_buffer_size - send_pos);
 
 	// return a packet size and pointer to the buffer to use
@@ -334,15 +349,15 @@ void sound_buffer_flush()
 	pa_mutex.lock();
 
 	// calculate sent bytes available in the ring buffer to play
-	size_t segment0_size = pa_buffer_size - pa_buffer_play_pos;
+	size_t segment0_size = pa_buffer_size - pa_buffer_play_end;
 	size_t available =
-		(pa_buffer_send_pos >= pa_buffer_play_pos) ?
-		(pa_buffer_send_pos - pa_buffer_play_pos) :
+		(pa_buffer_send_pos >= pa_buffer_play_end) ?
+		(pa_buffer_send_pos - pa_buffer_play_end) :
 		(segment0_size + pa_buffer_send_pos);
 
 	if (available > keep) // only discard samples if we have too many
 	{
-		pa_buffer_send_pos = pa_buffer_play_pos + keep;
+		pa_buffer_send_pos = pa_buffer_play_end + keep;
 		if (pa_buffer_send_pos >= pa_buffer_size)
 			pa_buffer_send_pos -= pa_buffer_size;
 	}
@@ -422,6 +437,7 @@ bool sound_setup(const NSFCore* core)
 
 	// reset buffers while stream is stopped
 	pa_buffer_play_pos = 0;
+	pa_buffer_play_end = 0;
 	pa_buffer_send_pos = 0;
 	pa_buffer_send_get_size = 0;
 
