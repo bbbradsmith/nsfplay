@@ -251,17 +251,17 @@ jobs:
         run: |
           export CC=clang
           export WXOUT=wxlibArm
-          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64"
+          export WXCONF_EXTRA="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_OSX_ARCHITECTURES=arm64"
           export PAOUT=portaudiolib/makeArm
           export PACMAKE=../makeArm_cmake
-          export PACONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64"
+          export PACONF_EXTRA="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_OSX_ARCHITECTURES=arm64"
           make wxlib
           make portaudiolib
           export WXOUT=wxlibIntel
-          export WXCONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+          export WXCONF_EXTRA="-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_OSX_ARCHITECTURES=x86_64"
           export PAOUT=portaudiolib/makeIntel
           export PACMAKE=../makeIntel_cmake
-          export PACONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+          export PACONF_EXTRA="-DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_OSX_ARCHITECTURES=x86_64"
           make wxlib
           make portaudiolib
           rm -rf wxlibArm/make/libs
