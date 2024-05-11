@@ -264,8 +264,9 @@ jobs:
           export PACONF_EXTRA="-DCMAKE_OSX_ARCHITECTURES=x86_64"
           make wxlib
           make portaudiolib
-          #rm -rf wxlibArm/make/libs
-          #rm -rf wxlibIntel/make/libs
+          rm -rf wxlibArm/make/libs
+          rm -rf wxlibIntel/make/libs
+        # Remove libs folder to keep cache smaller. It's just temporary build data.
       - name: Make
         run: |
           export CC=clang
