@@ -171,10 +171,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\sound.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="platform.cpp" />
-    <ClCompile Include="sound.cpp" />
     <ClCompile Include="unit_test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\nsfplaycore.h" />
+    <ClInclude Include="..\include\nsfplayenums.h" />
+    <ClInclude Include="..\shared\sound.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

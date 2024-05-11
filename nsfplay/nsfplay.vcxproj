@@ -172,9 +172,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\nsfplaycore.h" />
+    <ClInclude Include="..\include\nsfplayenums.h" />
+    <ClInclude Include="..\include\nsfplaygui.h" />
+    <ClInclude Include="..\shared\sound.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\sound.cpp" />
     <ClCompile Include="nsfplay.cpp" />
   </ItemGroup>
   <ItemGroup>

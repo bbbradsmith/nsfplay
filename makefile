@@ -32,10 +32,6 @@ gui: core
 nsfplay: core gui
 	$(MAKE) -C nsfplay
 
-nsfplay_nosound: core gui
-	$(MAKE) -C nsfplay clean
-	$(MAKE) -C nsfplay NOSOUND=1
-
 mac:
 	$(MAKE) -C nsfplay mac
 

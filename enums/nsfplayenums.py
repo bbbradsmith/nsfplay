@@ -46,7 +46,7 @@
 #   Settings definitions.
 #   The SETLIST is like a SETINT but will map its numbers to a LIST.
 #   INT settings and properties have a display-type which hints to the implementer
-#   how to display that setting.
+#   how to display that setting. For SETSTR * can be used for a blank default string.
 #     SETINT group-key key default min max hintmin hintmax display-type
 #     SETLIST group-key key list-key default-key
 #     SETSTR group-key key "default"
@@ -542,7 +542,7 @@ def parse_enums(path):
             if li != None:
                 add_set((p[1],p[0],lk,0,dcount-1,0,dcount-1,li,False,DT_LIST))
         elif command == "SETSTR": # 0-group 1-key 2-default
-            add_set((p[1],p[0],p[2],0,0,0,0,None,True,DT_STR))
+            add_set((p[1],p[0],p[2] if (p[2]!="*") else "",0,0,0,0,None,True,DT_STR))
         # PROP
         elif command == "PROPINT":       add_prop((p[1],p[0],PROP_INT,p[2],None,p[3])) # 0-key 1-group-key(index) 2-type 3-display 4-list-index 5-commend
         elif command == "PROPLONG":      add_prop((p[1],p[0],PROP_LONG,p[2],None,p[3]))

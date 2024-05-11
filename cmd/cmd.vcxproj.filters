@@ -4,6 +4,11 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="platform.cpp" />
     <ClCompile Include="unit_test.cpp" />
-    <ClCompile Include="sound.cpp" />
+    <ClCompile Include="..\shared\sound.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\nsfplaycore.h" />
+    <ClInclude Include="..\include\nsfplayenums.h" />
+    <ClInclude Include="..\shared\sound.h" />
   </ItemGroup>
 </Project>

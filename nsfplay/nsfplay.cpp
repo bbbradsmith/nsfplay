@@ -1,6 +1,24 @@
 // stub
 
 #include <wx/wx.h>
+#include <cstdio> // std::vfprintf
+#include <cstdarg> // va_list, va_start
+
+// TODO these should go to logs (needed for ../shared/sound.cpp)
+
+void err_printf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args,fmt);
+	std::vfprintf(stderr,fmt,args);
+}
+
+void out_printf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args,fmt);
+	std::vfprintf(stdout,fmt,args);
+}
 
 class MainApp : public wxApp
 {

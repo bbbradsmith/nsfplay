@@ -24,6 +24,7 @@ Support:
 * `include` - Public interfaces for the `core` and `gui` libraries.
 * `icons` - Icons used for the GUI, edit the PNG files, and rebuild the ICO copies using the makefile ([imagemagick](https://imagemagick.org) required).
 * `enum` - Definitions of all settings and text used by NSFPlay, allowing localized text in multiple languages ([python](https://www.python.org/) required).
+* `shared` - Miscellaneous shared internal code.
 * `wx` - [wxWidgets v3.2.4](https://github.com/wxWidgets/wxWidgets/tree/v3.2.4) cross platform GUI library.
 * `portaudio` - [PortAudio v19.7.0](https://github.com/PortAudio/portaudio/tree/v19.7.0) cross platform audio library.
 
@@ -121,6 +122,8 @@ On other platforms, you can use `PAL_DIR` to tell the make build to use a differ
 
 Like with the wxWidgets library build, you can delete the cmake directories in `portaudiolib` after building the libraries if you wish to save space.
 
+Note: the MSVC build currently does not support WDM/KS drivers, because there is some conflict involving a multiple definition of `_GUID_NULL` which I could not find a resolution for. Hopefully this will be fixed in the next release of PortAudio.
+
 ### Make Targets
 
 * `make` - builds `cmd`, `gui`
@@ -133,7 +136,6 @@ Like with the wxWidgets library build, you can delete the cmake directories in `
 * `make cmd_nosound` - (build test) rebuild cmd without PortAudio.
 * `make gui` - build gui library `nsfgui` to `output/make/`.
 * `make nsfplay` - build `nsfplay` to `output/make/`.
-* `make nsfplay_nosound` - (build test) rebuild nsfplay without PortAudio.
 * `make winamp` - (windows 32-bit only) build `nsfplay.dll` winamp plugin to `output/make/`.
 * `make install` - copy `nsfplay`/`nsfplac` to `/usr/local/bin/`.
 * `make uninstall` - delete install from `/usr/local/bin/`.

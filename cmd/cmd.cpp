@@ -5,13 +5,14 @@
 #define DEFAULT_INI_ENV  "NSFPLAY_INI"
 
 #include <nsfplaycore.h>
-#include <cstdio> // std::fprintf
-#include <cstdlib> // std::exit, std::atexit, std::strtol
-#include <cstring> // std::strlen, std::memset, std::snprintf
+#include <cstdio> // std::vfprintf, std::snprintf
+#include <cstdlib> // std::exit, std::atexit, std::strtol, std::malloc, std::free
+#include <cstring> // std::strlen, std::memset
 #include <cstddef> // NULL
 #include <cstdarg> // va_list, va_start
 #include <cerrno> // cerrno
 #include <thread> // std::this_thread::sleep_for
+#include "../shared/sound.h"
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);
@@ -20,12 +21,7 @@ int platform_argc();
 const char* platform_argv(int index); // note: return only valid until next argv/getenv
 const char* platform_getenv(const char* name); // note: return only valid until next argv/getenv, name limit of 63 chars
 FILE* platform_fopen(const char* path, const char* mode);
-int platform_nonblock_getc();
-
-// sound output (sound.cpp)
-const char* sound_error_text();
-bool sound_setup();
-void sound_shutdown();
+int platform_nonblock_getc(); // get a keypress, 0 if none waiting
 
 // unit testing (unit_test.cpp)
 int unit_test(const char* path);
@@ -40,20 +36,34 @@ NSFCore* core = NULL;
 // logging functions
 //
 
+void err_printf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args,fmt);
+	std::vfprintf(stderr,fmt,args);
+}
+
+void out_printf(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args,fmt);
+	std::vfprintf(stdout,fmt,args);
+}
+
 void error_log(const NSFCore* core_, int32_t code, const char* msg)
 {
 	(void)core_;
-	std::fprintf(stderr,"Error(%d): %s\n",code,msg);
+	err_printf("Error(%d): %s\n",code,msg);
 }
 
 void debug_print(const char* msg)
 {
-	std::fprintf(stdout,"Debug: %s\n",msg);
+	out_printf("Debug: %s\n",msg);
 }
 
 void fatal_log(const char* msg)
 {
-	std::fprintf(stderr,"Fatal: %s\n",msg);
+	err_printf("Fatal: %s\n",msg);
 	platform_shutdown();
 	std::exit(-1);
 }
@@ -69,7 +79,7 @@ static void* load_file(const char* path, const char* mode, size_t& filesize, boo
 	FILE* f = platform_fopen(path,mode);
 	if (f == NULL)
 	{
-		if (!silent_notfound) std::fprintf(stderr,"Could not open: %s\n",path);
+		if (!silent_notfound) err_printf("Could not open: %s\n",path);
 		return NULL;
 	}
 	// get size
@@ -80,7 +90,7 @@ static void* load_file(const char* path, const char* mode, size_t& filesize, boo
 	uint8_t* fd = reinterpret_cast<uint8_t*>(std::malloc(fs+1));
 	if (fd == NULL)
 	{
-		std::fprintf(stderr,"Out of memory loading: %s\n",path);
+		err_printf("Out of memory loading: %s\n",path);
 		std::fclose(f);
 		return NULL;
 	}
@@ -89,7 +99,7 @@ static void* load_file(const char* path, const char* mode, size_t& filesize, boo
 	size_t frs = std::fread(fd,1,fs,f);
 	if (frs != fs)
 	{
-		std::fprintf(stderr,"Read error in: %s\n",path);
+		err_printf("Read error in: %s\n",path);
 		std::fclose(f);
 		std::free(fd);
 		return NULL;
@@ -105,7 +115,7 @@ static bool load_ini(const char* path, bool silent_notfound=false)
 	char* ini = reinterpret_cast<char*>(load_file(path,"rt",filesize,silent_notfound));
 	if (!ini) return false;
 	nsfplay_set_ini(core,ini);
-	std::printf("Loaded INI: %s\n",path);
+	out_printf("Loaded INI: %s\n",path);
 	std::free(ini);
 	return true;
 }
@@ -188,7 +198,7 @@ int parse_commandline() // returns -1 on success, otherwise is index of bad argu
 	std::memset(arg.mute,0,sizeof(arg.mute));
 
 	#ifdef DEBUG
-		for (int i=0; i<platform_argc(); ++i) std::printf("Debug: arg[%d] = \"%s\"\n",i,platform_argv(i));
+		for (int i=0; i<platform_argc(); ++i) out_printf("Debug: arg[%d] = \"%s\"\n",i,platform_argv(i));
 	#endif
 
 	// start with default settings
@@ -237,7 +247,7 @@ int parse_commandline() // returns -1 on success, otherwise is index of bad argu
 			const char* path = platform_getenv(DEFAULT_INI_ENV);
 			if (!path || !load_ini(path,true))
 			{
-				std::printf("No default INI file found.\n");
+				out_printf("No default INI file found.\n");
 			}
 		}
 	}
@@ -308,19 +318,19 @@ const char HELP_TEXT[] =
 
 void help_chans()
 {
-	printf("channels:");
+	out_printf("channels:");
 	int32_t last_unit = -1;
 	for (int32_t i=0; i<NSF_CHANNEL_COUNT; ++i)
 	{
 		NSFChannelInfo info = nsfplay_channel_info(core,i);
 		if (info.unit != last_unit)
 		{
-			printf("\n ");
+			out_printf("\n ");
 			last_unit = info.unit;
 		}
-		printf(" %s",info.short_name);
+		out_printf(" %s",info.short_name);
 	}
-	printf("\n");
+	out_printf("\n");
 }
 
 //
@@ -350,8 +360,8 @@ int run()
 		int bad_arg = parse_commandline();
 		if (bad_arg >= 0)
 		{
-			std::fprintf(stderr,"Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
-			std::printf("Try -h for command line usage help.\n");
+			err_printf("Invalid argument %d: %s\n",bad_arg,platform_argv(bad_arg));
+			out_printf("Try -h for command line usage help.\n");
 			return -1;
 		}
 	}
@@ -359,7 +369,7 @@ int run()
 	// print help
 	if (arg.help)
 	{
-		std::printf(HELP_TEXT);
+		out_printf(HELP_TEXT);
 		help_chans();
 		return 0;
 	}
@@ -368,11 +378,11 @@ int run()
 	if (arg.save_default_ini >= 0)
 	{
 		const char* path = platform_argv(arg.save_default_ini);
-		std::printf("Generate default INI file: %s\n",path);
+		out_printf("Generate default INI file: %s\n",path);
 		FILE* f = platform_fopen(path,"wt");
 		if (f == NULL)
 		{
-			std::fprintf(stderr,"Could not open: %s\n",path);
+			err_printf("Could not open: %s\n",path);
 			return -1;
 		}
 		nsfplay_set_default(core);
@@ -380,10 +390,10 @@ int run()
 		std::fclose(f);
 		if (!result)
 		{
-			std::fprintf(stderr,"Error writitng to file: %s\n",path);
+			err_printf("Error writitng to file: %s\n",path);
 			return -1;
 		}
-		std::printf("Success.\n");
+		out_printf("Success.\n");
 		return 0;
 	}
 
@@ -410,14 +420,14 @@ int run()
 	if (arg.waveout >= 0)
 	{
 		if (!waveout(platform_argv(arg.waveout))) return -1;
-		std::printf("Success.\n");
+		out_printf("Success.\n");
 		return 0;
 	}
 	if (arg.waveout_multi >= 0)
 	{
 		if (nsfplay_song_count(core) < 1)
 		{
-			std::fprintf(stderr,"No songs in input file.\n");
+			err_printf("No songs in input file.\n");
 			return -1;
 		}
 		for (int32_t i=0; i<nsfplay_song_count(core); ++i)
@@ -428,7 +438,7 @@ int run()
 			std::snprintf(path,PATH_SIZE,"%s%s.wav",platform_argv(arg.waveout_multi),nsfplay_prop_str(core,NSF_PROP_SONG_TITLE));
 			if (!waveout(path)) return -1;
 		}
-		std::printf("Success.\n");
+		out_printf("Success.\n");
 		return 0;
 	}
 
@@ -439,62 +449,62 @@ int run()
 
 	// TODO  the rest of this function is test code I am keeping as an example for later menus
 
-	//sound_setup();
+	sound_setup(core);
+	out_printf(sound_debug_text());
 
 	// test of non blocking getc
-	printf("Q to quit...\n");
+	out_printf("Q to quit...\n");
 	int kc = -1;
 	while (kc != 'q' && kc != 'Q')
 	{
-		printf("check?\n");
+		out_printf("check?\n");
 		int kn = platform_nonblock_getc();
 		if (kn)
 		{
 			kc = kn;
-			printf("key %3d $%02X '%c'\n",kc,kc,char(kc));
+			out_printf("key %3d $%02X '%c'\n",kc,kc,char(kc));
 		}
 		else
 		{
-			printf("Waiting...\n");
+			out_printf("Waiting...\n");
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 	}
 
-	//sound_shutdown();
+	sound_shutdown();
 
 	/*
 	// test info
-	printf("GROUPS:\n");
+	out_printf("GROUPS:\n");
 	for (int i=0;i<NSF_GROUP_COUNT;++i)
 	{
 		NSFGroupInfo info = nsfplay_set_group_info(core,i);
-		printf("%s %s - %s\n",info.key,info.name,info.desc);
+		out_printf("%s %s - %s\n",info.key,info.name,info.desc);
 	}
-	printf("SETS:\n");
+	out_printf("SETS:\n");
 	for (int i=0;i<NSF_SET_COUNT;++i)
 	{
 		NSFSetInfo info = nsfplay_set_info(core,i);
-		printf("%s %s %s - %s %d %d %d %d %s\n",
+		out_printf("%s %s %s - %s %d %d %d %d %s\n",
 			nsfplay_set_group_info(core,info.group).key,
 			info.key,info.name,info.desc,
 			int(info.is_string),info.default_int,info.min_int,info.max_int,
 			info.default_str ? info.default_str : "<NULL>");
 		if (info.list)
 		{
-			printf("List:");
+			out_printf("List:");
 			const char* e = info.list;
 			for (int j=info.min_int; j<=info.max_int; ++j)
 			{
-				printf(" %d=[%s]",j,e);
+				out_printf(" %d=[%s]",j,e);
 				e += std::strlen(e)+1;
 			}
-			printf("\n");
+			out_printf("\n");
 		}
 	}
-	*/
 
 	// test props
-	printf("PROPS:\n");
+	out_printf("PROPS:\n");
 	int32_t last_group = -1;
 	for (int i=0;i<NSF_PROP_COUNT;++i)
 	{
@@ -503,56 +513,55 @@ int run()
 		{
 			last_group = info.group;
 			NSFGroupInfo ginfo = nsfplay_group_info(core,last_group);
-			printf("PROP GROUP: %s\n",ginfo.name);
+			out_printf("PROP GROUP: %s\n",ginfo.name);
 		}
-		//printf("%s %s %d\n",info.key,info.name,info.type);
+		//out_printf("%s %s %d\n",info.key,info.name,info.type);
 		if (nsfplay_prop_exists(core,i))
 		{
 			if (info.type == NSF_PROP_TYPE_INT || info.type == NSF_PROP_TYPE_LIST)
-				printf("%s: %d\n",info.key,nsfplay_prop_int(core,i));
+				out_printf("%s: %d\n",info.key,nsfplay_prop_int(core,i));
 			else if (info.type == NSF_PROP_TYPE_STR)
-				printf("%s: %s\n",info.key,nsfplay_prop_str(core,i));
+				out_printf("%s: %s\n",info.key,nsfplay_prop_str(core,i));
 			else if (info.type == NSF_PROP_TYPE_BLOB)
 			{
 				uint32_t blob_size = 0;
 				const uint8_t* blob = reinterpret_cast<const uint8_t*>(nsfplay_prop_blob(core,&blob_size,i));
-				printf("%s: %d bytes\n",info.key,blob_size);
+				out_printf("%s: %d bytes\n",info.key,blob_size);
 				const int COLS = 16;
 				for (uint32_t j=0; j<blob_size; j+=COLS) // print rows of hex + ascii
 				{
-					for (uint32_t k=0; k<COLS; ++k) if ((j+k)<(blob_size)) { printf(" %02X",blob[j+k]); } else { printf("   "); }
-					printf(" ");
+					for (uint32_t k=0; k<COLS; ++k) if ((j+k)<(blob_size)) { out_printf(" %02X",blob[j+k]); } else { out_printf("   "); }
+					out_printf(" ");
 					for (uint32_t k=0; k<COLS; ++k)
 					{
 						if ((j+k)<(blob_size))
 						{
 							uint8_t c = blob[j+k];
-							if (c > 0x20 && c < 0x7F) printf("%c",c);
-							else printf("."); // unprintable
+							if (c > 0x20 && c < 0x7F) out_printf("%c",c);
+							else out_printf("."); // unprintable
 						}
-						else printf(" ");
+						else out_printf(" ");
 					}
-					printf("\n");
+					out_printf("\n");
 				}
 			}
 			else if (info.type == NSF_PROP_TYPE_LINES)
 			{
 				int32_t lines = nsfplay_prop_lines(core,i);
-				printf("%s: %d lines\n",info.key,lines);
+				out_printf("%s: %d lines\n",info.key,lines);
 				const char* line;
 				while ((line = nsfplay_prop_line(core)) != NULL)
-					printf(" %s\n",line);
+					out_printf(" %s\n",line);
 			}
 			else
-				printf("%s (Type: %d)\n",info.key,info.type);
+				out_printf("%s (Type: %d)\n",info.key,info.type);
 		}
 	}
 
 	// test ini generation
 	for (int i=0;i<NSF_SET_COUNT;++i)
-		printf("%s\n",nsfplay_ini_line(core,i));
+		out_printf("%s\n",nsfplay_ini_line(core,i));
 
-	/*
 	// test ini write
 	nsfplay_ini_write(core,stdout);
 	*/

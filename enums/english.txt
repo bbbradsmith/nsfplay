@@ -29,7 +29,6 @@ LOCALLIST SAMPLERATES SR_44100   "44100 Hz"
 LOCALLIST SAMPLERATES SR_48000   "48000 Hz"
 LOCALLIST SAMPLERATES SR_96000   "96000 Hz"
 LOCALLIST SAMPLERATES SR_192000  "192,000 Hz"
-LOCALLIST SAMPLERATES SR_CPU     "Emulation CPU Rate"
 
 LOCALLIST BITS BIT_8             "8-bit unsigned"
 LOCALLIST BITS BIT_16            "16-bit signed"
@@ -37,6 +36,7 @@ LOCALLIST BITS BIT_32            "32-bit signed"
 
 LOCALLIST WAVEOUT_BITS BIT_8     "8-bit unsigned"
 LOCALLIST WAVEOUT_BITS BIT_16    "16-bit signed"
+LOCALLIST WAVEOUT_BITS BIT_24    "24-bit signed"
 LOCALLIST WAVEOUT_BITS BIT_32    "32-bit signed"
 LOCALLIST WAVEOUT_BITS AUTO      "Auto"
 
@@ -90,10 +90,17 @@ LOCALCHANNELSET " On" " Volume" " Pan" " Colour" " enabled." " volume." " pannin
 
 LOCALGROUP MAIN               "Main" "Main settings: volume and ouput, song title format"
 LOCALSET VOLUME               "Volume" "Total output loudness."
+LOCALSET TITLE_FORMAT         "NSF song title format" "Format: %F filename, %P path, %T NSF title, %A NSF artist, %C NSF copyright, %L NSFe song title, %N/%n song number (%n is 3-digit with leading zeroes), %S/%s NSF starting song, %E/%e NSF song count."
+
+LOCALGROUP PLAYER             "Player Sound" "Sound device output."
 LOCALSET SAMPLERATE           "Samplerate" "Audio output samplerate."
 LOCALSET STEREO               "Stereo" "Disable to output 1-channel mono sound."
 LOCALSET BITS                 "Bit Depth" "Audio output bit depth."
-LOCALSET TITLE_FORMAT         "NSF song title format" "Format: %F filename, %P path, %T NSF title, %A NSF artist, %C NSF copyright, %L NSFe song title, %N/%n song number (%n is 3-digit with leading zeroes), %S/%s NSF starting song, %E/%e NSF song count."
+LOCALSET SOUND_DEVICE         "Sound Device" "Name of the sound device to use. Blank for default."
+LOCALSET SOUND_DEVICE_NUM     "Sound Device Index" "-1 for default, used if Sound Device is blank or not found."
+LOCALSET SOUND_LATENCY        "Sound Device Latency" "Adjusts the length of internal sample buffers for latency. 0 is 64 samples, and each step doubles. Default 6 is 4096 samples (~100ms)."
+LOCALSET SAMPLERATE_OVERRIDE  "Samplerate Override" "If a custom output samplerate is needed, it can be given here. 0 to use the normal output rate."
+
 
 LOCALGROUP PLAY               "Playback" "Playback settings: timing and sequence"
 LOCALSET CHANNEL_RESET        "Channel Reset" "Turn all channels on whenever playing a new song."
@@ -202,9 +209,7 @@ LOCALSET WAVEOUT_SAMPLERATE   "Samplerate" "Overrides the output samplerate when
 LOCALSET WAVEOUT_BITS         "Bit Depth" "Override the output bit depth when saving a WAV file."
 LOCALSET WAVEOUT_STEREO       "Stereo" "Override the output stereo setting when saving a WAV file."
 
-LOCALGROUP ADVANCED           "Advanced" "Advanced settings: specific samplerate, shift-JIS"
-LOCALSET SAMPLERATE_OVERRIDE  "Samplerate Override" "If a custom output samplerate is needed, it can be given here. 0 to use the normal output rate, -1 to use the CPU rate."
-LOCALSET SHIFT_JIS            "Shift-JIS" "Older Japanese NSF files often use Shift-JIS for their title, artist, and copyright fields. We can automatically detect it, assume Shift-JIS, or assume UTF-8. NSF2 files are always UTF-8."
+LOCALGROUP ADVANCED           "Advanced" "Advanced settings"
 LOCALSET FORCE_EXP_FDS        "FDS Expansion"   "Force enable/disable FDS."
 LOCALSET FORCE_EXP_MMC5       "MMC5 Expansion"  "Force enable/disable MMC5."
 LOCALSET FORCE_EXP_VRC6       "VRC6 Expansion"  "Force enable/disable VRC6."
@@ -213,6 +218,7 @@ LOCALSET FORCE_EXP_N163       "N163 Expansion"  "Force enable/disable N163."
 LOCALSET FORCE_EXP_S5B        "5B Expansion"    "Force enable/disable 5B."
 LOCALSET FORCE_EXP_VT02       "VT02+ Expansion" "Force enable/disable VT02+."
 LOCALSET OVERRIDE_NSF_SONG    "NSF Song Override" "Force a specific song value, regardless of song count. -1 to disable."
+LOCALSET SHIFT_JIS            "Shift-JIS" "Older Japanese NSF files often use Shift-JIS for their title, artist, and copyright fields. We can automatically detect it, assume Shift-JIS, or assume UTF-8. NSF2 files are always UTF-8."
 
 #
 # NSF Properties

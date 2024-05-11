@@ -26,9 +26,6 @@ jobs:
         run: make core_minimal
       - name: Build No-Sound Cmd
         run: make cmd_nosound
-      # Not testing this, to avoid these tests depending on wxWidgets
-      #- name: Build No-Sound NSFPlay
-      #  run: make nsfplay_nosound
 
   build-msvc:
     name: Windows MSVC

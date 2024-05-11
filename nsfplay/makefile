@@ -15,44 +15,36 @@ OBJS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.o))
 DEPS = $(addprefix $(NSFPLAY_INTDIR)/,$(SRCS:.cpp=.d))
 CORE = ../$(OUTDIR)/$(CORE_NAME)$(LIB_SUFFIX)
 GUI = ../$(OUTDIR)/$(GUI_NAME)$(LIB_SUFFIX)
-CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON) $(WXL_CXXFLAGS)
+CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON) $(WXL_CXXFLAGS) $(PAL_CXXFLAGS)
 LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_NSFPLAY)
-LIBS = $(CORE) $(GUI) $(WXL_LIBS)
+LIBS = $(CORE) $(GUI) $(WXL_LIBS) $(PAL_LIBS)
 
+SHARED_SRCS = ../shared/sound.cpp
+SHARED_OBJS = $(addprefix $(NSFPLAY_INTDIR)/shared/,$(notdir $(SHARED_SRCS:.cpp=.o)))
+SHARED_DEPS = $(addprefix $(NSFPLAY_INTDIR)/shared/,$(notdir $(SHARED_SRCS:.cpp=.d)))
+
+# Windows RC for icon resources
 ifeq ($(OS),Windows_NT)
 OBJS += $(NSFPLAY_INTDIR)/nsfplay_rc.o
+$(NSFPLAY_INTDIR)/nsfplay_rc.o: nsfplay.rc $(wildcard ../icons/*.ico) | $(NSFPLAY_INTDIR)/
+	windres -i $< -o $@
 endif
 
-# NOSOUND=1 builds with no audio output (WAV out only)
-
-NOSOUND ?= 0
-
-ifeq ($(NOSOUND),1)
-	CXXFLAGS_ALL += -DNSF_NOSOUND=1
-else
-	CXXFLAGS_ALL += $(PAL_CXXFLAGS)
-	LIBS += $(PAL_LIBS)
-endif
-
-# target build
-
-$(TARGET): $(OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
-	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(LIBS)
+$(TARGET): $(OBJS) $(SHARED_OBJS) $(CORE) $(GUI) | $(dir $(TARGET))
+	$(CXX) -o $(TARGET) $(LDFLAGS_ALL) $(OBJS) $(SHARED_OBJS) $(LIBS)
 	$(STRIP_DEBUG)
 
 $(NSFPLAY_INTDIR)/%.d: %.cpp | $(NSFPLAY_INTDIR)/
 	$(CXX) -M -MM -MF $@ -MT $(NSFPLAY_INTDIR)/$(basename $<).o $(CXXFLAGS_ALL) -c $<
+$(NSFPLAY_INTDIR)/shared/%.d: ../shared/%.cpp | $(NSFPLAY_INTDIR)/shared/
+	$(CXX) -M -MM -MF $@ -MT $(NSFPLAY_INTDIR)/shared/$(basenamse $(notdir $<)).o $(CXXFLAGS_ALL) -c $<
 
 $(NSFPLAY_INTDIR)/%.o: %.cpp $(NSFPLAY_INTDIR)/%.d | $(NSFPLAY_INTDIR)/
 	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<
+$(NSFPLAY_INTDIR)/shared/%.o: ../shared/%.cpp $(NSFPLAY_INTDIR)/shared/%.d | $(NSFPLAY_INTDIR)/shared/
+	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<
 
-$(NSFPLAY_INTDIR)/nsfplay_rc.o: nsfplay.rc $(wildcard ../icons/*.ico) | $(NSFPLAY_INTDIR)/
-	windres -i $< -o $@
-
-$(NSFPLAY_INTDIR)/:
-	$(MKDIR) $@
-
-$(dir $(TARGET)):
+$(NSFPLAY_INTDIR)/ $(NSFPLAY_INTDIR)/shared/ $(dir $(TARGET)):
 	$(MKDIR) $@
 
 $(CORE):
@@ -72,15 +64,17 @@ clean:
 	rm -rf $(NSFPLAY_INTDIR)
 	rm -rf $(TARGET)
 
-# mac app build
+# Mac app build
 # intentionally does not depend on $(TARGET) to allow modifying it for fat builds before creating the app
+
+ICON_INTDIR ?= ../$(INTDIR)/icon
 
 mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/MacOS
 	$(MKDIR) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
-	cp ../$(INTDIR)/icon/nsfplay.icns $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
+	cp $(ICON_INTDIR)/nsfplay.icns $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Resources
 	cp $(TARGET) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/MacOS
 	cp Info.plist $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents
 	plutil -insert CFBundleShortVersionString -string $(shell cat ../version.txt) $(TARGET_DIR)/$(NSFPLAY_NAME).app/Contents/Info.plist
@@ -89,4 +83,5 @@ mac: $(ICON_INTDIR)/nsfplay.icns Info.plist ../version.txt
 $(ICON_INTDIR)/nsfplay.icns:
 	make -C ../icons mac
 
--include $(DEPS)
+
+-include $(DEPS) $(SHARED_DEPS)
