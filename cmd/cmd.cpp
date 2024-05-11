@@ -449,7 +449,8 @@ int run()
 
 	// TODO  the rest of this function is test code I am keeping as an example for later menus
 
-	sound_setup(core);
+	sound_setup();
+	sound_start(core);
 	out_printf(sound_debug_text());
 
 	// test of non blocking getc
@@ -471,6 +472,7 @@ int run()
 		}
 	}
 
+	sound_stop();
 	sound_shutdown();
 
 	/*

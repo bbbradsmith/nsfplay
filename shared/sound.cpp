@@ -34,6 +34,7 @@ static double pa_samplerate = 0;
 static std::mutex pa_mutex;
 static void* pa_buffer = NULL;
 static size_t pa_buffer_size = 0; // total size in bytes
+static size_t pa_buffer_allocated = 0; // may be larger than pa_buffer_size due to alignment
 static size_t pa_buffer_play_pos = 0; // start of play position for next callback
 static size_t pa_buffer_play_end = 0; // end of play buffer for next callback (usually same as play_pos, except when the callback is busy copying)
 static size_t pa_buffer_send_pos = 0; // next send position for write
@@ -392,27 +393,8 @@ int64_t sound_play_time(uint32_t* mark_index)
 	return int64_t((pa_samplerate*(pa_time-mark_time))+0.5);
 }
 
-void sound_pause(bool pause)
+bool sound_setup()
 {
-	pa_mutex.lock();
-	pa_pause = pause;
-	pa_mutex.unlock();
-}
-
-bool sound_setup(const NSFCore* core)
-{
-	pa_device = -1;
-	pa_stream_info = {0};
-	pa_sample_size = 0;
-	pa_samplerate = 0.0;
-	pa_latency = 0;
-	pa_pause = false;
-	pa_mark_index = 0;
-	pa_mark_time = 0.0;
-	pa_mark_active = false;
-	pa_mark_active_index = 0;
-	pa_mark_active_pos = 0;
-
 	if (!pa_initialized)
 	{
 		pa_last_error = Pa_Initialize();
@@ -426,14 +408,29 @@ bool sound_setup(const NSFCore* core)
 		for (int i=0; i<sound_device_count(); ++i) sound_device_info(i);
 	#endif
 
-	if (pa_stream)
+	return true;
+}
+
+bool sound_start(const NSFCore* core)
+{
+	pa_device = -1;
+	pa_stream_info = {0};
+	pa_sample_size = 0;
+	pa_samplerate = 0.0;
+	pa_latency = 0;
+	pa_pause = false;
+	pa_mark_index = 0;
+	pa_mark_time = 0.0;
+	pa_mark_active = false;
+	pa_mark_active_index = 0;
+	pa_mark_active_pos = 0;
+
+	// make sure initialized and stopped
+	if (!pa_initialized)
 	{
-		pa_last_error = Pa_StopStream(pa_stream);
-		pa_result_check("Pa_StopStream");
-		pa_last_error = Pa_CloseStream(pa_stream);
-		pa_result_check("Pa_CloseStream");
-		pa_stream = NULL;
+		if (!sound_setup()) return false;
 	}
+	if (pa_stream) sound_stop();
 
 	// reset buffers while stream is stopped
 	pa_buffer_play_pos = 0;
@@ -550,13 +547,14 @@ bool sound_setup(const NSFCore* core)
 	size_t buffer_size = pa_sample_size * size_t((samplerate * PA_BUFFER_MS) / 1000);
 	if (buffer_size < (pa_sample_size * 2 * pa_latency)) // need at least 2 buffers at the requested latency
 		buffer_size = (pa_sample_size * 2 * pa_latency);
-	if (pa_buffer && pa_buffer_size < buffer_size)
+	if (pa_buffer && pa_buffer_allocated < buffer_size)
 	{
 		std::free(pa_buffer);
 		pa_buffer = NULL;
 		pa_buffer_size = 0;
+		pa_buffer_allocated = 0;
 	}
-	if (!pa_buffer || pa_buffer_size < buffer_size)
+	if (!pa_buffer || pa_buffer_allocated < buffer_size)
 	{
 		pa_buffer = std::malloc(buffer_size);
 		if (pa_buffer == NULL)
@@ -570,13 +568,21 @@ bool sound_setup(const NSFCore* core)
 			pa_result_check("std::malloc, playback buffer");
 			return false;
 		}
+		pa_buffer_allocated = buffer_size;
 	}
-	pa_buffer_size = pa_sample_size;
+	pa_buffer_size = buffer_size; // <= pa_buffer_allocated
 
 	return true;
 }
 
-void sound_shutdown()
+void sound_pause(bool pause)
+{
+	pa_mutex.lock();
+	pa_pause = pause;
+	pa_mutex.unlock();
+}
+
+void sound_stop()
 {
 	if (pa_stream)
 	{
@@ -586,12 +592,18 @@ void sound_shutdown()
 		pa_result_check("Pa_CloseStream");
 		pa_stream = NULL;
 	}
+}
+
+void sound_shutdown()
+{
+	sound_stop();
 
 	if (pa_buffer)
 	{
 		std::free(pa_buffer);
 		pa_buffer = NULL;
 		pa_buffer_size = 0;
+		pa_buffer_allocated = 0;
 	}
 
 	if (pa_initialized)
@@ -650,15 +662,24 @@ int64_t sound_play_time(uint32_t* mark_index)
 	return 0;
 }
 
-void sound_pause(bool pause)
+bool sound_start()
 {
-	(void)pause;
+	return false;
 }
 
 bool sound_setup(const NSFCore* core)
 {
 	(void)core;
 	return false;
+}
+
+void sound_pause(bool pause)
+{
+	(void)pause;
+}
+
+void sound_stop()
+{
 }
 
 void sound_shutdown()
