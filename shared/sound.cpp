@@ -676,12 +676,12 @@ int64_t sound_play_time(uint32_t* mark_index)
 	return 0;
 }
 
-bool sound_start()
+bool sound_setup()
 {
 	return false;
 }
 
-bool sound_setup(const NSFCore* core)
+bool sound_start(const NSFCore* core)
 {
 	(void)core;
 	return false;
