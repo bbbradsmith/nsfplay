@@ -292,18 +292,7 @@ uint64_t nsfplay_samples_played(const NSFCore* core)
 	return 0;
 }
 
-uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
-{
-	NSF_MUTEX_GUARD();
-	if (!core) return 0;
-	NSF_UNUSED(core);
-	NSF_UNUSED(samples);
-	NSF_UNUSED(stereo_output);
-	// TODO
-	return 0;
-}
-
-uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output)
+uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int32_t* stereo_output)
 {
 	NSF_MUTEX_GUARD();
 	if (!core) return 0;
@@ -463,6 +452,31 @@ NSFOpcode nsfplay_emu_opcode(uint8 op)
 	NSF_UNUSED(op);
 	// TODO
 	return {0};
+}
+
+uint32_t nsfplay_savestate_size(const NSFCore* core)
+{
+	NSF_MUTEX_GUARD();
+	NSF_UNUSED(core);
+	// TODO
+	return 0;
+}
+
+void nsfplay_savestate_save(const NSFCore* core, uint8_t* state)
+{
+	NSF_MUTEX_GUARD();
+	NSF_UNUSED(core);
+	NSF_UNUSED(state);
+	// TODO
+}
+
+bool nsfplay_savestate_restore(NSFCore* core, const uint8_t* state)
+{
+	NSF_MUTEX_GUARD();
+	NSF_UNUSED(core);
+	NSF_UNUSED(state);
+	// TODO
+	return false;
 }
 
 NSFPropInfo nsfplay_prop_info(const NSFCore* core, int32_t prop)

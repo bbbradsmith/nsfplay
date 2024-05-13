@@ -243,13 +243,12 @@ void nsfplay_seek(NSFCore* core, uint64_t samples);
 uint64_t nsfplay_samples_played(const NSFCore* core); // samples since song_play
 
 // emulate and render sound samples
-// - every two elements of stereo_output alternates left channel, right channel (length must be 2*samples)
+// - internal mixing is done at 32-bits
+// - 4-bit overhead for clipping is intended, clamp at +/-268,435,436 ((1<<28)-1) then shift to desired bit size
+// - every two elements of stereo_output alternates left channel, right channel (stereo_output length must be 2*samples)
 // - stereo_output can be NULL if the output isn't needed
 // - returns number of samples rendered, may be less than samples if song is finished (will zero fill unused output samples)
-uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output);
-// internal mixing is done at 32-bits, this can be delivered if desired
-// - ensure the output volume is low enough to prevent overflow (32-bit render is not able to clip out of range samples)
-uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output);
+uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int32_t* stereo_output);
 
 // manually trigger render buffer allocations if needed
 // call after the desired NSF is loaded and all settings have been made, but before the first render or emu_init/run
@@ -311,6 +310,10 @@ typedef struct
 
 NSFOpcode nsfplay_emu_opcode(uint8_t op);
 
+// savestate
+uint32_t nsfplay_savestate_size(const NSFCore* core); // guaranteed not to change after loading an NSF
+void nsfplay_savestate_save(const NSFCore* core, uint8_t* state);
+bool nsfplay_savestate_restore(NSFCore* core, const uint8_t* state);
 
 // NSF properties
 // - prop parameter should use the NSF_PROP_key enumerations, as the values are subject to change
