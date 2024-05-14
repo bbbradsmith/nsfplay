@@ -17,7 +17,7 @@ CXXFLAGS_ALL = $(CXXFLAGS) $(CXXFLAGS_EXTRA) $(INC_COMMON)
 LDFLAGS_ALL = $(LDFLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_CMD)
 LIBS =
 
-SHARED_SRCS = ../shared/sound.cpp
+SHARED_SRCS = ../shared/sound.cpp ../shared/wav_file.cpp
 SHARED_OBJS = $(addprefix $(CMD_INTDIR)/shared/,$(notdir $(SHARED_SRCS:.cpp=.o)))
 SHARED_DEPS = $(addprefix $(CMD_INTDIR)/shared/,$(notdir $(SHARED_SRCS:.cpp=.d)))
 
@@ -39,9 +39,9 @@ $(TARGET): $(OBJS) $(SHARED_OBJS) $(CORE) | $(dir $(TARGET))
 	$(STRIP_DEBUG)
 
 $(CMD_INTDIR)/%.d: %.cpp | $(CMD_INTDIR)/
-	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(notdir $<).o $(CXXFLAGS_ALL) -c $<
+	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/$(basename $<).o $(CXXFLAGS_ALL) -c $<
 $(CMD_INTDIR)/shared/%.d: ../shared/%.cpp | $(CMD_INTDIR)/shared/
-	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/shared/$(notdir $<).o $(CXXFLAGS_ALL) -c $<
+	$(CXX) -M -MM -MF $@ -MT $(CMD_INTDIR)/shared/$(basename $(notdir $<)).o $(CXXFLAGS_ALL) -c $<
 
 $(CMD_INTDIR)/%.o: %.cpp $(CMD_INTDIR)/%.d | $(CMD_INTDIR)/
 	$(CXX) -o $@ $(CXXFLAGS_ALL) -c $<

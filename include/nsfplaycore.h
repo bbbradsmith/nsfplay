@@ -244,10 +244,11 @@ uint64_t nsfplay_samples_played(const NSFCore* core); // samples since song_play
 
 // emulate and render sound samples
 // - internal mixing is done at 32-bits
-// - 4-bit overhead for clipping is intended, clamp at +/-268,435,436 ((1<<28)-1) then shift to desired bit size
-// - every two elements of stereo_output alternates left channel, right channel (stereo_output length must be 2*samples)
+// - 4-bit overhead for clipping is intended, clamp at +/- (1<<27)-1) if needed, then shift to desired bit size
+// - every two elements of stereo_output alternates left channel, right channel (stereo_output length must be samples*2)
 // - stereo_output can be NULL if the output isn't needed
 // - returns number of samples rendered, may be less than samples if song is finished (will zero fill unused output samples)
+// - see shared/sound_convert.h for conversion examples to various formats
 uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int32_t* stereo_output);
 
 // manually trigger render buffer allocations if needed

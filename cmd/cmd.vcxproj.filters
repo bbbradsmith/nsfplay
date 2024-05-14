@@ -5,10 +5,13 @@
     <ClCompile Include="platform.cpp" />
     <ClCompile Include="unit_test.cpp" />
     <ClCompile Include="..\shared\sound.cpp" />
+    <ClCompile Include="..\shared\wav_file.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\nsfplaycore.h" />
     <ClInclude Include="..\include\nsfplayenums.h" />
     <ClInclude Include="..\shared\sound.h" />
+    <ClInclude Include="..\shared\sound_convert.h" />
+    <ClInclude Include="..\shared\wav_file.h" />
   </ItemGroup>
 </Project>

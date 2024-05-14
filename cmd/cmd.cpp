@@ -13,6 +13,8 @@
 #include <cerrno> // cerrno
 #include <thread> // std::this_thread::sleep_for
 #include "../shared/sound.h"
+#include "../shared/sound_convert.h"
+#include "../shared/wav_file.h"
 
 // platform specific abstractions (platform.cpp)
 void platform_setup(int argc, char** argv);

@@ -176,10 +176,13 @@
     <ClInclude Include="..\include\nsfplayenums.h" />
     <ClInclude Include="..\include\nsfplaygui.h" />
     <ClInclude Include="..\shared\sound.h" />
+    <ClInclude Include="..\shared\sound_convert.h" />
+    <ClInclude Include="..\shared\wav_file.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\shared\sound.cpp" />
+    <ClCompile Include="..\shared\wav_file.cpp" />
     <ClCompile Include="nsfplay.cpp" />
   </ItemGroup>
   <ItemGroup>
