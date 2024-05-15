@@ -292,7 +292,18 @@ uint64_t nsfplay_samples_played(const NSFCore* core)
 	return 0;
 }
 
-uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int32_t* stereo_output)
+uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output)
+{
+	NSF_MUTEX_GUARD();
+	if (!core) return 0;
+	NSF_UNUSED(core);
+	NSF_UNUSED(samples);
+	NSF_UNUSED(stereo_output);
+	// TODO
+	return 0;
+}
+
+uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output)
 {
 	NSF_MUTEX_GUARD();
 	if (!core) return 0;

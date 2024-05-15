@@ -249,7 +249,9 @@ uint64_t nsfplay_samples_played(const NSFCore* core); // samples since song_play
 // - stereo_output can be NULL if the output isn't needed
 // - returns number of samples rendered, may be less than samples if song is finished (will zero fill unused output samples)
 // - see shared/sound_convert.h for conversion examples to various formats
-uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int32_t* stereo_output);
+uint32_t nsfplay_render32(NSFCore* core, uint32_t samples, int32_t* stereo_output);
+// nsfplay_render32 with a conversion to the most common 16-bit stereo format for convenience
+uint32_t nsfplay_render(NSFCore* core, uint32_t samples, int16_t* stereo_output);
 
 // manually trigger render buffer allocations if needed
 // call after the desired NSF is loaded and all settings have been made, but before the first render or emu_init/run
