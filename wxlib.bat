@@ -81,6 +81,7 @@ cmake --install . --prefix .. --config Release           || @goto error
 @if defined WXB_NODEBUG goto :nodebug64
 cmake --build .               --config Debug   --verbose || @goto error
 cmake --install . --prefix .. --config Debug             || @goto error
+copy lib/vc_x64_lib/*.pdb ../lib/vc_x64_lib
 :nodebug64
 @popd
 :no64
@@ -97,6 +98,7 @@ cmake --install . --prefix .. --config Release           || @goto error
 @if defined WXB_NODEBUG goto :nodebug32
 cmake --build .               --config Debug   --verbose || @goto error
 cmake --install . --prefix .. --config Debug             || @goto error
+copy lib/vc_lib/*.pdb ../lib/vc_lib
 :nodebug32
 @popd
 :no32
