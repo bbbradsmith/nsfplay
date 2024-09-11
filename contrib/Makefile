@@ -62,7 +62,8 @@ LIBXGM_CPP_SRCS = \
 	../xgm/player/nsf/nsfconfig.cpp \
 	../xgm/player/nsf/nsfplay.cpp \
 	../xgm/player/nsf/pls/ppls.cpp \
-	../xgm/player/nsf/pls/sstream.cpp
+	../xgm/player/nsf/pls/sstream.cpp \
+	../xgm/fileutil.cpp
 
 LIBXGM_C_SRCS = \
 	../xgm/devices/Sound/legacy/emu2149.c \
@@ -140,6 +141,7 @@ LIBXGM_HEADERS = \
 	../xgm/player/soundData.h \
 	../xgm/utils/tagctrl.h \
 	../xgm/version.h \
+	../xgm/fileutil.h \
 	../xgm/xgm.h \
 	../xgm/xtypes.h
 

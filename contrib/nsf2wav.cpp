@@ -10,8 +10,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sysexits.h>
 #include <string.h>
+
+#if __has_include(<sysexits.h>)
+#  include <sysexits.h>
+#else
+#  define EX_USAGE        64
+#endif // __has_include(<sysexits.h>)
 
 #include <algorithm>
 #include <memory>
