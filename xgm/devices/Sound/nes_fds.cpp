@@ -37,8 +37,8 @@ void NES_FDS::SetStereoMix(int trk, INT16 mixl, INT16 mixr)
 ITrackInfo *NES_FDS::GetTrackInfo(int trk)
 {
     trkinfo.max_volume = 32;
-    trkinfo.volume = last_vol;
-    trkinfo.key = last_vol > 0;
+    trkinfo.volume = vout;
+    trkinfo.key = vout > 0;
     trkinfo._freq = last_freq;
     trkinfo.freq = (double(last_freq) * clock) / (65536.0 * 64.0);
     trkinfo.tone = env_out[EMOD];
@@ -79,7 +79,7 @@ void NES_FDS::Reset ()
     master_io = true;
     master_vol = 0;
     last_freq = 0;
-    last_vol = 0;
+    vout = 0;
 
     rc_accum = 0;
 
@@ -225,21 +225,19 @@ void NES_FDS::Tick (UINT32 clocks)
     }
 
     // output volume caps at 32
-    INT32 vol_out = env_out[EVOL];
-    if (vol_out > 32) vol_out = 32;
+    // store for trackinfo and for later DAC calculation
+    vout = env_out[EVOL];
+    if (vout > 32) vout = 32;
 
     // final output
     if (!wav_write)
-        fout = wave[TWAV][(phase[TWAV]>>16)&0x3F] * vol_out;
+        wout = wave[TWAV][(phase[TWAV]>>16)&0x3F];
 
     // NOTE: during wav_halt, the unit still outputs (at phase 0)
     // and volume can affect it if the first sample is nonzero.
     // haven't worked out 100% of the conditions for volume to
     // effect (vol envelope does not seem to run, but am unsure)
     // but this implementation is very close to correct
-
-    // store for trackinfo
-    last_vol = vol_out;
 }
 
 UINT32 NES_FDS::Render (INT32 b[2])
@@ -247,13 +245,13 @@ UINT32 NES_FDS::Render (INT32 b[2])
     // 8 bit approximation of master volume
     const double MASTER_VOL = 2.4 * 1223.0; // max FDS vol vs max APU square (arbitrarily 1223)
     const double MAX_OUT = 32.0f * 63.0f; // value that should map to master vol
-    const INT32 MASTER[4] = {
-        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 2.0f),
-        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 3.0f),
-        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 4.0f),
-        int((MASTER_VOL / MAX_OUT) * 256.0 * 2.0f / 5.0f) };
+    const double MASTER[4] = {
+        ((MASTER_VOL / MAX_OUT) * 2.0f / 2.0f),
+        ((MASTER_VOL / MAX_OUT) * 2.0f / 3.0f),
+        ((MASTER_VOL / MAX_OUT) * 2.0f / 4.0f),
+        ((MASTER_VOL / MAX_OUT) * 2.0f / 5.0f) };
 
-    INT32 v = fout * MASTER[master_vol] >> 8;
+    INT32 v = INT32((FDS_LUT_norm[wout] * double(63 * vout) * MASTER[master_vol]) + 0.5);
 
     // lowpass RC filter
     INT32 rc_out = ((rc_accum * rc_k) + (v * rc_l)) >> RC_BITS;
