@@ -147,19 +147,18 @@ namespace xgm
 
     if(option[OPT_NONLINEAR_MIXER])
     {
-        INT32 voltage = square_table[out[0] + out[1]];
-        m[0] = out[0] << 6;
-        m[1] = out[1] << 6;
-        INT32 ref = m[0] + m[1];
+        INT32 ref = out[0] + out[1];
         if (ref > 0)
         {
-            m[0] = (m[0] * voltage) / ref;
-            m[1] = (m[1] * voltage) / ref;
+            INT32 voltage = square_table[ref];
+            m[0] = (out[0] * voltage) / ref;
+            m[1] = (out[1] * voltage) / ref;
         }
         else
         {
-            m[0] = voltage;
-            m[1] = voltage;
+            // square_table[0] = 0;
+            m[0] = 0;
+            m[1] = 0;
         }
     }
     else
@@ -170,11 +169,11 @@ namespace xgm
 
     b[0]  = m[0] * sm[0][0];
     b[0] += m[1] * sm[0][1];
-    b[0] >>= 7;
+    b[0] >>= 11;
 
     b[1]  = m[0] * sm[1][0];
     b[1] += m[1] * sm[1][1];
-    b[1] >>= 7;
+    b[1] >>= 11;
 
     return 2;
   }
@@ -190,8 +189,8 @@ namespace xgm
     option[OPT_NEGATE_SWEEP_INIT] = false;
 
     square_table[0] = 0;
-    for(int i=1;i<32;i++) 
-        square_table[i]=(INT32)((8192.0*95.88)/(8128.0/i+100));
+    for(int i=1;i<32;i++)
+        square_table[i]=(INT32)round((16.0*8192.0*95.88)/(8128.0/i+100));
 
     square_linear = square_table[15]; // match linear scale to one full volume square of nonlinear
 
