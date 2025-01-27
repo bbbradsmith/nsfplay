@@ -7,8 +7,6 @@ DYNLIB_EXT=.so
 EXE_EXT=
 INSTALL=install
 
-LIBS_ICONV = -liconv
-
 DESTDIR=
 PREFIX=/usr/local
 LIBDIR=$(DESTDIR)$(PREFIX)/lib
@@ -19,14 +17,16 @@ OBJDIR := .objs
 LIB_STATIC=$(STATIC_PREFIX)nsfplay$(STATIC_EXT)
 LIB_DYNLIB=$(DYNLIB_PREFIX)nsfplay$(DYNLIB_EXT)
 
-CXXFLAGS_DEBUG := -g -O0 -Wall -fPIC -std=c++17
-CFLAGS_DEBUG := -g -O0 -Wall -fPIC
+CFLAGS_WARN := -Wall -Wno-deprecated-declarations
 
-CXXFLAGS_RELEASE := -g0 -O2 -Wall -fPIC -std=c++17 -DNDEBUG
-CFLAGS_RELEASE := -g0 -O2 -Wall -fPIC -DNDEBUG
+CXXFLAGS_DEBUG := -g -O0 $(CFLAGS_WARN) -fPIC -std=c++17
+CFLAGS_DEBUG := -g -O0 $(CFLAGS_WARN) -fPIC
 
-CXXFLAGS_RELEASE_DEBUG := -g -O2 -Wall -fPIC -std=c++17 -DNDEBUG
-CFLAGS_RELEASE_DEBUG := -g -O2 -Wall -fPIC -DNDEBUG
+CXXFLAGS_RELEASE := -g0 -O2 $(CFLAGS_WARN) -fPIC -std=c++17 -DNDEBUG
+CFLAGS_RELEASE := -g0 -O2 $(CFLAGS_WARN) -fPIC -DNDEBUG
+
+CXXFLAGS_RELEASE_DEBUG := -g -O2 $(CFLAGS_WARN) -fPIC -std=c++17 -DNDEBUG
+CFLAGS_RELEASE_DEBUG := -g -O2 $(CFLAGS_WARN) -fPIC -DNDEBUG
 
 ifeq ($(CFLAGS),)
 CFLAGS := $(CFLAGS_DEBUG)
@@ -34,6 +34,11 @@ endif
 
 ifeq ($(CXXFLAGS),)
 CXXFLAGS := $(CXXFLAGS_DEBUG)
+endif
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Darwin)
+	LDFLAGS_EXTRA = -liconv
 endif
 
 LIBXGM_CPP_SRCS = \
@@ -175,7 +180,7 @@ release_debug:
 demo: nsf2wav$(EXE_EXT)
 
 nsfmeta$(EXE_EXT): $(OBJDIR)/nsfmeta.o $(LIB_STATIC)
-	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA) $(LIBS_ICONV)
+	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA)
 
 nsf2wav$(EXE_EXT): $(OBJDIR)/nsf2wav.o $(LIB_STATIC)
 	$(CXX) -o $@ $^ $(LDFLAGS_EXTRA)

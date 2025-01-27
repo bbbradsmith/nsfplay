@@ -16,3 +16,9 @@ extern FILE* fopen_utf8(const char* filename, const char* mode);
 // convert a utf8 filename to wchar_t, returns length
 // use wfile=NULL, wfile_len=0 to query length without writing the conversion to wfile
 #define utf8_file(utf8,wfile,wfile_len) MultiByteToWideChar(CP_UTF8,0,(utf8),-1,(wfile),(wfile_len))
+
+#ifndef _WIN32
+// convert multibyte charset string to utf-8 string using iconv
+// returns number converted characters or -1 on error
+extern int mbs_to_utf8(char* outbuf, size_t outsize, const char* incharset, const char* inbuf, size_t insize);
+#endif
