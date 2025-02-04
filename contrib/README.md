@@ -1,6 +1,7 @@
 # NSFPlay Library
 
 This directory contains a `Makefile` for building an NSFPlay library.
+This is intended to be built on Windows with MSYS2, Linux, or MacOS.
 
 The library is just the core NSF/NSFe/M3U parser/emulator/renderer.
 It does not have routines/methods for creating a GUI, playing audio to
