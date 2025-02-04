@@ -1,0 +1,44 @@
+name: NSFPlay contrib build test
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-msys2:
+    name: Contrib MSYS2
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          install: make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-libiconv
+      - name: Build
+        shell: msys2 {0}
+        run: make -C contrib -j
+
+  build-contrib-ubuntu:
+    name: Contrib Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Build
+        run: make -C contrib -j
+
+  build-contrib-macos:
+    name: Contrib macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+      - name: Build
+        run: make -C contrib -j
