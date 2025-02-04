@@ -30,21 +30,3 @@ jobs:
         with:
           name: nsfplay-unstable--${{ env.BUILD_TAG }}
           path: artifact/
-
-  build-contrib-ubuntu:
-    name: Contrib Ubuntu
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout Files
-        uses: actions/checkout@v4
-      - name: Build
-        run: make -C contrib -j
-
-  build-contrib-macos:
-    name: Contrib macOS
-    runs-on: macos-14
-    steps:
-      - name: Checkout Files
-        uses: actions/checkout@v4
-      - name: Build
-        run: make -C contrib -j

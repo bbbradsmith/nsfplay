@@ -36,9 +36,13 @@ ifeq ($(CXXFLAGS),)
 CXXFLAGS := $(CXXFLAGS_DEBUG)
 endif
 
-UNAME := $(shell uname -s)
-ifeq ($(UNAME),Darwin)
-	LDFLAGS_EXTRA = -liconv
+ifeq ($(OS),Windows_NT)
+	LDFLAGS_EXTRA := -liconv
+else ifeq ($(shell uname),Darwin)
+	LDFLAGS_EXTRA := -liconv
+else
+	# iconv assumed to be part of the standard C library
+	LDFLAGS_EXTRA :=
 endif
 
 LIBXGM_CPP_SRCS = \
