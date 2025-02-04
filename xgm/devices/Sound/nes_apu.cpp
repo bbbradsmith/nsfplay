@@ -190,7 +190,7 @@ namespace xgm
 
     square_table[0] = 0;
     for(int i=1;i<32;i++)
-        square_table[i]=(INT32)round((16.0*8192.0*95.88)/(8128.0/i+100));
+        square_table[i]=(INT32)round(((1<<17)*95.88)/(8128.0/i+100));
 
     square_linear = square_table[15]; // match linear scale to one full volume square of nonlinear
 
